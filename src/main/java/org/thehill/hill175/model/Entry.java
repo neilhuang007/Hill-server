@@ -133,6 +133,16 @@ public final class Entry {
         return true;
     }
 
+    public boolean setCameraPose(int oneBasedIndex, CameraPose pose) {
+        int index = oneBasedIndex - 1;
+        if (index < 0 || index >= cameraPoses.size()) {
+            return false;
+        }
+        cameraPoses.set(index, pose);
+        clearSubmission();
+        return true;
+    }
+
     public boolean removeCameraPose(int oneBasedIndex) {
         int index = oneBasedIndex - 1;
         if (index < 0 || index >= cameraPoses.size()) {

@@ -48,12 +48,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.world.PortalCreateEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Entry;
@@ -69,9 +72,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public final class ServerListener implements Listener {
-    private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "rules");
+    private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
+    private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "rules", "help");
     private static final Set<String> COMPETITION_COMMANDS = Set.of(
-            "hill175", "competition", "entry", "team", "camera", "hub", "rules", "login", "register"
+            "hill175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "help"
     );
     private static final Set<Material> TNT_IGNITERS = Set.of(Material.FLINT_AND_STEEL, Material.FIRE_CHARGE);
 
@@ -109,7 +113,17 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (isNamespacedCommand(event.getMessage())) {
+            event.setCancelled(true);
+            deny(event.getPlayer(), "Use the Hill commands shown in /help.");
+            return;
+        }
         String commandName = commandName(event.getMessage());
+        if (commandName.equals("help")) {
+            event.setCancelled(true);
+            competition.sendHelp(event.getPlayer());
+            return;
+        }
         Set<String> allowed = competition.isAuthenticated(event.getPlayer()) ? COMPETITION_COMMANDS : AUTH_COMMANDS;
         if (!allowed.contains(commandName)) {
             event.setCancelled(true);
@@ -119,15 +133,27 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
-        if (!event.hasChangedBlock() && event.getFrom().getWorld().equals(event.getTo().getWorld())) {
-            return;
-        }
         Player player = event.getPlayer();
         if (!competition.isAuthenticated(player)) {
-            if (!event.getTo().getWorld().equals(worlds.authenticationSpawn().getWorld())
-                    || event.getTo().distanceSquared(worlds.authenticationSpawn()) > 64.0) {
-                event.setTo(worlds.authenticationSpawn());
+            Location locked = worlds.authenticationSpawn();
+            Location to = event.getTo();
+            if (to == null) {
+                event.setTo(locked);
+                return;
             }
+            boolean movedPosition = !to.getWorld().equals(locked.getWorld())
+                    || Math.abs(to.getX() - locked.getX()) > 0.001
+                    || Math.abs(to.getY() - locked.getY()) > 0.001
+                    || Math.abs(to.getZ() - locked.getZ()) > 0.001;
+            if (movedPosition) {
+                Location corrected = locked.clone();
+                corrected.setYaw(to.getYaw());
+                corrected.setPitch(to.getPitch());
+                event.setTo(corrected);
+            }
+            return;
+        }
+        if (!event.hasChangedBlock() && event.getFrom().getWorld().equals(event.getTo().getWorld())) {
             return;
         }
         competition.refreshMovementMode(player, event.getTo());
@@ -147,9 +173,46 @@ public final class ServerListener implements Listener {
                 menus.openMain(player);
                 return;
             }
+            if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_MENU_ITEM_ID)) {
+                event.setCancelled(true);
+                menus.openCurrentEntry(player);
+                return;
+            }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
                 event.setCancelled(true);
-                competition.recordCamera(player);
+                if (event.getAction().isLeftClick()) {
+                    competition.previewNextCamera(player);
+                } else if (competition.mayBuild(player, player.getLocation())) {
+                    competition.recordCamera(player);
+                } else {
+                    competition.previewNextCamera(player);
+                }
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
+                event.setCancelled(true);
+                competition.previewNextCamera(player);
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)) {
+                event.setCancelled(true);
+                competition.resetCurrentEntry(player);
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)) {
+                event.setCancelled(true);
+                competition.currentEntry(player).ifPresentOrElse(entry -> {
+                    if (entry.submitted()) {
+                        competition.unlockEntry(player, entry);
+                    } else {
+                        competition.submitEntry(player, entry);
+                    }
+                }, () -> deny(player, "Open one of your entries first."));
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)) {
+                event.setCancelled(true);
+                competition.teleportHub(player);
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID)) {
@@ -177,9 +240,43 @@ public final class ServerListener implements Listener {
         if (entity.getScoreboardTags().contains("hill175_category_npc")) {
             return;
         }
+        if (entity.getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
+            event.setCancelled(true);
+            competition.previewCameraMarker(event.getPlayer(), entity);
+            return;
+        }
         if (!competition.mayBuild(event.getPlayer(), entity.getLocation())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "Visitor Mode is read-only.");
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
+        ItemStack hotbarItem = event.getHotbarButton() >= 0
+                ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton())
+                : null;
+        if (isProtectedCompetitionItem(event.getCurrentItem())
+                || isProtectedCompetitionItem(event.getCursor())
+                || isProtectedCompetitionItem(hotbarItem)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getNewItems().values().stream().anyMatch(this::isProtectedCompetitionItem)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onSwapHands(PlayerSwapHandItemsEvent event) {
+        if (isProtectedCompetitionItem(event.getMainHandItem()) || isProtectedCompetitionItem(event.getOffHandItem())) {
+            event.setCancelled(true);
         }
     }
 
@@ -357,6 +454,10 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (event.getRightClicked().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
+            event.setCancelled(true);
+            return;
+        }
         if (!competition.mayBuild(event.getPlayer(), event.getRightClicked().getLocation())) {
             event.setCancelled(true);
         }
@@ -430,6 +531,14 @@ public final class ServerListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        if (event.getEntity().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
+            event.setCancelled(true);
+            if (event instanceof EntityDamageByEntityEvent byEntity
+                    && byEntity.getDamager() instanceof Player player) {
+                competition.previewCameraMarker(player, event.getEntity());
+            }
+            return;
+        }
         if (event.getEntity() instanceof EnderCrystal) {
             event.setCancelled(true);
             if (event instanceof EntityDamageByEntityEvent byEntity
@@ -444,11 +553,20 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent event) {
-        if (competition.isCompetitionItem(event.getItemDrop().getItemStack(), CompetitionModule.COMPASS_ITEM_ID)
-                || competition.isCompetitionItem(event.getItemDrop().getItemStack(), CompetitionModule.CAMERA_ITEM_ID)
-                || competition.isCompetitionItem(event.getItemDrop().getItemStack(), CompetitionModule.RULES_ITEM_ID)) {
+        if (isProtectedCompetitionItem(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
+    }
+
+    private boolean isProtectedCompetitionItem(ItemStack item) {
+        return competition.isCompetitionItem(item, CompetitionModule.COMPASS_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.ENTRY_MENU_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID);
     }
 
     private void deny(Player player, String text) {
@@ -470,5 +588,12 @@ public final class ServerListener implements Listener {
             name = name.substring(namespace + 1);
         }
         return name.toLowerCase(Locale.ROOT);
+    }
+
+    private static boolean isNamespacedCommand(String rawCommand) {
+        String stripped = rawCommand.startsWith("/") ? rawCommand.substring(1) : rawCommand;
+        int space = stripped.indexOf(' ');
+        String name = space >= 0 ? stripped.substring(0, space) : stripped;
+        return name.contains(":");
     }
 }

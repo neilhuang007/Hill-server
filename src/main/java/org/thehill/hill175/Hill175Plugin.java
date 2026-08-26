@@ -61,13 +61,14 @@ public final class Hill175Plugin extends JavaPlugin {
         pluginManager.registerEvents(hubNpcs, this);
         pluginManager.registerEvents(serverListener, this);
 
-        for (String commandName : List.of("register", "login", "hill175", "competition", "hub", "rules", "entry", "team", "camera")) {
+        for (String commandName : List.of("register", "login", "hill175", "competition", "hub", "lobby", "help", "rules", "entry", "team", "camera")) {
             var command = Objects.requireNonNull(getCommand(commandName), "Missing command in plugin.yml: " + commandName);
             command.setExecutor(commands);
             command.setTabCompleter(commands);
         }
 
         Bukkit.getScheduler().runTask(this, hubNpcs::spawnCategoryNpcs);
+        Bukkit.getScheduler().runTask(this, competition::rebuildAllCameraMarkers);
         Bukkit.getScheduler().runTaskTimer(this, this::removeForbiddenMobsAndPrimedTnt, 20L, 20L);
         Bukkit.getScheduler().runTaskTimer(this, store::flush, 20L * 300L, 20L * 300L);
 

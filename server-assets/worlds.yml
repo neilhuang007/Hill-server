@@ -1,4 +1,16 @@
 # Third-party archives are downloaded directly from their creators and are not redistributed in this repository.
+authentication:
+  name: Small Medieval Church 1.0.5
+  creators: CoinCoffer and TheHyperboloid
+  project-page: https://www.curseforge.com/minecraft/worlds/small-medieval-church
+  direct-download: https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download
+  filename: Small Medieval Church 1.0.5.zip
+  sha256: de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630
+  archive-root: Small Medieval Church 1.0.5
+  install-world-name: hill_auth
+  permission: All Rights Reserved; temporary smoke-test use pending direct permission from the creator.
+  minecraft-version: 26.2
+
 hub:
   name: Server Spawn/Lobby 1.03
   creator: mikele12327
@@ -12,7 +24,6 @@ hub:
   minecraft-version: 1.21.11 world; Paper upgrades it on first load for Minecraft 26.2.
 
 generated-worlds:
-  authentication: hill_auth
   journey: hill_journey
   place: hill_place
   people-fallback: one private hill_people_<entry> world per People entry

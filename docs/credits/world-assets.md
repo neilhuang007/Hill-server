@@ -1,5 +1,12 @@
 # World asset credits
 
+## Authentication lobby
+
+- **Small Medieval Church 1.0.5** by **CoinCoffer and TheHyperboloid**
+- Project: https://www.curseforge.com/minecraft/worlds/small-medieval-church
+- Temporary smoke-test use only. The project is marked All Rights Reserved; obtain direct permission before a public launch.
+- The 26.2 archive is downloaded during installation and is not redistributed in this repository.
+
 ## Temporary exhibition hub
 
 - **Asset:** `Server Spawn/Lobby` version `1.03`

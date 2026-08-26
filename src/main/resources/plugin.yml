@@ -19,8 +19,12 @@ commands:
     description: Open the Hill 175 competition menu
   hub:
     description: Return to the exhibition hub
+  lobby:
+    description: Return to the exhibition hub
   rules:
     description: Show competition rules
+  help:
+    description: Show Hill 175 competition commands
   entry:
     description: Manage competition entries
   team:

@@ -1,6 +1,7 @@
 package org.thehill.hill175.model;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public record CameraPose(
         String worldName,
@@ -22,5 +23,12 @@ public record CameraPose(
                 location.getYaw(),
                 location.getPitch()
         );
+    }
+
+    public Location toLocation(World world) {
+        if (world == null) {
+            throw new IllegalArgumentException("world is required");
+        }
+        return new Location(world, x, y, z, yaw, pitch);
     }
 }

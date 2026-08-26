@@ -33,7 +33,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             case "register" -> register(player, args);
             case "login" -> login(player, args);
             case "hill175", "competition" -> competitionMenu(player);
-            case "hub" -> hub(player);
+            case "hub", "lobby", "help" -> routedUtility(player, command.getName().toLowerCase(Locale.ROOT), args);
             case "rules" -> rules(player);
             case "entry" -> entry(player, args);
             case "team" -> team(player, args);
@@ -69,7 +69,11 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean hub(Player player) {
+    private boolean routedUtility(Player player, String commandName, String[] args) {
+        if (commandName.equals("help")) {
+            competition.sendHelp(player);
+            return true;
+        }
         if (!competition.isAuthenticated(player)) {
             competition.sendAuthenticationInstructions(player);
             return true;
@@ -92,8 +96,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             menus.openMain(player);
             return true;
         }
-        String subcommand = args[0].toLowerCase(Locale.ROOT);
-        switch (subcommand) {
+        switch (args[0].toLowerCase(Locale.ROOT)) {
             case "create" -> {
                 if (args.length != 2) {
                     player.sendMessage("Usage: /entry create <journey|place|people>");
@@ -139,8 +142,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             }
             case "submit" -> competition.submit(player);
             case "unlock" -> competition.unlock(player);
-            default ->
-                    player.sendMessage("Entry commands: create, home, list, visit, reset, delete, switch, title, description, submit, unlock");
+            default -> player.sendMessage("Entry commands: create, home, list, visit, reset, delete, switch, title, description, submit, unlock");
         }
         return true;
     }
@@ -186,6 +188,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         }
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "list" -> competition.listCameras(player);
+            case "preview" -> competition.previewNextCamera(player);
             case "remove" -> {
                 if (args.length != 2) {
                     player.sendMessage("Usage: /camera remove <1-3>");
@@ -197,7 +200,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                     player.sendMessage("Camera index must be 1, 2, or 3.");
                 }
             }
-            default -> player.sendMessage("Camera commands: save, list, remove <1-3>");
+            default -> player.sendMessage("Camera commands: save, list, preview, remove <1-3>");
         }
         return true;
     }
@@ -216,7 +219,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             return filter(args[0], List.of("invite", "accept", "leave"));
         }
         if (command.getName().equalsIgnoreCase("camera") && args.length == 1) {
-            return filter(args[0], List.of("save", "list", "remove"));
+            return filter(args[0], List.of("save", "list", "preview", "remove"));
         }
         return List.of();
     }

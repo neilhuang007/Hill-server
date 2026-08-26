@@ -10,6 +10,12 @@ authentication:
 
 worlds:
   authentication: hill_auth
+  authentication-spawn:
+    x: 131.5
+    y: 52.1
+    z: 163.5
+    yaw: 0.0
+    pitch: 0.0
   hub: hill_hub
   journey: hill_journey
   place: hill_place
@@ -17,9 +23,13 @@ worlds:
 people:
   # Extract a rights-cleared campus template to this folder before creating People entries.
   template-folder: world-templates/hill_people_template
+  # When no prepared world template exists, stream this structure into the private People world instead.
+  structure-file: structure.nbt
+  structure-import-blocks-per-tick: 12000
+  structure-origin-y: 64
   fallback-seed: 175
-  build-radius: 128
-  world-border-size: 288.0
+  build-radius: 1024
+  world-border-size: 2112.0
 
 build-rules:
   max-non-player-entities-per-entry: 128

@@ -17,6 +17,9 @@ PAPER_SHA256="a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629"
 JAVA_URL="https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_x64_linux_hotspot_25.0.4.1_1.tar.gz"
 JAVA_SHA256="dbb698396d478e7fa2b1e50f4103324b2a99b90569ee27c33f2261f9215cf41e"
 
+AUTH_URL="https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download"
+AUTH_SHA256="de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630"
+
 HUB_URL="https://www.curseforge.com/api/v1/mods/1421699/files/7604500/download"
 HUB_SHA256="58f4ebbb546ad7b911a9ab0a616bd98c71664336b91bbe3c5acc39ece309a2a8"
 
@@ -73,7 +76,46 @@ install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/server-config/spigot.yml" \
   "${RUNTIME_DIR}/spigot.yml"
+install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
+  "${RUNTIME_DIR}/plugins/Hill175"
+install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
+  "${REPO_DIR}/src/main/resources/config.yml" \
+  "${RUNTIME_DIR}/plugins/Hill175/config.yml"
+if [[ -f "${REPO_DIR}/structure.nbt" ]]; then
+  install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
+    "${REPO_DIR}/structure.nbt" \
+    "${RUNTIME_DIR}/structure.nbt"
+fi
 printf 'eula=true\n' > "${RUNTIME_DIR}/eula.txt"
+
+auth_install_marker="${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed"
+if [[ ! -f "${auth_install_marker}" ]]; then
+  # The authentication world is immutable event scenery. Stop Paper before
+  # replacing either its legacy world root or Paper's migrated dimension.
+  systemctl stop hill175.service 2>/dev/null || true
+  rm -rf "${RUNTIME_DIR}/hill_auth" \
+         "${RUNTIME_DIR}/world/dimensions/minecraft/hill_auth"
+
+  auth_archive="${RUNTIME_DIR}/assets/Small-Medieval-Church-1.0.5.zip"
+  curl --fail --location --silent --show-error "${AUTH_URL}" --output "${auth_archive}.tmp"
+  verify_sha256 "${auth_archive}.tmp" "${AUTH_SHA256}"
+  mv "${auth_archive}.tmp" "${auth_archive}"
+
+  auth_extract="$(mktemp -d /tmp/hill175-auth.XXXXXX)"
+  unzip -q "${auth_archive}" -d "${auth_extract}"
+  if [[ ! -f "${auth_extract}/Small Medieval Church 1.0.5/level.dat" ]]; then
+    echo "Authentication archive did not contain the expected Small Medieval Church 1.0.5 world root." >&2
+    exit 1
+  fi
+  rm -rf "${auth_extract}/Small Medieval Church 1.0.5/playerdata" \
+         "${auth_extract}/Small Medieval Church 1.0.5/stats" \
+         "${auth_extract}/Small Medieval Church 1.0.5/advancements"
+  rm -f "${auth_extract}/Small Medieval Church 1.0.5/uid.dat" \
+        "${auth_extract}/Small Medieval Church 1.0.5/session.lock"
+  mv "${auth_extract}/Small Medieval Church 1.0.5" "${RUNTIME_DIR}/hill_auth"
+  rm -rf "${auth_extract}"
+  touch "${auth_install_marker}"
+fi
 
 if [[ ! -d "${RUNTIME_DIR}/hill_hub" && ! -d "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub" ]]; then
   hub_archive="${RUNTIME_DIR}/assets/Server-Spawn-1.03.zip"

@@ -8,6 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
@@ -50,13 +51,19 @@ public final class HubNpcModule implements Listener {
     }
 
     @EventHandler
-    public void onInteract(PlayerInteractEntityEvent event) {
+    public void onInteractAt(PlayerInteractAtEntityEvent event) {
+        event.setCancelled(true);
         handle(event.getPlayer(), event.getRightClicked());
     }
 
     @EventHandler
-    public void onInteractAt(PlayerInteractAtEntityEvent event) {
-        handle(event.getPlayer(), event.getRightClicked());
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player && event.getEntity() instanceof ArmorStand) {
+            if (event.getEntity().getScoreboardTags().contains(NPC_TAG)) {
+                event.setCancelled(true);
+                handle(player, event.getEntity());
+            }
+        }
     }
 
     private void handle(Player player, Entity entity) {
