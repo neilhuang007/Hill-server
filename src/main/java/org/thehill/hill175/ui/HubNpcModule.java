@@ -21,15 +21,22 @@ import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Category;
 import org.thehill.hill175.world.WorldModule;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public final class HubNpcModule implements Listener {
     private static final String NPC_TAG = "hill175_category_npc";
+    private static final Duration INTERACTION_DEBOUNCE = Duration.ofMillis(350);
 
     private final JavaPlugin plugin;
     private final CompetitionModule competition;
     private final MenuModule menus;
     private final WorldModule worlds;
+    private final Map<UUID, RecentInteraction> recentInteractions = new HashMap<>();
 
     public HubNpcModule(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, WorldModule worlds) {
         this.plugin = plugin;
@@ -39,19 +46,40 @@ public final class HubNpcModule implements Listener {
     }
 
     public void spawnCategoryNpcs() {
+        // Persistent stands in an unloaded anchor chunk are not returned by
+        // World#getEntities. Load every configured anchor first so restarts
+        // remove old guides before adding replacements.
+        for (Category category : Category.values()) {
+            worlds.hubNpcLocation(category).getChunk().load();
+        }
         for (Entity entity : worlds.hubWorld().getEntities()) {
             if (entity.getScoreboardTags().contains(NPC_TAG)) {
                 entity.remove();
             }
         }
-        Location center = worlds.hubSpawn();
-        spawn(center.clone().add(-6, 0, -6), Category.JOURNEY, Color.fromRGB(120, 56, 40));
-        spawn(center.clone().add(0, 0, -8), Category.PLACE, Color.fromRGB(58, 93, 166));
-        spawn(center.clone().add(6, 0, -6), Category.PEOPLE, Color.fromRGB(64, 132, 78));
+        spawn(worlds.hubNpcLocation(Category.JOURNEY), Category.JOURNEY, Color.fromRGB(120, 56, 40));
+        spawn(worlds.hubNpcLocation(Category.PLACE), Category.PLACE, Color.fromRGB(58, 93, 166));
+        spawn(worlds.hubNpcLocation(Category.PEOPLE), Category.PEOPLE, Color.fromRGB(64, 132, 78));
+        long npcCount = worlds.hubWorld().getEntitiesByClass(ArmorStand.class).stream()
+                .filter(entity -> entity.getScoreboardTags().contains(NPC_TAG))
+                .count();
+        plugin.getLogger().info("Hill 175 category guides ready: " + npcCount + "/3.");
     }
 
     @EventHandler
     public void onInteractAt(PlayerInteractAtEntityEvent event) {
+        if (!event.getRightClicked().getScoreboardTags().contains(NPC_TAG)) {
+            return;
+        }
+        event.setCancelled(true);
+        handle(event.getPlayer(), event.getRightClicked());
+    }
+
+    @EventHandler
+    public void onInteract(PlayerInteractEntityEvent event) {
+        if (!event.getRightClicked().getScoreboardTags().contains(NPC_TAG)) {
+            return;
+        }
         event.setCancelled(true);
         handle(event.getPlayer(), event.getRightClicked());
     }
@@ -70,6 +98,14 @@ public final class HubNpcModule implements Listener {
         if (!entity.getScoreboardTags().contains(NPC_TAG)) {
             return;
         }
+        Instant now = Instant.now();
+        RecentInteraction recent = recentInteractions.get(player.getUniqueId());
+        if (recent != null
+                && recent.entityId().equals(entity.getUniqueId())
+                && Duration.between(recent.when(), now).compareTo(INTERACTION_DEBOUNCE) < 0) {
+            return;
+        }
+        recentInteractions.put(player.getUniqueId(), new RecentInteraction(entity.getUniqueId(), now));
         for (Category category : Category.values()) {
             if (entity.getScoreboardTags().contains(categoryTag(category))) {
                 if (!competition.isAuthenticated(player)) {
@@ -88,7 +124,9 @@ public final class HubNpcModule implements Listener {
             stand.customName(Component.text(category.displayName(), NamedTextColor.GOLD));
             stand.setCustomNameVisible(true);
             stand.setGravity(false);
-            stand.setInvulnerable(true);
+            // Damage events do not fire for an invulnerable armor stand. The NPC
+            // remains protected because every tagged damage event is cancelled.
+            stand.setInvulnerable(false);
             stand.setPersistent(true);
             stand.setRemoveWhenFarAway(false);
             stand.setArms(true);
@@ -114,5 +152,8 @@ public final class HubNpcModule implements Listener {
 
     private static String categoryTag(Category category) {
         return "hill175_category_" + category.name().toLowerCase(Locale.ROOT);
+    }
+
+    private record RecentInteraction(UUID entityId, Instant when) {
     }
 }

@@ -20,8 +20,9 @@ JAVA_SHA256="dbb698396d478e7fa2b1e50f4103324b2a99b90569ee27c33f2261f9215cf41e"
 AUTH_URL="https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download"
 AUTH_SHA256="de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630"
 
-HUB_URL="https://www.curseforge.com/api/v1/mods/1421699/files/7604500/download"
-HUB_SHA256="58f4ebbb546ad7b911a9ab0a616bd98c71664336b91bbe3c5acc39ece309a2a8"
+HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
+HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
+HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -117,22 +118,62 @@ if [[ ! -f "${auth_install_marker}" ]]; then
   touch "${auth_install_marker}"
 fi
 
-if [[ ! -d "${RUNTIME_DIR}/hill_hub" && ! -d "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub" ]]; then
-  hub_archive="${RUNTIME_DIR}/assets/Server-Spawn-1.03.zip"
-  curl --fail --location --silent --show-error "${HUB_URL}" --output "${hub_archive}.tmp"
-  verify_sha256 "${hub_archive}.tmp" "${HUB_SHA256}"
-  mv "${hub_archive}.tmp" "${hub_archive}"
+hub_install_marker="${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed"
+installed_hub_sha=""
+if [[ -f "${hub_install_marker}" ]]; then
+  installed_hub_sha="$(tr -d '[:space:]' < "${hub_install_marker}")"
+fi
+if [[ "${installed_hub_sha}" != "${HUB_SHA256}" ]]; then
+  hub_archive="${RUNTIME_DIR}/assets/${HUB_ARCHIVE_NAME}"
+  if [[ ! -f "${hub_archive}" ]]; then
+    echo "Missing user-provided hub archive: ${hub_archive}" >&2
+    echo "Package it with scripts/package-user-hub.ps1 and stage it before running this installer." >&2
+    exit 1
+  fi
+  verify_sha256 "${hub_archive}" "${HUB_SHA256}"
 
   hub_extract="$(mktemp -d /tmp/hill175-hub.XXXXXX)"
   unzip -q "${hub_archive}" -d "${hub_extract}"
-  if [[ ! -f "${hub_extract}/1.03/level.dat" ]]; then
-    echo "Hub archive did not contain the expected 1.03 world root." >&2
+  if [[ ! -f "${hub_extract}/${HUB_ARCHIVE_ROOT}/level.dat" ]]; then
+    echo "Hub archive did not contain the expected ${HUB_ARCHIVE_ROOT} world root." >&2
     exit 1
   fi
-  rm -rf "${hub_extract}/1.03/playerdata" "${hub_extract}/1.03/stats" "${hub_extract}/1.03/advancements"
-  rm -f "${hub_extract}/1.03/uid.dat" "${hub_extract}/1.03/session.lock"
-  mv "${hub_extract}/1.03" "${RUNTIME_DIR}/hill_hub"
+  rm -rf "${hub_extract}/${HUB_ARCHIVE_ROOT}/players" \
+         "${hub_extract}/${HUB_ARCHIVE_ROOT}/playerdata" \
+         "${hub_extract}/${HUB_ARCHIVE_ROOT}/stats" \
+         "${hub_extract}/${HUB_ARCHIVE_ROOT}/advancements"
+  rm -f "${hub_extract}/${HUB_ARCHIVE_ROOT}/uid.dat" \
+        "${hub_extract}/${HUB_ARCHIVE_ROOT}/session.lock"
+
+  # Validate the replacement before stopping Paper, then move the previous
+  # world aside so an interrupted deployment remains recoverable.
+  systemctl stop hill175.service 2>/dev/null || true
+  hub_backup="$(mktemp -d "${RUNTIME_DIR}/assets/hub-backup.XXXXXX")"
+  hub_backup_has_world=false
+  if [[ -d "${RUNTIME_DIR}/hill_hub" ]]; then
+    mv "${RUNTIME_DIR}/hill_hub" "${hub_backup}/legacy"
+    hub_backup_has_world=true
+  fi
+  if [[ -d "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub" ]]; then
+    mv "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub" "${hub_backup}/modern"
+    hub_backup_has_world=true
+  fi
+  if ! mv "${hub_extract}/${HUB_ARCHIVE_ROOT}" "${RUNTIME_DIR}/hill_hub"; then
+    [[ -d "${hub_backup}/legacy" ]] && mv "${hub_backup}/legacy" "${RUNTIME_DIR}/hill_hub"
+    if [[ -d "${hub_backup}/modern" ]]; then
+      mkdir -p "${RUNTIME_DIR}/world/dimensions/minecraft"
+      mv "${hub_backup}/modern" "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub"
+    fi
+    echo "Hub replacement failed; the previous world was restored." >&2
+    exit 1
+  fi
   rm -rf "${hub_extract}"
+  printf '%s\n' "${HUB_SHA256}" > "${hub_install_marker}"
+  if [[ "${hub_backup_has_world}" == true ]]; then
+    echo "Previous hub retained for recovery at ${hub_backup}"
+  else
+    rmdir "${hub_backup}"
+  fi
 fi
 
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${RUNTIME_DIR}"

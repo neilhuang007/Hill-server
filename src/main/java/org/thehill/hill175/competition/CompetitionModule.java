@@ -4,6 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.event.ClickEvent;
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,6 +19,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -37,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -72,6 +77,7 @@ public final class CompetitionModule {
     private final Map<UUID, FailureWindow> loginFailures = new HashMap<>();
     private final Map<UUID, Integer> nextPreviewIndexByPlayer = new HashMap<>();
     private final Map<UUID, Integer> nextCameraWriteIndexByPlayer = new HashMap<>();
+    private final Map<UUID, UUID> pendingPeopleEntryByPlayer = new HashMap<>();
 
     public CompetitionModule(
             JavaPlugin plugin,
@@ -95,15 +101,13 @@ public final class CompetitionModule {
         currentEntryByPlayer.remove(player.getUniqueId());
         nextPreviewIndexByPlayer.remove(player.getUniqueId());
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
+        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(false);
         player.setFlying(false);
         player.teleport(worlds.authenticationSpawn());
-        player.showTitle(net.kyori.adventure.title.Title.title(
-                Component.text("Hill 175", NamedTextColor.GOLD, TextDecoration.BOLD),
-                Component.text("Please sign in using your Hill credentials", NamedTextColor.WHITE)
-        ));
+        showAuthenticationTitle(player);
         sendAuthenticationInstructions(player);
     }
 
@@ -115,6 +119,7 @@ public final class CompetitionModule {
         loginFailures.remove(player.getUniqueId());
         nextPreviewIndexByPlayer.remove(player.getUniqueId());
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
+        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
     }
 
     public boolean isAuthenticated(Player player) {
@@ -259,7 +264,7 @@ public final class CompetitionModule {
         message(player, NamedTextColor.WHITE, "Living mobs, portals, explosions, destructive commands, and bypass attempts are blocked.");
         message(player, NamedTextColor.WHITE, "Use the camera item to save or replace up to three submission views. Left-click previews them; right-click saves one.");
         message(player, NamedTextColor.WHITE, "Use /help, the Competition Compass, or the entry hotbar tools instead of remembering long command chains.");
-        message(player, NamedTextColor.GRAY, "Temporary exhibition hub: Server Spawn/Lobby by mikele12327 (used with creator permission).");
+        message(player, NamedTextColor.GRAY, "Main exhibition hub: the Hill 175 project world.");
     }
 
     public void sendHelp(Player player) {
@@ -273,9 +278,12 @@ public final class CompetitionModule {
         message(player, NamedTextColor.WHITE, "/competition or /hill175 - open the main competition menu");
         message(player, NamedTextColor.WHITE, "/help - show these competition commands again");
         message(player, NamedTextColor.WHITE, "/hub or /lobby - return to the exhibition lobby");
-        message(player, NamedTextColor.WHITE, "/entry home or /entry visit - jump to your build or browse entries");
+        message(player, NamedTextColor.WHITE, "/entry create <journey|place|people>, /entry list, /entry home, /entry visit");
+        message(player, NamedTextColor.WHITE, "/entry title <text>, /entry description <text>");
+        message(player, NamedTextColor.WHITE, "/entry reset, /entry delete, /entry switch <journey|place|people>");
+        message(player, NamedTextColor.WHITE, "/entry submit, /entry unlock");
         message(player, NamedTextColor.WHITE, "/team invite <nickname>, /team accept <nickname>, /team leave");
-        message(player, NamedTextColor.WHITE, "/camera, /camera list, /camera remove <1-3>, /camera preview");
+        message(player, NamedTextColor.WHITE, "/camera or /camera save, /camera list, /camera preview, /camera remove <1-3>");
         message(player, NamedTextColor.WHITE, "/rules - review the competition rules");
         message(player, NamedTextColor.GRAY, "Most actions are also available through the compass, entry menus, and hotbar tools.");
     }
@@ -325,30 +333,65 @@ public final class CompetitionModule {
         worlds.ensureEntryWorld(entry);
         if (entry.category() == Category.PEOPLE && !worlds.isPeopleWorldReady(entry.worldName())) {
             currentEntryByPlayer.put(player.getUniqueId(), entry.id());
-            player.teleport(worlds.hubSpawn());
+            pendingPeopleEntryByPlayer.put(player.getUniqueId(), entry.id());
+            if (!player.teleport(worlds.hubSpawn())) {
+                currentEntryByPlayer.remove(player.getUniqueId());
+                pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+                message(player, NamedTextColor.RED, "The lobby teleport was interrupted. Use /hub to try again.");
+                return;
+            }
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
+            player.setFlying(false);
             giveHubItems(player);
             worlds.whenPeopleWorldReady(entry.worldName(), () -> {
-                if (player.isOnline() && isAuthenticated(player)) {
+                UUID playerId = player.getUniqueId();
+                if (shouldCompletePendingPeopleTeleport(
+                        entry.id(),
+                        currentEntryByPlayer.get(playerId),
+                        pendingPeopleEntryByPlayer.get(playerId),
+                        player.isOnline(),
+                        isAuthenticated(player)
+                )) {
+                    pendingPeopleEntryByPlayer.remove(playerId);
                     teleportToEntry(player, entry, visiting);
                 }
             });
             message(player, NamedTextColor.AQUA, "The People world is still loading from structure.nbt. You'll be teleported in automatically when it is ready.");
+            sendHubTip(player);
+            return;
+        }
+        Optional<Location> safeSpawn = worlds.safeEntrySpawn(entry);
+        if (safeSpawn.isEmpty()) {
+            currentEntryByPlayer.remove(player.getUniqueId());
+            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+            message(player, NamedTextColor.RED, "No safe two-block-tall spawn is available inside this entry.");
+            message(player, NamedTextColor.YELLOW, "Open Entry Controls from the lobby to reset the build, or ask staff to clear its spawn area.");
+            return;
+        }
+        if (!player.teleport(safeSpawn.get())) {
+            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+            message(player, NamedTextColor.RED, "The entry teleport was interrupted. Try again from the Competition Compass.");
             return;
         }
         currentEntryByPlayer.put(player.getUniqueId(), entry.id());
-        player.teleport(worlds.entrySpawn(entry));
+        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         refreshCameraMarkers(entry);
+        if (entry.category() == Category.PEOPLE) {
+            message(player, NamedTextColor.AQUA,
+                    "This People build was spawned from the server's structure.nbt school template.");
+        }
         boolean owner = entry.isMember(nicknameKey(player.getName()));
         if (owner && !visiting && !entry.submitted() && !worlds.isResetting(entry.id())) {
             setOwnerMode(player);
             giveEntryOwnerItems(player, entry);
             message(player, NamedTextColor.GREEN, "Owner Mode: you may build inside this entry.");
+            sendOwnerEntryTip(player);
         } else {
             setVisitorMode(player);
             giveEntryVisitorItems(player, entry, owner);
             message(player, NamedTextColor.AQUA, "Visitor Mode: fly and observe; editing is disabled.");
+            sendVisitorEntryTip(player);
         }
     }
 
@@ -356,12 +399,17 @@ public final class CompetitionModule {
         if (!isAuthenticated(player)) {
             return;
         }
+        if (!player.teleport(worlds.hubSpawn())) {
+            message(player, NamedTextColor.RED, "The lobby teleport was interrupted. Use /hub to try again.");
+            return;
+        }
         currentEntryByPlayer.remove(player.getUniqueId());
-        player.teleport(worlds.hubSpawn());
+        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(true);
         player.setFlying(false);
         giveHubItems(player);
+        sendHubTip(player);
     }
 
     public boolean home(Player player) {
@@ -414,6 +462,7 @@ public final class CompetitionModule {
         Optional<Entry> entry = entryAt(location);
         if (entry.isPresent()) {
             currentEntryByPlayer.put(player.getUniqueId(), entry.get().id());
+            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
             if (entry.get().isMember(nicknameKey(player.getName()))
                     && !entry.get().submitted()
                     && !worlds.isResetting(entry.get().id())) {
@@ -427,6 +476,7 @@ public final class CompetitionModule {
         }
         if (location.getWorld() != null && location.getWorld().equals(worlds.hubWorld())) {
             currentEntryByPlayer.remove(player.getUniqueId());
+            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             giveHubItems(player);
@@ -518,6 +568,11 @@ public final class CompetitionModule {
             return;
         }
         CameraPose pose = CameraPose.from(player.getEyeLocation());
+        if (worlds.safeCameraTeleport(entry, pose, player.getEyeHeight()).isEmpty()) {
+            message(player, NamedTextColor.RED,
+                    "That camera position is obstructed, unsafe, or aimed outside your build. Move to a clear position, aim inward, and try again.");
+            return;
+        }
         int slotNumber;
         if (entry.cameraPoses().size() < 3) {
             entry.addCameraPose(pose);
@@ -585,15 +640,20 @@ public final class CompetitionModule {
             nextIndex = 0;
         }
         CameraPose pose = entry.cameraPoses().get(nextIndex);
-        World world = Bukkit.getWorld(pose.worldName());
-        if (world == null) {
-            message(player, NamedTextColor.RED, "That camera world is not loaded.");
+        Optional<Location> target = worlds.safeCameraTeleport(entry, pose, player.getEyeHeight());
+        if (target.isEmpty()) {
+            message(player, NamedTextColor.RED,
+                    "That camera pose is now obstructed or unsafe. Clear the viewpoint or save a replacement pose.");
             return;
         }
-        player.teleport(new Location(world, pose.x(), pose.y(), pose.z(), pose.yaw(), pose.pitch()));
+        if (!player.teleport(target.get())) {
+            message(player, NamedTextColor.RED, "The camera teleport was interrupted. Try the preview again.");
+            return;
+        }
         nextPreviewIndexByPlayer.put(player.getUniqueId(), (nextIndex + 1) % entry.cameraPoses().size());
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
-        message(player, NamedTextColor.AQUA, "Previewing camera " + (nextIndex + 1) + "/" + entry.cameraPoses().size() + ".");
+        message(player, NamedTextColor.AQUA, "Previewing camera " + (nextIndex + 1) + "/" + entry.cameraPoses().size()
+                + ". Tip: /entry home returns to the build; /hub returns to the lobby.");
     }
 
     public void previewCamera(Player player, Entry entry, int oneBasedIndex) {
@@ -606,15 +666,20 @@ public final class CompetitionModule {
             return;
         }
         CameraPose pose = entry.cameraPoses().get(index);
-        World world = Bukkit.getWorld(pose.worldName());
-        if (world == null) {
-            message(player, NamedTextColor.RED, "That camera world is not loaded.");
+        Optional<Location> target = worlds.safeCameraTeleport(entry, pose, player.getEyeHeight());
+        if (target.isEmpty()) {
+            message(player, NamedTextColor.RED,
+                    "That camera pose is now obstructed or unsafe. Clear the viewpoint or save a replacement pose.");
             return;
         }
-        player.teleport(pose.toLocation(world));
+        if (!player.teleport(target.get())) {
+            message(player, NamedTextColor.RED, "The camera teleport was interrupted. Try the preview again.");
+            return;
+        }
         nextPreviewIndexByPlayer.put(player.getUniqueId(), (index + 1) % entry.cameraPoses().size());
         player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 0.7f, 1.2f);
-        message(player, NamedTextColor.AQUA, "Previewing camera " + oneBasedIndex + "/" + entry.cameraPoses().size() + ". Use /lobby or the lobby pearl to return to the hub.");
+        message(player, NamedTextColor.AQUA, "Previewing camera " + oneBasedIndex + "/" + entry.cameraPoses().size()
+                + ". Tip: /entry home returns to the build; /hub returns to the lobby.");
     }
 
     public boolean previewCameraMarker(Player player, Entity entity) {
@@ -626,6 +691,9 @@ public final class CompetitionModule {
             return false;
         }
         Entry entry = current.get();
+        if (!entry.isMember(nicknameKey(player.getName())) && !player.hasPermission("hill175.staff")) {
+            return false;
+        }
         if (!entity.getScoreboardTags().contains(cameraMarkerEntryTag(entry.id()))) {
             return false;
         }
@@ -761,10 +829,7 @@ public final class CompetitionModule {
         player.displayName(Component.text(account.displayName()));
         player.playerListName(Component.text(account.displayName(), NamedTextColor.GOLD));
         teleportHub(player);
-        player.showTitle(net.kyori.adventure.title.Title.title(
-                Component.text("Welcome, " + account.displayName(), NamedTextColor.GOLD),
-                Component.text("Hill 175 Minecraft Competition", NamedTextColor.WHITE)
-        ));
+        showWelcomeTitle(player, account.displayName());
         message(player, NamedTextColor.GREEN, successMessage);
         sendRules(player);
     }
@@ -868,14 +933,15 @@ public final class CompetitionModule {
     }
 
     private void giveHubItems(Player player) {
+        clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Competition Compass",
                 "Open entries, visit builds, or create a project."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
-        player.getInventory().setItem(8, null);
     }
 
     private void giveEntryOwnerItems(Player player, Entry entry) {
+        clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
         player.getInventory().setItem(1, competitionItem(Material.BARRIER, ENTRY_RESET_ITEM_ID, "Reset Entry",
@@ -895,6 +961,7 @@ public final class CompetitionModule {
     }
 
     private void giveEntryVisitorItems(Player player, Entry entry, boolean owner) {
+        clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
         player.getInventory().setItem(3, competitionItem(Material.BLAZE_ROD, CAMERA_ITEM_ID, "Submission Camera",
@@ -914,7 +981,26 @@ public final class CompetitionModule {
         meta.lore(List.of(Component.text(lore, NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)));
         meta.getPersistentDataContainer().set(itemKey, PersistentDataType.STRING, id);
         item.setItemMeta(meta);
+        // Minecraft 26.2 only sends an air-use packet for items with a use
+        // behavior. A no-animation, long-running consumable makes every Hill
+        // tool right-clickable in empty air; ServerListener cancels the use
+        // immediately, before consumption can complete.
+        item.setData(DataComponentTypes.CONSUMABLE, Consumable.consumable()
+                .consumeSeconds(60.0F)
+                .animation(ItemUseAnimation.NONE)
+                .hasConsumeParticles(false));
         return item;
+    }
+
+    private void clearCompetitionItems(Player player) {
+        PlayerInventory inventory = player.getInventory();
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.hasItemMeta()
+                    && item.getItemMeta().getPersistentDataContainer().has(itemKey, PersistentDataType.STRING)) {
+                inventory.setItem(slot, null);
+            }
+        }
     }
 
     private Optional<Entry> requireCurrentOwnedEntry(Player player) {
@@ -1042,14 +1128,45 @@ public final class CompetitionModule {
 
     private void evacuateEntry(Entry entry) {
         for (Player online : Bukkit.getOnlinePlayers()) {
-            if (entry.region().contains(online.getLocation())) {
-                currentEntryByPlayer.remove(online.getUniqueId());
-                online.teleport(worlds.hubSpawn());
-                online.setGameMode(GameMode.ADVENTURE);
-                online.setAllowFlight(true);
-                giveHubItems(online);
+            boolean insideOwnedRegion = entry.region().contains(online.getLocation());
+            boolean insidePrivatePeopleWorld = entry.category() == Category.PEOPLE
+                    && online.getWorld().getName().equals(entry.worldName());
+            if (insideOwnedRegion || insidePrivatePeopleWorld) {
+                teleportHub(online);
             }
         }
+    }
+
+    private void showAuthenticationTitle(Player player) {
+        player.clearTitle();
+        player.showTitle(net.kyori.adventure.title.Title.title(
+                Component.text("Hill 175", NamedTextColor.GOLD, TextDecoration.BOLD),
+                Component.text("Please sign in using your Hill credentials", NamedTextColor.WHITE)
+        ));
+    }
+
+    private void showWelcomeTitle(Player player, String displayName) {
+        // Clearing first guarantees clients replay the welcome even when the same account reconnects.
+        player.clearTitle();
+        player.showTitle(net.kyori.adventure.title.Title.title(
+                Component.text("Welcome, " + displayName, NamedTextColor.GOLD),
+                Component.text("Hill 175 Minecraft Competition", NamedTextColor.WHITE)
+        ));
+    }
+
+    private void sendHubTip(Player player) {
+        message(player, NamedTextColor.GRAY,
+                "Tip: right-click the Compass or a category guide to choose an entry; /entry home returns to your build.");
+    }
+
+    private void sendOwnerEntryTip(Player player) {
+        message(player, NamedTextColor.GRAY,
+                "Tip: /hub returns to the lobby. Your hotbar has Reset, Lock, Camera, and Entry Controls; commands include /entry reset and /camera.");
+    }
+
+    private void sendVisitorEntryTip(Player player) {
+        message(player, NamedTextColor.GRAY,
+                "Tip: /hub returns to the lobby; use the Compass or Entry Controls to choose another build.");
     }
 
     private void refreshCameraMarkers(Entry entry) {
@@ -1085,6 +1202,13 @@ public final class CompetitionModule {
                 if (equipment != null) {
                     equipment.setHelmet(new ItemStack(Material.BLAZE_ROD));
                 }
+                for (Player viewer : world.getPlayers()) {
+                    if (entry.isMember(nicknameKey(viewer.getName())) || viewer.hasPermission("hill175.staff")) {
+                        viewer.showEntity(plugin, stand);
+                    } else {
+                        viewer.hideEntity(plugin, stand);
+                    }
+                }
             });
         }
     }
@@ -1113,6 +1237,19 @@ public final class CompetitionModule {
             return 1;
         }
         return next;
+    }
+
+    static boolean shouldCompletePendingPeopleTeleport(
+            UUID expectedEntry,
+            UUID currentEntry,
+            UUID pendingEntry,
+            boolean online,
+            boolean authenticated
+    ) {
+        return online
+                && authenticated
+                && Objects.equals(expectedEntry, currentEntry)
+                && Objects.equals(expectedEntry, pendingEntry);
     }
 
     private static void message(Player player, NamedTextColor color, String text) {

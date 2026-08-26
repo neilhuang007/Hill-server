@@ -10,7 +10,7 @@ Run against Minecraft Java Edition 26.2.
 4. Run `/register <currentNickname> TestPassword123! TestPassword123!`.
 5. Confirm a temporary browser link appears.
 6. Confirm the development identity adapter approves after approximately one second.
-7. Confirm teleport to the exhibition hub and receipt of Compass, Camera, and Rules items.
+7. Confirm teleport to the exhibition hub and receipt of the Competition Compass and Rules book.
 8. Disconnect and reconnect with the same nickname.
 9. Confirm building/chat are blocked until authentication.
 10. Confirm `/login WrongPassword` fails.
@@ -58,11 +58,11 @@ Run against Minecraft Java Edition 26.2.
 ## Camera and submission
 
 1. Hold the Camera and right-click at three positions inside the owned entry.
-2. Confirm the fourth pose is rejected.
+2. Confirm the fourth right-click replaces camera 1 and continues rotating through the three saved slots.
 3. Run `/camera list`, then `/camera remove 2` and save a replacement.
 4. Run `/entry title <title>`.
 5. Run `/entry description <description>`.
-6. Run `/entry submit`.
+6. Run `/entry submit`, confirm the lock checklist appears, then choose Confirm Lock.
 7. Confirm the entry changes to read-only Spectator Mode for both team members.
 8. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
 9. Run `/entry unlock`; confirm Creative Mode/building returns.
@@ -73,4 +73,6 @@ Run against Minecraft Java Edition 26.2.
 2. Start it again.
 3. Login with the same nickname/password.
 4. Confirm both entries, team members, title, description, camera poses, submission state, plots, and private People worlds persist.
-5. Confirm the downloaded hub and category NPCs load without duplicates.
+5. Confirm the checksum-pinned Hill exhibition hub and category NPCs load without duplicates.
+6. Confirm `/hub` arrives safely at `70.5, 66.1, 42.5`, facing south toward the category personnel.
+7. Confirm Journey, Place, and People personnel stand at the block-centred anchors `70.5,67,70.5`, `70.5,75,70.5`, and `70.5,61,70.5`, respectively, and face the arrival point.

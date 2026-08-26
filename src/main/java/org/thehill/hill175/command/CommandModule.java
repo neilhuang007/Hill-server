@@ -114,8 +114,18 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             }
             case "list" -> menus.openMain(player);
             case "visit" -> menus.openVisits(player, 0);
-            case "reset" -> competition.resetCurrentEntry(player);
-            case "delete" -> competition.deleteCurrentEntry(player);
+            case "reset" -> competition.currentEntry(player)
+                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .ifPresentOrElse(
+                            entry -> menus.openResetConfirmation(player, entry),
+                            () -> player.sendMessage("Open one of your entries first.")
+                    );
+            case "delete" -> competition.currentEntry(player)
+                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .ifPresentOrElse(
+                            entry -> menus.openDeleteConfirmation(player, entry),
+                            () -> player.sendMessage("Open one of your entries first.")
+                    );
             case "switch" -> {
                 if (args.length != 2) {
                     player.sendMessage("Usage: /entry switch <journey|place|people>");
@@ -140,7 +150,12 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                 }
                 competition.setDescription(player, joinFrom(args, 1));
             }
-            case "submit" -> competition.submit(player);
+            case "submit" -> competition.currentEntry(player)
+                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .ifPresentOrElse(
+                            entry -> menus.openSubmitConfirmation(player, entry),
+                            () -> player.sendMessage("Open one of your entries first.")
+                    );
             case "unlock" -> competition.unlock(player);
             default -> player.sendMessage("Entry commands: create, home, list, visit, reset, delete, switch, title, description, submit, unlock");
         }

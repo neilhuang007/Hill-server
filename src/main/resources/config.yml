@@ -17,6 +17,33 @@ worlds:
     yaw: 0.0
     pitch: 0.0
   hub: hill_hub
+  hub-spawn:
+    # Block-centred arrival point supplied with the Hill-owned exhibition map.
+    # Yaw 0 faces south toward the three category personnel at z=70.
+    x: 70.5
+    y: 66.1
+    z: 42.5
+    yaw: 0.0
+    pitch: 0.0
+  hub-npcs:
+    journey:
+      x: 70.5
+      y: 67.0
+      z: 70.5
+      yaw: 180.0
+      pitch: 0.0
+    place:
+      x: 70.5
+      y: 75.0
+      z: 70.5
+      yaw: 180.0
+      pitch: 0.0
+    people:
+      x: 70.5
+      y: 61.0
+      z: 70.5
+      yaw: 180.0
+      pitch: 0.0
   journey: hill_journey
   place: hill_place
 

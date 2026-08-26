@@ -2,6 +2,8 @@
 
 Verified: 2026-08-26. Scope: downloadable Minecraft Java world/schematic/data-pack assets that can lawfully be used as a private Hill 175 competition server hub or category template. Exclusions: Google/Voxel Earth-derived geometry, pirated/reposted packs, Bedrock-only `.mcworld` assets, assets with no visible permission for server use, and assets whose source page could not be traced to the creator/platform listing.
 
+> **Current implementation note (2026-08-26):** The project owner subsequently supplied a Hill-owned Minecraft 26.2 save for the main exhibition hub. That local asset supersedes the temporary downloadable hub recommendation below. It is sanitized and packaged by `scripts/package-user-hub.ps1`, kept outside Git, and checksum-pinned in `server-assets/worlds.yml`.
+
 ## Recommendation
 
 1. **Use `Server Spawn/Lobby` by `mikele12327` as the temporary polished hub/spawn candidate.**

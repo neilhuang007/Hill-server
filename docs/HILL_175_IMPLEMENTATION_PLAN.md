@@ -63,7 +63,7 @@ receive Hill launcher package
 -> Pending Registration becomes Account Link
 -> plugin marks Minecraft session authenticated
 -> plugin teleports player to Exhibition Hub
--> plugin gives Competition Compass + Camera Item + Rules item
+-> plugin gives Competition Compass + Rules item in the hub; entry hotbars add Camera and Return to Hub tools
 -> player opens Competition Compass or interacts with category NPC
 -> player creates or opens Entry
 -> optional second Participant is invited
@@ -734,6 +734,8 @@ Recommended dimensions:
 
 #### Primary recommendation: original Hill hub
 
+Implementation status (2026-08-26): the project owner supplied the Minecraft 26.2 world now used as the main exhibition hub. Deployment sanitizes session/player/entity data, pins the external archive checksum, and uses the supplied safe spawn and category-personnel anchors recorded in `server-assets/worlds.yml`.
+
 ```text
 collect Hill logo/ram/anniversary references
 -> convert references into approved block palette
@@ -801,7 +803,7 @@ Avoid:
 
 | Candidate | Intended use | Decision rule |
 |---|---|---|
-| Original Hill 175 exhibition hall | production hub | primary recommendation; build around original ram sculpture |
+| Owner-supplied Hill 175 exhibition world | production hub | selected; package outside Git, checksum-pin, and preserve the supplied spawn/personnel anchors |
 | [Arnis](https://github.com/louis-e/arnis) | rights-cleared OSM/elevation campus reference | use as rough terrain/footprint reference; preserve OSM attribution |
 | PlotSquared-generated worlds | Journey/Place production base | use generated protected plots rather than a downloaded static plot map |
 | [Server Spawn/Lobby by mikele12327](https://www.curseforge.com/minecraft/worlds/server-spawn-lobby) | authentication-lobby prototype | inspect exact file/license/version; do not redistribute without permission |
@@ -1096,6 +1098,8 @@ Recommended authenticated hotbar:
 | 7 | Rules Book | category and server rules |
 | 8 | Return to Hub | safe hub teleport |
 | 9 | Report/Help | support and moderation report |
+
+Current smoke implementation uses context-specific kits: the hub reserves slots 1 and 8 for the Compass and Rules Book; owned entries reserve slots 1-4 and 8-9 for Return, Reset, Lock, Camera, Rules, and Entry Controls. Visitor entries keep Return, Camera Preview, Rules, and navigation. This keeps the Camera actionable only while an Entry is active.
 
 Do not force items into student inventory while actively building if it harms Creative use. Alternative:
 
@@ -1719,6 +1723,8 @@ Validation:
 - People pose must remain inside world border;
 - Journey/Place external perimeter allowance is configurable;
 - no more than three active slots.
+
+Smoke implementation enforces the primary-subject rule by requiring a point six blocks along the saved view ray to remain inside the owned Build Space. It also revalidates the player body, eye block, Entry bounds, and world border before every preview, so later building changes cannot turn an old pose into an unsafe teleport.
 
 ### 13.3 Marker behavior
 

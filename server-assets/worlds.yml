@@ -12,16 +12,24 @@ authentication:
   minecraft-version: 26.2
 
 hub:
-  name: Server Spawn/Lobby 1.03
-  creator: mikele12327
-  project-page: https://www.curseforge.com/minecraft/worlds/server-spawn-lobby
-  direct-download: https://www.curseforge.com/api/v1/mods/1421699/files/7604500/download
-  filename: Server Spawn 1.03.zip
-  sha256: 58f4ebbb546ad7b911a9ab0a616bd98c71664336b91bbe3c5acc39ece309a2a8
-  archive-root: 1.03
+  name: Hill 175 Exhibition Hub 2026-08-26
+  creator: Hill project owner
+  source-save: C:/Users/neil_/AppData/Roaming/ModrinthApp/profiles/Fabric 26.2/saves/New World
+  filename: Hill175-Exhibition-Hub-2026-08-26.zip
+  sha256: d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de
+  archive-root: Hill175 Exhibition Hub 2026-08-26
   install-world-name: hill_hub
-  permission: Creator states the map is free for personal and general use; do not reupload it as your own.
-  minecraft-version: 1.21.11 world; Paper upgrades it on first load for Minecraft 26.2.
+  permission: User-provided project asset; no third-party redistribution dependency.
+  minecraft-version: 26.2 (DataVersion 4903)
+  source-size-bytes: 17686682
+  sanitized-archive-size-bytes: 1544267
+  sanitized-content: source entities, session locks, UIDs, player data, statistics, and advancements are excluded
+  packaging-script: scripts/package-user-hub.ps1
+  spawn: [70.5, 66.1, 42.5, 0.0, 0.0]
+  category-personnel:
+    journey: [70.5, 67.0, 70.5, 180.0, 0.0]
+    place: [70.5, 75.0, 70.5, 180.0, 0.0]
+    people: [70.5, 61.0, 70.5, 180.0, 0.0]
 
 generated-worlds:
   journey: hill_journey

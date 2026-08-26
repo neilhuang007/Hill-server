@@ -159,7 +159,7 @@ public final class ServerListener implements Listener {
         competition.refreshMovementMode(player, event.getTo());
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
         if (!competition.isAuthenticated(player)) {
@@ -196,7 +196,13 @@ public final class ServerListener implements Listener {
             }
             if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)) {
                 event.setCancelled(true);
-                competition.resetCurrentEntry(player);
+                competition.currentEntry(player).ifPresentOrElse(entry -> {
+                    if (entry.isMember(competition.nicknameKey(player.getName()))) {
+                        menus.openResetConfirmation(player, entry);
+                    } else {
+                        deny(player, "Open one of your entries first.");
+                    }
+                }, () -> deny(player, "Open one of your entries first."));
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)) {
@@ -204,8 +210,10 @@ public final class ServerListener implements Listener {
                 competition.currentEntry(player).ifPresentOrElse(entry -> {
                     if (entry.submitted()) {
                         competition.unlockEntry(player, entry);
+                    } else if (entry.isMember(competition.nicknameKey(player.getName()))) {
+                        menus.openSubmitConfirmation(player, entry);
                     } else {
-                        competition.submitEntry(player, entry);
+                        deny(player, "Open one of your entries first.");
                     }
                 }, () -> deny(player, "Open one of your entries first."));
                 return;

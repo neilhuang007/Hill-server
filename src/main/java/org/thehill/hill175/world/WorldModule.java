@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.thehill.hill175.model.BuildRegion;
+import org.thehill.hill175.model.CameraPose;
 import org.thehill.hill175.model.Category;
 import org.thehill.hill175.model.Entry;
 
@@ -24,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -75,6 +77,10 @@ public final class WorldModule {
         if (isNearlyEmpty(hubWorld)) {
             buildFallbackHub();
         }
+        Location configuredHubSpawn = configuredSpawn(hubWorld, "worlds.hub-spawn");
+        if (configuredHubSpawn != null) {
+            hubWorld.setSpawnLocation(configuredHubSpawn);
+        }
         resolvePeopleStructureMetadata();
         beginPeopleTemplatePreparation();
     }
@@ -120,6 +126,24 @@ public final class WorldModule {
         return hubWorld;
     }
 
+    public Location hubNpcLocation(Category category) {
+        String categoryPath = switch (category) {
+            case JOURNEY -> "journey";
+            case PLACE -> "place";
+            case PEOPLE -> "people";
+        };
+        Location configured = configuredSpawn(hubWorld, "worlds.hub-npcs." + categoryPath);
+        if (configured != null) {
+            return configured;
+        }
+        Location center = hubSpawn();
+        return switch (category) {
+            case JOURNEY -> center.clone().add(-6, 0, -6);
+            case PLACE -> center.clone().add(0, 0, -8);
+            case PEOPLE -> center.clone().add(6, 0, -6);
+        };
+    }
+
     public Allocation allocate(Category category, int allocationIndex, UUID entryId) {
         return switch (category) {
             case JOURNEY -> allocatePlot(journeyWorld, category, allocationIndex, 96);
@@ -155,6 +179,92 @@ public final class WorldModule {
         }
         int y = entry.category() == Category.PLACE ? BUILD_BASE_Y + 2 : BUILD_BASE_Y + 3;
         return new Location(world, entry.region().centerX() + 0.5, y, entry.region().centerZ() + 0.5, 0.0f, 0.0f);
+    }
+
+    /**
+     * Resolves a safe, two-block-tall standing position near the normal entry spawn. The search is
+     * intentionally constrained to the entry region so a safety fallback can never grant access to
+     * a neighboring plot.
+     */
+    public Optional<Location> safeEntrySpawn(Entry entry) {
+        Location preferred = entrySpawn(entry);
+        World world = Bukkit.getWorld(entry.worldName());
+        if (world == null || preferred.getWorld() == null || !entry.worldName().equals(preferred.getWorld().getName())) {
+            return Optional.empty();
+        }
+        return SafeSpawnFinder.find(
+                entry.region(),
+                preferred.getBlockX(),
+                preferred.getBlockY(),
+                preferred.getBlockZ(),
+                new SafeSpawnFinder.CellSafety() {
+                    @Override
+                    public boolean canOccupy(int x, int y, int z) {
+                        Block block = world.getBlockAt(x, y, z);
+                        Material material = block.getType();
+                        return block.isPassable() && !block.isLiquid() && !isUnsafeBodyMaterial(material);
+                    }
+
+                    @Override
+                    public boolean canStandOn(int x, int y, int z) {
+                        Block block = world.getBlockAt(x, y, z);
+                        Material material = block.getType();
+                        return material.isSolid() && !block.isPassable() && !isUnsafeFloorMaterial(material);
+                    }
+                }
+        ).map(spawn -> new Location(
+                world,
+                spawn.x() + 0.5,
+                spawn.y() + 0.05,
+                spawn.z() + 0.5,
+                preferred.getYaw(),
+                preferred.getPitch()
+        ));
+    }
+
+    /**
+     * Resolves the safe feet position that reproduces a saved eye-level camera pose without
+     * teleporting the player's body into a block, dangerous fluid, another world, or outside the
+     * entry/world border.
+     */
+    public Optional<Location> safeCameraTeleport(Entry entry, CameraPose pose, double eyeHeight) {
+        World world = Bukkit.getWorld(pose.worldName());
+        if (world == null || !entry.worldName().equals(pose.worldName())) {
+            return Optional.empty();
+        }
+        return CameraPoseResolver.resolve(
+                entry.region(),
+                pose,
+                eyeHeight,
+                (x, y, z) -> world.getWorldBorder().isInside(new Location(world, x, y, z)),
+                (x, y, z) -> {
+                    Block block = world.getBlockAt(x, y, z);
+                    return block.isPassable() && !block.isLiquid() && !isUnsafeBodyMaterial(block.getType());
+                }
+        ).map(resolved -> new Location(
+                world,
+                resolved.x(),
+                resolved.feetY(),
+                resolved.z(),
+                resolved.yaw(),
+                resolved.pitch()
+        ));
+    }
+
+    private static boolean isUnsafeBodyMaterial(Material material) {
+        return switch (material) {
+            case FIRE, SOUL_FIRE, WATER, LAVA, POWDER_SNOW, SWEET_BERRY_BUSH, WITHER_ROSE, NETHER_PORTAL,
+                    END_PORTAL -> true;
+            default -> false;
+        };
+    }
+
+    private static boolean isUnsafeFloorMaterial(Material material) {
+        return switch (material) {
+            case FIRE, SOUL_FIRE, WATER, LAVA, POWDER_SNOW, MAGMA_BLOCK, CACTUS, CAMPFIRE, SOUL_CAMPFIRE,
+                    SWEET_BERRY_BUSH, WITHER_ROSE, POINTED_DRIPSTONE, NETHER_PORTAL, END_PORTAL -> true;
+            default -> false;
+        };
     }
 
     public boolean isResetting(UUID entryId) {
