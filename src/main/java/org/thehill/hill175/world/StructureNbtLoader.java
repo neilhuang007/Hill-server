@@ -94,9 +94,12 @@ final class StructureNbtLoader implements Closeable {
         return remainingBlocks <= 0;
     }
 
-    int importNextBlocks(int maxBlocks) throws IOException {
+    int importNextBlocks(int maxBlocks, long maxNanos) throws IOException {
         int imported = 0;
-        while (imported < maxBlocks && remainingBlocks > 0) {
+        long deadline = System.nanoTime() + Math.max(1L, maxNanos);
+        while (imported < maxBlocks
+                && remainingBlocks > 0
+                && (imported == 0 || System.nanoTime() < deadline)) {
             importSingleBlock();
             remainingBlocks--;
             imported++;

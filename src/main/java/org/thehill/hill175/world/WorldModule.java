@@ -493,11 +493,14 @@ public final class WorldModule {
                     "people.structure-import-blocks-per-tick",
                     plugin.getConfig().getInt("people.import-blocks-per-tick", 12_000)
             ));
+            long maxNanosPerTick = Math.max(1L,
+                    plugin.getConfig().getLong("people.structure-import-max-millis-per-tick", 10L)) * 1_000_000L;
             new PeopleStructureImportTask(
                     buildWorld,
                     metadata,
                     region,
                     blocksPerTick,
+                    maxNanosPerTick,
                     loadedMetadata -> finalizePeopleTemplate(buildWorld, loadedMetadata, templateFolder),
                     () -> {
                         peopleTemplatePreparing = false;
@@ -818,18 +821,21 @@ public final class WorldModule {
         private final World world;
         private final StructureNbtLoader loader;
         private final int blocksPerTick;
+        private final long maxNanosPerTick;
 
         private PeopleStructureImportTask(
                 World world,
                 StructureNbtLoader.Metadata metadata,
                 BuildRegion region,
                 int blocksPerTick,
+                long maxNanosPerTick,
                 ImportSuccess onSuccess,
                 Runnable onFailure
         ) throws IOException {
             this.world = world;
             this.loader = StructureNbtLoader.open(metadata.source(), world, region.minX(), region.minY(), region.minZ());
             this.blocksPerTick = blocksPerTick;
+            this.maxNanosPerTick = maxNanosPerTick;
             this.onSuccess = onSuccess;
             this.onFailure = onFailure;
         }
@@ -837,7 +843,7 @@ public final class WorldModule {
         @Override
         public void run() {
             try {
-                loader.importNextBlocks(blocksPerTick);
+                loader.importNextBlocks(blocksPerTick, maxNanosPerTick);
                 if (!loader.isFinished()) {
                     return;
                 }

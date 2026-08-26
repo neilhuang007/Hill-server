@@ -26,6 +26,8 @@ people:
   # When no prepared world template exists, stream this structure into the private People world instead.
   structure-file: structure.nbt
   structure-import-blocks-per-tick: 12000
+  # Hard main-thread time budget so registration and UI ticks stay responsive during template warm-up.
+  structure-import-max-millis-per-tick: 10
   structure-origin-y: 64
   fallback-seed: 175
   build-radius: 1024
