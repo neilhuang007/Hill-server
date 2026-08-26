@@ -91,7 +91,7 @@ if [[ ! -d "${RUNTIME_DIR}/hill_hub" && ! -d "${RUNTIME_DIR}/world/dimensions/mi
   rm -rf "${hub_extract}/1.03/playerdata" "${hub_extract}/1.03/stats" "${hub_extract}/1.03/advancements"
   rm -f "${hub_extract}/1.03/uid.dat" "${hub_extract}/1.03/session.lock"
   mv "${hub_extract}/1.03" "${RUNTIME_DIR}/hill_hub"
-  rmdir "${hub_extract}"
+  rm -rf "${hub_extract}"
 fi
 
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${RUNTIME_DIR}"
