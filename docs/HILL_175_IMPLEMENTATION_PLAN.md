@@ -1101,6 +1101,8 @@ Recommended authenticated hotbar:
 
 Current smoke implementation uses context-specific kits: the hub reserves slots 1 and 8 for the Compass and Rules Book; owned entries reserve slots 1-4 and 8-9 for Return, Reset, Lock, Camera, Rules, and Entry Controls. Visitor entries keep Return, Camera Preview, Rules, and navigation. This keeps the Camera actionable only while an Entry is active.
 
+Context kits are applied only when the player changes between hub, owner, and visitor modes. Ordinary movement never clears or recreates the hotbar.
+
 Do not force items into student inventory while actively building if it harms Creative use. Alternative:
 
 ```text

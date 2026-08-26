@@ -168,6 +168,23 @@ public final class WorldModule {
         }
     }
 
+    /** Updates older People entries to the current structure/world-height build bounds. */
+    public boolean synchronizePeopleRegion(Entry entry) {
+        if (entry.category() != Category.PEOPLE) {
+            return false;
+        }
+        World world = Bukkit.getWorld(entry.worldName());
+        if (world == null) {
+            return false;
+        }
+        BuildRegion expected = peopleRegion(entry.worldName(), world);
+        if (expected.equals(entry.region())) {
+            return false;
+        }
+        entry.region(expected);
+        return true;
+    }
+
     public Location entrySpawn(Entry entry) {
         ensureEntryWorld(entry);
         World world = Bukkit.getWorld(entry.worldName());
@@ -478,7 +495,7 @@ public final class WorldModule {
                     minY,
                     minZ,
                     minX + metadata.sizeX() - 1,
-                    Math.min(world.getMaxHeight() - 1, minY + metadata.sizeY() - 1),
+                    world.getMaxHeight() - 1,
                     minZ + metadata.sizeZ() - 1
             );
         }

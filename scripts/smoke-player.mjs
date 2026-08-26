@@ -550,6 +550,43 @@ async function cameraViewScenario() {
   console.log("PASS: camera preview preserved the saved full-screen viewpoint and safe feet position");
 }
 
+async function movementKitStabilityScenario() {
+  await delay(500);
+  let hotbarMutations = 0;
+  const onSetSlot = (packet) => {
+    const slot = packet.slot ?? packet.slotId;
+    if (Number.isInteger(slot) && slot >= 36 && slot <= 44) hotbarMutations++;
+  };
+  const onWindowItems = () => {
+    hotbarMutations++;
+  };
+  bot._client.on("set_slot", onSetSlot);
+  bot._client.on("window_items", onWindowItems);
+  try {
+    bot.physicsEnabled = false;
+    const start = bot.entity.position.clone();
+    for (let step = 1; step <= 8; step++) {
+      const x = start.x + step * 0.4;
+      bot.entity.position.set(x, start.y, start.z);
+      bot._client.write("position", {
+        x,
+        y: start.y,
+        z: start.z,
+        flags: { onGround: true, hasHorizontalCollision: false },
+      });
+      await delay(100);
+    }
+    await delay(750);
+  } finally {
+    bot._client.removeListener("set_slot", onSetSlot);
+    bot._client.removeListener("window_items", onWindowItems);
+  }
+  if (hotbarMutations !== 0) {
+    throw new Error(`Walking across the hub refreshed the inventory ${hotbarMutations} times`);
+  }
+  console.log("PASS: normal hub movement did not clear or refresh the Hill hotbar");
+}
+
 async function peopleImportScenario() {
   bot.chat("/entry create people");
   await waitFor(
@@ -630,6 +667,9 @@ try {
       break;
     case "camera-view":
       await cameraViewScenario();
+      break;
+    case "movement-kit-stability":
+      await movementKitStabilityScenario();
       break;
     case "people-import":
       await peopleImportScenario();

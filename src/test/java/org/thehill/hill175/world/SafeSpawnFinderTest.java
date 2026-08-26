@@ -56,6 +56,17 @@ final class SafeSpawnFinderTest {
         assertTrue(result.isEmpty());
     }
 
+    @Test
+    void canSpawnAboveTheRoofOfATallImportedStructure() {
+        BuildRegion tallRegion = new BuildRegion("hill_people", -875, 64, -877, 874, 319, 876);
+        Set<Point> solid = new HashSet<>();
+        solid.add(new Point(-1, 232, -1));
+
+        var result = SafeSpawnFinder.find(tallRegion, -1, 234, -1, safety(solid));
+
+        assertEquals(new SafeSpawnFinder.SpawnBlock(-1, 233, -1), result.orElseThrow());
+    }
+
     private static Set<Point> floor() {
         Set<Point> floor = new HashSet<>();
         for (int x = REGION.minX(); x <= REGION.maxX(); x++) {

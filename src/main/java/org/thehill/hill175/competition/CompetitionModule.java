@@ -63,6 +63,7 @@ public final class CompetitionModule {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
     private static final String CAMERA_MARKER_ENTRY_PREFIX = "hill175_camera_entry_";
     private static final String CAMERA_MARKER_INDEX_PREFIX = "hill175_camera_index_";
+    private static final String HUB_KIT = "hub";
 
     private final JavaPlugin plugin;
     private final CompetitionStore store;
@@ -78,6 +79,7 @@ public final class CompetitionModule {
     private final Map<UUID, Integer> nextPreviewIndexByPlayer = new HashMap<>();
     private final Map<UUID, Integer> nextCameraWriteIndexByPlayer = new HashMap<>();
     private final Map<UUID, UUID> pendingPeopleEntryByPlayer = new HashMap<>();
+    private final Map<UUID, String> activeKitByPlayer = new HashMap<>();
 
     public CompetitionModule(
             JavaPlugin plugin,
@@ -102,6 +104,7 @@ public final class CompetitionModule {
         nextPreviewIndexByPlayer.remove(player.getUniqueId());
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+        activeKitByPlayer.remove(player.getUniqueId());
         player.getInventory().clear();
         player.setGameMode(GameMode.ADVENTURE);
         player.setAllowFlight(false);
@@ -120,6 +123,7 @@ public final class CompetitionModule {
         nextPreviewIndexByPlayer.remove(player.getUniqueId());
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+        activeKitByPlayer.remove(player.getUniqueId());
     }
 
     public boolean isAuthenticated(Player player) {
@@ -331,6 +335,9 @@ public final class CompetitionModule {
             return;
         }
         worlds.ensureEntryWorld(entry);
+        if (worlds.synchronizePeopleRegion(entry)) {
+            store.saveEntry(entry);
+        }
         if (entry.category() == Category.PEOPLE && !worlds.isPeopleWorldReady(entry.worldName())) {
             currentEntryByPlayer.put(player.getUniqueId(), entry.id());
             pendingPeopleEntryByPlayer.put(player.getUniqueId(), entry.id());
@@ -461,22 +468,35 @@ public final class CompetitionModule {
         }
         Optional<Entry> entry = entryAt(location);
         if (entry.isPresent()) {
-            currentEntryByPlayer.put(player.getUniqueId(), entry.get().id());
+            Entry activeEntry = entry.get();
+            currentEntryByPlayer.put(player.getUniqueId(), activeEntry.id());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-            if (entry.get().isMember(nicknameKey(player.getName()))
-                    && !entry.get().submitted()
-                    && !worlds.isResetting(entry.get().id())) {
+            boolean ownerMode = activeEntry.isMember(nicknameKey(player.getName()))
+                    && !activeEntry.submitted()
+                    && !worlds.isResetting(activeEntry.id());
+            boolean entryOwner = activeEntry.isMember(nicknameKey(player.getName()));
+            String desiredKit = ownerMode
+                    ? ownerKit(activeEntry)
+                    : visitorKit(activeEntry, entryOwner);
+            if (desiredKit.equals(activeKitByPlayer.get(player.getUniqueId()))) {
+                return;
+            }
+            if (ownerMode) {
                 setOwnerMode(player);
-                giveEntryOwnerItems(player, entry.get());
+                giveEntryOwnerItems(player, activeEntry);
             } else {
                 setVisitorMode(player);
-                giveEntryVisitorItems(player, entry.get(), entry.get().isMember(nicknameKey(player.getName())));
+                giveEntryVisitorItems(player, activeEntry, entryOwner);
             }
             return;
         }
         if (location.getWorld() != null && location.getWorld().equals(worlds.hubWorld())) {
-            currentEntryByPlayer.remove(player.getUniqueId());
-            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+            if (!pendingPeopleEntryByPlayer.containsKey(player.getUniqueId())) {
+                currentEntryByPlayer.remove(player.getUniqueId());
+            }
+            if (HUB_KIT.equals(activeKitByPlayer.get(player.getUniqueId()))) {
+                return;
+            }
             player.setGameMode(GameMode.ADVENTURE);
             player.setAllowFlight(true);
             giveHubItems(player);
@@ -938,6 +958,7 @@ public final class CompetitionModule {
                 "Open entries, visit builds, or create a project."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
+        activeKitByPlayer.put(player.getUniqueId(), HUB_KIT);
     }
 
     private void giveEntryOwnerItems(Player player, Entry entry) {
@@ -958,6 +979,7 @@ public final class CompetitionModule {
                 "Right-click to review competition rules."));
         player.getInventory().setItem(8, competitionItem(Material.NETHER_STAR, ENTRY_MENU_ITEM_ID, "Entry Controls",
                 "Open the menu for this entry."));
+        activeKitByPlayer.put(player.getUniqueId(), ownerKit(entry));
     }
 
     private void giveEntryVisitorItems(Player player, Entry entry, boolean owner) {
@@ -972,6 +994,7 @@ public final class CompetitionModule {
                 owner ? ENTRY_MENU_ITEM_ID : COMPASS_ITEM_ID,
                 owner ? "Entry Controls" : "Competition Compass",
                 owner ? "Open the menu for this entry." : "Open entries, visit builds, or create a project."));
+        activeKitByPlayer.put(player.getUniqueId(), visitorKit(entry, owner));
     }
 
     private ItemStack competitionItem(Material material, String id, String name, String lore) {
@@ -1229,6 +1252,14 @@ public final class CompetitionModule {
 
     private static String cameraMarkerEntryTag(UUID entryId) {
         return CAMERA_MARKER_ENTRY_PREFIX + entryId;
+    }
+
+    private static String ownerKit(Entry entry) {
+        return "owner:" + entry.id();
+    }
+
+    private static String visitorKit(Entry entry, boolean owner) {
+        return "visitor:" + entry.id() + ":" + owner;
     }
 
     private int normalizedCameraWriteIndex(Player player, Entry entry) {
