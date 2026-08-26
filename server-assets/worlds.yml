@@ -1,0 +1,18 @@
+# Third-party archives are downloaded directly from their creators and are not redistributed in this repository.
+hub:
+  name: Server Spawn/Lobby 1.03
+  creator: mikele12327
+  project-page: https://www.curseforge.com/minecraft/worlds/server-spawn-lobby
+  direct-download: https://www.curseforge.com/api/v1/mods/1421699/files/7604500/download
+  filename: Server Spawn 1.03.zip
+  sha256: 58f4ebbb546ad7b911a9ab0a616bd98c71664336b91bbe3c5acc39ece309a2a8
+  archive-root: 1.03
+  install-world-name: hill_hub
+  permission: Creator states the map is free for personal and general use; do not reupload it as your own.
+  minecraft-version: 1.21.11 world; Paper upgrades it on first load for Minecraft 26.2.
+
+generated-worlds:
+  authentication: hill_auth
+  journey: hill_journey
+  place: hill_place
+  people-fallback: one private hill_people_<entry> world per People entry

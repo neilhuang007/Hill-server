@@ -1,0 +1,24 @@
+# Gradle / IDE
+.gradle/
+build/
+out/
+.idea/
+*.iml
+
+# Local Paper runtime and downloaded third-party world archives
+runtime/
+run/
+server/
+
+# Local/private map experiments. These are not rights-cleared release assets.
+combined_3d_tiles.glb
+structure.nbt
+
+# Plugin data and generated worlds
+competition-data.yml
+*.log
+crash-reports/
+
+# OS
+.DS_Store
+Thumbs.db

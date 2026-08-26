@@ -1,0 +1,29 @@
+# Hill 175 development configuration.
+# School account linking intentionally uses the always-approve stub until Hill selects an identity provider.
+authentication:
+  provider: always-approve-development-stub
+  # Required safety acknowledgement. Replace the identity adapter before a real competition launch.
+  development-stub-acknowledged: true
+  stub-link-base-url: https://example.invalid/hill175/link
+  stub-link-delay-ticks: 20
+  password-min-length: 8
+
+worlds:
+  authentication: hill_auth
+  hub: hill_hub
+  journey: hill_journey
+  place: hill_place
+
+people:
+  # Extract a rights-cleared campus template to this folder before creating People entries.
+  template-folder: world-templates/hill_people_template
+  fallback-seed: 175
+  build-radius: 128
+  world-border-size: 288.0
+
+build-rules:
+  max-non-player-entities-per-entry: 128
+
+privacy:
+  # Purge this audit data 30 days after the event; the exact event-end timestamp is not configured yet.
+  connection-audit-retention-days-after-event: 30

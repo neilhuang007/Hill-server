@@ -1,0 +1,33 @@
+name: Hill175
+version: '${version}'
+main: org.thehill.hill175.Hill175Plugin
+api-version: '26.2'
+load: POSTWORLD
+authors: [The Hill School]
+description: Hill School 175th Anniversary Minecraft competition server
+commands:
+  register:
+    description: Register a competition nickname and password
+    usage: /register <username> <password> <repeatPassword>
+  login:
+    description: Authenticate with the competition password
+    usage: /login <password>
+  hill175:
+    description: Open the Hill 175 competition menu
+    aliases: [h175]
+  competition:
+    description: Open the Hill 175 competition menu
+  hub:
+    description: Return to the exhibition hub
+  rules:
+    description: Show competition rules
+  entry:
+    description: Manage competition entries
+  team:
+    description: Manage a two-person entry team
+  camera:
+    description: Save and manage submission camera poses
+permissions:
+  hill175.staff:
+    description: Reserved for future faculty moderation tools
+    default: op

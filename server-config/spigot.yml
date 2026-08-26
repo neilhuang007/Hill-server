@@ -1,0 +1,5 @@
+commands:
+  # Sensitive /login and /register arguments must not be written to console/latest.log.
+  log: false
+settings:
+  debug: false
