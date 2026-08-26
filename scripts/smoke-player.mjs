@@ -143,7 +143,9 @@ async function approachEntity(entity) {
   const target = entity.position.offset((deltaX / length) * 2.25, 0, (deltaZ / length) * 2.25);
   bot.physicsEnabled = false;
   const start = bot.entity.position.clone();
-  const steps = Math.max(1, Math.ceil(start.distanceTo(target) / 3));
+  // Stay below normal sprint speed so a remote Paper server accepts each
+  // position update instead of correcting the test client before its click.
+  const steps = Math.max(1, Math.ceil(start.distanceTo(target) / 0.4));
   for (let step = 1; step <= steps; step++) {
     const fraction = step / steps;
     const position = start.scaled(1 - fraction).plus(target.scaled(fraction));
@@ -154,7 +156,7 @@ async function approachEntity(entity) {
       z: position.z,
       flags: { onGround: true, hasHorizontalCollision: false },
     });
-    await delay(100);
+    await delay(75);
   }
   await delay(500);
   await bot.lookAt(entity.position.offset(0, 1, 0), true);
