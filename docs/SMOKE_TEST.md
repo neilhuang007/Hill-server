@@ -29,7 +29,11 @@ Run against Minecraft Java Edition 26.2.
 7. Try to create People as a third entry; confirm rejection.
 8. Delete or switch one entry, then create People; confirm a private `hill_people_<entry>` world.
 9. Open Visit Builds; confirm player-head entry cards and read-only visitor teleport.
-10. Click each category NPC; confirm it opens that category's entry or creation confirmation.
+10. Confirm all three category guides are Player entities (not armor stands), use distinct role-appropriate skins, have a floating category title plus `CLICK TO OPEN`, and do not remain listed in the player list.
+11. Left-click and right-click each category guide; confirm each action opens exactly one category entry/creation GUI.
+12. In an owned entry, confirm the hotbar contains Return to Hub, Camera, Rules, and Entry Controls, but no standalone Reset or Lock item.
+13. Open Entry Controls; confirm Build Options contains submission lock/unlock, reset, delete, and category change, with confirmations for destructive actions.
+14. Reset an entry, leave its region, and re-enter it; confirm the owner returns to Creative Mode and may build. Repeat once while another reset request is attempted and confirm the second request is rejected until the first completes.
 
 ## Teams
 
@@ -57,15 +61,19 @@ Run against Minecraft Java Edition 26.2.
 
 ## Camera and submission
 
-1. Hold the Camera and right-click at three positions inside the owned entry.
+1. Hold the Camera and right-click empty air at three positions inside the owned entry; confirm no ground click is required.
 2. Confirm the fourth right-click replaces camera 1 and continues rotating through the three saved slots.
 3. Run `/camera list`, then `/camera remove 2` and save a replacement.
-4. Run `/entry title <title>`.
-5. Run `/entry description <description>`.
-6. Run `/entry submit`, confirm the lock checklist appears, then choose Confirm Lock.
-7. Confirm the entry changes to read-only Spectator Mode for both team members.
-8. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
-9. Run `/entry unlock`; confirm Creative Mode/building returns.
+4. Sneak, swim, or glide, then left-click the Camera; confirm preview canonicalizes the player to standing and begins at the exact saved eye viewpoint, yaw, and pitch without shifting vertically into a block. Confirm it displays `Previewing camera #…` as a title plus a persistent status bar.
+5. While previewing, try walking, flying, sneaking, swimming, gliding, and rotating the view; confirm all position and camera changes are corrected immediately and camera markers are hidden.
+6. Use the Exit Camera Preview item with a right-click, preview again, then use it with a left-click; confirm both return to the pre-preview position and restore the owner hotbar.
+7. Left-click and right-click each visible camera marker; confirm both enter that marker's exact locked preview and show its camera number.
+8. Run `/entry title <title>`.
+9. Run `/entry description <description>`.
+10. Open Entry Controls, choose Lock Submission, confirm the checklist appears, then choose Confirm Lock.
+11. Confirm the entry changes to read-only Spectator Mode for both team members.
+12. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
+13. Run `/entry unlock`; confirm Creative Mode/building returns.
 
 ## Persistence and restart
 
@@ -73,6 +81,6 @@ Run against Minecraft Java Edition 26.2.
 2. Start it again.
 3. Login with the same nickname/password.
 4. Confirm both entries, team members, title, description, camera poses, submission state, plots, and private People worlds persist.
-5. Confirm the checksum-pinned Hill exhibition hub and category NPCs load without duplicates.
+5. Confirm the checksum-pinned Hill exhibition hub and three Player category guides load without duplicates.
 6. Confirm `/hub` arrives safely at `70.5, 66.1, 42.5`, facing south toward the category personnel.
 7. Confirm Journey, Place, and People personnel stand at the block-centred anchors `70.5,67,70.5`, `70.5,75,70.5`, and `70.5,61,70.5`, respectively, and face the arrival point.

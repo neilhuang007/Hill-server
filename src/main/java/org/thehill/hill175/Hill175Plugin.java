@@ -23,6 +23,8 @@ import java.util.Objects;
 
 public final class Hill175Plugin extends JavaPlugin {
     private CompetitionStore store;
+    private CompetitionModule competition;
+    private HubNpcModule hubNpcs;
 
     @Override
     public void onEnable() {
@@ -44,7 +46,7 @@ public final class Hill175Plugin extends JavaPlugin {
         IdentityLinker identityLinker = new AlwaysApproveIdentityLinker(
                 getConfig().getString("authentication.stub-link-base-url", "https://example.invalid/hill175/link")
         );
-        CompetitionModule competition = new CompetitionModule(
+        competition = new CompetitionModule(
                 this,
                 store,
                 worlds,
@@ -52,7 +54,7 @@ public final class Hill175Plugin extends JavaPlugin {
                 identityLinker
         );
         MenuModule menus = new MenuModule(competition);
-        HubNpcModule hubNpcs = new HubNpcModule(this, competition, menus, worlds);
+        hubNpcs = new HubNpcModule(this, competition, menus, worlds);
         ServerListener serverListener = new ServerListener(this, competition, menus, worlds);
         CommandModule commands = new CommandModule(competition, menus);
 
@@ -67,7 +69,16 @@ public final class Hill175Plugin extends JavaPlugin {
             command.setTabCompleter(commands);
         }
 
-        Bukkit.getScheduler().runTask(this, hubNpcs::spawnCategoryNpcs);
+        Bukkit.getScheduler().runTask(this, () -> {
+            try {
+                hubNpcs.spawnCategoryNpcs();
+            } catch (RuntimeException exception) {
+                getLogger().log(java.util.logging.Level.SEVERE,
+                        "Player category guides could not start; disabling Hill175 instead of running without navigation.",
+                        exception);
+                getServer().getPluginManager().disablePlugin(this);
+            }
+        });
         Bukkit.getScheduler().runTask(this, competition::rebuildAllCameraMarkers);
         Bukkit.getScheduler().runTaskTimer(this, this::removeForbiddenMobsAndPrimedTnt, 20L, 20L);
         Bukkit.getScheduler().runTaskTimer(this, store::flush, 20L * 300L, 20L * 300L);
@@ -80,6 +91,12 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (competition != null) {
+            competition.shutdown();
+        }
+        if (hubNpcs != null) {
+            hubNpcs.shutdown();
+        }
         if (store != null) {
             store.flush();
         }

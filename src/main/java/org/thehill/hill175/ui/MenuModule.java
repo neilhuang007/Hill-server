@@ -22,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -124,11 +125,16 @@ public final class MenuModule implements Listener {
     public void openEntryDetails(Player player, Entry entry) {
         HillMenuHolder holder = new HillMenuHolder();
         Inventory inventory = Bukkit.createInventory(holder, 27,
-                Component.text(entry.category().displayName() + " Entry", NamedTextColor.GOLD));
+                Component.text("Build Options - " + entry.category().displayName(), NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
         fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
 
+        inventory.setItem(4, item(Material.NETHER_STAR, "Build Options",
+                List.of(
+                        entry.submitted() ? "This entry is locked." : "Manage this entry without hotbar clutter.",
+                        "Camera and navigation tools remain in the hotbar."
+                ), NamedTextColor.GOLD));
         inventory.setItem(10, entrySummary(entry));
         inventory.setItem(11, item(entry.submitted() ? Material.LIME_DYE : Material.CLOCK,
                 entry.submitted() ? "Submission Locked" : "Build Open",
@@ -160,6 +166,16 @@ public final class MenuModule implements Listener {
         inventory.setItem(16, item(Material.ENDER_EYE, "Visit Build",
                 List.of("Open this entry in Visitor Mode."), NamedTextColor.YELLOW));
         session.actions.put(16, new MenuAction(ActionType.VISIT_ENTRY, entry.id(), null, 0));
+
+        if (entry.submitted()) {
+            inventory.setItem(20, item(Material.GRAY_DYE, "Category Change Locked",
+                    List.of("Resume editing before changing", "this entry's category."), NamedTextColor.GRAY));
+        } else {
+            inventory.setItem(20, item(Material.RECOVERY_COMPASS, "Change Category",
+                    List.of("Choose a different competition category.", "This replaces the entire build space."),
+                    NamedTextColor.YELLOW));
+            session.actions.put(20, new MenuAction(ActionType.OPEN_CATEGORY_SWITCH, entry.id(), null, 0));
+        }
 
         inventory.setItem(21, item(entry.submitted() ? Material.LIME_DYE : Material.TRIPWIRE_HOOK,
                 entry.submitted() ? "Resume Editing" : "Lock Submission",
@@ -306,6 +322,54 @@ public final class MenuModule implements Listener {
         );
     }
 
+    private void openCategorySwitch(Player player, Entry entry) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 27,
+                Component.text("Change Category", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.RECOVERY_COMPASS, "Choose a New Category",
+                List.of("Changing category replaces all blocks,", "submission details, and camera poses."),
+                NamedTextColor.RED));
+        int slot = 11;
+        for (Category category : Category.values()) {
+            if (category == entry.category()) {
+                inventory.setItem(slot, item(Material.GRAY_DYE, category.displayName() + " — current category",
+                        List.of("Choose one of the other categories."), NamedTextColor.GRAY));
+            } else {
+                inventory.setItem(slot, item(category.icon(), "Switch to " + category.displayName(),
+                        categoryLore(category), NamedTextColor.YELLOW));
+                session.actions.put(slot,
+                        new MenuAction(ActionType.CONFIRM_CATEGORY_SWITCH, entry.id(), category, 0));
+            }
+            slot += 2;
+        }
+        inventory.setItem(26, item(Material.ARROW, "Back to Build Options", List.of(), NamedTextColor.GOLD));
+        session.actions.put(26, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
+    private void openCategorySwitchConfirmation(Player player, Entry entry, Category category) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 9,
+                Component.text("Replace with " + category.displayName() + "?", NamedTextColor.RED));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(2, item(Material.LAVA_BUCKET, "The current build will be replaced",
+                List.of("Blocks, title, description, cameras,", "and submission data will be cleared."),
+                NamedTextColor.RED));
+        inventory.setItem(4, item(Material.LIME_CONCRETE, "Confirm Category Change",
+                List.of("Switch to " + category.displayName() + "."), NamedTextColor.GREEN));
+        session.actions.put(4, new MenuAction(ActionType.SWITCH_CATEGORY, entry.id(), category, 0));
+        inventory.setItem(6, item(Material.RED_CONCRETE, "Back Without Changes", List.of(), NamedTextColor.RED));
+        session.actions.put(6, new MenuAction(ActionType.OPEN_CATEGORY_SWITCH, entry.id(), null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
     private void openEntryConfirmation(
             Player player,
             Entry entry,
@@ -419,6 +483,10 @@ public final class MenuModule implements Listener {
             case CONFIRM_RESET -> competition.entry(action.entryId).ifPresent(entry -> openResetConfirmation(player, entry));
             case CONFIRM_SUBMISSION -> competition.entry(action.entryId).ifPresent(entry -> openSubmitConfirmation(player, entry));
             case CONFIRM_DELETE -> competition.entry(action.entryId).ifPresent(entry -> openDeleteConfirmation(player, entry));
+            case OPEN_CATEGORY_SWITCH -> competition.entry(action.entryId)
+                    .ifPresent(entry -> openCategorySwitch(player, entry));
+            case CONFIRM_CATEGORY_SWITCH -> competition.entry(action.entryId)
+                    .ifPresent(entry -> openCategorySwitchConfirmation(player, entry, action.category));
             case CREATE_ENTRY -> {
                 player.closeInventory();
                 competition.createEntry(player, action.category).ifPresent(entry -> openSubmissionDialog(player, entry, true));
@@ -455,6 +523,21 @@ public final class MenuModule implements Listener {
                 player.closeInventory();
                 competition.deleteEntry(player, entry);
             });
+            case SWITCH_CATEGORY -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.switchEntry(player, entry, action.category);
+            });
+        }
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (!(event.getWhoClicked() instanceof Player player)) {
+            return;
+        }
+        MenuSession session = sessions.get(player.getUniqueId());
+        if (session != null && event.getView().getTopInventory().equals(session.inventory)) {
+            event.setCancelled(true);
         }
     }
 
@@ -532,7 +615,7 @@ public final class MenuModule implements Listener {
             competition.setTitle(player, entry, title);
             competition.setDescription(player, entry, description);
             player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                    .append(Component.text("Submission details saved. Use the hotbar or entry menu to submit when your cameras are ready.", NamedTextColor.GREEN)
+                    .append(Component.text("Submission details saved. Use Entry Controls to open Build Options and submit when your cameras are ready.", NamedTextColor.GREEN)
                             .decoration(TextDecoration.BOLD, false)));
             Bukkit.getScheduler().runTaskLater(plugin, () -> openEntryDetails(player, entry), 1L);
         });
@@ -618,6 +701,8 @@ public final class MenuModule implements Listener {
         CONFIRM_RESET,
         CONFIRM_SUBMISSION,
         CONFIRM_DELETE,
+        OPEN_CATEGORY_SWITCH,
+        CONFIRM_CATEGORY_SWITCH,
         CREATE_ENTRY,
         ENTER_BUILD,
         VISIT_ENTRY,
@@ -625,7 +710,8 @@ public final class MenuModule implements Listener {
         RESET_ENTRY,
         SUBMIT_ENTRY,
         TOGGLE_SUBMISSION,
-        DELETE_ENTRY
+        DELETE_ENTRY,
+        SWITCH_CATEGORY
     }
 
     private record MenuAction(ActionType type, UUID entryId, Category category, int page) {

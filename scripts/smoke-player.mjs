@@ -126,10 +126,45 @@ async function holdHotbarItem(name) {
   return slot;
 }
 
-async function nearestArmorStand() {
+async function categoryNpcs() {
+  const expectedEquipment = new Map([
+    ["HillJourney", ["bricks", "compass"]],
+    ["HillPlace", ["bookshelf", "writable_book"]],
+    ["HillPeople", ["compass", "oak_sapling"]],
+  ]);
+  await waitFor(
+    () => [...expectedEquipment.keys()].every((name) =>
+      Object.values(bot.entities).filter((entity) => entity.username === name).length === 1),
+    "all three player category NPC profiles",
+  );
+  await delay(500);
+  const npcs = [...expectedEquipment.keys()].map((name) =>
+    Object.values(bot.entities).find((entity) => entity.username === name));
+  for (const npc of npcs) {
+    const [mainHand, offHand] = expectedEquipment.get(npc.username);
+    if (npc.type !== "player") {
+      throw new Error(`${npc.username} rendered as ${npc.type} instead of a player entity`);
+    }
+    if (npc.heldItem?.name !== mainHand || npc.equipment?.[1]?.name !== offHand) {
+      throw new Error(`${npc.username} equipment was ${npc.heldItem?.name}/${npc.equipment?.[1]?.name}; expected ${mainHand}/${offHand}`);
+    }
+    const listed = bot.players[npc.username]?.listed;
+    if (listed !== false && listed !== 0) {
+      throw new Error(`${npc.username} tab-list state was ${String(listed)} instead of false`);
+    }
+  }
+  return npcs;
+}
+
+async function nearestCategoryNpc() {
+  return (await categoryNpcs())
+    .sort((left, right) => left.position.distanceTo(bot.entity.position) - right.position.distanceTo(bot.entity.position))[0];
+}
+
+async function nearestCameraMarker() {
   await waitFor(
     () => Object.values(bot.entities).some((entity) => entity.name === "armor_stand"),
-    "a category NPC armor stand",
+    "a saved camera marker",
   );
   return Object.values(bot.entities)
     .filter((entity) => entity.name === "armor_stand")
@@ -137,28 +172,22 @@ async function nearestArmorStand() {
 }
 
 async function approachEntity(entity) {
-  const deltaX = bot.entity.position.x - entity.position.x;
-  const deltaZ = bot.entity.position.z - entity.position.z;
-  const length = Math.hypot(deltaX, deltaZ) || 1;
-  const target = entity.position.offset((deltaX / length) * 2.25, 0, (deltaZ / length) * 2.25);
-  bot.physicsEnabled = false;
-  const start = bot.entity.position.clone();
-  // Stay below normal sprint speed so a remote Paper server accepts each
-  // position update instead of correcting the test client before its click.
-  const steps = Math.max(1, Math.ceil(start.distanceTo(target) / 0.4));
-  for (let step = 1; step <= steps; step++) {
-    const fraction = step / steps;
-    const position = start.scaled(1 - fraction).plus(target.scaled(fraction));
-    bot.entity.position.set(position.x, position.y, position.z);
-    bot._client.write("position", {
-      x: position.x,
-      y: position.y,
-      z: position.z,
-      flags: { onGround: true, hasHorizontalCollision: false },
-    });
-    await delay(75);
+  const horizontalDistance = () => Math.hypot(
+    bot.entity.position.x - entity.position.x,
+    bot.entity.position.z - entity.position.z,
+  );
+  bot.physicsEnabled = true;
+  await bot.lookAt(entity.position.offset(0, 1, 0), true);
+  bot.setControlState("sprint", false);
+  bot.setControlState("forward", true);
+  try {
+    // Drive the bot through vanilla movement so Paper validates the same path
+    // a human player would take, including collision and teleport corrections.
+    await waitFor(() => horizontalDistance() <= 2.6, "walking within reach of the NPC", 20_000);
+  } finally {
+    bot.clearControlStates();
   }
-  await delay(500);
+  await delay(750);
   await bot.lookAt(entity.position.offset(0, 1, 0), true);
 }
 
@@ -302,7 +331,10 @@ async function lobbyItemAirScenario() {
 }
 
 async function npcInteractionsScenario() {
-  const npc = await nearestArmorStand();
+  const npcs = await categoryNpcs();
+  console.log(`Verified player NPC profiles: ${npcs.map((npc) => `${npc.username}=${npc.heldItem.name}/${npc.equipment[1].name}`).join(", ")}`);
+  const npc = npcs
+    .sort((left, right) => left.position.distanceTo(bot.entity.position) - right.position.distanceTo(bot.entity.position))[0];
   await approachEntity(npc);
   console.log(`Testing category NPC entity ${npc.id} at ${npc.position}`);
 
@@ -341,11 +373,11 @@ async function npcInteractionsScenario() {
   if (!windowTitle(leftClickWindow).includes("Create")) {
     throw new Error(`Left-clicking the NPC opened the wrong GUI: ${windowTitle(leftClickWindow)}`);
   }
-  console.log("PASS: right-click and left-click each opened the category GUI exactly once");
+  console.log("PASS: all three hidden-tab player NPCs rendered with equipment; right-click and left-click opened the category GUI exactly once");
 }
 
 async function npcLeftClickScenario() {
-  const npc = await nearestArmorStand();
+  const npc = await nearestCategoryNpc();
   await approachEntity(npc);
   console.log(`Testing left-click on category NPC entity ${npc.id} at ${npc.position}`);
   const leftClickWindow = await expectSingleWindow(
@@ -464,45 +496,89 @@ async function confirmationNavigationScenario() {
     "Journey entry creation",
   );
 
-  await holdHotbarItem("barrier");
-  const resetWindow = await waitForWindow(
+  await holdHotbarItem("nether_star");
+  const buildOptions = await waitForWindow(
     () => bot.activateItem(),
-    "Reset confirmation from the hotbar",
+    "Build Options from Entry Controls",
+  );
+  if (!windowTitle(buildOptions).includes("Build Options")) {
+    throw new Error(`Entry Controls opened the wrong GUI: ${windowTitle(buildOptions)}`);
+  }
+  const ownerHotbar = bot.inventory.slots.slice(36, 45).map((item) => item?.name ?? "empty");
+  for (const removedTool of ["barrier", "tripwire_hook"]) {
+    if (ownerHotbar.includes(removedTool)) {
+      throw new Error(`${removedTool} remained in the owner hotbar instead of Build Options`);
+    }
+  }
+
+  const resetWindow = await waitForWindow(
+    () => bot.clickWindow(22, 0, 0),
+    "Reset confirmation from Build Options",
   );
   if (!windowTitle(resetWindow).includes("Reset this entry?")) {
-    throw new Error(`Reset hotbar item skipped confirmation: ${windowTitle(resetWindow)}`);
+    throw new Error(`Reset Build Option skipped confirmation: ${windowTitle(resetWindow)}`);
   }
-  const entryAfterResetCancel = await waitForWindow(
+  const buildOptionsAfterResetCancel = await waitForWindow(
     () => bot.clickWindow(6, 0, 0),
-    "entry controls after cancelling Reset",
+    "Build Options after cancelling Reset",
   );
-  if (!windowTitle(entryAfterResetCancel).includes("Entry")) {
-    throw new Error("Reset confirmation did not return to entry controls");
+  if (!windowTitle(buildOptionsAfterResetCancel).includes("Build Options")) {
+    throw new Error("Reset confirmation did not return to Build Options");
   }
-  bot.closeWindow(entryAfterResetCancel);
 
-  await holdHotbarItem("tripwire_hook");
+  const categoryWindow = await waitForWindow(
+    () => bot.clickWindow(20, 0, 0),
+    "category selector from Build Options",
+  );
+  if (!windowTitle(categoryWindow).includes("Change Category")) {
+    throw new Error(`Category Build Option opened the wrong GUI: ${windowTitle(categoryWindow)}`);
+  }
+  const categoryConfirmation = await waitForWindow(
+    () => bot.clickWindow(13, 0, 0),
+    "category-change confirmation",
+  );
+  if (!windowTitle(categoryConfirmation).includes("Replace with")) {
+    throw new Error(`Category change skipped confirmation: ${windowTitle(categoryConfirmation)}`);
+  }
+  const categoryWindowAfterCancel = await waitForWindow(
+    () => bot.clickWindow(6, 0, 0),
+    "category selector after cancelling category change",
+  );
+  const buildOptionsAfterCategoryCancel = await waitForWindow(
+    () => bot.clickWindow(26, 0, 0),
+    "Build Options after leaving category selector",
+  );
+  if (!windowTitle(categoryWindowAfterCancel).includes("Change Category")
+    || !windowTitle(buildOptionsAfterCategoryCancel).includes("Build Options")) {
+    throw new Error("Category-change cancellation did not return through the expected menus");
+  }
+
   const lockWindow = await waitForWindow(
-    () => bot.activateItem(),
-    "Lock confirmation from the hotbar",
+    () => bot.clickWindow(21, 0, 0),
+    "Lock confirmation from Build Options",
   );
   if (!windowTitle(lockWindow).includes("Lock this submission?")) {
-    throw new Error(`Lock hotbar item skipped confirmation: ${windowTitle(lockWindow)}`);
+    throw new Error(`Lock Build Option skipped confirmation: ${windowTitle(lockWindow)}`);
   }
-  const entryAfterLockCancel = await waitForWindow(
+  const buildOptionsAfterLockCancel = await waitForWindow(
     () => bot.clickWindow(6, 0, 0),
-    "entry controls after cancelling Lock",
+    "Build Options after cancelling Lock",
   );
-  bot.closeWindow(entryAfterLockCancel);
-
+  if (!windowTitle(buildOptionsAfterLockCancel).includes("Build Options")) {
+    throw new Error("Lock confirmation did not return to Build Options");
+  }
   const deleteWindow = await waitForWindow(
-    () => bot.chat("/entry delete"),
-    "Delete confirmation from the command",
+    () => bot.clickWindow(23, 0, 0),
+    "Delete confirmation from Build Options",
   );
   if (!windowTitle(deleteWindow).includes("Delete this entry?")) {
-    throw new Error(`Delete command skipped confirmation: ${windowTitle(deleteWindow)}`);
+    throw new Error(`Delete Build Option skipped confirmation: ${windowTitle(deleteWindow)}`);
   }
-  bot.closeWindow(deleteWindow);
+  const buildOptionsAfterDeleteCancel = await waitForWindow(
+    () => bot.clickWindow(6, 0, 0),
+    "Build Options after cancelling Delete",
+  );
+  bot.closeWindow(buildOptionsAfterDeleteCancel);
 
   bot.chat("/hub");
   await waitFor(
@@ -511,12 +587,12 @@ async function confirmationNavigationScenario() {
   );
   await delay(500);
   const hotbarNames = bot.inventory.slots.slice(36, 45).map((item) => item?.name ?? "empty");
-  for (const leaked of ["barrier", "tripwire_hook", "blaze_rod", "nether_star"]) {
+  for (const leaked of ["barrier", "tripwire_hook", "spyglass", "nether_star"]) {
     if (hotbarNames.includes(leaked)) {
       throw new Error(`Owner-only ${leaked} leaked into the hub hotbar`);
     }
   }
-  console.log("PASS: reset/lock/delete require confirmation and owner tools do not leak into the hub");
+  console.log("PASS: Build Options owns reset/lock/delete/category change and owner tools do not leak into the hub");
 }
 
 async function cameraViewScenario() {
@@ -529,25 +605,141 @@ async function cameraViewScenario() {
 
   const savedFeetPosition = bot.entity.position.clone();
   const saveTranscriptStart = transcript.length;
-  bot.chat("/camera save");
+  await holdHotbarItem("spyglass");
+  bot.activateItem();
   await waitFor(
     () => transcript.slice(saveTranscriptStart).some((line) => line.includes("Camera pose 1/3 saved")),
-    "camera pose save",
+    "camera pose save from right-clicking empty air",
   );
+  bot.deactivateItem();
 
   const previewTranscriptStart = transcript.length;
+  let bossBarPackets = 0;
+  let titlePackets = 0;
+  const onBossBar = () => bossBarPackets++;
+  const onTitle = () => titlePackets++;
+  bot._client.on("boss_bar", onBossBar);
+  bot._client.on("set_title_text", onTitle);
   bot.chat("/camera preview");
   await waitFor(
-    () => transcript.slice(previewTranscriptStart).some((line) => line.includes("Previewing camera 1/1")),
+    () => transcript.slice(previewTranscriptStart).some((line) => line.includes("Previewing camera #1/1")),
     "camera preview",
   );
   await delay(500);
+  bot._client.removeListener("boss_bar", onBossBar);
+  bot._client.removeListener("set_title_text", onTitle);
+  if (bossBarPackets === 0 || titlePackets === 0) {
+    throw new Error(`Camera preview did not render both persistent and title displays (boss bar ${bossBarPackets}, title ${titlePackets})`);
+  }
 
   const feetShift = bot.entity.position.distanceTo(savedFeetPosition);
   if (feetShift > 0.15) {
     throw new Error(`Camera preview shifted the player ${feetShift.toFixed(3)} blocks instead of preserving the full-screen eye view`);
   }
-  console.log("PASS: camera preview preserved the saved full-screen viewpoint and safe feet position");
+
+  const lockedYaw = bot.entity.yaw;
+  const lockedPitch = bot.entity.pitch;
+  await bot.look(lockedYaw + 0.8, Math.max(-1.2, Math.min(1.2, lockedPitch + 0.35)), true);
+  await delay(500);
+  const yawShift = Math.abs(bot.entity.yaw - lockedYaw);
+  const pitchShift = Math.abs(bot.entity.pitch - lockedPitch);
+  if (bot.entity.position.distanceTo(savedFeetPosition) > 0.15 || yawShift > 0.05 || pitchShift > 0.05) {
+    throw new Error(`Camera preview failed to lock movement/rotation (yaw ${yawShift.toFixed(3)}, pitch ${pitchShift.toFixed(3)})`);
+  }
+
+  let closeTranscriptStart = transcript.length;
+  await holdHotbarItem("barrier");
+  bot.activateItem();
+  await waitFor(
+    () => transcript.slice(closeTranscriptStart).some((line) => line.includes("Camera preview closed")),
+    "right-click camera preview exit item",
+  );
+  bot.deactivateItem();
+
+  let marker = await nearestCameraMarker();
+  let markerPreviewStart = transcript.length;
+  bot._client.write("use_entity", {
+    target: marker.id,
+    hand: 0,
+    location: { x: 0, y: 1, z: 0 },
+    usingSecondaryAction: false,
+  });
+  await waitFor(
+    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera #1/1")),
+    "right-click camera marker preview",
+  );
+
+  closeTranscriptStart = transcript.length;
+  await holdHotbarItem("barrier");
+  const leftClickBlock = bot.blockAt(bot.entity.position.offset(0, -1, 0).floored());
+  if (!leftClickBlock) {
+    throw new Error("Could not find a nearby block for the left-click preview-exit check");
+  }
+  bot._client.write("block_dig", {
+    status: 0,
+    location: leftClickBlock.position,
+    face: 1,
+  });
+  bot.swingArm();
+  await waitFor(
+    () => transcript.slice(closeTranscriptStart).some((line) => line.includes("Camera preview closed")),
+    "left-click camera preview exit item",
+  );
+
+  marker = await nearestCameraMarker();
+  markerPreviewStart = transcript.length;
+  bot._client.write("attack", { entityId: marker.id });
+  bot.swingArm();
+  await waitFor(
+    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera #1/1")),
+    "left-click camera marker preview",
+  );
+
+  console.log("PASS: camera screen, view lock, marker clicks, air-save, and both exit-item clicks worked");
+}
+
+async function movePlayerLinearly(target) {
+  bot.physicsEnabled = false;
+  const start = bot.entity.position.clone();
+  const steps = Math.max(1, Math.ceil(start.distanceTo(target) / 0.4));
+  for (let step = 1; step <= steps; step++) {
+    const fraction = step / steps;
+    const position = start.scaled(1 - fraction).plus(target.scaled(fraction));
+    bot.entity.position.set(position.x, position.y, position.z);
+    bot._client.write("position", {
+      x: position.x,
+      y: position.y,
+      z: position.z,
+      flags: { onGround: true, hasHorizontalCollision: false },
+    });
+    await delay(60);
+  }
+}
+
+async function plotResetReentryScenario() {
+  bot.chat("/entry create journey");
+  await waitFor(
+    () => transcript.some((line) => line.includes("Journey entry created")),
+    "Journey entry creation",
+  );
+  await holdHotbarItem("nether_star");
+  await waitForWindow(() => bot.activateItem(), "Build Options before reset");
+  await waitForWindow(() => bot.clickWindow(22, 0, 0), "Reset confirmation");
+  const resetTranscriptStart = transcript.length;
+  bot.clickWindow(4, 0, 0);
+  await waitFor(
+    () => transcript.slice(resetTranscriptStart).some((line) => line.includes("Entry reset complete")),
+    "completed plot reset",
+    30_000,
+  );
+  await waitFor(() => bot.game.gameMode === "creative", "Creative Mode after plot reset");
+
+  const ownerPosition = bot.entity.position.clone();
+  await movePlayerLinearly(ownerPosition.offset(40, 0, 0));
+  await waitFor(() => bot.game.gameMode === "spectator", "Spectator Mode outside the owned plot");
+  await movePlayerLinearly(ownerPosition);
+  await waitFor(() => bot.game.gameMode === "creative", "Creative Mode after plot re-entry");
+  console.log("PASS: completed reset, boundary exit, and re-entry restored Creative Mode");
 }
 
 async function movementKitStabilityScenario() {
@@ -611,6 +803,9 @@ const bot = mineflayer.createBot({
   username,
   auth: "offline",
   hideErrors: false,
+  // The pinned Mineflayer fork does not yet decode Minecraft 26.2's team
+  // component shape. Team state is irrelevant to these interaction checks.
+  plugins: { team: false },
 });
 
 bot.on("messagestr", (message) => {
@@ -667,6 +862,9 @@ try {
       break;
     case "camera-view":
       await cameraViewScenario();
+      break;
+    case "plot-reset-reentry":
+      await plotResetReentryScenario();
       break;
     case "movement-kit-stability":
       await movementKitStabilityScenario();

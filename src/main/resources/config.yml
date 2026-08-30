@@ -27,18 +27,27 @@ worlds:
     pitch: 0.0
   hub-npcs:
     journey:
+      profile-name: HillJourney
+      # Smoke skin: surveyor/builder. Replace with a Hill-owned texture before public launch.
+      skin-texture: af41e2561a2c959f56df5dcda564397df1971d652e1ac159d8b4c74733026077
       x: 70.5
       y: 67.0
       z: 70.5
       yaw: 180.0
       pitch: 0.0
     place:
+      profile-name: HillPlace
+      # Smoke skin: contemporary interior designer. Replace with a Hill-owned texture before public launch.
+      skin-texture: 6ac6ca262d67bcfb3dbc924ba8215a18195497c780058a5749de674217721892
       x: 70.5
       y: 75.0
       z: 70.5
       yaw: 180.0
       pitch: 0.0
     people:
+      profile-name: HillPeople
+      # Smoke skin: scientist/community planner. Replace with a Hill-owned texture before public launch.
+      skin-texture: 9658c5ac64cdd7189e8db50393f27439fc9ce9177c9c5285d6f1f7b4eda9d7ec
       x: 70.5
       y: 61.0
       z: 70.5

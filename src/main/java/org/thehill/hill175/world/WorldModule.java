@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public final class WorldModule {
@@ -39,7 +40,7 @@ public final class WorldModule {
 
     private final JavaPlugin plugin;
     private final VoidChunkGenerator voidGenerator = new VoidChunkGenerator();
-    private final Set<UUID> resettingEntries = new HashSet<>();
+    private final Map<UUID, ResetOperation> resetOperations = new HashMap<>();
     private final Set<String> readyPeopleWorlds = new HashSet<>();
     private final Map<String, List<Runnable>> waitingPeopleWorldCallbacks = new HashMap<>();
     private World authenticationWorld;
@@ -285,29 +286,52 @@ public final class WorldModule {
     }
 
     public boolean isResetting(UUID entryId) {
-        return resettingEntries.contains(entryId);
+        return resetOperations.containsKey(entryId);
     }
 
     public void reset(Entry entry, Runnable completion) {
-        if (!resettingEntries.add(entry.id())) {
-            return;
-        }
-        if (entry.category() == Category.PEOPLE) {
-            resetPeople(entry, completion);
-            return;
-        }
-        ensureEntryWorld(entry);
-        World world = Bukkit.getWorld(entry.worldName());
-        if (world == null) {
-            resettingEntries.remove(entry.id());
-            return;
-        }
-        new RegionClearTask(entry, world, completion).runTaskTimer(plugin, 1L, 1L);
+        reset(entry, completion, ignored -> {
+        });
     }
 
-    public void deletePrivateWorld(Entry entry) {
-        if (entry.category() != Category.PEOPLE || !entry.worldName().startsWith("hill_people_")) {
+    public void reset(Entry entry, Runnable completion, Consumer<RuntimeException> failure) {
+        if (!Bukkit.isPrimaryThread()) {
+            Bukkit.getScheduler().runTask(plugin, () -> reset(entry, completion, failure));
             return;
+        }
+
+        ResetOperation existing = resetOperations.get(entry.id());
+        if (existing != null) {
+            existing.callbacks.add(new ResetCallback(completion, failure));
+            return;
+        }
+
+        ResetOperation operation = new ResetOperation(completion, failure);
+        resetOperations.put(entry.id(), operation);
+        try {
+            if (entry.category() == Category.PEOPLE) {
+                resetPeople(entry);
+                return;
+            }
+            ensureEntryWorld(entry);
+            World world = Bukkit.getWorld(entry.worldName());
+            if (world == null) {
+                throw new IllegalStateException("Entry world is unavailable: " + entry.worldName());
+            }
+            new RegionClearTask(
+                    entry.id(),
+                    world,
+                    entry.category(),
+                    entry.region()
+            ).runTaskTimer(plugin, 1L, 1L);
+        } catch (RuntimeException exception) {
+            failReset(entry.id(), exception);
+        }
+    }
+
+    public boolean deletePrivateWorld(Entry entry) {
+        if (entry.category() != Category.PEOPLE || !entry.worldName().startsWith("hill_people_")) {
+            return false;
         }
         readyPeopleWorlds.remove(entry.worldName());
         waitingPeopleWorldCallbacks.remove(entry.worldName());
@@ -317,9 +341,12 @@ public final class WorldModule {
             for (org.bukkit.entity.Player player : world.getPlayers()) {
                 player.teleport(hubSpawn());
             }
-            Bukkit.unloadWorld(world, false);
+            if (!Bukkit.unloadWorld(world, false)) {
+                plugin.getLogger().severe("Could not unload private world " + entry.worldName());
+                return false;
+            }
         }
-        deleteDirectorySafely(worldPath);
+        return deleteDirectorySafely(worldPath);
     }
 
     private World loadImportedWorld(String worldName) {
@@ -511,19 +538,26 @@ public final class WorldModule {
         );
     }
 
-    private void resetPeople(Entry entry, Runnable completion) {
+    private void resetPeople(Entry entry) {
         for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().getName().equals(entry.worldName())) {
                 player.teleport(hubSpawn());
             }
         }
-        deletePrivateWorld(entry);
+        if (!deletePrivateWorld(entry)) {
+            failReset(entry.id(), new IllegalStateException(
+                    "Private world could not be unloaded and removed: " + entry.worldName()));
+            return;
+        }
         World world = createPeopleWorld(entry.worldName());
         Runnable whenReady = () -> {
-            configureWorld(world);
-            applyPeopleWorldSettings(world);
-            resettingEntries.remove(entry.id());
-            completion.run();
+            try {
+                configureWorld(world);
+                applyPeopleWorldSettings(world);
+                completeReset(entry.id());
+            } catch (RuntimeException exception) {
+                failReset(entry.id(), exception);
+            }
         };
         if (isPeopleWorldReady(entry.worldName())) {
             whenReady.run();
@@ -903,22 +937,24 @@ public final class WorldModule {
         );
     }
 
-    private void deleteDirectorySafely(Path target) {
+    private boolean deleteDirectorySafely(Path target) {
         Path worldContainer = Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
         Path normalized = target.toAbsolutePath().normalize();
         if (!normalized.startsWith(worldContainer) || !normalized.getFileName().toString().startsWith("hill_people_")) {
             plugin.getLogger().severe("Refused to delete unexpected world path: " + normalized);
-            return;
+            return false;
         }
         if (!Files.exists(normalized)) {
-            return;
+            return true;
         }
         try (var paths = Files.walk(normalized)) {
             for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
                 Files.deleteIfExists(path);
             }
+            return !Files.exists(normalized);
         } catch (IOException exception) {
             plugin.getLogger().log(Level.SEVERE, "Could not delete private world " + normalized, exception);
+            return false;
         }
     }
 
@@ -997,21 +1033,19 @@ public final class WorldModule {
 
     private final class RegionClearTask extends BukkitRunnable {
         private static final int BLOCKS_PER_TICK = 8_000;
-        private final Entry entry;
+        private final UUID entryId;
         private final World world;
-        private final Runnable completion;
         private final Category category;
         private final BuildRegion region;
         private int x;
         private int y;
         private int z;
 
-        private RegionClearTask(Entry entry, World world, Runnable completion) {
-            this.entry = entry;
+        private RegionClearTask(UUID entryId, World world, Category category, BuildRegion region) {
+            this.entryId = entryId;
             this.world = world;
-            this.completion = completion;
-            this.category = entry.category();
-            this.region = entry.region();
+            this.category = category;
+            this.region = region;
             this.x = region.minX();
             this.y = region.minY();
             this.z = region.minZ();
@@ -1020,26 +1054,71 @@ public final class WorldModule {
         @Override
         public void run() {
             int changed = 0;
-            while (changed < BLOCKS_PER_TICK) {
-                world.getBlockAt(x, y, z).setType(Material.AIR, false);
-                changed++;
-                z++;
-                if (z > region.maxZ()) {
-                    z = region.minZ();
-                    y++;
+            try {
+                while (changed < BLOCKS_PER_TICK) {
+                    world.getBlockAt(x, y, z).setType(Material.AIR, false);
+                    changed++;
+                    z++;
+                    if (z > region.maxZ()) {
+                        z = region.minZ();
+                        y++;
+                    }
+                    if (y > region.maxY()) {
+                        y = region.minY();
+                        x++;
+                    }
+                    if (x > region.maxX()) {
+                        preparePlot(world, category, region);
+                        cancel();
+                        completeReset(entryId);
+                        return;
+                    }
                 }
-                if (y > region.maxY()) {
-                    y = region.minY();
-                    x++;
-                }
-                if (x > region.maxX()) {
-                    preparePlot(world, category, region);
-                    resettingEntries.remove(entry.id());
-                    completion.run();
-                    cancel();
-                    return;
-                }
+            } catch (RuntimeException exception) {
+                cancel();
+                failReset(entryId, exception);
             }
         }
+    }
+
+    private void completeReset(UUID entryId) {
+        ResetOperation operation = resetOperations.remove(entryId);
+        if (operation == null) {
+            return;
+        }
+        for (ResetCallback callback : operation.callbacks) {
+            try {
+                callback.completion.run();
+            } catch (RuntimeException exception) {
+                plugin.getLogger().log(Level.WARNING, "Reset completion callback failed for " + entryId, exception);
+            }
+        }
+    }
+
+    private void failReset(UUID entryId, RuntimeException exception) {
+        ResetOperation operation = resetOperations.remove(entryId);
+        if (operation == null) {
+            return;
+        }
+        plugin.getLogger().log(Level.SEVERE, "Reset failed for entry " + entryId, exception);
+        for (ResetCallback callback : operation.callbacks) {
+            try {
+                callback.failure.accept(exception);
+            } catch (RuntimeException callbackException) {
+                plugin.getLogger().log(Level.WARNING,
+                        "Reset failure callback failed for " + entryId, callbackException);
+            }
+        }
+    }
+
+    private static final class ResetOperation {
+        private final List<ResetCallback> callbacks = new ArrayList<>();
+
+        private ResetOperation(Runnable completion, Consumer<RuntimeException> failure) {
+            callbacks.add(new ResetCallback(completion, failure));
+        }
+    }
+
+    private record ResetCallback(Runnable completion, Consumer<RuntimeException> failure) {
     }
 }

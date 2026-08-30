@@ -1,6 +1,8 @@
 package org.thehill.hill175.listener;
 
 import io.papermc.paper.event.player.AsyncChatEvent;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
@@ -35,6 +37,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.EntityToggleGlideEvent;
+import org.bukkit.event.entity.EntityToggleSwimEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -49,6 +53,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.world.PortalCreateEvent;
@@ -134,6 +139,11 @@ public final class ServerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
+        Optional<Location> previewLocation = competition.cameraPreviewLocation(player);
+        if (previewLocation.isPresent()) {
+            event.setTo(previewLocation.get());
+            return;
+        }
         if (!competition.isAuthenticated(player)) {
             Location locked = worlds.authenticationSpawn();
             Location to = event.getTo();
@@ -157,6 +167,50 @@ public final class ServerListener implements Listener {
             return;
         }
         competition.refreshMovementMode(player, event.getTo());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onToggleSneak(PlayerToggleSneakEvent event) {
+        if (competition.isCameraPreviewing(event.getPlayer())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onToggleSwim(EntityToggleSwimEvent event) {
+        if (event.getEntity() instanceof Player player && competition.isCameraPreviewing(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onToggleGlide(EntityToggleGlideEvent event) {
+        if (event.getEntity() instanceof Player player && competition.isCameraPreviewing(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerAnimation(PlayerArmSwingEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) {
+            return;
+        }
+        Player player = event.getPlayer();
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
+            if (competition.acceptsCameraPreviewLeftClick(player)) {
+                event.setCancelled(true);
+                competition.exitCameraPreview(player);
+            }
+            return;
+        }
+        if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
+            if (!competition.acceptsCameraItemLeftClick(player)) {
+                return;
+            }
+            event.setCancelled(true);
+            competition.previewNextCamera(player);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -191,7 +245,7 @@ public final class ServerListener implements Listener {
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
                 event.setCancelled(true);
-                competition.previewNextCamera(player);
+                competition.exitCameraPreview(player);
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)) {
@@ -244,6 +298,14 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteractEntity(PlayerInteractEntityEvent event) {
+        if (event.getHand() == EquipmentSlot.HAND
+                && competition.isCompetitionItem(
+                event.getPlayer().getInventory().getItemInMainHand(),
+                CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
+            event.setCancelled(true);
+            competition.exitCameraPreview(event.getPlayer());
+            return;
+        }
         Entity entity = event.getRightClicked();
         if (entity.getScoreboardTags().contains("hill175_category_npc")) {
             return;
@@ -257,6 +319,15 @@ public final class ServerListener implements Listener {
             event.setCancelled(true);
             deny(event.getPlayer(), "Visitor Mode is read-only.");
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPrePlayerAttackEntity(PrePlayerAttackEntityEvent event) {
+        if (!event.getAttacked().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
+            return;
+        }
+        event.setCancelled(true);
+        competition.previewCameraMarker(event.getPlayer(), event.getAttacked());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

@@ -63,7 +63,7 @@ receive Hill launcher package
 -> Pending Registration becomes Account Link
 -> plugin marks Minecraft session authenticated
 -> plugin teleports player to Exhibition Hub
--> plugin gives Competition Compass + Rules item in the hub; entry hotbars add Camera and Return to Hub tools
+-> plugin gives Competition Compass + Rules item in the hub; entry hotbars add Camera, Return to Hub, and Entry Controls
 -> player opens Competition Compass or interacts with category NPC
 -> player creates or opens Entry
 -> optional second Participant is invited
@@ -842,6 +842,8 @@ NPC implementation:
 - Provide interaction-entity fallback if Citizens is unavailable.
 - Every NPC action must also exist through Competition Compass and commands.
 
+The current Paper 26.2 smoke runtime uses a version-pinned synthetic Player bridge; [Citizens has previously reported Paper 26.2 linkage failures](https://github.com/CitizensDev/Citizens2/issues/3331), so any migration must still pass the exact pinned-build smoke suite. Each guide has a validated skin texture, a hidden native name tag, a floating category/title prompt, and both attack and interact handlers.
+
 ---
 
 ## 7. Competition phases and schedule placeholders
@@ -1099,7 +1101,7 @@ Recommended authenticated hotbar:
 | 8 | Return to Hub | safe hub teleport |
 | 9 | Report/Help | support and moderation report |
 
-Current smoke implementation uses context-specific kits: the hub reserves slots 1 and 8 for the Compass and Rules Book; owned entries reserve slots 1-4 and 8-9 for Return, Reset, Lock, Camera, Rules, and Entry Controls. Visitor entries keep Return, Camera Preview, Rules, and navigation. This keeps the Camera actionable only while an Entry is active.
+Current smoke implementation uses context-specific kits: the hub reserves slots 1 and 8 for the Compass and Rules Book; owned entries reserve slots 1, 4, 8, and 9 for Return, Camera, Rules, and Entry Controls. Reset, submission lock, delete, and category change live in the Build Options GUI instead of consuming hotbar slots. Visitor entries keep Return, Camera Preview, Rules, and navigation. This keeps the Camera actionable only while an Entry is active.
 
 Context kits are applied only when the player changes between hub, owner, and visitor modes. Ordinary movement never clears or recreates the hotbar.
 
@@ -1732,13 +1734,16 @@ Smoke implementation enforces the primary-subject rule by requiring a point six 
 
 ```text
 save Camera Pose
--> spawn ItemDisplay/Interaction marker or camera-head representation
+-> spawn a tagged camera-head marker
 -> tag marker with Entry ID and slot
 -> show only to Team and staff when possible
 -> hide from visitors by default
--> remove marker before capture
--> restore after capture when phase permits
+-> left-click or right-click enters its exact Camera Preview
+-> hide all markers during Camera Preview
+-> restore markers when preview exits
 ```
+
+The smoke preview uses the saved player-eye viewpoint while keeping the player's safe feet location exact, locks position/yaw/pitch and pose changes, displays the numbered preview as a title and persistent boss bar, and replaces the Camera item with an exit item that accepts either click direction.
 
 ### 13.4 Camera management
 

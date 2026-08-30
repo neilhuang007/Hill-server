@@ -11,7 +11,7 @@ join with an offline nickname
 -> receive a temporary school-link URL
 -> development adapter approves the link automatically
 -> teleport to the exhibition hub
--> use the Competition Compass or category NPCs
+-> use the Competition Compass or the titled player category guides
 -> create The Journey, The Place, or The People entry
 -> build in a protected plot/private world
 -> invite one teammate with /team invite <nickname>
@@ -28,15 +28,17 @@ Production copies `server-config/spigot.yml` with `commands.log: false` so Paper
 - Offline-mode nickname protection with salted PBKDF2 password hashes.
 - Always-approve School Identity adapter for development testing.
 - Authentication lobby title, popup instructions, and private command workflow.
-- Owner-provided exhibition hub plus three in-world category personnel.
+- Owner-provided exhibition hub plus three skinned Player NPC category guides with Hypixel-style floating titles; left- and right-click both open their category GUI.
 - Journey 64x64 outdoor plots.
 - Place 32x32 interior shells.
 - People private worlds cloned from the cached world built from the supplied `structure.nbt`; generated campus-planning terrain is used only when that file is absent.
 - Maximum two category entries per participant and maximum two team members per entry.
-- Compass entry/visitor GUI with player heads.
+- Compass entry/visitor GUI with player heads and an Entry Controls GUI for reset, submission lock, delete, and category change instead of separate hotbar items.
 - Owner Creative Mode inside an owned entry; Spectator Mode outside it and while visiting.
 - Reset, delete, category switch, team invite/accept/leave, title, description, submit, and unlock flows.
-- Up to three camera poses per entry.
+- Up to three camera poses per entry, saved by right-clicking the Camera in empty air or on a block.
+- Full-screen camera preview mode with title and persistent status bar, exact movement/view lock, clickable camera markers, and a left/right-click exit item.
+- Reset operations stay in a tracked in-progress state until world restoration finishes, then restore returning owners to Creative Mode.
 - Block/entity/command/portal/explosion protections.
 - Water, lava, and manually placed fire are allowed inside entry bounds; spread and boundary escape are blocked.
 - TNT and end crystals may be placed decoratively but cannot explode. Sneak-punch an end crystal to remove it safely.
