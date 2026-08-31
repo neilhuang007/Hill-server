@@ -452,21 +452,22 @@ public final class WorldModule {
         }
 
         boolean copiedTemplate = false;
-        if (!target.exists() && templateReady) {
+        Path cloneDestination = peopleTemplateCloneDestination(target.toPath(), migrated.toPath());
+        if (!target.exists() && !migrated.exists() && templateReady) {
             try {
-                copyWorldFolder(template.toPath(), target.toPath());
+                copyWorldFolder(template.toPath(), cloneDestination);
                 copiedTemplate = true;
             } catch (IOException exception) {
                 plugin.getLogger().log(Level.SEVERE, "Could not copy People template; falling back to generated terrain", exception);
             }
         }
-        if (copiedTemplate && metadata != null && !hasMatchingPeopleReadyMarker(target.toPath(), metadata)) {
-            deleteDirectorySafely(target.toPath());
+        if (copiedTemplate && metadata != null && !hasMatchingPeopleReadyMarker(cloneDestination, metadata)) {
+            deleteDirectorySafely(cloneDestination);
             copiedTemplate = false;
         }
 
         World world;
-        if (target.isDirectory()) {
+        if (target.isDirectory() || migrated.isDirectory()) {
             world = WorldCreator.name(worldName).createWorld();
         } else {
             world = WorldCreator.name(worldName)
@@ -973,6 +974,10 @@ public final class WorldModule {
         World primary = Bukkit.getWorlds().getFirst();
         File primaryLevelRoot = new File(Bukkit.getWorldContainer(), primary.getName());
         return new File(primaryLevelRoot, "dimensions/minecraft/" + worldName);
+    }
+
+    static Path peopleTemplateCloneDestination(Path legacyWorldFolder, Path migratedWorldFolder) {
+        return migratedWorldFolder;
     }
 
     public record Allocation(String worldName, BuildRegion region, int allocationIndex) {

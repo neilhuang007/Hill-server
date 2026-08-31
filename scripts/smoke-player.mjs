@@ -11,6 +11,7 @@ const mineflayer = existsSync(path.join(dependencyRoot, "index.js"))
   ? requireFromDependencies(path.join(dependencyRoot, "index.js"))
   : requireFromDependencies("mineflayer");
 const nbt = requireFromDependencies("prismarine-nbt");
+const { Vec3 } = requireFromDependencies("vec3");
 
 const host = process.env.HILL175_SMOKE_HOST ?? "127.0.0.1";
 const port = Number(process.env.HILL175_SMOKE_PORT ?? "25566");
@@ -794,7 +795,18 @@ async function peopleImportScenario() {
     "People world ready",
     60_000,
   );
-  console.log("PASS: People entry imported the structure.nbt world and auto-teleported the player when ready");
+  const campusSentinel = new Vec3(-1, 94, 0);
+  await waitFor(
+    () => bot.blockAt(campusSentinel, false) != null,
+    "the campus sentinel chunk",
+  );
+  const sentinelBlock = bot.blockAt(campusSentinel, false);
+  if (sentinelBlock?.name !== "gray_concrete") {
+    throw new Error(
+      `People world sentinel ${campusSentinel} was ${sentinelBlock?.name ?? "unloaded"}; expected gray_concrete from the LiDAR campus road`,
+    );
+  }
+  console.log("PASS: People entry imported the LiDAR structure.nbt world, matched the campus sentinel, and auto-teleported the player");
 }
 
 const bot = mineflayer.createBot({
