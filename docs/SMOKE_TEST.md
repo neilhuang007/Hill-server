@@ -90,7 +90,7 @@ Run against Minecraft Java Edition 26.2.
 
 1. Before first survival entry, confirm `world/datapacks` contains exactly Terralith, Terratonic, Structory, Structory Towers, Towns and Towers, Incendium Legacy, and Nullscape from `server-assets/survival-worldgen-manifest.tsv`.
 2. Confirm no Tectonic zip is present.
-3. Confirm `server.properties` has `level-seed=<seed>`, `plugins/Hill175/config.yml` has the same installer-managed `survival.seed`, and `assets/survival-worldgen/survival-seed.txt` exists outside Git.
+3. Confirm `server.properties` has `level-seed=<seed>` and `difficulty=normal`, `plugins/Hill175/config.yml` has the same installer-managed `survival.seed`, and `assets/survival-worldgen/survival-seed.txt` exists outside Git.
 4. Confirm `plugins/Chunky-Bukkit-1.5.3.jar` is installed and that no other Chunky jar is present. Do not start pregeneration during this smoke pass.
 5. If a first primary-world transition archive exists, confirm all archived non-survival custom dimensions from every namespace were restored under `world/dimensions`, while `minecraft:hill_survival`, `minecraft:hill_survival_nether`, `minecraft:hill_survival_the_end`, `minecraft:overworld`, `minecraft:the_nether`, and `minecraft:the_end` were not copied from the archive.
 6. Confirm archived primary-root `players/`, `playerdata/`, `data/`, `stats/`, and `advancements/` were copied back into `world/` when present, while old `level.dat`, `session.lock`, and old `datapacks` were not copied.

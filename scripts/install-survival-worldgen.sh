@@ -360,6 +360,7 @@ write_server_properties_seed() {
   set_server_property "${properties_file}" "level-seed" "${seed}"
   set_server_property "${properties_file}" "generate-structures" "true"
   set_server_property "${properties_file}" "allow-nether" "true"
+  set_server_property "${properties_file}" "difficulty" "normal"
   set_server_property "${properties_file}" "pvp" "true"
 }
 

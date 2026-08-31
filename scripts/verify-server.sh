@@ -185,6 +185,7 @@ verify_primary_trio_seed_and_config() {
   require_line "${SERVER_PROPERTIES}" "level-seed=${seed}"
   require_line "${SERVER_PROPERTIES}" "generate-structures=true"
   require_line "${SERVER_PROPERTIES}" "allow-nether=true"
+  require_line "${SERVER_PROPERTIES}" "difficulty=normal"
   require_line "${SERVER_PROPERTIES}" "pvp=true"
 
   require_line "${PLUGIN_CONFIG}" "  survival: world"
