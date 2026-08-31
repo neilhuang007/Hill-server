@@ -277,6 +277,10 @@ public final class ServerListener implements Listener {
                 competition.sendRules(player);
                 return;
             }
+            if (competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)) {
+                event.setCancelled(true);
+                return;
+            }
         }
         if (event.getClickedBlock() != null
                 && event.getClickedBlock().getType() == Material.TNT
@@ -751,6 +755,7 @@ public final class ServerListener implements Listener {
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID);
     }
 

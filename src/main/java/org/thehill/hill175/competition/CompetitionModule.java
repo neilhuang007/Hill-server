@@ -8,6 +8,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.title.Title;
 import io.papermc.paper.datacomponent.DataComponentTypes;
 import io.papermc.paper.datacomponent.item.Consumable;
+import io.papermc.paper.datacomponent.item.MapId;
 import io.papermc.paper.datacomponent.item.consumable.ItemUseAnimation;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -24,6 +25,8 @@ import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.map.MapRenderer;
+import org.bukkit.map.MapView;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
@@ -32,9 +35,11 @@ import org.thehill.hill175.auth.PasswordHasher;
 import org.thehill.hill175.data.CompetitionStore;
 import org.thehill.hill175.data.SurvivalInventoryStore;
 import org.thehill.hill175.model.Account;
+import org.thehill.hill175.model.BuildRegion;
 import org.thehill.hill175.model.CameraPose;
 import org.thehill.hill175.model.Category;
 import org.thehill.hill175.model.Entry;
+import org.thehill.hill175.world.CampusChartMapRenderer;
 import org.thehill.hill175.world.WorldModule;
 
 import java.time.Duration;
@@ -63,10 +68,12 @@ public final class CompetitionModule {
     public static final String CAMERA_PREVIEW_REMOVE_ITEM_ID = "camera-preview-remove";
     public static final String RULES_ITEM_ID = "competition-rules";
     public static final String LOBBY_ITEM_ID = "return-lobby";
+    public static final String CAMPUS_CHART_ITEM_ID = "campus-chart";
     private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{3,16}$");
     private static final Set<String> RESERVED_NICKNAMES = Set.of("hilljourney", "hillplace", "hillpeople", "hillsurvival");
     private static final int MAX_TITLE_LENGTH = 80;
     private static final int MAX_DESCRIPTION_LENGTH = 750;
+    private static final int CAMPUS_CHART_SLOT = 1;
     private static final long CAMERA_CAPTURE_SILENCE_NANOS = 750_000_000L;
     private static final float CAMERA_MARKER_HITBOX_WIDTH = 0.8F;
     private static final float CAMERA_MARKER_HITBOX_HEIGHT = 1.2F;
@@ -95,6 +102,7 @@ public final class CompetitionModule {
     private final Map<UUID, Integer> nextCameraWriteIndexByPlayer = new HashMap<>();
     private final Map<UUID, UUID> pendingPeopleEntryByPlayer = new HashMap<>();
     private final Map<UUID, String> activeKitByPlayer = new HashMap<>();
+    private final Map<UUID, CampusChartMap> campusChartMapsByEntry = new HashMap<>();
     private final Map<UUID, PreviewState> activePreviewsByPlayer = new HashMap<>();
     private final Map<UUID, BossBar> previewBossBarsByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastPreviewExitAtNanosByPlayer = new HashMap<>();
@@ -1386,6 +1394,7 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
+        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Capture Camera View",
                 "Right-click once to save your exact position and view."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
@@ -1399,6 +1408,7 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
+        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Next Camera View",
                 "Right-click to view the next saved camera, or click a marker."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
@@ -1414,6 +1424,7 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
+        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.BARRIER, CAMERA_PREVIEW_ITEM_ID, "Exit Camera Preview",
                 "Left-click or right-click to return to your previous position."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
@@ -1428,6 +1439,51 @@ public final class CompetitionModule {
                 owner ? "Entry Controls" : "Competition Compass",
                 owner ? "Open the menu for this entry." : "Open entries, visit builds, or create a project."));
         activeKitByPlayer.put(player.getUniqueId(), previewKit(entry));
+    }
+
+    private void givePeopleCampusChart(Player player, Entry entry) {
+        if (!shouldGiveCampusChart(entry, player.getWorld())) {
+            return;
+        }
+        player.getInventory().setItem(CAMPUS_CHART_SLOT, campusChartItem(player, entry));
+    }
+
+    private ItemStack campusChartItem(Player player, Entry entry) {
+        ItemStack item = competitionItem(Material.FILLED_MAP, CAMPUS_CHART_ITEM_ID, "People Campus Chart",
+                "North is up. The red marker shows your position in this campus world.");
+        MapView mapView = campusChartMapView(player, entry);
+        if (mapView != null) {
+            item.setData(DataComponentTypes.MAP_ID, MapId.mapId(mapView.getId()));
+        }
+        return item;
+    }
+
+    private MapView campusChartMapView(Player player, Entry entry) {
+        World world = player.getWorld();
+        if (world == null) {
+            return null;
+        }
+        BuildRegion chartRegion = campusChartBounds(entry);
+        CampusChartMap cached = campusChartMapsByEntry.get(entry.id());
+        if (cached != null
+                && cached.world() == world
+                && cached.region().equals(chartRegion)) {
+            return cached.view();
+        }
+
+        MapView mapView = Bukkit.createMap(world);
+        mapView.setCenterX(chartRegion.centerX());
+        mapView.setCenterZ(chartRegion.centerZ());
+        mapView.setScale(MapView.Scale.FARTHEST);
+        mapView.setTrackingPosition(false);
+        mapView.setUnlimitedTracking(false);
+        mapView.setLocked(true);
+        for (MapRenderer renderer : List.copyOf(mapView.getRenderers())) {
+            mapView.removeRenderer(renderer);
+        }
+        mapView.addRenderer(new CampusChartMapRenderer(chartRegion));
+        campusChartMapsByEntry.put(entry.id(), new CampusChartMap(chartRegion, world, mapView));
+        return mapView;
     }
 
     private ItemStack competitionItem(Material material, String id, String name, String lore) {
@@ -2025,6 +2081,35 @@ public final class CompetitionModule {
         return "preview:" + entry.id();
     }
 
+    static boolean shouldGiveCampusChart(Entry entry, World world) {
+        return entry.category() == Category.PEOPLE
+                && world != null
+                && entry.worldName().equals(world.getName());
+    }
+
+    private BuildRegion campusChartBounds(Entry entry) {
+        return campusChartBounds(entry, plugin.getConfig().getIntegerList("people.campus-chart.block-bounds"));
+    }
+
+    static BuildRegion campusChartBounds(Entry entry, List<Integer> configuredBounds) {
+        if (configuredBounds.size() != 6) {
+            return entry.region();
+        }
+        try {
+            return new BuildRegion(
+                    entry.worldName(),
+                    configuredBounds.get(0),
+                    configuredBounds.get(1),
+                    configuredBounds.get(2),
+                    configuredBounds.get(3),
+                    configuredBounds.get(4),
+                    configuredBounds.get(5)
+            );
+        } catch (IllegalArgumentException ignored) {
+            return entry.region();
+        }
+    }
+
     private int normalizedCameraWriteIndex(Player player, Entry entry) {
         int next = nextCameraWriteIndexByPlayer.getOrDefault(player.getUniqueId(), 1);
         if (next < 1 || next > Entry.MAX_CAMERA_SLOTS) {
@@ -2070,6 +2155,9 @@ public final class CompetitionModule {
     }
 
     private record TeamInvite(UUID entryId, String inviterKey, Instant expiresAt) {
+    }
+
+    private record CampusChartMap(BuildRegion region, World world, MapView view) {
     }
 
     private record PreviewState(

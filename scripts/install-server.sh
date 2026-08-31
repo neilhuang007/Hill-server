@@ -224,16 +224,21 @@ validate_people_template_root() {
     echo "${label} is missing region directory" >&2
     return 1
   }
-  [[ -d "${template_root}/poi" ]] || {
-    echo "${label} is missing poi directory" >&2
-    return 1
-  }
+  if [[ "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" != "0" ]]; then
+    [[ -d "${template_root}/poi" ]] || {
+      echo "${label} is missing poi directory" >&2
+      return 1
+    }
+  fi
   region_count="$(count_mca_files "${template_root}/region")"
   [[ "${region_count}" == "${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" ]] || {
     echo "${label} has ${region_count} region MCA files; expected ${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" >&2
     return 1
   }
-  poi_count="$(count_mca_files "${template_root}/poi")"
+  poi_count="0"
+  if [[ -d "${template_root}/poi" ]]; then
+    poi_count="$(count_mca_files "${template_root}/poi")"
+  fi
   [[ "${poi_count}" == "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" ]] || {
     echo "${label} has ${poi_count} POI MCA files; expected ${PEOPLE_TEMPLATE_POI_MCA_COUNT}" >&2
     return 1
@@ -432,12 +437,12 @@ HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
 HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
 HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
 
-PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_20260830_2207_deploy.tgz"
+PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_groundfill_v5_20260831_1249_deploy.tgz"
 PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
-PEOPLE_TEMPLATE_SHA256="a3fcc855ff68067f8dd26f61bc15760251d8bb0311a65abb34858ff28477749c"
+PEOPLE_TEMPLATE_SHA256="858cac003d1803775ad6887d01510ca4202829b75b0fdca7d0dbae72a5a03385"
 PEOPLE_TEMPLATE_READY_MARKER="generated"
-PEOPLE_TEMPLATE_REGION_MCA_COUNT="26"
-PEOPLE_TEMPLATE_POI_MCA_COUNT="11"
+PEOPLE_TEMPLATE_REGION_MCA_COUNT="20"
+PEOPLE_TEMPLATE_POI_MCA_COUNT="0"
 PEOPLE_TEMPLATE_ASSET_DIR="${RUNTIME_DIR}/assets/voxelearth"
 PEOPLE_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
 

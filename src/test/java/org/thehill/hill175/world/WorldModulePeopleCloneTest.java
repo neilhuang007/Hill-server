@@ -21,6 +21,18 @@ final class WorldModulePeopleCloneTest {
     }
 
     @Test
+    void acceptsGeneratedAnvilTemplateWithoutPoiFilesWhenConfigured(@TempDir Path template) throws IOException {
+        Files.writeString(template.resolve(".hill175-people-ready"), "generated\n");
+        Path region = Files.createDirectories(template.resolve("region"));
+        Files.writeString(template.resolve("voxelearth-hill-manifest.json"), "{}\n");
+        for (int index = 0; index < 20; index++) {
+            Files.write(region.resolve("r." + index + ".0.mca"), new byte[8_192]);
+        }
+
+        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template, 20, 0));
+    }
+
+    @Test
     void excludesIdentityMetadataWhenCloningPaperWorlds() {
         assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("uid.dat")));
         assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("session.lock")));
@@ -61,4 +73,5 @@ final class WorldModulePeopleCloneTest {
         Files.writeString(template.resolve(".hill175-people-ready"), "wrong\n");
         assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
     }
+
 }

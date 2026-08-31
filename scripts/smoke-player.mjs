@@ -123,6 +123,19 @@ function itemUiText(item) {
   return [item.customName, ...(item.customLore ?? [])].map(componentText).join("\n");
 }
 
+function hotbarSummary() {
+  return bot.inventory.slots
+    .slice(36, 45)
+    .map((item, slot) => item ? `${slot}:${item.name}:${itemUiText(item)}` : `${slot}:empty`)
+    .join(", ");
+}
+
+function hasHotbarItem(name, text) {
+  return bot.inventory.slots
+    .slice(36, 45)
+    .some((item) => item?.name === name && (!text || itemUiText(item).includes(text)));
+}
+
 async function holdHotbarItem(name) {
   await delay(500);
   const hotbar = bot.inventory.slots.slice(36, 45);
@@ -1298,15 +1311,23 @@ async function peopleVoxelEarthTemplateScenario() {
   if (manifest?.format !== "voxelearth-hill-campus-v1") {
     throw new Error(`Unexpected VoxelEarth manifest format: ${manifest?.format}`);
   }
-  if ((manifest?.result?.keptVoxels ?? 0) < 10_000_000) {
-    throw new Error(`VoxelEarth manifest kept only ${manifest?.result?.keptVoxels ?? 0} voxels`);
+  if (manifest?.voxelGrid !== 64 || manifest?.blocksPerMetre !== 1) {
+    throw new Error(`Unexpected VoxelEarth v5 scale: grid ${manifest?.voxelGrid}, ${manifest?.blocksPerMetre} blocks/metre`);
   }
   const regionDir = path.join(folder, "region");
   const regionFiles = readdirSync(regionDir).filter((name) => name.endsWith(".mca"));
   const regionBytes = regionFiles.reduce((sum, name) => sum + statSync(path.join(regionDir, name)).size, 0);
-  if (regionFiles.length < 20 || regionBytes < 60_000_000) {
+  if ((manifest?.result?.keptVoxels ?? 0) < 8_000_000) {
+    throw new Error(`VoxelEarth groundfill v5 manifest kept only ${manifest?.result?.keptVoxels ?? 0} voxels`);
+  }
+  if (regionFiles.length < 20 || regionBytes < 40_000_000) {
     throw new Error(`VoxelEarth People world has weak region output: ${regionFiles.length} files, ${regionBytes} bytes`);
   }
+  await waitFor(
+    () => hasHotbarItem("filled_map", "People Campus Chart"),
+    `People Campus Chart filled_map in hotbar: ${hotbarSummary()}`,
+    30_000,
+  );
 
   await delay(2_000);
   const below = bot.blockAt(bot.entity.position.offset(0, -1, 0).floored(), false);
@@ -1314,7 +1335,7 @@ async function peopleVoxelEarthTemplateScenario() {
     throw new Error(`People world spawn is not standing on solid VoxelEarth terrain: ${below?.name ?? "unloaded"}`);
   }
 
-  console.log(`PASS: People entry cloned VoxelEarth template from ${folder}; ${manifest.result.keptVoxels} kept voxels, ${regionFiles.length} region files, standing on ${below.name}`);
+  console.log(`PASS: People entry cloned VoxelEarth groundfill v5 template from ${folder}; ${manifest.result.keptVoxels} kept voxels, ${regionFiles.length} region files, chart map present, standing on ${below.name}`);
 }
 
 const bot = mineflayer.createBot({

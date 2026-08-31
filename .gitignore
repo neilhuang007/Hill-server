@@ -21,6 +21,7 @@ __pycache__/
 # Large generated/source map assets stay outside Git and are deployed separately.
 combined_3d_tiles.glb
 structure.nbt
+world-templates/
 
 # Plugin data and generated worlds
 competition-data.yml

@@ -719,7 +719,7 @@ public final class WorldModule {
         }
         int expectedRegionFiles = Math.max(1,
                 plugin.getConfig().getInt("people.template-region-file-count", 26));
-        int expectedPoiFiles = Math.max(1,
+        int expectedPoiFiles = Math.max(0,
                 plugin.getConfig().getInt("people.template-poi-file-count", 11));
         return isGeneratedAnvilTemplateReady(templateFolder.toPath(), expectedRegionFiles, expectedPoiFiles);
     }
@@ -736,7 +736,7 @@ public final class WorldModule {
         if (!Files.isRegularFile(marker)
                 || !Files.isRegularFile(manifest)
                 || !Files.isDirectory(regionFolder)
-                || !Files.isDirectory(poiFolder)
+                || (expectedPoiFiles > 0 && !Files.isDirectory(poiFolder))
                 || Files.exists(templateFolder.resolve("dimensions"))) {
             return false;
         }
@@ -746,10 +746,17 @@ public final class WorldModule {
                 return false;
             }
             return hasExpectedAnvilFiles(regionFolder, expectedRegionFiles)
-                    && hasExpectedAnvilFiles(poiFolder, expectedPoiFiles);
+                    && hasExpectedOptionalAnvilFiles(poiFolder, expectedPoiFiles);
         } catch (IOException exception) {
             return false;
         }
+    }
+
+    private static boolean hasExpectedOptionalAnvilFiles(Path folder, int expectedCount) throws IOException {
+        if (expectedCount == 0 && !Files.isDirectory(folder)) {
+            return true;
+        }
+        return hasExpectedAnvilFiles(folder, expectedCount);
     }
 
     private static boolean hasExpectedAnvilFiles(Path folder, int expectedCount) throws IOException {
