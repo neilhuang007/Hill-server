@@ -16,6 +16,7 @@ const { Vec3 } = requireFromDependencies("vec3");
 const host = process.env.HILL175_SMOKE_HOST ?? "127.0.0.1";
 const port = Number(process.env.HILL175_SMOKE_PORT ?? "25566");
 const scenario = process.argv[2] ?? "lobby-return";
+const skipLocalWorldFiles = process.env.HILL175_SMOKE_SKIP_LOCAL_WORLD_FILES === "1";
 const username = `Smoke${String(Date.now()).slice(-9)}`;
 const password = "SmokeTest123!";
 const transcript = [];
@@ -1298,6 +1299,22 @@ async function peopleVoxelEarthTemplateScenario() {
     "People owner mode",
     120_000,
   );
+  await waitFor(
+    () => hasHotbarItem("filled_map", "People Campus Chart"),
+    `People Campus Chart filled_map in hotbar: ${hotbarSummary()}`,
+    30_000,
+  );
+
+  await delay(2_000);
+  const below = bot.blockAt(bot.entity.position.offset(0, -1, 0).floored(), false);
+  if (!below || below.name === "air" || below.name === "void_air") {
+    throw new Error(`People world spawn is not standing on solid VoxelEarth terrain: ${below?.name ?? "unloaded"}`);
+  }
+
+  if (skipLocalWorldFiles) {
+    console.log(`PASS: People entry cloned VoxelEarth groundfill v5 template into ${currentDimension(bot)}; chart map present, standing on ${below.name}`);
+    return;
+  }
 
   const folder = currentWorldFolder();
   if (!folder) {
@@ -1322,17 +1339,6 @@ async function peopleVoxelEarthTemplateScenario() {
   }
   if (regionFiles.length < 20 || regionBytes < 40_000_000) {
     throw new Error(`VoxelEarth People world has weak region output: ${regionFiles.length} files, ${regionBytes} bytes`);
-  }
-  await waitFor(
-    () => hasHotbarItem("filled_map", "People Campus Chart"),
-    `People Campus Chart filled_map in hotbar: ${hotbarSummary()}`,
-    30_000,
-  );
-
-  await delay(2_000);
-  const below = bot.blockAt(bot.entity.position.offset(0, -1, 0).floored(), false);
-  if (!below || below.name === "air" || below.name === "void_air") {
-    throw new Error(`People world spawn is not standing on solid VoxelEarth terrain: ${below?.name ?? "unloaded"}`);
   }
 
   console.log(`PASS: People entry cloned VoxelEarth groundfill v5 template from ${folder}; ${manifest.result.keptVoxels} kept voxels, ${regionFiles.length} region files, chart map present, standing on ${below.name}`);
