@@ -181,12 +181,25 @@ async function nearestCameraMarker(targetBot = bot) {
   const marker = Object.values(targetBot.entities)
     .filter((entity) => entity.name === "armor_stand")
     .sort((left, right) => left.position.distanceTo(targetBot.entity.position) - right.position.distanceTo(targetBot.entity.position))[0];
+  const hasMetadataNumber = (entity, expected) => Object.values(entity.metadata ?? {})
+    .some((value) => typeof value === "number" && Math.abs(value - expected) < 0.001);
   await waitFor(
-    () => marker.attributes?.["generic.scale"]?.value >= 1.2,
+    () => Object.values(targetBot.entities).some((entity) =>
+      entity.name === "interaction"
+      && hasMetadataNumber(entity, 0.8)
+      && hasMetadataNumber(entity, 1.2)),
     "an expanded camera-marker hitbox",
     3_000,
   );
-  return marker;
+  const hitbox = Object.values(targetBot.entities)
+    .filter((entity) => entity.name === "interaction"
+      && hasMetadataNumber(entity, 0.8)
+      && hasMetadataNumber(entity, 1.2))
+    .sort((left, right) => left.position.distanceTo(marker.position) - right.position.distanceTo(marker.position))[0];
+  if (hitbox.position.distanceTo(marker.position) > 1.1) {
+    throw new Error(`Expanded camera hitbox was ${hitbox.position.distanceTo(marker.position).toFixed(3)} blocks from its marker`);
+  }
+  return hitbox;
 }
 
 async function approachEntity(entity) {
