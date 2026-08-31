@@ -34,20 +34,39 @@ hub:
 generated-worlds:
   journey: hill_journey
   place: hill_place
-  people-fallback: one private hill_people_<entry> world per People entry
+  people: one private hill_people_<entry> clone per People entry
 
 people-campus:
-  name: Hill School phase 1 campus
+  name: Hill School full-property VoxelEarth campus
   address: 860 Beech Street, Pottstown, PA 19464
-  generator: scripts/generate-hill-campus.py
-  install-filename: structure.nbt
+  engine: VoxelEarth Java 3D Tiles voxelizer
+  upstream: https://github.com/ryanhlewis/VoxelEarth
+  upstream-base: ed68433
+  hill-generator-commit: 4c60f35
+  world-artifact-filename: hill_school_voxelearth_full_20260830_2207-paper26-final.zip
+  world-artifact-sha256: ff694baadb6b04616a53c29c2a5eca7ea762d411b77c33dc34527f68b140d4ae
+  world-archive-root: hill_school_voxelearth_full_20260830_2207
+  world-template-source: dimensions/minecraft/overworld
+  template-artifact-filename: hill_people_template_voxelearth_full_20260830_2207_deploy.tgz
+  template-artifact-sha256: a3fcc855ff68067f8dd26f61bc15760251d8bb0311a65abb34858ff28477749c
+  template-archive-root: hill_people_template
   install-template: world-templates/hill_people_template
-  sha256: fcbbef9200e73b04f1493bfb087b0e2fbf462aadb58df7a3e1d336f82c34aa04
-  data-version: 4903
-  size: [1338, 117, 1143]
-  block-records: 4195187
-  palette-size: 28
-  resolution-metres-per-block: 1.0
-  scope: phase 1 academic and athletic campus
-  sources: Montgomery County parcels/building outlines, USGS D24 DEM/lidar, OpenStreetMap site features, PEMA orthophoto, and the official Hill campus map
-  permission: School-authorized project asset; large binary deployed separately from Git
+  minecraft-version: 26.2
+  paper-build: 119
+  voxel-grid: 128
+  blocks-per-metre: 2.1
+  resolution-metres-per-block: 0.47619047619047616
+  sector-radius-metres: 230
+  sector-candidates: 20
+  rendered-sectors: 15
+  skipped-disjoint-sectors: 5
+  source-tiles: 3976
+  kept-voxels: 11497110
+  clipped-voxels: 21571811
+  block-bounds: [-1268, 70, -1145, 1268, 195, 1146]
+  region-files: 26
+  poi-files: 11
+  parcel-tax-pins: [160015116006, 160016044005, 160016052006]
+  scope: all selected Hill-owned parcels; neighborhood geometry is excluded by the parcel clip
+  sources: VoxelEarth 3D Tiles mesh and Montgomery County parcel boundaries, visually checked against Google Maps and the official Hill campus map
+  permission: School-authorized project asset; large world archive is deployed separately from Git

@@ -71,6 +71,10 @@ worlds:
 people:
   # Extract a rights-cleared campus template to this folder before creating People entries.
   template-folder: world-templates/hill_people_template
+  # Production must fail closed instead of silently substituting flat generated terrain.
+  require-template: true
+  template-region-file-count: 26
+  template-poi-file-count: 11
   # Optional fallback. Leave blank when using a prepared Anvil template folder.
   structure-file: ""
   structure-import-blocks-per-tick: 12000

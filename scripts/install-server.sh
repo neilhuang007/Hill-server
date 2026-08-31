@@ -22,6 +22,8 @@ auth_replacement_applied=false
 auth_replacement_backup=""
 hub_replacement_applied=false
 hub_replacement_backup=""
+people_template_replacement_applied=false
+people_template_backup=""
 
 backup_runtime_file() {
   local target="$1"
@@ -174,11 +176,205 @@ rollback_imported_world_replacement() {
   return 0
 }
 
+count_mca_files() {
+  local directory="$1"
+
+  find "${directory}" -maxdepth 1 -type f -name 'r.*.mca' | wc -l | tr -d '[:space:]'
+}
+
+remove_people_template_staging() {
+  local staging_dir="$1"
+
+  case "${staging_dir}" in
+    "${RUNTIME_DIR}/assets/voxelearth/install-staging/"*) ;;
+    *)
+      echo "Refused to remove unsafe People template staging path: ${staging_dir}" >&2
+      return 1
+      ;;
+  esac
+  rm -rf -- "${staging_dir}"
+}
+
+validate_people_template_root() {
+  local template_root="$1"
+  local label="$2"
+  local marker
+  local nested_dimensions
+  local region_count
+  local poi_count
+
+  [[ -d "${template_root}" ]] || {
+    echo "${label} is missing expected root directory: ${template_root}" >&2
+    return 1
+  }
+  [[ -f "${template_root}/.hill175-people-ready" ]] || {
+    echo "${label} is missing .hill175-people-ready" >&2
+    return 1
+  }
+  marker="$(tr -d '\r\n' < "${template_root}/.hill175-people-ready")"
+  [[ "${marker}" == "${PEOPLE_TEMPLATE_READY_MARKER}" ]] || {
+    echo "${label} has unexpected People template marker: ${marker}" >&2
+    return 1
+  }
+  [[ -f "${template_root}/voxelearth-hill-manifest.json" ]] || {
+    echo "${label} is missing voxelearth-hill-manifest.json" >&2
+    return 1
+  }
+  [[ -d "${template_root}/region" ]] || {
+    echo "${label} is missing region directory" >&2
+    return 1
+  }
+  [[ -d "${template_root}/poi" ]] || {
+    echo "${label} is missing poi directory" >&2
+    return 1
+  }
+  region_count="$(count_mca_files "${template_root}/region")"
+  [[ "${region_count}" == "${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" ]] || {
+    echo "${label} has ${region_count} region MCA files; expected ${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" >&2
+    return 1
+  }
+  poi_count="$(count_mca_files "${template_root}/poi")"
+  [[ "${poi_count}" == "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" ]] || {
+    echo "${label} has ${poi_count} POI MCA files; expected ${PEOPLE_TEMPLATE_POI_MCA_COUNT}" >&2
+    return 1
+  }
+  nested_dimensions="$(find "${template_root}" -type d -name dimensions -print -quit)"
+  [[ -z "${nested_dimensions}" ]] || {
+    echo "${label} contains nested dimensions directory: ${nested_dimensions}" >&2
+    return 1
+  }
+}
+
+preflight_people_template_archive() {
+  local archive="${PEOPLE_TEMPLATE_ASSET_DIR}/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
+
+  if [[ ! -f "${archive}" ]]; then
+    echo "Missing user-provided People template archive: ${archive}" >&2
+    echo "Stage ${PEOPLE_TEMPLATE_ARCHIVE_NAME} under ${PEOPLE_TEMPLATE_ASSET_DIR} before running this installer." >&2
+    exit 1
+  fi
+  verify_sha256 "${archive}" "${PEOPLE_TEMPLATE_SHA256}" || {
+    echo "People template archive SHA-256 mismatch: ${archive}" >&2
+    exit 1
+  }
+}
+
+rollback_people_template_replacement() {
+  local recovery_dir
+
+  case "${people_template_backup}" in
+    "${RUNTIME_DIR}/assets/people-template-backup."*) ;;
+    *)
+      echo "Cannot roll back unsafe People template backup path: ${people_template_backup}" >&2
+      return 1
+      ;;
+  esac
+  [[ -d "${people_template_backup}" ]] || {
+    echo "Cannot roll back missing People template backup: ${people_template_backup}" >&2
+    return 1
+  }
+
+  recovery_dir="$(mktemp -d "${RUNTIME_DIR}/assets/failed-people-template-start.XXXXXX")"
+  if [[ -e "${PEOPLE_TEMPLATE_TARGET}" || -L "${PEOPLE_TEMPLATE_TARGET}" ]]; then
+    if ! mv "${PEOPLE_TEMPLATE_TARGET}" "${recovery_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"; then
+      echo "Could not preserve failed People template replacement; automatic rollback stopped." >&2
+      return 1
+    fi
+  fi
+  if [[ -e "${people_template_backup}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" ]]; then
+    install -d "$(dirname "${PEOPLE_TEMPLATE_TARGET}")"
+    if ! mv "${people_template_backup}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" "${PEOPLE_TEMPLATE_TARGET}"; then
+      echo "Could not restore previous People template; automatic rollback stopped." >&2
+      return 1
+    fi
+  elif [[ -f "${people_template_backup}/.absent" ]]; then
+    :
+  else
+    echo "People template backup did not contain ${PEOPLE_TEMPLATE_ARCHIVE_ROOT} or .absent marker." >&2
+    return 1
+  fi
+  people_template_replacement_applied=false
+  echo "Rolled back People template replacement; failed replacement remains recoverable at ${recovery_dir}." >&2
+  return 0
+}
+
+install_people_template() {
+  local archive="${PEOPLE_TEMPLATE_ASSET_DIR}/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
+  local staging_parent="${PEOPLE_TEMPLATE_ASSET_DIR}/install-staging"
+  local extract_dir
+  local staged_root
+  local extra_top_level
+  local backup_dir
+
+  preflight_people_template_archive
+  install -d -m 0750 -o root -g root "${PEOPLE_TEMPLATE_ASSET_DIR}" "${staging_parent}"
+  install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_USER}" "$(dirname "${PEOPLE_TEMPLATE_TARGET}")"
+  extract_dir="$(mktemp -d "${staging_parent}/hill-template.XXXXXX")"
+  if ! tar --extract --gzip --no-same-owner --no-same-permissions --file "${archive}" --directory "${extract_dir}"; then
+    remove_people_template_staging "${extract_dir}"
+    echo "Could not extract People template archive: ${archive}" >&2
+    exit 1
+  fi
+  staged_root="${extract_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
+  extra_top_level="$(find "${extract_dir}" -mindepth 1 -maxdepth 1 ! -name "${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" -print -quit)"
+  if [[ -n "${extra_top_level}" ]]; then
+    remove_people_template_staging "${extract_dir}"
+    echo "People template archive contains unexpected top-level path: ${extra_top_level}" >&2
+    exit 1
+  fi
+  if ! validate_people_template_root "${staged_root}" "Extracted People template"; then
+    remove_people_template_staging "${extract_dir}"
+    exit 1
+  fi
+
+  if [[ -L "${PEOPLE_TEMPLATE_TARGET}" || -e "${PEOPLE_TEMPLATE_TARGET}" && ! -d "${PEOPLE_TEMPLATE_TARGET}" ]]; then
+    remove_people_template_staging "${extract_dir}"
+    echo "Refusing to replace unexpected People template path: ${PEOPLE_TEMPLATE_TARGET}" >&2
+    exit 1
+  fi
+
+  backup_dir="$(mktemp -d "${RUNTIME_DIR}/assets/people-template-backup.XXXXXX")"
+  if [[ -d "${PEOPLE_TEMPLATE_TARGET}" ]]; then
+    if ! mv "${PEOPLE_TEMPLATE_TARGET}" "${backup_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"; then
+      remove_people_template_staging "${extract_dir}"
+      echo "Could not move previous People template aside: ${PEOPLE_TEMPLATE_TARGET}" >&2
+      exit 1
+    fi
+  else
+    touch "${backup_dir}/.absent"
+  fi
+  people_template_backup="${backup_dir}"
+
+  if ! mv "${staged_root}" "${PEOPLE_TEMPLATE_TARGET}"; then
+    if [[ -d "${backup_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" ]]; then
+      mv "${backup_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" "${PEOPLE_TEMPLATE_TARGET}"
+    fi
+    remove_people_template_staging "${extract_dir}"
+    echo "People template replacement failed; the previous template was restored." >&2
+    exit 1
+  fi
+  people_template_replacement_applied=true
+  rmdir "${extract_dir}"
+
+  validate_people_template_root "${PEOPLE_TEMPLATE_TARGET}" "Installed People template"
+  chown -R "${SERVICE_USER}:${SERVICE_USER}" "${PEOPLE_TEMPLATE_TARGET}"
+  find "${PEOPLE_TEMPLATE_TARGET}" -type d -exec chmod 0750 {} +
+  find "${PEOPLE_TEMPLATE_TARGET}" -type f -exec chmod 0640 {} +
+  echo "Installed People template ${PEOPLE_TEMPLATE_ARCHIVE_NAME} at ${PEOPLE_TEMPLATE_TARGET}"
+  if [[ -d "${backup_dir}/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}" ]]; then
+    echo "Previous People template retained for recovery at ${backup_dir}"
+  fi
+}
+
 cleanup() {
   local status=$?
   trap - EXIT INT TERM
   if [[ "${status}" -ne 0 && -n "${runtime_rollback_dir}" ]]; then
     systemctl stop "${SERVICE_NAME}" 2>/dev/null || true
+    if [[ "${people_template_replacement_applied}" == true ]] \
+        && ! rollback_people_template_replacement; then
+      startup_rollback_failed=true
+    fi
     if [[ "${hub_replacement_applied}" == true ]] \
         && ! rollback_imported_world_replacement hub "${hub_target}" "${hub_modern_target}" "${hub_replacement_backup}"; then
       startup_rollback_failed=true
@@ -236,6 +432,15 @@ HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
 HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
 HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
 
+PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_20260830_2207_deploy.tgz"
+PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
+PEOPLE_TEMPLATE_SHA256="a3fcc855ff68067f8dd26f61bc15760251d8bb0311a65abb34858ff28477749c"
+PEOPLE_TEMPLATE_READY_MARKER="generated"
+PEOPLE_TEMPLATE_REGION_MCA_COUNT="26"
+PEOPLE_TEMPLATE_POI_MCA_COUNT="11"
+PEOPLE_TEMPLATE_ASSET_DIR="${RUNTIME_DIR}/assets/voxelearth"
+PEOPLE_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
+
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
     echo "Missing required command: $1" >&2
@@ -260,10 +465,12 @@ require_command tar
 require_command unzip
 require_command borg
 require_command flock
+require_command find
 require_command grep
 require_command sha256sum
 require_command sha512sum
 require_command systemctl
+require_command wc
 
 if ! id "${SERVICE_USER}" >/dev/null 2>&1; then
   useradd --system --home-dir "${RUNTIME_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
@@ -305,6 +512,8 @@ for existing_chunky in "${RUNTIME_DIR}"/plugins/*[Cc]hunky*.jar; do
     exit 1
   fi
 done
+
+preflight_people_template_archive
 
 # Runtime files, datapacks, and fresh survival world folders are updated while Paper is stopped.
 if systemctl is-active --quiet "${SERVICE_NAME}"; then
@@ -355,6 +564,8 @@ if [[ -f "${REPO_DIR}/structure.nbt" ]]; then
     "${RUNTIME_DIR}/structure.nbt"
 fi
 printf 'eula=true\n' > "${RUNTIME_DIR}/eula.txt"
+
+install_people_template
 
 if [[ -f "${RUNTIME_DIR}/assets/survival-worldgen/primary-trio-managed.env" ]]; then
   primary_transition_marker_existed=true

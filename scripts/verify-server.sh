@@ -15,6 +15,14 @@ EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\t
 CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
 CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
 CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
+PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_20260830_2207_deploy.tgz"
+PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
+PEOPLE_TEMPLATE_SHA256="a3fcc855ff68067f8dd26f61bc15760251d8bb0311a65abb34858ff28477749c"
+PEOPLE_TEMPLATE_READY_MARKER="generated"
+PEOPLE_TEMPLATE_REGION_MCA_COUNT="26"
+PEOPLE_TEMPLATE_POI_MCA_COUNT="11"
+PEOPLE_TEMPLATE_ARCHIVE="${RUNTIME_DIR}/assets/voxelearth/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
+PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
 
 fail() {
   echo "verify-server failed: $*" >&2
@@ -25,6 +33,18 @@ verify_sha512() {
   local file="$1"
   local expected="$2"
   echo "${expected}  ${file}" | sha512sum --check --status
+}
+
+verify_sha256() {
+  local file="$1"
+  local expected="$2"
+  echo "${expected}  ${file}" | sha256sum --check --status
+}
+
+count_mca_files() {
+  local directory="$1"
+
+  find "${directory}" -maxdepth 1 -type f -name 'r.*.mca' | wc -l | tr -d '[:space:]'
 }
 
 verify_worldgen_datapacks() {
@@ -103,6 +123,50 @@ verify_chunky_plugin() {
     fi
   done
   shopt -u nullglob
+}
+
+verify_people_template() {
+  local marker
+  local nested_dimensions
+  local region_count
+  local poi_count
+
+  [[ -f "${PEOPLE_TEMPLATE_ARCHIVE}" ]] || fail "missing pinned People template archive: ${PEOPLE_TEMPLATE_ARCHIVE}"
+  verify_sha256 "${PEOPLE_TEMPLATE_ARCHIVE}" "${PEOPLE_TEMPLATE_SHA256}" \
+    || fail "People template archive hash mismatch: ${PEOPLE_TEMPLATE_ARCHIVE}"
+
+  [[ -f "${PLUGIN_CONFIG}" ]] || fail "missing Hill175 plugin config: ${PLUGIN_CONFIG}"
+  grep -Eq '^  template-folder:[[:space:]]*world-templates/hill_people_template[[:space:]]*$' "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config does not point People entries at world-templates/hill_people_template"
+  grep -Eq '^  require-template:[[:space:]]*true[[:space:]]*$' "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must fail closed when the People template is unavailable"
+  grep -Eq '^  template-region-file-count:[[:space:]]*26[[:space:]]*$' "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must require all 26 VoxelEarth region files"
+  grep -Eq '^  template-poi-file-count:[[:space:]]*11[[:space:]]*$' "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must require all 11 VoxelEarth POI files"
+  grep -Eq "^  structure-file:[[:space:]]*(''|\"\"|)[[:space:]]*$" "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must leave people.structure-file blank for the Anvil template"
+
+  [[ ! -L "${PEOPLE_TEMPLATE_DIR}" ]] || fail "People template path must not be a symlink: ${PEOPLE_TEMPLATE_DIR}"
+  [[ -d "${PEOPLE_TEMPLATE_DIR}" ]] || fail "missing People template directory: ${PEOPLE_TEMPLATE_DIR}"
+  [[ -f "${PEOPLE_TEMPLATE_DIR}/.hill175-people-ready" ]] || fail "missing People template ready marker"
+  marker="$(tr -d '\r\n' < "${PEOPLE_TEMPLATE_DIR}/.hill175-people-ready")"
+  [[ "${marker}" == "${PEOPLE_TEMPLATE_READY_MARKER}" ]] \
+    || fail "People template marker was '${marker}', expected '${PEOPLE_TEMPLATE_READY_MARKER}'"
+  [[ -f "${PEOPLE_TEMPLATE_DIR}/voxelearth-hill-manifest.json" ]] \
+    || fail "missing People template voxelearth-hill-manifest.json"
+  [[ -d "${PEOPLE_TEMPLATE_DIR}/region" ]] || fail "missing People template region directory"
+  [[ -d "${PEOPLE_TEMPLATE_DIR}/poi" ]] || fail "missing People template POI directory"
+
+  region_count="$(count_mca_files "${PEOPLE_TEMPLATE_DIR}/region")"
+  [[ "${region_count}" == "${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" ]] \
+    || fail "People template has ${region_count} region MCA files; expected ${PEOPLE_TEMPLATE_REGION_MCA_COUNT}"
+  poi_count="$(count_mca_files "${PEOPLE_TEMPLATE_DIR}/poi")"
+  [[ "${poi_count}" == "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" ]] \
+    || fail "People template has ${poi_count} POI MCA files; expected ${PEOPLE_TEMPLATE_POI_MCA_COUNT}"
+  nested_dimensions="$(find "${PEOPLE_TEMPLATE_DIR}" -type d -name dimensions -print -quit)"
+  [[ -z "${nested_dimensions}" ]] \
+    || fail "People template contains nested dimensions directory: ${nested_dimensions}"
 }
 
 require_line() {
@@ -210,6 +274,7 @@ systemctl is-active --quiet hill175.service
 systemctl --no-pager --full status hill175.service
 ss -ltnp | grep -E '(:25566)([[:space:]]|$)'
 verify_chunky_plugin
+verify_people_template
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
 check_latest_log

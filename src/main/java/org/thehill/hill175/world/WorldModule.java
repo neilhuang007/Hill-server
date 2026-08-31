@@ -520,12 +520,24 @@ public final class WorldModule {
                 copyWorldFolder(template.toPath(), cloneDestination);
                 copiedTemplate = true;
             } catch (IOException exception) {
-                plugin.getLogger().log(Level.SEVERE, "Could not copy People template; falling back to generated terrain", exception);
+                if (!deleteDirectorySafely(cloneDestination)) {
+                    throw new IllegalStateException("Could not remove a partial People template clone at "
+                            + cloneDestination, exception);
+                }
+                plugin.getLogger().log(Level.SEVERE, "Could not copy People template", exception);
             }
         }
         if (copiedTemplate && metadata != null && !hasMatchingPeopleReadyMarker(cloneDestination, metadata)) {
             deleteDirectorySafely(cloneDestination);
             copiedTemplate = false;
+        }
+        if (!target.exists()
+                && !migrated.exists()
+                && !copiedTemplate
+                && metadata == null
+                && plugin.getConfig().getBoolean("people.require-template", true)) {
+            throw new IllegalStateException("The configured People template is unavailable or invalid: "
+                    + (template == null ? "<not configured>" : template.getAbsolutePath()));
         }
 
         World world;
@@ -602,6 +614,11 @@ public final class WorldModule {
     }
 
     private void resetPeople(Entry entry) {
+        if (!isPeopleRebuildSourceReady()) {
+            failReset(entry.id(), new IllegalStateException(
+                    "The People template is unavailable or still preparing; the existing entry was preserved."));
+            return;
+        }
         for (org.bukkit.entity.Player player : Bukkit.getOnlinePlayers()) {
             if (player.getWorld().getName().equals(entry.worldName())) {
                 player.teleport(hubSpawn());
@@ -627,6 +644,17 @@ public final class WorldModule {
         } else {
             whenPeopleWorldReady(entry.worldName(), whenReady);
         }
+    }
+
+    private boolean isPeopleRebuildSourceReady() {
+        StructureNbtLoader.Metadata metadata = resolvePeopleStructureMetadata();
+        if (metadata != null && !isPeopleTemplateReady()) {
+            beginPeopleTemplatePreparation();
+            return false;
+        }
+        return metadata != null
+                || !plugin.getConfig().getBoolean("people.require-template", true)
+                || isPeopleTemplateReady();
     }
 
     private File resolveTemplateFolder() {
@@ -683,9 +711,63 @@ public final class WorldModule {
     }
 
     private boolean isConfiguredPeopleTemplateReady(File templateFolder, StructureNbtLoader.Metadata metadata) {
-        return templateFolder != null
-                && templateFolder.isDirectory()
-                && hasMatchingPeopleReadyMarker(templateFolder.toPath(), metadata);
+        if (templateFolder == null || !templateFolder.isDirectory()) {
+            return false;
+        }
+        if (metadata != null) {
+            return hasMatchingPeopleReadyMarker(templateFolder.toPath(), metadata);
+        }
+        int expectedRegionFiles = Math.max(1,
+                plugin.getConfig().getInt("people.template-region-file-count", 26));
+        int expectedPoiFiles = Math.max(1,
+                plugin.getConfig().getInt("people.template-poi-file-count", 11));
+        return isGeneratedAnvilTemplateReady(templateFolder.toPath(), expectedRegionFiles, expectedPoiFiles);
+    }
+
+    static boolean isGeneratedAnvilTemplateReady(
+            Path templateFolder,
+            int expectedRegionFiles,
+            int expectedPoiFiles
+    ) {
+        Path marker = templateFolder.resolve(PEOPLE_READY_MARKER);
+        Path regionFolder = templateFolder.resolve("region");
+        Path poiFolder = templateFolder.resolve("poi");
+        Path manifest = templateFolder.resolve("voxelearth-hill-manifest.json");
+        if (!Files.isRegularFile(marker)
+                || !Files.isRegularFile(manifest)
+                || !Files.isDirectory(regionFolder)
+                || !Files.isDirectory(poiFolder)
+                || Files.exists(templateFolder.resolve("dimensions"))) {
+            return false;
+        }
+        try {
+            if (!Files.readString(marker).trim().equals(GENERATED_READY_MARKER)
+                    || Files.size(manifest) == 0L) {
+                return false;
+            }
+            return hasExpectedAnvilFiles(regionFolder, expectedRegionFiles)
+                    && hasExpectedAnvilFiles(poiFolder, expectedPoiFiles);
+        } catch (IOException exception) {
+            return false;
+        }
+    }
+
+    private static boolean hasExpectedAnvilFiles(Path folder, int expectedCount) throws IOException {
+        try (var paths = Files.list(folder)) {
+            List<Path> regionFiles = paths
+                    .filter(path -> Files.isRegularFile(path)
+                            && path.getFileName().toString().matches("r\\.-?\\d+\\.-?\\d+\\.mca"))
+                    .toList();
+            if (regionFiles.size() != expectedCount) {
+                return false;
+            }
+            for (Path regionFile : regionFiles) {
+                if (Files.size(regionFile) < 8_192L) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     private void beginPeopleTemplatePreparation() {
@@ -1053,6 +1135,8 @@ public final class WorldModule {
         String name = relative.getFileName() == null ? "" : relative.getFileName().toString();
         return name.equals("uid.dat")
                 || name.equals("session.lock")
+                || name.equals("level.dat")
+                || name.equals("level.dat_old")
                 || relative.equals(Path.of("data", "paper", "metadata.dat"));
     }
 
