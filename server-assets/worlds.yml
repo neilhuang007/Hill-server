@@ -42,7 +42,7 @@ people-campus:
   engine: VoxelEarth Java 3D Tiles voxelizer for terrain/context plus Roofer LoD2 geometry voxelized by VoxCity
   upstream: https://github.com/ryanhlewis/VoxelEarth, https://github.com/3DBAG/roofer, and https://github.com/kunifujiwara/VoxCity
   upstream-base: ed68433
-  hill-generator-commit: pending-v15
+  hill-generator-commit: 80b23b8
   world-artifact-filename: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831-paper26-final.tgz
   world-artifact-sha256: b4980c8e387ada4e98ac5ff5b7424211306973087269bdb9974d602adefb2d21
   world-archive-root: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831
