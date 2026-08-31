@@ -42,7 +42,7 @@ people-campus:
   engine: VoxelEarth Java 3D Tiles voxelizer with constrained campus material pass
   upstream: https://github.com/ryanhlewis/VoxelEarth
   upstream-base: ed68433
-  hill-generator-commit: pending-local
+  hill-generator-commit: 1358f98
   world-artifact-filename: hill_school_voxelearth_full_groundfill_v5_1xg64_20260831_1249-paper26-final.tgz
   world-artifact-sha256: 0b210bd0a92ef7b425e977a670e27c9eb57afce705a952485ead27875e42f4d6
   world-archive-root: hill_school_voxelearth_full_groundfill_v5_1xg64_20260831_1249
