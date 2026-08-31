@@ -1,5 +1,5 @@
 import { createRequire } from "node:module";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -1262,6 +1262,65 @@ async function peopleImportScenario() {
   console.log("PASS: People entry imported the LiDAR structure.nbt world, matched the campus sentinel, and auto-teleported the player");
 }
 
+function currentWorldFolder() {
+  const dimension = currentDimension(bot);
+  const worldName = dimension.includes(":") ? dimension.split(":").at(-1) : dimension;
+  const candidates = [
+    path.resolve(scriptDirectory, "..", "runtime", "server", "world", "dimensions", "minecraft", worldName),
+    path.resolve(scriptDirectory, "..", "runtime", "server", worldName),
+  ];
+  return candidates.find((candidate) => existsSync(candidate));
+}
+
+async function peopleVoxelEarthTemplateScenario() {
+  bot.chat("/entry create people");
+  await waitFor(
+    () => transcript.some((line) => line.includes("People entry created.")),
+    "People entry creation",
+    120_000,
+  );
+  await waitFor(
+    () => currentDimension(bot).includes("hill_people_"),
+    "teleport into a private People world",
+    120_000,
+  );
+  await waitFor(
+    () => transcript.some((line) => line.includes("Owner Mode: you may build inside this entry.")),
+    "People owner mode",
+    120_000,
+  );
+
+  const folder = currentWorldFolder();
+  if (!folder) {
+    throw new Error(`Could not resolve current People world folder for ${currentDimension(bot)}`);
+  }
+  const manifestPath = path.join(folder, "voxelearth-hill-manifest.json");
+  if (!existsSync(manifestPath)) {
+    throw new Error(`People world does not contain VoxelEarth manifest: ${manifestPath}`);
+  }
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+  if (manifest?.format !== "voxelearth-hill-campus-v1") {
+    throw new Error(`Unexpected VoxelEarth manifest format: ${manifest?.format}`);
+  }
+  if ((manifest?.result?.keptVoxels ?? 0) < 10_000_000) {
+    throw new Error(`VoxelEarth manifest kept only ${manifest?.result?.keptVoxels ?? 0} voxels`);
+  }
+  const regionDir = path.join(folder, "region");
+  const regionFiles = readdirSync(regionDir).filter((name) => name.endsWith(".mca"));
+  const regionBytes = regionFiles.reduce((sum, name) => sum + statSync(path.join(regionDir, name)).size, 0);
+  if (regionFiles.length < 20 || regionBytes < 60_000_000) {
+    throw new Error(`VoxelEarth People world has weak region output: ${regionFiles.length} files, ${regionBytes} bytes`);
+  }
+
+  await delay(2_000);
+  const below = bot.blockAt(bot.entity.position.offset(0, -1, 0).floored(), false);
+  if (!below || below.name === "air" || below.name === "void_air") {
+    throw new Error(`People world spawn is not standing on solid VoxelEarth terrain: ${below?.name ?? "unloaded"}`);
+  }
+
+  console.log(`PASS: People entry cloned VoxelEarth template from ${folder}; ${manifest.result.keptVoxels} kept voxels, ${regionFiles.length} region files, standing on ${below.name}`);
+}
+
 const bot = mineflayer.createBot({
   host,
   port,
@@ -1352,6 +1411,9 @@ try {
       break;
     case "people-import":
       await peopleImportScenario();
+      break;
+    case "people-voxelearth-template":
+      await peopleVoxelEarthTemplateScenario();
       break;
     case "navigation":
       await helpScenario();

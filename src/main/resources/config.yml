@@ -71,15 +71,15 @@ worlds:
 people:
   # Extract a rights-cleared campus template to this folder before creating People entries.
   template-folder: world-templates/hill_people_template
-  # When no prepared world template exists, stream this structure into the private People world instead.
-  structure-file: structure.nbt
+  # Optional fallback. Leave blank when using a prepared Anvil template folder.
+  structure-file: ""
   structure-import-blocks-per-tick: 12000
   # Hard main-thread time budget so registration and UI ticks stay responsive during template warm-up.
   structure-import-max-millis-per-tick: 10
   structure-origin-y: 64
   fallback-seed: 175
-  build-radius: 1024
-  world-border-size: 2112.0
+  build-radius: 1400
+  world-border-size: 2865.0
 
 build-rules:
   max-non-player-entities-per-entry: 128

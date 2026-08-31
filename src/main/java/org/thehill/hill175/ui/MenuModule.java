@@ -878,7 +878,7 @@ public final class MenuModule implements Listener {
         return switch (category) {
             case JOURNEY -> List.of("Recreate a Hill building, landmark, or area.", "64 x 64 protected outdoor plot.");
             case PLACE -> List.of("Design a useful Hill interior.", "32 x 32 protected interior shell.");
-            case PEOPLE -> List.of("Imagine Hill's future.", "Private Hill campus world imported from structure.nbt.");
+            case PEOPLE -> List.of("Imagine Hill's future.", "Private Hill campus world generated from the VoxelEarth template.");
         };
     }
 

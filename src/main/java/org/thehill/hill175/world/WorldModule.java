@@ -456,7 +456,7 @@ public final class WorldModule {
         String worldName = "hill_people_" + entryId.toString().replace("-", "").substring(0, 12);
         if (resolvePeopleStructureMetadata() != null && !isPeopleTemplateReady()) {
             beginPeopleTemplatePreparation();
-            throw new IllegalStateException("The People template is still preparing from structure.nbt. Try again in about a minute.");
+            throw new IllegalStateException("The People template is still preparing. Try again in about a minute.");
         }
         World world = createPeopleWorld(worldName);
         BuildRegion region = peopleRegion(worldName, world);
@@ -492,7 +492,7 @@ public final class WorldModule {
         deleteStalePeopleWorldIfNecessary(migrated.toPath(), metadata);
         boolean hadSavedWorldBeforeCreate = migrated.isDirectory() || target.isDirectory();
         File template = resolveTemplateFolder();
-        boolean templateReady = metadata != null && template != null && hasMatchingPeopleReadyMarker(template.toPath(), metadata);
+        boolean templateReady = isConfiguredPeopleTemplateReady(template, metadata);
 
         if (migrated.isDirectory()) {
             World migratedWorld = WorldCreator.name(worldName).createWorld();
@@ -508,7 +508,7 @@ public final class WorldModule {
                 deleteDirectorySafely(migratedWorld.getWorldFolder().toPath());
                 return createPeopleWorld(worldName);
             } else {
-                throw new IllegalStateException("The People template is still preparing from structure.nbt. Try again in about a minute.");
+                throw new IllegalStateException("The People template is still preparing. Try again in about a minute.");
             }
             return migratedWorld;
         }
@@ -554,7 +554,7 @@ public final class WorldModule {
             Bukkit.unloadWorld(world, false);
             deleteDirectorySafely(world.getWorldFolder().toPath());
             beginPeopleTemplatePreparation();
-            throw new IllegalStateException("The People template is still preparing from structure.nbt. Try again in about a minute.");
+            throw new IllegalStateException("The People template is still preparing. Try again in about a minute.");
         }
 
         buildPeopleFallback(world);
@@ -664,13 +664,13 @@ public final class WorldModule {
         }
         try {
             peopleStructureMetadata = StructureNbtLoader.readMetadata(structureFile.toPath());
-            plugin.getLogger().info("Loaded structure.nbt metadata from " + structureFile.getAbsolutePath()
+            plugin.getLogger().info("Loaded People structure metadata from " + structureFile.getAbsolutePath()
                     + " (" + peopleStructureMetadata.sizeX() + "x"
                     + peopleStructureMetadata.sizeY() + "x"
                     + peopleStructureMetadata.sizeZ() + ", "
                     + peopleStructureMetadata.blockCount() + " blocks).");
         } catch (IOException exception) {
-            plugin.getLogger().log(Level.SEVERE, "Could not read structure.nbt metadata for People entries", exception);
+            plugin.getLogger().log(Level.SEVERE, "Could not read People structure metadata for People entries", exception);
         }
         return peopleStructureMetadata;
     }
@@ -678,10 +678,14 @@ public final class WorldModule {
     private boolean isPeopleTemplateReady() {
         StructureNbtLoader.Metadata metadata = resolvePeopleStructureMetadata();
         File templateFolder = resolveTemplateFolder();
-        peopleTemplateReady = metadata != null
-                && templateFolder != null
-                && hasMatchingPeopleReadyMarker(templateFolder.toPath(), metadata);
+        peopleTemplateReady = isConfiguredPeopleTemplateReady(templateFolder, metadata);
         return peopleTemplateReady;
+    }
+
+    private boolean isConfiguredPeopleTemplateReady(File templateFolder, StructureNbtLoader.Metadata metadata) {
+        return templateFolder != null
+                && templateFolder.isDirectory()
+                && hasMatchingPeopleReadyMarker(templateFolder.toPath(), metadata);
     }
 
     private void beginPeopleTemplatePreparation() {
@@ -731,7 +735,7 @@ public final class WorldModule {
                         plugin.getLogger().severe("People template import failed. The template was not prepared.");
                     }
             ).runTaskTimer(plugin, 1L, 1L);
-            plugin.getLogger().info("Preparing cached People template from structure.nbt using "
+            plugin.getLogger().info("Preparing cached People template from structure file using "
                     + metadata.blockCount() + " blocks at " + blocksPerTick + " blocks/tick.");
         } catch (IOException exception) {
             peopleTemplatePreparing = false;

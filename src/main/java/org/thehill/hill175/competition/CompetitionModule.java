@@ -474,7 +474,7 @@ public final class CompetitionModule {
                     teleportToEntry(player, entry, visiting);
                 }
             });
-            message(player, NamedTextColor.AQUA, "The People world is still loading from structure.nbt. You'll be teleported in automatically when it is ready.");
+            message(player, NamedTextColor.AQUA, "The People world is still loading from the campus template. You'll be teleported in automatically when it is ready.");
             sendHubTip(player);
             return;
         }
@@ -500,7 +500,7 @@ public final class CompetitionModule {
         refreshCameraMarkers(entry);
         if (entry.category() == Category.PEOPLE) {
             message(player, NamedTextColor.AQUA,
-                    "This People build was spawned from the server's structure.nbt school template.");
+                    "This People build was spawned from the server's Hill School campus template.");
         }
         boolean owner = entry.isMember(nicknameKey(player.getName()));
         if (owner && !visiting && !entry.submitted() && !worlds.isResetting(entry.id())) {
