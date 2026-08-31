@@ -220,6 +220,10 @@ validate_people_template_root() {
     echo "${label} is missing voxelearth-hill-manifest.json" >&2
     return 1
   }
+  [[ -f "${template_root}/hill-hybrid-manifest.json" ]] || {
+    echo "${label} is missing hill-hybrid-manifest.json" >&2
+    return 1
+  }
   [[ -d "${template_root}/region" ]] || {
     echo "${label} is missing region directory" >&2
     return 1
@@ -437,11 +441,11 @@ HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
 HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
 HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
 
-PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_groundfill_v5_20260831_1249_deploy.tgz"
+PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz"
 PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
-PEOPLE_TEMPLATE_SHA256="858cac003d1803775ad6887d01510ca4202829b75b0fdca7d0dbae72a5a03385"
+PEOPLE_TEMPLATE_SHA256="c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99"
 PEOPLE_TEMPLATE_READY_MARKER="generated"
-PEOPLE_TEMPLATE_REGION_MCA_COUNT="20"
+PEOPLE_TEMPLATE_REGION_MCA_COUNT="21"
 PEOPLE_TEMPLATE_POI_MCA_COUNT="0"
 PEOPLE_TEMPLATE_ASSET_DIR="${RUNTIME_DIR}/assets/voxelearth"
 PEOPLE_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"

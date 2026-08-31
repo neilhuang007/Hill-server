@@ -37,18 +37,18 @@ generated-worlds:
   people: one private hill_people_<entry> clone per People entry
 
 people-campus:
-  name: Hill School full-property VoxelEarth campus, groundfill v5
+  name: Hill School strict hybrid VoxelEarth ground and Roofer/VoxCity buildings v15
   address: 860 Beech Street, Pottstown, PA 19464
-  engine: VoxelEarth Java 3D Tiles voxelizer with constrained campus material pass
-  upstream: https://github.com/ryanhlewis/VoxelEarth
+  engine: VoxelEarth Java 3D Tiles voxelizer for terrain/context plus Roofer LoD2 geometry voxelized by VoxCity
+  upstream: https://github.com/ryanhlewis/VoxelEarth, https://github.com/3DBAG/roofer, and https://github.com/kunifujiwara/VoxCity
   upstream-base: ed68433
-  hill-generator-commit: 1358f98
-  world-artifact-filename: hill_school_voxelearth_full_groundfill_v5_1xg64_20260831_1249-paper26-final.tgz
-  world-artifact-sha256: 0b210bd0a92ef7b425e977a670e27c9eb57afce705a952485ead27875e42f4d6
-  world-archive-root: hill_school_voxelearth_full_groundfill_v5_1xg64_20260831_1249
-  world-template-source: hill_school_voxelearth_full_groundfill_v5_1xg64_20260831_1249
-  template-artifact-filename: hill_people_template_voxelearth_full_groundfill_v5_20260831_1249_deploy.tgz
-  template-artifact-sha256: 858cac003d1803775ad6887d01510ca4202829b75b0fdca7d0dbae72a5a03385
+  hill-generator-commit: pending-v15
+  world-artifact-filename: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831-paper26-final.tgz
+  world-artifact-sha256: b4980c8e387ada4e98ac5ff5b7424211306973087269bdb9974d602adefb2d21
+  world-archive-root: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831
+  world-template-source: hill_school_hybrid_v15_strict_voxelearth_v11_roofer_npz_support_1x_20260831
+  template-artifact-filename: hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz
+  template-artifact-sha256: c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99
   template-archive-root: hill_people_template
   install-template: world-templates/hill_people_template
   minecraft-version: 26.2
@@ -61,12 +61,22 @@ people-campus:
   rendered-sectors: 33
   skipped-disjoint-sectors: 23
   source-tiles: 5875
-  kept-voxels: 8448254
+  kept-voxels: 7781053
   clipped-voxels: 6655405
+  hybrid-changed-blocks: 536091
+  hybrid-edit-mask-blocks: 499917
+  hybrid-buildings: 92
+  hybrid-skipped-out-of-source-buildings: 16
+  hybrid-support-fill-columns: 25897
+  hybrid-terrain-fallback: false
+  hybrid-building-apron-cleanup: false
+  hybrid-invariance-blocks-checked: 35184435
+  hybrid-invariance-raw-chunks-checked: 11055
+  hybrid-invariance-mismatches: 0
   block-bounds: [-283, 70, -1742, 1453, 133, 197]
-  region-files: 20
+  region-files: 21
   poi-files: 0
   parcel-tax-pins: [160015116006, 160016044005, 160016052006]
   scope: all selected Hill-owned parcels; neighborhood geometry is excluded by the parcel clip
-  sources: VoxelEarth 3D Tiles mesh, Montgomery County parcel/building/surface boundaries, and local visual QA previews
+  sources: VoxelEarth 3D Tiles mesh, Roofer LoD2 buildings, VoxCity mesh voxelization, Montgomery County parcel/building/surface boundaries, and local visual QA previews
   permission: School-authorized project asset; large world archive is deployed separately from Git

@@ -73,7 +73,7 @@ people:
   template-folder: world-templates/hill_people_template
   # Production must fail closed instead of silently substituting flat generated terrain.
   require-template: true
-  template-region-file-count: 20
+  template-region-file-count: 21
   template-poi-file-count: 0
   # Optional fallback. Leave blank when using a prepared Anvil template folder.
   structure-file: ""
@@ -85,7 +85,7 @@ people:
   build-radius: 1400
   world-border-size: 2865.0
   campus-chart:
-    # Exact parcel-cropped VoxelEarth v5 campus bounds from voxelearth-hill-manifest.json.
+    # Exact parcel-cropped VoxelEarth/Roofer v15 campus bounds from voxelearth-hill-manifest.json.
     # The generated map item uses X/Z for chart coverage; Y is retained for auditability.
     block-bounds: [-283, 70, -1742, 1453, 133, 197]
 

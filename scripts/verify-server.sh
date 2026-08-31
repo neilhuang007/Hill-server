@@ -15,11 +15,11 @@ EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\t
 CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
 CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
 CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
-PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_voxelearth_full_groundfill_v5_20260831_1249_deploy.tgz"
+PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz"
 PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
-PEOPLE_TEMPLATE_SHA256="858cac003d1803775ad6887d01510ca4202829b75b0fdca7d0dbae72a5a03385"
+PEOPLE_TEMPLATE_SHA256="c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99"
 PEOPLE_TEMPLATE_READY_MARKER="generated"
-PEOPLE_TEMPLATE_REGION_MCA_COUNT="20"
+PEOPLE_TEMPLATE_REGION_MCA_COUNT="21"
 PEOPLE_TEMPLATE_POI_MCA_COUNT="0"
 PEOPLE_TEMPLATE_ARCHIVE="${RUNTIME_DIR}/assets/voxelearth/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
 PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
@@ -140,8 +140,8 @@ verify_people_template() {
     || fail "Hill175 config does not point People entries at world-templates/hill_people_template"
   grep -Eq '^  require-template:[[:space:]]*true[[:space:]]*$' "${PLUGIN_CONFIG}" \
     || fail "Hill175 config must fail closed when the People template is unavailable"
-  grep -Eq '^  template-region-file-count:[[:space:]]*20[[:space:]]*$' "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must require all 20 VoxelEarth region files"
+  grep -Eq '^  template-region-file-count:[[:space:]]*21[[:space:]]*$' "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must require all 21 VoxelEarth region files"
   grep -Eq '^  template-poi-file-count:[[:space:]]*0[[:space:]]*$' "${PLUGIN_CONFIG}" \
     || fail "Hill175 config must require zero VoxelEarth POI files"
   grep -Eq "^  structure-file:[[:space:]]*(''|\"\"|)[[:space:]]*$" "${PLUGIN_CONFIG}" \
@@ -155,6 +155,8 @@ verify_people_template() {
     || fail "People template marker was '${marker}', expected '${PEOPLE_TEMPLATE_READY_MARKER}'"
   [[ -f "${PEOPLE_TEMPLATE_DIR}/voxelearth-hill-manifest.json" ]] \
     || fail "missing People template voxelearth-hill-manifest.json"
+  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-hybrid-manifest.json" ]] \
+    || fail "missing People template hill-hybrid-manifest.json"
   [[ -d "${PEOPLE_TEMPLATE_DIR}/region" ]] || fail "missing People template region directory"
   if [[ "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" != "0" ]]; then
     [[ -d "${PEOPLE_TEMPLATE_DIR}/poi" ]] || fail "missing People template POI directory"

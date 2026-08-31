@@ -1312,7 +1312,7 @@ async function peopleVoxelEarthTemplateScenario() {
   }
 
   if (skipLocalWorldFiles) {
-    console.log(`PASS: People entry cloned VoxelEarth groundfill v5 template into ${currentDimension(bot)}; chart map present, standing on ${below.name}`);
+    console.log(`PASS: People entry cloned strict VoxelEarth/Roofer v15 template into ${currentDimension(bot)}; chart map present, standing on ${below.name}`);
     return;
   }
 
@@ -1329,19 +1329,39 @@ async function peopleVoxelEarthTemplateScenario() {
     throw new Error(`Unexpected VoxelEarth manifest format: ${manifest?.format}`);
   }
   if (manifest?.voxelGrid !== 64 || manifest?.blocksPerMetre !== 1) {
-    throw new Error(`Unexpected VoxelEarth v5 scale: grid ${manifest?.voxelGrid}, ${manifest?.blocksPerMetre} blocks/metre`);
+    throw new Error(`Unexpected VoxelEarth v15 scale: grid ${manifest?.voxelGrid}, ${manifest?.blocksPerMetre} blocks/metre`);
+  }
+  const hybridManifestPath = path.join(folder, "hill-hybrid-manifest.json");
+  if (!existsSync(hybridManifestPath)) {
+    throw new Error(`People world does not contain strict hybrid manifest: ${hybridManifestPath}`);
+  }
+  const hybrid = JSON.parse(readFileSync(hybridManifestPath, "utf8"));
+  if (hybrid?.format !== "hill-hybrid-voxelearth-ground-roofer-v1") {
+    throw new Error(`Unexpected hybrid manifest format: ${hybrid?.format}`);
+  }
+  if (hybrid?.building_source !== "npz" || hybrid?.buildings?.count !== 92 || hybrid?.buildings?.skipped_count !== 16) {
+    throw new Error(`Unexpected strict hybrid building set: source ${hybrid?.building_source}, accepted ${hybrid?.buildings?.count}, skipped ${hybrid?.buildings?.skipped_count}`);
+  }
+  if (hybrid?.terrain_only_fallback?.enabled || hybrid?.building_apron_cleanup?.enabled) {
+    throw new Error("Strict hybrid unexpectedly rewrites VoxelEarth ground outside building volumes");
+  }
+  if (hybrid?.invariance_audit?.block_mismatches_outside_edit_mask !== 0
+      || hybrid?.invariance_audit?.raw_mismatches_outside_edit_chunks !== 0
+      || hybrid?.support_audit?.support_block_mismatches !== 0
+      || hybrid?.support_audit?.floating_floor_columns !== 0) {
+    throw new Error("Strict hybrid invariance or building-support audit did not pass");
   }
   const regionDir = path.join(folder, "region");
   const regionFiles = readdirSync(regionDir).filter((name) => name.endsWith(".mca"));
   const regionBytes = regionFiles.reduce((sum, name) => sum + statSync(path.join(regionDir, name)).size, 0);
-  if ((manifest?.result?.keptVoxels ?? 0) < 8_000_000) {
-    throw new Error(`VoxelEarth groundfill v5 manifest kept only ${manifest?.result?.keptVoxels ?? 0} voxels`);
+  if ((manifest?.result?.keptVoxels ?? 0) < 7_700_000) {
+    throw new Error(`VoxelEarth v15 base manifest kept only ${manifest?.result?.keptVoxels ?? 0} voxels`);
   }
-  if (regionFiles.length < 20 || regionBytes < 40_000_000) {
+  if (regionFiles.length < 21 || regionBytes < 40_000_000) {
     throw new Error(`VoxelEarth People world has weak region output: ${regionFiles.length} files, ${regionBytes} bytes`);
   }
 
-  console.log(`PASS: People entry cloned VoxelEarth groundfill v5 template from ${folder}; ${manifest.result.keptVoxels} kept voxels, ${regionFiles.length} region files, chart map present, standing on ${below.name}`);
+  console.log(`PASS: People entry cloned strict VoxelEarth/Roofer v15 template from ${folder}; ${manifest.result.keptVoxels} base voxels, ${hybrid.buildings.count} clean buildings, ${regionFiles.length} region files, chart map present, standing on ${below.name}`);
 }
 
 const bot = mineflayer.createBot({

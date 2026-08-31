@@ -6,3 +6,7 @@ pyproj>=3.7
 laspy[lazrs]>=2.7
 requests>=2.32
 Pillow>=12.1
+affine>=2.4
+geopandas>=1.1
+nbtlib>=2.0
+pytest>=8.0
