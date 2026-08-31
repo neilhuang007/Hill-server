@@ -14,6 +14,7 @@ LAST_TRANSITION_ARCHIVE_FILE="${WORLDGEN_STATE_DIR}/last-transition-archive.txt"
 EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\tversion_id\tversion_number\tgame_versions\tloader\tclient_side\tserver_side\tfilename\tsize\tsha512\tsha1\tdownload_url\tlicense_id\tlicense_url\tproject_url'
 CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
 CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
+CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
 
 fail() {
   echo "verify-server failed: $*" >&2
@@ -92,6 +93,9 @@ verify_chunky_plugin() {
 
   [[ -f "${plugin_path}" ]] || fail "missing pinned Chunky plugin: ${plugin_path}"
   verify_sha512 "${plugin_path}" "${CHUNKY_SHA512}" || fail "Chunky plugin hash mismatch: ${plugin_path}"
+  [[ -f "${CHUNKY_CONFIG}" ]] || fail "missing managed Chunky config: ${CHUNKY_CONFIG}"
+  require_line "${CHUNKY_CONFIG}" "continue-on-restart: true"
+  require_line "${CHUNKY_CONFIG}" "update-interval: 60"
   shopt -s nullglob
   for existing in "${RUNTIME_DIR}"/plugins/*[Cc]hunky*.jar; do
     if [[ "$(basename "${existing}")" != "${CHUNKY_FILENAME}" ]]; then

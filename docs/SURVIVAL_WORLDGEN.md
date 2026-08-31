@@ -9,7 +9,7 @@ The public survival world uses a fresh Paper 26.2 vanilla-client datapack stack.
 
 No Fabric, Forge, NeoForge, Quilt, shader, resource-pack, or client-required files from the cinematic profile are installed. Downloaded zip archives are fetched directly from Modrinth into the runtime asset cache and must not be committed or redistributed from this repository.
 
-Chunky is installed separately as a Paper/Bukkit server plugin only for operator-controlled pregeneration after smoke testing. The pinned file is Modrinth project `fALzjamp`, version `MdY6JATr`, `Chunky-Bukkit-1.5.3.jar`, SHA-512 `43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422`. It requires no student client mod. The installer only stages the plugin; it does not start pregeneration.
+Chunky is installed separately as a Paper/Bukkit server plugin only for operator-controlled pregeneration after smoke testing. The pinned file is Modrinth project `fALzjamp`, version `MdY6JATr`, `Chunky-Bukkit-1.5.3.jar`, SHA-512 `43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422`. It requires no student client mod. The installer stages the plugin with restart-safe task continuation enabled; it does not create a pregeneration task.
 
 ## Runtime Layout
 
@@ -71,7 +71,7 @@ After the marker exists, the installer verifies the marker/seed/manifest and pre
 
 Target pregen radius: 4000 blocks.
 
-The installer records this plan in `assets/survival-worldgen/pregen-plan.txt` but does not pre-generate chunks. After the server smoke test proves the datapacks load cleanly, use a Paper-compatible pregenerator manually if launch traffic needs it. Keep the Overworld, Nether, and End on the same manifest and seed.
+The installer records this plan in `assets/survival-worldgen/pregen-plan.txt` but does not create a pregeneration task. After the server smoke test proves the datapacks load cleanly, use Chunky manually if launch traffic needs it. Its managed config has `continue-on-restart: true`, so a saved task resumes under the normal systemd-managed Paper service after an interruption. Keep the Overworld, Nether, and End on the same manifest and seed.
 
 ## Smoke Test
 

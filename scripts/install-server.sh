@@ -50,6 +50,7 @@ restore_runtime_files() {
   restore_runtime_file "${RUNTIME_DIR}/server.properties" server.properties
   restore_runtime_file "${RUNTIME_DIR}/spigot.yml" spigot.yml
   restore_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
+  restore_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
   restore_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
   restore_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
   restore_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
@@ -319,6 +320,7 @@ backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175/config.yml" plugin-config.ym
 backup_runtime_file "${RUNTIME_DIR}/server.properties" server.properties
 backup_runtime_file "${RUNTIME_DIR}/spigot.yml" spigot.yml
 backup_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
+backup_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
 backup_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
 backup_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
 backup_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
@@ -331,6 +333,11 @@ install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${chunky_asset}" \
   "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}"
 verify_sha512 "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" "${CHUNKY_SHA512}"
+install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
+  "${RUNTIME_DIR}/plugins/Chunky"
+install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
+  "${REPO_DIR}/server-config/chunky-config.yml" \
+  "${RUNTIME_DIR}/plugins/Chunky/config.yml"
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/server-config/server.properties" \
   "${RUNTIME_DIR}/server.properties"

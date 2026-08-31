@@ -88,7 +88,7 @@ The local smoke runtime is intentionally excluded from Git. Use Paper 26.2 build
 
 Survival world generation is pinned separately in `server-assets/survival-worldgen-manifest.tsv`. The installer stages the official Modrinth datapack zips, verifies SHA-512 before moving a live world, and installs them into the primary `world/datapacks` folder before the primary survival trio `world`, `world_nether`, and `world_the_end` is generated. The survival seed is generated once, persisted outside Git in the runtime asset directory, and written to runtime `server.properties` as `level-seed`. On the first primary-world transition, the old primary `world` remains archived recoverably while every non-survival custom dimension namespace plus primary-root player data, stats, advancements, and scoreboard/custom data are copied back into the fresh primary world.
 
-The installer also pins Chunky `1.5.3` from Modrinth as a Paper/Bukkit server plugin at `plugins/Chunky-Bukkit-1.5.3.jar`. It is for manual operator pregeneration after smoke testing and requires no client mod; no pregeneration is started by the install scripts.
+The installer also pins Chunky `1.5.3` from Modrinth as a Paper/Bukkit server plugin at `plugins/Chunky-Bukkit-1.5.3.jar`. It is for manual operator pregeneration after smoke testing and requires no client mod. Install scripts do not create a pregeneration task, but saved tasks are configured to continue safely after a Paper restart.
 
 The local Hill campus `structure.nbt` can be regenerated from rights-cleared GIS, DEM, lidar, OSM, and orthophoto inputs:
 
