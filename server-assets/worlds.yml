@@ -35,3 +35,19 @@ generated-worlds:
   journey: hill_journey
   place: hill_place
   people-fallback: one private hill_people_<entry> world per People entry
+
+people-campus:
+  name: Hill School phase 1 campus
+  address: 860 Beech Street, Pottstown, PA 19464
+  generator: scripts/generate-hill-campus.py
+  install-filename: structure.nbt
+  install-template: world-templates/hill_people_template
+  sha256: fcbbef9200e73b04f1493bfb087b0e2fbf462aadb58df7a3e1d336f82c34aa04
+  data-version: 4903
+  size: [1338, 117, 1143]
+  block-records: 4195187
+  palette-size: 28
+  resolution-metres-per-block: 1.0
+  scope: phase 1 academic and athletic campus
+  sources: Montgomery County parcels/building outlines, USGS D24 DEM/lidar, OpenStreetMap site features, PEMA orthophoto, and the official Hill campus map
+  permission: School-authorized project asset; large binary deployed separately from Git

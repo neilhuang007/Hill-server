@@ -1,0 +1,8 @@
+numpy>=2.4
+scipy>=1.17
+rasterio>=1.5
+shapely>=2.1
+pyproj>=3.7
+laspy[lazrs]>=2.7
+requests>=2.32
+Pillow>=12.1

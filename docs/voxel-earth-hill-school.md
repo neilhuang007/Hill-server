@@ -82,6 +82,8 @@ This is the most important caveat:
 
 For private evaluation, keep the result in the live viewer. For a publishable, editable, commercial, or Minecraft-distributable asset, use photogrammetry/mesh data that The Hill School owns or has licensed for derivatives, then run that rights-cleared GLB through the local Voxel Earth voxelization tools. The project documents a standalone GLB-to-voxel CPU path. ([Voxel Earth monorepo - CPU voxelization](https://github.com/ryanhlewis/VoxelEarth#3-cpu-voxelization--java-cpu-voxelizer))
 
+This repo now includes `scripts/voxelearth_glb_to_structure.py` for that rights-cleared GLB case. It keeps VoxelEarth-compatible `blocks`/`xyzi` JSON output, adds glTF node-transform traversal, skips primitives without `POSITION` data, and can emit the `structure.nbt` format consumed by the Hill server. It is independent local code; the inspected VoxelEarth clones are kept only under ignored `runtime/tools/`.
+
 Google's general Geo Guidelines allow certain static Google Maps/Earth screenshots when the stated use and attribution rules are followed, but a voxelized view may be considered significantly altered or derivative. Do not assume that the ordinary screenshot permission resolves that issue for publication or promotion. ([Google Geo Guidelines](https://about.google/brand-resource-center/products-and-services/geo-guidelines/))
 
 ## Primary sources
