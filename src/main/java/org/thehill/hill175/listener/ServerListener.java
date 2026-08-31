@@ -5,6 +5,7 @@ import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -39,6 +40,7 @@ import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.EntityToggleSwimEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
@@ -52,6 +54,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
@@ -71,10 +74,12 @@ import org.thehill.hill175.world.WorldModule;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
@@ -88,7 +93,8 @@ public final class ServerListener implements Listener {
     private final CompetitionModule competition;
     private final MenuModule menus;
     private final WorldModule worlds;
-    private final Map<java.util.UUID, Instant> lastDenialMessage = new HashMap<>();
+    private final Map<UUID, Instant> lastDenialMessage = new HashMap<>();
+    private final Set<UUID> survivalDeaths = new HashSet<>();
 
     public ServerListener(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, WorldModule worlds) {
         this.plugin = plugin;
@@ -118,6 +124,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (competition.isAuthenticated(event.getPlayer()) && worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            return;
+        }
         if (isNamespacedCommand(event.getMessage())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "Use the Hill commands shown in /help.");
@@ -139,34 +148,22 @@ public final class ServerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
-        Optional<Location> previewLocation = competition.cameraPreviewLocation(player);
-        if (previewLocation.isPresent()) {
-            event.setTo(previewLocation.get());
+        Optional<Location> lockedLocation = competition.lockedSessionLocation(player);
+        if (lockedLocation.isPresent()) {
+            event.setTo(lockedLocation.get());
             return;
         }
-        if (!competition.isAuthenticated(player)) {
-            Location locked = worlds.authenticationSpawn();
-            Location to = event.getTo();
-            if (to == null) {
-                event.setTo(locked);
-                return;
-            }
-            boolean movedPosition = !to.getWorld().equals(locked.getWorld())
-                    || Math.abs(to.getX() - locked.getX()) > 0.001
-                    || Math.abs(to.getY() - locked.getY()) > 0.001
-                    || Math.abs(to.getZ() - locked.getZ()) > 0.001;
-            if (movedPosition) {
-                Location corrected = locked.clone();
-                corrected.setYaw(to.getYaw());
-                corrected.setPitch(to.getPitch());
-                event.setTo(corrected);
-            }
+        Location to = event.getTo();
+        if (to == null) {
             return;
         }
-        if (!event.hasChangedBlock() && event.getFrom().getWorld().equals(event.getTo().getWorld())) {
+        if (worlds.isSurvivalWorld(event.getFrom()) && worlds.isSurvivalWorld(to)) {
             return;
         }
-        competition.refreshMovementMode(player, event.getTo());
+        if (!event.hasChangedBlock() && event.getFrom().getWorld().equals(to.getWorld())) {
+            return;
+        }
+        competition.refreshMovementMode(player, to);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -205,11 +202,8 @@ public final class ServerListener implements Listener {
             return;
         }
         if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
-            if (!competition.acceptsCameraItemLeftClick(player)) {
-                return;
-            }
             event.setCancelled(true);
-            competition.previewNextCamera(player);
+            menus.openCameraControls(player);
         }
     }
 
@@ -218,6 +212,9 @@ public final class ServerListener implements Listener {
         Player player = event.getPlayer();
         if (!competition.isAuthenticated(player)) {
             event.setCancelled(true);
+            return;
+        }
+        if (worlds.isSurvivalWorld(player.getWorld())) {
             return;
         }
         if (event.getHand() == EquipmentSlot.HAND) {
@@ -234,18 +231,17 @@ public final class ServerListener implements Listener {
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
                 event.setCancelled(true);
-                if (event.getAction().isLeftClick()) {
-                    competition.previewNextCamera(player);
-                } else if (competition.mayBuild(player, player.getLocation())) {
-                    competition.recordCamera(player);
-                } else {
-                    competition.previewNextCamera(player);
-                }
+                menus.openCameraControls(player);
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
                 event.setCancelled(true);
                 competition.exitCameraPreview(player);
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_REMOVE_ITEM_ID)) {
+                event.setCancelled(true);
+                menus.openActiveCameraRemovalConfirmation(player);
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)) {
@@ -298,6 +294,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInteractEntity(PlayerInteractEntityEvent event) {
+        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            return;
+        }
         if (event.getHand() == EquipmentSlot.HAND
                 && competition.isCompetitionItem(
                 event.getPlayer().getInventory().getItemInMainHand(),
@@ -323,6 +322,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPrePlayerAttackEntity(PrePlayerAttackEntityEvent event) {
+        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            return;
+        }
         if (!event.getAttacked().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
             return;
         }
@@ -332,7 +334,7 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!(event.getWhoClicked() instanceof Player)) {
+        if (!(event.getWhoClicked() instanceof Player player) || worlds.isSurvivalWorld(player.getWorld())) {
             return;
         }
         ItemStack hotbarItem = event.getHotbarButton() >= 0
@@ -347,6 +349,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
+        if (event.getWhoClicked() instanceof Player player && worlds.isSurvivalWorld(player.getWorld())) {
+            return;
+        }
         if (event.getNewItems().values().stream().anyMatch(this::isProtectedCompetitionItem)) {
             event.setCancelled(true);
         }
@@ -354,6 +359,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSwapHands(PlayerSwapHandItemsEvent event) {
+        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            return;
+        }
         if (isProtectedCompetitionItem(event.getMainHandItem()) || isProtectedCompetitionItem(event.getOffHandItem())) {
             event.setCancelled(true);
         }
@@ -361,6 +369,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         if (!competition.mayBuild(event.getPlayer(), event.getBlock().getLocation())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "You may only break blocks inside your own unlocked entry.");
@@ -369,6 +380,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPlace(BlockPlaceEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlockPlaced().getWorld())) {
+            return;
+        }
         if (!competition.mayBuild(event.getPlayer(), event.getBlockPlaced().getLocation())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "You may only place blocks inside your own unlocked entry.");
@@ -377,6 +391,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBucketEmpty(PlayerBucketEmptyEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlockClicked().getWorld())) {
+            return;
+        }
         Location target = event.getBlockClicked().getRelative(event.getBlockFace()).getLocation();
         if (!competition.mayBuild(event.getPlayer(), target)) {
             event.setCancelled(true);
@@ -386,6 +403,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBucketFill(PlayerBucketFillEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlockClicked().getWorld())) {
+            return;
+        }
         if (!competition.mayBuild(event.getPlayer(), event.getBlockClicked().getLocation())) {
             event.setCancelled(true);
         }
@@ -393,6 +413,10 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onFluidFlow(BlockFromToEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())
+                || worlds.isSurvivalWorld(event.getToBlock().getWorld())) {
+            return;
+        }
         Optional<Entry> sourceEntry = competition.entryAt(event.getBlock().getLocation());
         if (sourceEntry.isEmpty() || !sourceEntry.get().region().contains(event.getToBlock().getLocation())) {
             event.setCancelled(true);
@@ -401,6 +425,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDispense(BlockDispenseEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
         if (entry.isEmpty() || !(event.getBlock().getBlockData() instanceof Directional directional)) {
             event.setCancelled(true);
@@ -418,6 +445,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onIgnite(BlockIgniteEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         boolean allowed = switch (event.getCause()) {
             case FLINT_AND_STEEL, FIREBALL -> event.getPlayer() != null
                     && competition.mayBuild(event.getPlayer(), event.getBlock().getLocation());
@@ -432,6 +462,10 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onFireSpread(BlockSpreadEvent event) {
+        if (worlds.isSurvivalWorld(event.getSource().getWorld())
+                || worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         if (event.getSource().getType() == Material.FIRE || event.getSource().getType() == Material.SOUL_FIRE) {
             event.setCancelled(true);
             return;
@@ -444,6 +478,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
@@ -451,6 +488,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onStructureGrow(StructureGrowEvent event) {
+        if (worlds.isSurvivalWorld(event.getWorld())) {
+            return;
+        }
         Optional<Entry> sourceEntry = competition.entryAt(event.getLocation());
         if (sourceEntry.isEmpty() || event.getBlocks().stream()
                 .anyMatch(state -> !sourceEntry.get().region().contains(state.getLocation()))) {
@@ -460,6 +500,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onForm(BlockFormEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
@@ -467,6 +510,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onFade(BlockFadeEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
@@ -474,26 +520,37 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBurn(BlockBurnEvent event) {
-        event.setCancelled(true);
+        if (!worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onTntPrime(TNTPrimeEvent event) {
-        event.setCancelled(true);
+        if (!worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent event) {
-        event.setCancelled(true);
+        if (!worlds.isSurvivalWorld(event.getEntity().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        event.setCancelled(true);
+        if (!worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent event) {
+        if (worlds.isSurvivalWorld(event.getLocation().getWorld())) {
+            return;
+        }
         if (event.getEntityType() == EntityType.TNT) {
             event.setCancelled(true);
         }
@@ -501,6 +558,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (worlds.isSurvivalWorld(event.getLocation().getWorld())) {
+            return;
+        }
         if (event.getEntity() instanceof ArmorStand) {
             return;
         }
@@ -513,6 +573,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onEntityPlace(EntityPlaceEvent event) {
+        if (worlds.isSurvivalWorld(event.getEntity().getWorld())) {
+            return;
+        }
         Player player = event.getPlayer();
         if (player == null || !competition.mayBuild(player, event.getEntity().getLocation())) {
             event.setCancelled(true);
@@ -533,6 +596,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        if (worlds.isSurvivalWorld(event.getRightClicked().getWorld())) {
+            return;
+        }
         if (event.getRightClicked().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
             event.setCancelled(true);
             return;
@@ -544,6 +610,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onHangingPlace(HangingPlaceEvent event) {
+        if (worlds.isSurvivalWorld(event.getEntity().getWorld())) {
+            return;
+        }
         if (event.getPlayer() == null || !competition.mayBuild(event.getPlayer(), event.getEntity().getLocation())) {
             event.setCancelled(true);
         }
@@ -551,6 +620,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onHangingBreak(HangingBreakByEntityEvent event) {
+        if (worlds.isSurvivalWorld(event.getEntity().getWorld())) {
+            return;
+        }
         if (!(event.getRemover() instanceof Player player) || !competition.mayBuild(player, event.getEntity().getLocation())) {
             event.setCancelled(true);
         }
@@ -558,6 +630,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onVehicleCreate(VehicleCreateEvent event) {
+        if (worlds.isSurvivalWorld(event.getVehicle().getWorld())) {
+            return;
+        }
         if (competition.entryAt(event.getVehicle().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
@@ -565,6 +640,11 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onVehicleMove(VehicleMoveEvent event) {
+        if (worlds.isSurvivalWorld(event.getVehicle().getWorld())
+                || worlds.isSurvivalWorld(event.getFrom())
+                || worlds.isSurvivalWorld(event.getTo())) {
+            return;
+        }
         Optional<Entry> entry = competition.entryAt(event.getFrom());
         if (entry.isPresent() && !entry.get().region().contains(event.getTo())) {
             event.getVehicle().teleport(event.getFrom());
@@ -573,6 +653,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPistonExtend(BlockPistonExtendEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
         if (entry.isEmpty() || event.getBlocks().stream()
                 .map(block -> block.getRelative(event.getDirection()).getLocation())
@@ -583,6 +666,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPistonRetract(BlockPistonRetractEvent event) {
+        if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
+            return;
+        }
         Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
         BlockFace direction = event.getDirection();
         if (entry.isEmpty() || event.getBlocks().stream().anyMatch(block ->
@@ -595,17 +681,34 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPortal(PlayerPortalEvent event) {
+        if (worlds.isSurvivalWorld(event.getFrom())) {
+            // The survival world is Paper's primary Overworld/Nether/End trio,
+            // so retaining Paper's resolved destination preserves normal portal
+            // search, creation, coordinate scaling, and safe arrival behavior.
+            if (event.getTo() == null || !worlds.isSurvivalWorld(event.getTo())) {
+                event.setCancelled(true);
+                plugin.getLogger().warning("Blocked a survival portal whose resolved destination left the primary world trio.");
+                deny(event.getPlayer(), "That portal destination is unavailable. Please try again.");
+            }
+            return;
+        }
         event.setCancelled(true);
         deny(event.getPlayer(), "Portals are disabled in the competition.");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPortalCreate(PortalCreateEvent event) {
-        event.setCancelled(true);
+        if (!worlds.isSurvivalWorld(event.getWorld())
+                && event.getBlocks().stream().noneMatch(state -> worlds.isSurvivalWorld(state.getWorld()))) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDamage(EntityDamageEvent event) {
+        if (worlds.isSurvivalWorld(event.getEntity().getWorld())) {
+            return;
+        }
         if (event.getEntity() instanceof Player) {
             event.setCancelled(true);
             return;
@@ -632,6 +735,9 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onDrop(PlayerDropItemEvent event) {
+        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            return;
+        }
         if (isProtectedCompetitionItem(event.getItemDrop().getItemStack())) {
             event.setCancelled(true);
         }
@@ -642,10 +748,31 @@ public final class ServerListener implements Listener {
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_MENU_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_REMOVE_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onDeath(PlayerDeathEvent event) {
+        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+            survivalDeaths.add(event.getPlayer().getUniqueId());
+            competition.handleSurvivalDeath(event.getPlayer());
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        if (!survivalDeaths.remove(player.getUniqueId())) {
+            return;
+        }
+        if (!worlds.isSurvivalWorld(event.getRespawnLocation().getWorld())) {
+            event.setRespawnLocation(worlds.survivalSpawn());
+        }
+        Bukkit.getScheduler().runTask(plugin, () -> competition.handleSurvivalRespawn(player));
     }
 
     private void deny(Player player, String text) {

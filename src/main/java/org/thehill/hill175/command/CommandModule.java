@@ -197,8 +197,20 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             competition.sendAuthenticationInstructions(player);
             return true;
         }
-        if (args.length == 0 || args[0].equalsIgnoreCase("save")) {
-            competition.recordCamera(player);
+        if (args.length == 0) {
+            menus.openCameraControls(player);
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("save")) {
+            if (args.length == 1) {
+                menus.openCameraControls(player);
+                return true;
+            }
+            try {
+                competition.recordCamera(player, Integer.parseInt(args[1]));
+            } catch (NumberFormatException ignored) {
+                player.sendMessage("Camera slot must be 1, 2, or 3.");
+            }
             return true;
         }
         switch (args[0].toLowerCase(Locale.ROOT)) {

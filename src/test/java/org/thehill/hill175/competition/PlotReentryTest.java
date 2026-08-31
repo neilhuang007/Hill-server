@@ -7,6 +7,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.thehill.hill175.auth.IdentityLinker;
 import org.thehill.hill175.auth.PasswordHasher;
 import org.thehill.hill175.data.CompetitionStore;
@@ -17,6 +18,7 @@ import org.thehill.hill175.model.Entry;
 import org.thehill.hill175.world.WorldModule;
 
 import java.lang.reflect.Field;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +36,9 @@ class PlotReentryTest {
     private static final UUID PLAYER_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
     private static final UUID ENTRY_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
+    @TempDir
+    Path tempDir;
+
     @Test
     void restoresCreativeModeWhenOwnerReentersWithAnAlreadyActiveOwnerKit() throws Exception {
         World buildWorld = mock(World.class);
@@ -50,6 +55,7 @@ class PlotReentryTest {
         JavaPlugin plugin = mock(JavaPlugin.class);
         when(plugin.getName()).thenReturn("Hill175");
         when(plugin.namespace()).thenReturn("hill175");
+        when(plugin.getDataFolder()).thenReturn(tempDir.toFile());
         FileConfiguration config = mock(FileConfiguration.class);
         when(plugin.getConfig()).thenReturn(config);
         WorldModule worlds = mock(WorldModule.class);

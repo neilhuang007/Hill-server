@@ -19,6 +19,7 @@ const scenario = process.argv[2] ?? "lobby-return";
 const username = `Smoke${String(Date.now()).slice(-9)}`;
 const password = "SmokeTest123!";
 const transcript = [];
+const currentWorldNames = new WeakMap();
 
 const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -41,16 +42,20 @@ async function waitFor(predicate, description, timeoutMilliseconds = 10_000) {
 }
 
 async function waitForWindow(action, description, timeoutMilliseconds = 10_000) {
+  return await waitForBotWindow(bot, action, description, timeoutMilliseconds);
+}
+
+async function waitForBotWindow(targetBot, action, description, timeoutMilliseconds = 10_000) {
   return await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => {
-      bot.removeListener("windowOpen", onWindowOpen);
+      targetBot.removeListener("windowOpen", onWindowOpen);
       reject(new Error(`Timed out waiting for ${description}`));
     }, timeoutMilliseconds);
     const onWindowOpen = (window) => {
       clearTimeout(timeout);
       resolve(window);
     };
-    bot.once("windowOpen", onWindowOpen);
+    targetBot.once("windowOpen", onWindowOpen);
     action();
   });
 }
@@ -105,6 +110,12 @@ function componentText(value) {
   if (value == null) return "";
   if (typeof value === "string") return value;
   return JSON.stringify(value);
+}
+
+function angleDistance(left, right) {
+  const fullTurn = Math.PI * 2;
+  const difference = Math.abs(left - right) % fullTurn;
+  return Math.min(difference, fullTurn - difference);
 }
 
 function itemUiText(item) {
@@ -198,6 +209,38 @@ async function authenticate() {
     () => transcript.some((line) => line.includes("Registration complete") || line.includes("Welcome to Hill")),
     "development identity approval",
   );
+}
+
+async function authenticationLockScenario() {
+  const lockedPosition = bot.entity.position.clone();
+  const lockedYaw = bot.entity.yaw;
+  const lockedPitch = bot.entity.pitch;
+  let repeatedTitles = 0;
+  const onTitle = () => repeatedTitles++;
+  bot._client.on("set_title_text", onTitle);
+  try {
+    await bot.look(lockedYaw + 1.1, Math.max(-1.2, Math.min(1.2, lockedPitch + 0.45)), true);
+    await delay(5_500);
+  } finally {
+    bot._client.removeListener("set_title_text", onTitle);
+  }
+
+  const positionShift = bot.entity.position.distanceTo(lockedPosition);
+  const yawShift = angleDistance(bot.entity.yaw, lockedYaw);
+  const pitchShift = Math.abs(bot.entity.pitch - lockedPitch);
+  const failures = [];
+  if (positionShift > 0.15 || yawShift > 0.05 || pitchShift > 0.05) {
+    failures.push(
+      `Authentication lobby failed to lock the complete viewpoint (position ${positionShift.toFixed(3)}, yaw ${yawShift.toFixed(3)}, pitch ${pitchShift.toFixed(3)})`,
+    );
+  }
+  if (repeatedTitles < 1) {
+    failures.push("Authentication title was not refreshed while the player remained unauthenticated");
+  }
+  if (failures.length > 0) {
+    throw new Error(failures.join("; "));
+  }
+  console.log("PASS: unauthenticated title remained continuous and the complete viewpoint stayed locked");
 }
 
 async function lobbyReturnScenario() {
@@ -596,6 +639,115 @@ async function confirmationNavigationScenario() {
   console.log("PASS: Build Options owns reset/lock/delete/category change and owner tools do not leak into the hub");
 }
 
+async function verifyVisitorCannotRemoveCamera(entryTitle) {
+  const visitorUsername = `Visit${String(Date.now()).slice(-9)}`;
+  const visitorTranscript = [];
+  const visitor = mineflayer.createBot({
+    host,
+    port,
+    username: visitorUsername,
+    auth: "offline",
+    hideErrors: false,
+    plugins: { team: false },
+  });
+  visitor.on("messagestr", (message) => {
+    visitorTranscript.push(message.replaceAll(/\u00a7[0-9A-FK-OR]/gi, ""));
+  });
+  try {
+    await new Promise((resolve) => visitor.once("spawn", resolve));
+    visitor.chat(`/register ${visitorUsername} ${password} ${password}`);
+    await waitFor(
+      () => visitorTranscript.some((line) => line.includes("Registration complete")),
+      "visitor authentication",
+    );
+
+    let visits = await waitForBotWindow(
+      visitor,
+      () => visitor.chat("/entry visit"),
+      "visitor entry browser",
+    );
+    let visitSlot = -1;
+    for (let page = 0; page < 32; page += 1) {
+      visitSlot = visits.slots
+        .slice(0, visits.inventoryStart)
+        .findIndex((item) => itemUiText(item).includes(entryTitle));
+      if (visitSlot >= 0 || !itemUiText(visits.slots[53]).includes("Next Page")) break;
+      visits = await waitForBotWindow(
+        visitor,
+        () => visitor.clickWindow(53, 0, 0),
+        `visitor entry browser page ${page + 2}`,
+      );
+    }
+    if (visitSlot < 0) {
+      throw new Error(`Visitor browser did not contain ${entryTitle}: ${topInventorySummary(visits)}`);
+    }
+    const arrivalStart = visitorTranscript.length;
+    visitor.clickWindow(visitSlot, 0, 0);
+    await waitFor(
+      () => visitorTranscript.slice(arrivalStart).some((line) => line.includes("Visitor Mode")),
+      "visitor entry arrival",
+    );
+    await delay(500);
+
+    const visitorHotbar = visitor.inventory.slots.slice(36, 45);
+    const cameraSlot = visitorHotbar.findIndex((item) => item?.name === "ender_eye");
+    if (cameraSlot < 0) {
+      throw new Error("Visitor did not receive the Camera Views item");
+    }
+    visitor.setQuickBarSlot(cameraSlot);
+    visitor._client.write("held_item_slot", { slotId: cameraSlot });
+    await delay(150);
+    const cameraViews = await waitForBotWindow(
+      visitor,
+      () => visitor.activateItem(),
+      "visitor Camera Views menu",
+    );
+    visitor.deactivateItem();
+    if (!windowTitle(cameraViews).includes("Camera Views")
+      || cameraViews.slots[11]?.name !== "ender_eye") {
+      throw new Error(`Visitor camera UI exposed the wrong controls: ${windowTitle(cameraViews)} [${topInventorySummary(cameraViews)}]`);
+    }
+
+    const previewStart = visitorTranscript.length;
+    visitor.clickWindow(11, 0, 0);
+    await waitFor(
+      () => visitorTranscript.slice(previewStart).some((line) => line.includes("Previewing camera slot 1")),
+      "visitor camera preview",
+    );
+    await delay(500);
+    if (visitor.inventory.slots.slice(36, 45).some((item) => item?.name === "red_dye")) {
+      throw new Error("Visitor received the owner-only Remove This Camera item");
+    }
+
+    const deniedStart = visitorTranscript.length;
+    visitor.chat("/camera remove 1");
+    await waitFor(
+      () => visitorTranscript.slice(deniedStart).some((line) => line.includes("Open one of your entries first")),
+      "visitor camera-removal denial",
+    );
+    if (visitorTranscript.slice(deniedStart).some((line) => line.includes("Camera pose 1 removed"))) {
+      throw new Error("Visitor command removed the owner's camera");
+    }
+
+    const exitSlot = visitor.inventory.slots.slice(36, 45).findIndex((item) => item?.name === "barrier");
+    if (exitSlot < 0) {
+      throw new Error("Visitor camera preview had no exit item");
+    }
+    visitor.setQuickBarSlot(exitSlot);
+    visitor._client.write("held_item_slot", { slotId: exitSlot });
+    const exitStart = visitorTranscript.length;
+    visitor.activateItem();
+    await waitFor(
+      () => visitorTranscript.slice(exitStart).some((line) => line.includes("Camera preview closed")),
+      "visitor camera exit",
+    );
+    visitor.deactivateItem();
+  } finally {
+    visitor.quit("Visitor camera smoke complete");
+    await delay(250);
+  }
+}
+
 async function cameraViewScenario() {
   bot.chat("/entry create journey");
   await waitFor(
@@ -604,33 +756,64 @@ async function cameraViewScenario() {
   );
   await delay(500);
 
+  const cameraEntryTitle = `Camera-${username}`;
+  const titleTranscriptStart = transcript.length;
+  bot.chat(`/entry title ${cameraEntryTitle}`);
+  await waitFor(
+    () => transcript.slice(titleTranscriptStart).some((line) => line.includes("Project title saved")),
+    "camera smoke entry title",
+  );
+
   const savedFeetPosition = bot.entity.position.clone();
   const saveTranscriptStart = transcript.length;
-  await holdHotbarItem("spyglass");
-  bot.activateItem();
-  await waitFor(
-    () => transcript.slice(saveTranscriptStart).some((line) => line.includes("Camera pose 1/3 saved")),
-    "camera pose save from right-clicking empty air",
+  await holdHotbarItem("ender_eye");
+  const cameraMenu = await waitForWindow(
+    () => bot.activateItem(),
+    "Camera Controls menu",
   );
   bot.deactivateItem();
+  if (!windowTitle(cameraMenu).includes("Camera Controls")
+    || cameraMenu.slots[11]?.name !== "lime_dye") {
+    throw new Error(`Camera Controls did not offer explicit empty slot 1: ${windowTitle(cameraMenu)} [${topInventorySummary(cameraMenu)}]`);
+  }
+  const refreshedCameraMenu = await waitForWindow(
+    () => bot.clickWindow(11, 0, 0),
+    "Camera Controls after saving slot 1",
+  );
+  await waitFor(
+    () => transcript.slice(saveTranscriptStart).some((line) => line.includes("Camera 1/3 saved")),
+    "camera pose save from explicit slot 1",
+  );
+  if (!windowTitle(refreshedCameraMenu).includes("Camera Controls")
+    || refreshedCameraMenu.slots[11]?.name !== "ender_eye") {
+    throw new Error("Saved camera slot 1 did not become a preview/manage control");
+  }
+  bot.closeWindow(refreshedCameraMenu);
 
   const previewTranscriptStart = transcript.length;
   let bossBarPackets = 0;
   let titlePackets = 0;
+  const cameraPackets = [];
   const onBossBar = () => bossBarPackets++;
   const onTitle = () => titlePackets++;
+  const onCamera = (packet) => cameraPackets.push(packet.cameraId);
   bot._client.on("boss_bar", onBossBar);
   bot._client.on("set_title_text", onTitle);
+  bot._client.on("camera", onCamera);
   bot.chat("/camera preview");
   await waitFor(
-    () => transcript.slice(previewTranscriptStart).some((line) => line.includes("Previewing camera #1/1")),
+    () => transcript.slice(previewTranscriptStart).some((line) => line.includes("Previewing camera slot 1")),
     "camera preview",
   );
   await delay(500);
   bot._client.removeListener("boss_bar", onBossBar);
   bot._client.removeListener("set_title_text", onTitle);
+  bot._client.removeListener("camera", onCamera);
   if (bossBarPackets === 0 || titlePackets === 0) {
     throw new Error(`Camera preview did not render both persistent and title displays (boss bar ${bossBarPackets}, title ${titlePackets})`);
+  }
+  if (!cameraPackets.some((cameraId) => cameraId !== bot.entity.id)) {
+    throw new Error(`Camera preview never focused a fixed client camera entity: ${JSON.stringify(cameraPackets)}`);
   }
 
   const feetShift = bot.entity.position.distanceTo(savedFeetPosition);
@@ -666,7 +849,7 @@ async function cameraViewScenario() {
     usingSecondaryAction: false,
   });
   await waitFor(
-    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera #1/1")),
+    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
     "right-click camera marker preview",
   );
 
@@ -692,11 +875,84 @@ async function cameraViewScenario() {
   bot._client.write("attack", { entityId: marker.id });
   bot.swingArm();
   await waitFor(
-    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera #1/1")),
+    () => transcript.slice(markerPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
     "left-click camera marker preview",
   );
 
-  console.log("PASS: camera screen, view lock, marker clicks, air-save, and both exit-item clicks worked");
+  await verifyVisitorCannotRemoveCamera(cameraEntryTitle);
+
+  const removeTranscriptStart = transcript.length;
+  await holdHotbarItem("red_dye");
+  const removeConfirmation = await waitForWindow(
+    () => bot.activateItem(),
+    "active camera removal confirmation",
+  );
+  bot.deactivateItem();
+  if (!windowTitle(removeConfirmation).includes("Remove camera 1?")) {
+    throw new Error(`Owner removal item opened the wrong UI: ${windowTitle(removeConfirmation)}`);
+  }
+  bot.clickWindow(4, 0, 0);
+  await waitFor(
+    () => transcript.slice(removeTranscriptStart).some((line) => line.includes("Camera pose 1 removed")),
+    "active camera removal",
+  );
+
+  console.log("PASS: explicit camera slots, fixed client camera, locked view, marker clicks, both exits, and owner-only removal UI worked");
+}
+
+async function cameraHeldUseScenario() {
+  bot.chat("/entry create journey");
+  await waitFor(
+    () => transcript.some((line) => line.includes("Journey entry created")),
+    "Journey entry creation",
+  );
+  await delay(500);
+
+  const hotbar = bot.inventory.slots.slice(36, 45);
+  const cameraSlot = hotbar.findIndex((item) => item?.name === "ender_eye" || item?.name === "spyglass");
+  if (cameraSlot < 0) {
+    throw new Error("Expected a Camera Controls item in the owner hotbar");
+  }
+  const cameraMaterial = hotbar[cameraSlot].name;
+  bot.setQuickBarSlot(cameraSlot);
+  bot._client.write("held_item_slot", { slotId: cameraSlot });
+  await delay(150);
+
+  const transcriptStart = transcript.length;
+  const opened = [];
+  const onWindowOpen = (window) => opened.push(window);
+  bot.on("windowOpen", onWindowOpen);
+  try {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      bot.activateItem();
+      await delay(80);
+    }
+    bot.deactivateItem();
+    await delay(750);
+  } finally {
+    bot.removeListener("windowOpen", onWindowOpen);
+  }
+
+  const cameraSaves = transcript.slice(transcriptStart)
+    .filter((line) => line.includes("Camera pose") && line.includes("saved"));
+  const failures = [];
+  if (cameraMaterial === "spyglass") {
+    failures.push("Camera Controls still uses the zooming spyglass");
+  }
+  if (cameraSaves.length > 1) {
+    failures.push(`one held camera use saved ${cameraSaves.length} poses`);
+  }
+  if (cameraMaterial === "ender_eye") {
+    if (opened.length !== 1) {
+      failures.push(`one held Camera Controls use opened ${opened.length} menus instead of exactly one`);
+    } else if (!windowTitle(opened[0]).includes("Camera")) {
+      failures.push(`Camera Controls opened the wrong menu: ${windowTitle(opened[0])}`);
+    }
+  }
+  if (failures.length > 0) {
+    throw new Error(failures.join("; "));
+  }
+  console.log("PASS: held Camera Controls input opened one non-zoom management menu and saved no duplicate poses");
 }
 
 async function movePlayerLinearly(target) {
@@ -743,6 +999,51 @@ async function plotResetReentryScenario() {
   console.log("PASS: completed reset, boundary exit, and re-entry restored Creative Mode");
 }
 
+async function entryActionOutsideScenario(action) {
+  bot.chat("/entry create journey");
+  await waitFor(
+    () => transcript.some((line) => line.includes("Journey entry created")),
+    "Journey entry creation",
+  );
+  const entryPosition = bot.entity.position.clone();
+  await movePlayerLinearly(entryPosition.offset(40, 0, 0));
+  await waitFor(() => bot.game.gameMode === "spectator", "Spectator Mode outside the affected plot");
+  const outsidePosition = bot.entity.position.clone();
+  const outsideDimension = bot.game.dimension;
+
+  await holdHotbarItem("nether_star");
+  const buildOptions = await waitForWindow(() => bot.activateItem(), `Build Options before ${action}`);
+  if (!windowTitle(buildOptions).includes("Build Options")) {
+    throw new Error(`Entry Controls opened ${windowTitle(buildOptions)} instead of Build Options`);
+  }
+  const actionSlot = action === "reset" ? 22 : 23;
+  const confirmation = await waitForWindow(
+    () => bot.clickWindow(actionSlot, 0, 0),
+    `${action} confirmation outside the plot`,
+  );
+  if (!windowTitle(confirmation).toLowerCase().includes(action)) {
+    throw new Error(`${action} confirmation opened the wrong GUI: ${windowTitle(confirmation)}`);
+  }
+
+  const transcriptStart = transcript.length;
+  await bot.clickWindow(4, 0, 0);
+  const completionText = action === "reset" ? "Entry reset complete" : "Entry deleted";
+  await waitFor(
+    () => transcript.slice(transcriptStart).some((line) => line.includes(completionText)),
+    `${action} completion outside the plot`,
+    30_000,
+  );
+  await delay(750);
+
+  const movedDistance = bot.entity.position.distanceTo(outsidePosition);
+  if (bot.game.dimension !== outsideDimension || movedDistance > 1.5) {
+    throw new Error(
+      `Entry ${action} moved an owner who was outside the build (dimension ${outsideDimension} -> ${bot.game.dimension}, distance ${movedDistance.toFixed(2)})`,
+    );
+  }
+  console.log(`PASS: entry ${action} left the outside owner in place while completing safely`);
+}
+
 async function movementKitStabilityScenario() {
   await delay(500);
   let hotbarMutations = 0;
@@ -778,6 +1079,158 @@ async function movementKitStabilityScenario() {
     throw new Error(`Walking across the hub refreshed the inventory ${hotbarMutations} times`);
   }
   console.log("PASS: normal hub movement did not clear or refresh the Hill hotbar");
+}
+
+function currentDimension(targetBot) {
+  const tracked = currentWorldNames.get(targetBot);
+  if (tracked) return tracked;
+  return typeof targetBot.game?.dimension === "string"
+    ? targetBot.game.dimension
+    : JSON.stringify(targetBot.game?.dimension ?? "");
+}
+
+function isPrimarySurvivalDimension(targetBot) {
+  const dimension = currentDimension(targetBot);
+  return dimension === "minecraft:overworld" || dimension === "overworld";
+}
+
+function trackCurrentWorld(targetBot) {
+  const update = (packet) => {
+    const name = packet?.worldState?.name;
+    if (typeof name === "string") currentWorldNames.set(targetBot, name);
+  };
+  targetBot._client.on("login", update);
+  targetBot._client.on("respawn", update);
+}
+
+async function survivalGuideNpc() {
+  await waitFor(
+    () => Object.values(bot.entities).filter((entity) => entity.username === "HillSurvival").length === 1,
+    "Survival Guide player NPC",
+  );
+  const npc = Object.values(bot.entities).find((entity) => entity.username === "HillSurvival");
+  if (npc.type !== "player"
+    || npc.heldItem?.name !== "grass_block"
+    || npc.equipment?.[1]?.name !== "compass") {
+    throw new Error(`Survival Guide rendered incorrectly: ${npc.type} ${npc.heldItem?.name}/${npc.equipment?.[1]?.name}`);
+  }
+  if (bot.players.HillSurvival?.listed !== false && bot.players.HillSurvival?.listed !== 0) {
+    throw new Error(`Survival Guide tab-list state was ${String(bot.players.HillSurvival?.listed)} instead of false`);
+  }
+  const expected = new Vec3(70.5, 66.0, 31.5);
+  if (npc.position.distanceTo(expected) > 0.05) {
+    throw new Error(`Survival Guide spawned at ${npc.position} instead of ${expected}`);
+  }
+  return npc;
+}
+
+async function enterSurvivalThroughGuide() {
+  const npc = await survivalGuideNpc();
+  await approachEntity(npc);
+  const menu = await expectSingleWindow(
+    async () => {
+      bot._client.write("use_entity", {
+        target: npc.id,
+        hand: 0,
+        location: { x: 0, y: 1, z: 0 },
+        usingSecondaryAction: false,
+      });
+      bot._client.write("use_entity", {
+        target: npc.id,
+        hand: 1,
+        location: { x: 0, y: 1, z: 0 },
+        usingSecondaryAction: false,
+      });
+    },
+    "Survival Guide entry menu",
+  );
+  if (!windowTitle(menu).includes("Enter Survival") || menu.slots[4]?.name !== "grass_block") {
+    throw new Error(`Survival Guide opened the wrong one-item UI: ${windowTitle(menu)} [${topInventorySummary(menu)}]`);
+  }
+  bot.clickWindow(4, 0, 0);
+  await waitFor(
+    () => isPrimarySurvivalDimension(bot),
+    "primary survival Overworld",
+    20_000,
+  );
+  await delay(750);
+}
+
+async function survivalWorldScenario() {
+  await enterSurvivalThroughGuide();
+  if (String(bot.game?.gameMode).toLowerCase() !== "survival") {
+    throw new Error(`Survival Guide left the player in ${String(bot.game?.gameMode)} mode`);
+  }
+  const competitionItems = new Set(["compass", "ender_eye", "barrier", "written_book", "nether_star"]);
+  if (bot.inventory.slots.slice(36, 45).some((item) => competitionItems.has(item?.name))) {
+    throw new Error("Competition hotbar items leaked into survival inventory");
+  }
+
+  bot.physicsEnabled = true;
+  const initialPosition = bot.entity.position.clone();
+  bot.setControlState("forward", true);
+  await delay(1_500);
+  bot.clearControlStates();
+  await delay(500);
+  const savedPosition = bot.entity.position.clone();
+  if (savedPosition.distanceTo(initialPosition) < 0.4) {
+    throw new Error("Survival movement was unexpectedly locked");
+  }
+
+  bot.chat("/hub");
+  await waitFor(
+    () => currentDimension(bot).includes("hill_hub"),
+    "hub return from survival",
+    20_000,
+  );
+  await delay(750);
+  await enterSurvivalThroughGuide();
+  if (bot.entity.position.distanceTo(savedPosition) > 1.0) {
+    throw new Error(`Survival re-entry did not restore location (shift ${bot.entity.position.distanceTo(savedPosition).toFixed(2)})`);
+  }
+
+  bot.quit("Survival resume reconnect smoke");
+  bot.end("Survival resume reconnect smoke");
+  await delay(750);
+  const resumeTranscript = [];
+  const resumeBot = mineflayer.createBot({
+    host,
+    port,
+    username,
+    auth: "offline",
+    hideErrors: false,
+    plugins: { team: false },
+  });
+  trackCurrentWorld(resumeBot);
+  resumeBot.on("messagestr", (message) => {
+    resumeTranscript.push(message.replaceAll(/\u00a7[0-9A-FK-OR]/gi, ""));
+  });
+  try {
+    await new Promise((resolve) => resumeBot.once("spawn", resolve));
+    resumeBot.chat(`/login ${password}`);
+    await waitFor(
+      () => resumeTranscript.some((line) => line.includes("Login successful")),
+      "survival reconnect login",
+    );
+    await waitFor(
+      () => isPrimarySurvivalDimension(resumeBot),
+      "automatic survival resume after authentication",
+      20_000,
+    );
+    await delay(750);
+    if (String(resumeBot.game?.gameMode).toLowerCase() !== "survival") {
+      throw new Error(`Reconnect resumed in ${String(resumeBot.game?.gameMode)} mode`);
+    }
+    if (resumeBot.entity.position.distanceTo(savedPosition) > 1.0) {
+      throw new Error(`Reconnect did not restore survival location (shift ${resumeBot.entity.position.distanceTo(savedPosition).toFixed(2)})`);
+    }
+  } finally {
+    resumeBot.quit("Survival smoke complete");
+    resumeBot.end("Survival smoke complete");
+    await delay(250);
+  }
+
+  console.log("PASS: Survival Guide NPC, one-item menu, unrestricted movement, scoped inventory, hub re-entry, and reconnect resume worked");
 }
 
 async function peopleImportScenario() {
@@ -819,6 +1272,7 @@ const bot = mineflayer.createBot({
   // component shape. Team state is irrelevant to these interaction checks.
   plugins: { team: false },
 });
+trackCurrentWorld(bot);
 
 bot.on("messagestr", (message) => {
   const clean = message.replaceAll(/\u00a7[0-9A-FK-OR]/gi, "");
@@ -836,9 +1290,12 @@ bot.once("kicked", (reason) => {
 
 try {
   await new Promise((resolve) => bot.once("spawn", resolve));
-  await authenticate();
+  if (scenario === "authentication-lock") {
+    await authenticationLockScenario();
+  } else {
+    await authenticate();
 
-  switch (scenario) {
+    switch (scenario) {
     case "lobby-return":
       await lobbyReturnScenario();
       break;
@@ -875,11 +1332,23 @@ try {
     case "camera-view":
       await cameraViewScenario();
       break;
+    case "camera-held-use":
+      await cameraHeldUseScenario();
+      break;
     case "plot-reset-reentry":
       await plotResetReentryScenario();
       break;
+    case "entry-reset-outside":
+      await entryActionOutsideScenario("reset");
+      break;
+    case "entry-delete-outside":
+      await entryActionOutsideScenario("delete");
+      break;
     case "movement-kit-stability":
       await movementKitStabilityScenario();
+      break;
+    case "survival-world":
+      await survivalWorldScenario();
       break;
     case "people-import":
       await peopleImportScenario();
@@ -890,10 +1359,17 @@ try {
       break;
     default:
       throw new Error(`Unknown scenario: ${scenario}`);
+    }
   }
 } catch (error) {
   fail(error.stack ?? error.message);
 } finally {
   bot.quit("Smoke test complete");
+  bot.end("Smoke test complete");
   await delay(250);
 }
+
+// The pinned Mineflayer fork can retain internal timers after its sockets close.
+// Every scenario has completed its cleanup above, so exit deterministically for
+// CI, deployment scripts, and repeated local smoke passes.
+process.exit(process.exitCode ?? 0);

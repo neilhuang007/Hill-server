@@ -1,0 +1,15 @@
+[Unit]
+Description=Cold Borg backup for Hill175 Paper runtime
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+Environment=HILL175_BACKUP_ENV_FILE=/etc/minecraft-backup.env
+ExecStart=/usr/local/bin/hill175-backup.sh
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+UMask=0077

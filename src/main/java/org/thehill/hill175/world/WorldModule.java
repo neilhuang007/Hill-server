@@ -1,12 +1,14 @@
 package org.thehill.hill175.world;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
 import org.bukkit.GameRules;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.thehill.hill175.model.BuildRegion;
@@ -19,6 +21,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,6 +45,7 @@ public final class WorldModule {
 
     private final JavaPlugin plugin;
     private final VoidChunkGenerator voidGenerator = new VoidChunkGenerator();
+    private final long survivalSeed;
     private final Map<UUID, ResetOperation> resetOperations = new HashMap<>();
     private final Set<String> readyPeopleWorlds = new HashSet<>();
     private final Map<String, List<Runnable>> waitingPeopleWorldCallbacks = new HashMap<>();
@@ -47,6 +53,9 @@ public final class WorldModule {
     private World hubWorld;
     private World journeyWorld;
     private World placeWorld;
+    private World survivalWorld;
+    private World survivalNetherWorld;
+    private World survivalEndWorld;
     private StructureNbtLoader.Metadata peopleStructureMetadata;
     private boolean peopleStructureMetadataResolved;
     private boolean peopleTemplatePreparing;
@@ -55,12 +64,23 @@ public final class WorldModule {
 
     public WorldModule(JavaPlugin plugin) {
         this.plugin = plugin;
+        this.survivalSeed = loadOrCreateSurvivalSeed();
     }
 
     public void initialize() {
         authenticationWorld = loadImportedWorld(plugin.getConfig().getString("worlds.authentication", "hill_auth"));
         journeyWorld = loadVoidWorld(plugin.getConfig().getString("worlds.journey", "hill_journey"));
         placeWorld = loadVoidWorld(plugin.getConfig().getString("worlds.place", "hill_place"));
+        String survivalName = plugin.getConfig().getString("worlds.survival", "world");
+        survivalWorld = loadSurvivalWorld(survivalName, World.Environment.NORMAL);
+        survivalNetherWorld = loadSurvivalWorld(
+                plugin.getConfig().getString("worlds.survival-nether", survivalName + "_nether"),
+                World.Environment.NETHER
+        );
+        survivalEndWorld = loadSurvivalWorld(
+                plugin.getConfig().getString("worlds.survival-end", survivalName + "_the_end"),
+                World.Environment.THE_END
+        );
 
         String hubName = plugin.getConfig().getString("worlds.hub", "hill_hub");
         hubWorld = loadImportedWorld(hubName);
@@ -72,6 +92,9 @@ public final class WorldModule {
         configureWorld(hubWorld);
         configureWorld(journeyWorld);
         configureWorld(placeWorld);
+        configureSurvivalWorld(survivalWorld);
+        configureSurvivalWorld(survivalNetherWorld);
+        configureSurvivalWorld(survivalEndWorld);
         if (isNearlyEmpty(authenticationWorld)) {
             buildAuthenticationLobby();
         }
@@ -125,6 +148,45 @@ public final class WorldModule {
 
     public World hubWorld() {
         return hubWorld;
+    }
+
+    public World survivalWorld() {
+        return survivalWorld;
+    }
+
+    public World survivalNetherWorld() {
+        return survivalNetherWorld;
+    }
+
+    public World survivalEndWorld() {
+        return survivalEndWorld;
+    }
+
+    public boolean isSurvivalWorld(World world) {
+        return sameWorld(world, survivalWorld)
+                || sameWorld(world, survivalNetherWorld)
+                || sameWorld(world, survivalEndWorld);
+    }
+
+    public boolean isSurvivalWorld(Location location) {
+        return location != null && isSurvivalWorld(location.getWorld());
+    }
+
+    public Location survivalSpawn() {
+        Location configuredOverride = configuredSpawn(survivalWorld, "worlds.survival-spawn");
+        if (configuredOverride != null) {
+            return configuredOverride;
+        }
+        Location spawn = survivalWorld.getSpawnLocation().clone().add(0.5, 0.1, 0.5);
+        return new Location(survivalWorld, spawn.getX(), spawn.getY(), spawn.getZ(), 0.0f, 0.0f);
+    }
+
+    public Location survivalNpcLocation() {
+        Location configured = configuredSpawn(hubWorld, "worlds.hub-npcs.survival");
+        if (configured != null) {
+            return configured;
+        }
+        return new Location(hubWorld, 70.5, 66.0, 31.5, 0.0f, 0.0f);
     }
 
     public Location hubNpcLocation(Category category) {
@@ -775,6 +837,62 @@ public final class WorldModule {
         return world;
     }
 
+    private World loadSurvivalWorld(String name, World.Environment environment) {
+        World world = Bukkit.getWorld(name);
+        if (world == null) {
+            world = WorldCreator.name(name)
+                    .environment(environment)
+                    .generateStructures(true)
+                    .seed(survivalSeed)
+                    .createWorld();
+        }
+        if (world == null) {
+            throw new IllegalStateException("Could not create survival world " + name);
+        }
+        return world;
+    }
+
+    private long loadOrCreateSurvivalSeed() {
+        if (plugin.getConfig().contains("survival.seed")) {
+            return plugin.getConfig().getLong("survival.seed");
+        }
+        Path seedFile = plugin.getDataFolder().toPath().resolve("survival-seed.txt");
+        if (Files.isRegularFile(seedFile)) {
+            try {
+                return Long.parseLong(Files.readString(seedFile, StandardCharsets.UTF_8).trim());
+            } catch (IOException | NumberFormatException exception) {
+                throw new IllegalStateException("Could not read persistent survival seed from " + seedFile, exception);
+            }
+        }
+        long seed;
+        do {
+            seed = new SecureRandom().nextLong();
+        } while (seed == 0L);
+        Path temporary = null;
+        try {
+            Files.createDirectories(seedFile.getParent());
+            temporary = Files.createTempFile(seedFile.getParent(), "survival-seed-", ".tmp");
+            Files.writeString(temporary, Long.toString(seed) + System.lineSeparator(), StandardCharsets.UTF_8);
+            try {
+                Files.move(temporary, seedFile, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(temporary, seedFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+            plugin.getLogger().info("Generated and persisted a random survival seed.");
+            return seed;
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not persist random survival seed to " + seedFile, exception);
+        } finally {
+            if (temporary != null) {
+                try {
+                    Files.deleteIfExists(temporary);
+                } catch (IOException ignored) {
+                    // The target seed is already durable; a stale temp file is harmless.
+                }
+            }
+        }
+    }
+
     private void configureWorld(World world) {
         world.setGameRule(GameRules.SPAWN_MOBS, false);
         world.setGameRule(GameRules.FIRE_SPREAD_RADIUS_AROUND_PLAYER, 0);
@@ -786,6 +904,38 @@ public final class WorldModule {
         world.setTime(6_000L);
         world.setStorm(false);
         world.setThundering(false);
+    }
+
+    private void configureSurvivalWorld(World world) {
+        world.setDifficulty(survivalDifficulty());
+        world.setGameRule(GameRules.SPAWN_MOBS, true);
+        world.setGameRule(GameRules.SPAWN_MONSTERS, true);
+        world.setGameRule(GameRules.MOB_GRIEFING, plugin.getConfig().getBoolean("survival.mob-griefing", true));
+        world.setGameRule(GameRules.KEEP_INVENTORY, plugin.getConfig().getBoolean("survival.keep-inventory", false));
+        world.setGameRule(GameRules.ADVANCE_TIME, true);
+        world.setGameRule(GameRules.ADVANCE_WEATHER, true);
+        world.setGameRule(GameRules.SHOW_DEATH_MESSAGES, true);
+        world.setGameRule(GameRules.FIRE_DAMAGE, true);
+        world.setGameRule(GameRules.FALL_DAMAGE, true);
+        world.setGameRule(GameRules.DROWNING_DAMAGE, true);
+        world.setGameRule(GameRules.FREEZE_DAMAGE, true);
+        world.setGameRule(GameRules.TNT_EXPLODES, true);
+        world.setGameRule(GameRules.PVP, plugin.getConfig().getBoolean("survival.pvp", true));
+        world.setPVP(plugin.getConfig().getBoolean("survival.pvp", true));
+    }
+
+    private Difficulty survivalDifficulty() {
+        String configured = plugin.getConfig().getString("survival.difficulty", "NORMAL");
+        try {
+            return Difficulty.valueOf(configured.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            plugin.getLogger().warning("Invalid survival.difficulty '" + configured + "'; using NORMAL.");
+            return Difficulty.NORMAL;
+        }
+    }
+
+    private static boolean sameWorld(World left, World right) {
+        return left != null && right != null && left.getName().equals(right.getName());
     }
 
     private void buildAuthenticationLobby() {
@@ -859,11 +1009,12 @@ public final class WorldModule {
     private static void fill(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Material material) {
         int worldMinY = world.getMinHeight();
         int worldMaxY = world.getMaxHeight() - 1;
+        BlockData blockData = material.createBlockData();
         for (int x = Math.min(minX, maxX); x <= Math.max(minX, maxX); x++) {
             for (int y = Math.max(worldMinY, Math.min(minY, maxY)); y <= Math.min(worldMaxY, Math.max(minY, maxY)); y++) {
                 for (int z = Math.min(minZ, maxZ); z <= Math.max(minZ, maxZ); z++) {
                     Block block = world.getBlockAt(x, y, z);
-                    block.setType(material, false);
+                    block.setBlockData(blockData, false);
                 }
             }
         }

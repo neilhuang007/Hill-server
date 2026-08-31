@@ -25,6 +25,7 @@ public final class Hill175Plugin extends JavaPlugin {
     private CompetitionStore store;
     private CompetitionModule competition;
     private HubNpcModule hubNpcs;
+    private WorldModule worlds;
 
     @Override
     public void onEnable() {
@@ -39,7 +40,7 @@ public final class Hill175Plugin extends JavaPlugin {
         }
         getLogger().warning("DEVELOPMENT AUTHENTICATION IS ACTIVE: any unregistered offline nickname can be claimed while registration is open.");
 
-        WorldModule worlds = new WorldModule(this);
+        worlds = new WorldModule(this);
         worlds.initialize();
 
         store = new YamlCompetitionStore(getDataFolder(), getLogger());
@@ -80,6 +81,7 @@ public final class Hill175Plugin extends JavaPlugin {
             }
         });
         Bukkit.getScheduler().runTask(this, competition::rebuildAllCameraMarkers);
+        Bukkit.getScheduler().runTaskTimer(this, competition::tickSessionLocks, 1L, 1L);
         Bukkit.getScheduler().runTaskTimer(this, this::removeForbiddenMobsAndPrimedTnt, 20L, 20L);
         Bukkit.getScheduler().runTaskTimer(this, store::flush, 20L * 300L, 20L * 300L);
 
@@ -105,6 +107,9 @@ public final class Hill175Plugin extends JavaPlugin {
     private void removeForbiddenMobsAndPrimedTnt() {
         for (var world : Bukkit.getWorlds()) {
             for (var entity : world.getEntities()) {
+                if (worlds != null && worlds.isSurvivalWorld(entity.getWorld())) {
+                    continue;
+                }
                 if (entity instanceof Mob && !entity.getScoreboardTags().contains("hill175_category_npc")) {
                     entity.remove();
                 } else if (entity.getType() == EntityType.TNT) {

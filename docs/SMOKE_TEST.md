@@ -29,7 +29,7 @@ Run against Minecraft Java Edition 26.2.
 7. Try to create People as a third entry; confirm rejection.
 8. Delete or switch one entry, then create People; confirm a private `hill_people_<entry>` world.
 9. Open Visit Builds; confirm player-head entry cards and read-only visitor teleport.
-10. Confirm all three category guides are Player entities (not armor stands), use distinct role-appropriate skins, have a floating category title plus `CLICK TO OPEN`, and do not remain listed in the player list.
+10. Confirm the three category guides and the Survival Guide are Player entities (not armor stands), have floating titles plus `CLICK TO OPEN`, and do not remain listed in the player list. Confirm the Survival Guide is at `70.5,66,31.5`.
 11. Left-click and right-click each category guide; confirm each action opens exactly one category entry/creation GUI.
 12. In an owned entry, confirm the hotbar contains Return to Hub, Camera, Rules, and Entry Controls, but no standalone Reset or Lock item.
 13. Open Entry Controls; confirm Build Options contains submission lock/unlock, reset, delete, and category change, with confirmations for destructive actions.
@@ -61,19 +61,20 @@ Run against Minecraft Java Edition 26.2.
 
 ## Camera and submission
 
-1. Hold the Camera and right-click empty air at three positions inside the owned entry; confirm no ground click is required.
-2. Confirm the fourth right-click replaces camera 1 and continues rotating through the three saved slots.
-3. Run `/camera list`, then `/camera remove 2` and save a replacement.
-4. Sneak, swim, or glide, then left-click the Camera; confirm preview canonicalizes the player to standing and begins at the exact saved eye viewpoint, yaw, and pitch without shifting vertically into a block. Confirm it displays `Previewing camera #…` as a title plus a persistent status bar.
-5. While previewing, try walking, flying, sneaking, swimming, gliding, and rotating the view; confirm all position and camera changes are corrected immediately and camera markers are hidden.
+1. Hold the Camera (Ender Eye) and repeatedly right-click; confirm exactly one Camera Controls UI opens and no spyglass zoom occurs.
+2. Save views into explicit slots 1, 2, and 3. Confirm a populated slot offers preview, replace, and remove controls, with confirmation before replacement or removal.
+3. Run `/camera list`, then `/camera remove 2` and save a replacement into slot 2.
+4. Preview a saved slot; confirm it begins at the exact saved eye viewpoint, yaw, and pitch without shifting vertically into a block. Confirm it displays `Previewing camera slot …` as a title plus a persistent status bar.
+5. While previewing, try walking, flying, sneaking, swimming, gliding, and rotating the view; confirm both position and angle remain continuously locked and camera markers are hidden.
 6. Use the Exit Camera Preview item with a right-click, preview again, then use it with a left-click; confirm both return to the pre-preview position and restore the owner hotbar.
-7. Left-click and right-click each visible camera marker; confirm both enter that marker's exact locked preview and show its camera number.
-8. Run `/entry title <title>`.
-9. Run `/entry description <description>`.
-10. Open Entry Controls, choose Lock Submission, confirm the checklist appears, then choose Confirm Lock.
-11. Confirm the entry changes to read-only Spectator Mode for both team members.
-12. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
-13. Run `/entry unlock`; confirm Creative Mode/building returns.
+7. As the entry owner, preview a camera and confirm the Remove This Camera item appears and requires confirmation. As a visitor, confirm that removal item and all removal actions are absent/denied.
+8. Left-click and right-click each visible camera marker; confirm both enter that marker's exact locked preview and show its camera number.
+9. Run `/entry title <title>`.
+10. Run `/entry description <description>`.
+11. Open Entry Controls, choose Lock Submission, confirm the checklist appears, then choose Confirm Lock.
+12. Confirm the entry changes to read-only Spectator Mode for both team members.
+13. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
+14. Run `/entry unlock`; confirm Creative Mode/building returns.
 
 ## Persistence and restart
 
@@ -84,3 +85,18 @@ Run against Minecraft Java Edition 26.2.
 5. Confirm the checksum-pinned Hill exhibition hub and three Player category guides load without duplicates.
 6. Confirm `/hub` arrives safely at `70.5, 66.1, 42.5`, facing south toward the category personnel.
 7. Confirm Journey, Place, and People personnel stand at the block-centred anchors `70.5,67,70.5`, `70.5,75,70.5`, and `70.5,61,70.5`, respectively, and face the arrival point.
+
+## Survival worldgen
+
+1. Before first survival entry, confirm `world/datapacks` contains exactly Terralith, Terratonic, Structory, Structory Towers, Towns and Towers, Incendium Legacy, and Nullscape from `server-assets/survival-worldgen-manifest.tsv`.
+2. Confirm no Tectonic zip is present.
+3. Confirm `server.properties` has `level-seed=<seed>`, `plugins/Hill175/config.yml` has the same installer-managed `survival.seed`, and `assets/survival-worldgen/survival-seed.txt` exists outside Git.
+4. Confirm `plugins/Chunky-Bukkit-1.5.3.jar` is installed and that no other Chunky jar is present. Do not start pregeneration during this smoke pass.
+5. If a first primary-world transition archive exists, confirm all archived non-survival custom dimensions from every namespace were restored under `world/dimensions`, while `minecraft:hill_survival`, `minecraft:hill_survival_nether`, `minecraft:hill_survival_the_end`, `minecraft:overworld`, `minecraft:the_nether`, and `minecraft:the_end` were not copied from the archive.
+6. Confirm archived primary-root `players/`, `playerdata/`, `data/`, `stats/`, and `advancements/` were copied back into `world/` when present, while old `level.dat`, `session.lock`, and old `datapacks` were not copied.
+7. Use the Survival Guide and confirm the destination is the primary `world`.
+8. Confirm `/datapack list` shows the seven selected packs as enabled.
+9. Generate Overworld, Nether, and End chunks; then check `logs/latest.log` for datapack parse errors, registry failures, structure-set warnings, and watchdog stalls.
+10. Use `/locate structure` for at least one Structory, Structory Towers, and Towns and Towers structure.
+11. Confirm normal survival consequences: mob spawning, damage, hunger, inventory drops on death, fire, explosions, terrain damage, and PvP.
+12. Record whether a 4000-block pregeneration pass is needed after this smoke test; do not pregen before the datapack stack is verified.

@@ -8,6 +8,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class Entry {
+    public static final int MAX_CAMERA_SLOTS = 3;
+
     private final UUID id;
     private Category category;
     private final LinkedHashSet<String> members;
@@ -30,6 +32,9 @@ public final class Entry {
         this.title = "";
         this.description = "";
         this.cameraPoses = new ArrayList<>();
+        for (int slot = 0; slot < MAX_CAMERA_SLOTS; slot++) {
+            this.cameraPoses.add(null);
+        }
     }
 
     public UUID id() {
@@ -121,21 +126,47 @@ public final class Entry {
     }
 
     public List<CameraPose> cameraPoses() {
-        return List.copyOf(cameraPoses);
+        return cameraPoses.stream()
+                .filter(java.util.Objects::nonNull)
+                .toList();
+    }
+
+    public List<Integer> savedCameraSlots() {
+        ArrayList<Integer> slots = new ArrayList<>();
+        for (int index = 0; index < cameraPoses.size(); index++) {
+            if (cameraPoses.get(index) != null) {
+                slots.add(index + 1);
+            }
+        }
+        return List.copyOf(slots);
+    }
+
+    public java.util.Optional<CameraPose> cameraPose(int oneBasedIndex) {
+        int index = oneBasedIndex - 1;
+        if (index < 0 || index >= MAX_CAMERA_SLOTS) {
+            return java.util.Optional.empty();
+        }
+        return java.util.Optional.ofNullable(cameraPoses.get(index));
+    }
+
+    public java.util.Optional<Integer> firstEmptyCameraSlot() {
+        for (int index = 0; index < cameraPoses.size(); index++) {
+            if (cameraPoses.get(index) == null) {
+                return java.util.Optional.of(index + 1);
+            }
+        }
+        return java.util.Optional.empty();
     }
 
     public boolean addCameraPose(CameraPose pose) {
-        if (cameraPoses.size() >= 3) {
-            return false;
-        }
-        cameraPoses.add(pose);
-        clearSubmission();
-        return true;
+        return firstEmptyCameraSlot()
+                .map(slot -> setCameraPose(slot, pose))
+                .orElse(false);
     }
 
     public boolean setCameraPose(int oneBasedIndex, CameraPose pose) {
         int index = oneBasedIndex - 1;
-        if (index < 0 || index >= cameraPoses.size()) {
+        if (index < 0 || index >= MAX_CAMERA_SLOTS || pose == null) {
             return false;
         }
         cameraPoses.set(index, pose);
@@ -145,16 +176,18 @@ public final class Entry {
 
     public boolean removeCameraPose(int oneBasedIndex) {
         int index = oneBasedIndex - 1;
-        if (index < 0 || index >= cameraPoses.size()) {
+        if (index < 0 || index >= MAX_CAMERA_SLOTS || cameraPoses.get(index) == null) {
             return false;
         }
-        cameraPoses.remove(index);
+        cameraPoses.set(index, null);
         clearSubmission();
         return true;
     }
 
     public void clearCameraPoses() {
-        cameraPoses.clear();
+        for (int index = 0; index < cameraPoses.size(); index++) {
+            cameraPoses.set(index, null);
+        }
         clearSubmission();
     }
 }

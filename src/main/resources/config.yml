@@ -53,8 +53,20 @@ worlds:
       z: 70.5
       yaw: 180.0
       pitch: 0.0
+    survival:
+      profile-name: HillSurvival
+      # Smoke skin: surveyor/builder. Replace with a Hill-owned survival guide texture before public launch.
+      skin-texture: af41e2561a2c959f56df5dcda564397df1971d652e1ac159d8b4c74733026077
+      x: 70.5
+      y: 66.0
+      z: 31.5
+      yaw: 0.0
+      pitch: 0.0
   journey: hill_journey
   place: hill_place
+  survival: world
+  survival-nether: world_nether
+  survival-end: world_the_end
 
 people:
   # Extract a rights-cleared campus template to this folder before creating People entries.

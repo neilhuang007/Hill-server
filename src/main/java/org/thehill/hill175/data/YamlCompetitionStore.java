@@ -119,8 +119,8 @@ public final class YamlCompetitionStore implements CompetitionStore {
             yaml.set(path + ".submitted", entry.submitted());
             yaml.set(path + ".submitted-at", entry.submittedAt() == null ? null : entry.submittedAt().toString());
             writeRegion(yaml, path + ".region", entry.region());
-            for (int index = 0; index < entry.cameraPoses().size(); index++) {
-                writeCamera(yaml, path + ".cameras." + index, entry.cameraPoses().get(index));
+            for (int slot : entry.savedCameraSlots()) {
+                entry.cameraPose(slot).ifPresent(pose -> writeCamera(yaml, path + ".cameras." + (slot - 1), pose));
             }
         }
         for (Map.Entry<Category, Integer> counter : allocationCounters.entrySet()) {
@@ -195,10 +195,16 @@ public final class YamlCompetitionStore implements CompetitionStore {
                     entry.description(yaml.getString(path + ".description", ""));
                     ConfigurationSection cameras = yaml.getConfigurationSection(path + ".cameras");
                     if (cameras != null) {
-                        cameras.getKeys(false).stream()
-                                .sorted()
-                                .map(key -> readCamera(yaml, path + ".cameras." + key))
-                                .forEach(entry::addCameraPose);
+                        for (String key : cameras.getKeys(false)) {
+                            try {
+                                int slot = Integer.parseInt(key) + 1;
+                                if (!entry.setCameraPose(slot, readCamera(yaml, path + ".cameras." + key))) {
+                                    logger.warning("Skipping out-of-range camera slot " + key + " for entry " + rawId);
+                                }
+                            } catch (NumberFormatException exception) {
+                                logger.warning("Skipping malformed camera slot " + key + " for entry " + rawId);
+                            }
+                        }
                     }
                     if (yaml.getBoolean(path + ".submitted")) {
                         entry.submit(parseInstant(yaml.getString(path + ".submitted-at")));

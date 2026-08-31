@@ -38,11 +38,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-/** Three real player-entity category guides with Hypixel-style floating titles. */
+/** Real player-entity hub guides with Hypixel-style floating titles. */
 public final class HubNpcModule implements Listener {
     private static final String NPC_TAG = "hill175_category_npc";
     private static final String NPC_PART_TAG = "hill175_category_npc_part";
     private static final String NPC_TEAM_NAME = "hill175_npcs";
+    private static final String SURVIVAL_TAG = "hill175_survival_guide";
     private static final Duration INTERACTION_DEBOUNCE = Duration.ofMillis(350);
     private static final Pattern PROFILE_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{3,16}$");
     private static final Pattern TEXTURE_HASH_PATTERN = Pattern.compile("^[0-9a-f]{64}$");
@@ -54,6 +55,8 @@ public final class HubNpcModule implements Listener {
     private final Map<Category, SyntheticPlayerNpc> categoryNpcs = new EnumMap<>(Category.class);
     private final Map<Category, TextDisplay> categoryNameplates = new EnumMap<>(Category.class);
     private final Map<UUID, RecentInteraction> recentInteractions = new HashMap<>();
+    private SyntheticPlayerNpc survivalNpc;
+    private TextDisplay survivalNameplate;
 
     public HubNpcModule(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, WorldModule worlds) {
         this.plugin = plugin;
@@ -67,6 +70,7 @@ public final class HubNpcModule implements Listener {
         for (Category category : Category.values()) {
             worlds.hubNpcLocation(category).getChunk().load();
         }
+        worlds.survivalNpcLocation().getChunk().load();
         // Remove guides left by an interrupted reload or the former armor-stand implementation.
         for (Entity entity : worlds.hubWorld().getEntities()) {
             if (entity.getScoreboardTags().contains(NPC_TAG)
@@ -84,15 +88,20 @@ public final class HubNpcModule implements Listener {
             }
             styles.put(category, style);
         }
+        SurvivalStyle survivalStyle = configuredSurvivalStyle();
+        if (!profileNames.add(survivalStyle.profileName().toLowerCase(Locale.ROOT))) {
+            throw new IllegalStateException("Hub NPC profile names must be unique");
+        }
         try {
             spawn(worlds.hubNpcLocation(Category.JOURNEY), Category.JOURNEY, styles.get(Category.JOURNEY));
             spawn(worlds.hubNpcLocation(Category.PLACE), Category.PLACE, styles.get(Category.PLACE));
             spawn(worlds.hubNpcLocation(Category.PEOPLE), Category.PEOPLE, styles.get(Category.PEOPLE));
+            spawnSurvival(worlds.survivalNpcLocation(), survivalStyle);
         } catch (RuntimeException exception) {
             removeCategoryNpcs();
             throw exception;
         }
-        plugin.getLogger().info("Hill 175 player category guides ready: " + categoryNpcs.size() + "/3.");
+        plugin.getLogger().info("Hill 175 player hub guides ready: " + (categoryNpcs.size() + (survivalNpc == null ? 0 : 1)) + "/4.");
     }
 
     public void shutdown() {
@@ -103,9 +112,7 @@ public final class HubNpcModule implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         // The hub is in another dimension, so preload the profiles before the
         // authenticated viewer gets close enough to track the NPC entities.
-        for (SyntheticPlayerNpc npc : categoryNpcs.values()) {
-            npc.sendTo(event.getPlayer());
-        }
+        sendNpcsTo(event.getPlayer());
     }
 
     @EventHandler
@@ -117,9 +124,7 @@ public final class HubNpcModule implements Listener {
             if (!event.getPlayer().isOnline() || !event.getPlayer().getWorld().equals(worlds.hubWorld())) {
                 return;
             }
-            for (SyntheticPlayerNpc npc : categoryNpcs.values()) {
-                npc.sendTo(event.getPlayer());
-            }
+            sendNpcsTo(event.getPlayer());
         });
     }
 
@@ -168,6 +173,14 @@ public final class HubNpcModule implements Listener {
             return;
         }
         recentInteractions.put(player.getUniqueId(), new RecentInteraction(entity.getUniqueId(), now));
+        if (entity.getScoreboardTags().contains(SURVIVAL_TAG)) {
+            if (!competition.isAuthenticated(player)) {
+                competition.sendAuthenticationInstructions(player);
+                return;
+            }
+            menus.openSurvival(player);
+            return;
+        }
         for (Category category : Category.values()) {
             if (!entity.getScoreboardTags().contains(categoryTag(category))) {
                 continue;
@@ -200,16 +213,41 @@ public final class HubNpcModule implements Listener {
         inventory.setItemInMainHand(new ItemStack(style.heldItem()));
         inventory.setItemInOffHand(new ItemStack(style.offhandItem()));
         categoryNpcs.put(category, synthetic);
-        categoryNameplates.put(category, spawnNameplate(location, category, style));
+        categoryNameplates.put(category,
+                spawnNameplate(location, style.title(), style.titleColor(), Set.of(categoryTag(category))));
         synthetic.activate();
         plugin.getLogger().fine("Spawned player category NPC " + category.name() + " at " + location);
     }
 
-    private TextDisplay spawnNameplate(Location location, Category category, CategoryStyle style) {
+    private void spawnSurvival(Location location, SurvivalStyle style) {
+        location.getChunk().load();
+        npcTeam().addEntry(style.profileName());
+        SyntheticPlayerNpc synthetic = SyntheticPlayerNpc.spawn(
+                plugin,
+                location,
+                style.profileName(),
+                style.skinTexture()
+        );
+        Player npc = synthetic.player();
+        npc.addScoreboardTag(NPC_TAG);
+        npc.addScoreboardTag(SURVIVAL_TAG);
+        npc.setCanPickupItems(false);
+        npc.setRotation(location.getYaw(), location.getPitch());
+        PlayerInventory inventory = npc.getInventory();
+        inventory.setHeldItemSlot(0);
+        inventory.setItemInMainHand(new ItemStack(style.heldItem()));
+        inventory.setItemInOffHand(new ItemStack(style.offhandItem()));
+        survivalNpc = synthetic;
+        survivalNameplate = spawnNameplate(location, style.title(), style.titleColor(), Set.of(SURVIVAL_TAG));
+        synthetic.activate();
+        plugin.getLogger().fine("Spawned player survival NPC at " + location);
+    }
+
+    private TextDisplay spawnNameplate(Location location, String title, NamedTextColor titleColor, Set<String> tags) {
         Location nameplateLocation = location.clone().add(0.0, 2.55, 0.0);
         TextDisplay nameplate = worlds.hubWorld().spawn(nameplateLocation, TextDisplay.class, display -> {
             display.text(Component.text()
-                    .append(Component.text(style.title(), style.titleColor()))
+                    .append(Component.text(title, titleColor))
                     .append(Component.newline())
                     .append(Component.text("CLICK TO OPEN", NamedTextColor.YELLOW))
                     .build());
@@ -228,7 +266,7 @@ public final class HubNpcModule implements Listener {
             display.setSilent(true);
             display.setPersistent(true);
             display.addScoreboardTag(NPC_PART_TAG);
-            display.addScoreboardTag(categoryTag(category));
+            tags.forEach(display::addScoreboardTag);
         });
         nameplate.setRotation(location.getYaw(), 0.0f);
         return nameplate;
@@ -254,9 +292,27 @@ public final class HubNpcModule implements Listener {
         for (TextDisplay nameplate : categoryNameplates.values()) {
             nameplate.remove();
         }
+        if (survivalNpc != null) {
+            team.removeEntry(survivalNpc.player().getName());
+            survivalNpc.remove();
+        }
+        if (survivalNameplate != null) {
+            survivalNameplate.remove();
+        }
         categoryNpcs.clear();
         categoryNameplates.clear();
+        survivalNpc = null;
+        survivalNameplate = null;
         recentInteractions.clear();
+    }
+
+    private void sendNpcsTo(Player player) {
+        for (SyntheticPlayerNpc npc : categoryNpcs.values()) {
+            npc.sendTo(player);
+        }
+        if (survivalNpc != null) {
+            survivalNpc.sendTo(player);
+        }
     }
 
     private static Entity npcEntity(Entity entity) {
@@ -290,6 +346,28 @@ public final class HubNpcModule implements Listener {
             throw new IllegalStateException("Invalid category NPC texture hash at " + path + ".skin-texture");
         }
         return new CategoryStyle(
+                defaults.title(),
+                profileName,
+                defaults.titleColor(),
+                defaults.heldItem(),
+                defaults.offhandItem(),
+                skinTexture
+        );
+    }
+
+    private SurvivalStyle configuredSurvivalStyle() {
+        SurvivalStyle defaults = SurvivalStyle.defaults();
+        String path = "worlds.hub-npcs.survival";
+        String profileName = plugin.getConfig().getString(path + ".profile-name", defaults.profileName()).trim();
+        String skinTexture = plugin.getConfig().getString(path + ".skin-texture", defaults.skinTexture())
+                .trim().toLowerCase(Locale.ROOT);
+        if (!PROFILE_NAME_PATTERN.matcher(profileName).matches()) {
+            throw new IllegalStateException("Invalid survival NPC profile name at " + path + ".profile-name");
+        }
+        if (!TEXTURE_HASH_PATTERN.matcher(skinTexture).matches()) {
+            throw new IllegalStateException("Invalid survival NPC texture hash at " + path + ".skin-texture");
+        }
+        return new SurvivalStyle(
                 defaults.title(),
                 profileName,
                 defaults.titleColor(),
@@ -341,5 +419,26 @@ public final class HubNpcModule implements Listener {
     }
 
     private record RecentInteraction(UUID entityId, Instant when) {
+    }
+
+    private record SurvivalStyle(
+            String title,
+            String profileName,
+            NamedTextColor titleColor,
+            Material heldItem,
+            Material offhandItem,
+            String skinTexture
+    ) {
+        private static SurvivalStyle defaults() {
+            return new SurvivalStyle(
+                    "Survival Guide",
+                    "HillSurvival",
+                    NamedTextColor.GREEN,
+                    Material.GRASS_BLOCK,
+                    Material.COMPASS,
+                    // Smoke skin: surveyor/builder. Replace with a Hill-owned survival guide texture before public launch.
+                    "af41e2561a2c959f56df5dcda564397df1971d652e1ac159d8b4c74733026077"
+            );
+        }
     }
 }

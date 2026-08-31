@@ -219,6 +219,172 @@ public final class MenuModule implements Listener {
                 );
     }
 
+    public void openSurvival(Player player) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 9,
+                Component.text("Enter Survival", NamedTextColor.GREEN));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        inventory.setItem(4, item(Material.GRASS_BLOCK, "Enter Survival",
+                List.of("Resume your survival world."), NamedTextColor.GREEN));
+        session.actions.put(4, new MenuAction(ActionType.ENTER_SURVIVAL, null, null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
+    public void openCameraControls(Player player) {
+        MenuSession openSession = sessions.get(player.getUniqueId());
+        if (openSession != null
+                && player.getOpenInventory().getTopInventory().equals(openSession.inventory)) {
+            return;
+        }
+        competition.currentEntry(player).ifPresentOrElse(
+                entry -> openCameraControls(player, entry),
+                () -> player.sendMessage(Component.text("Open or visit an entry first.", NamedTextColor.RED))
+        );
+    }
+
+    private void openCameraControls(Player player, Entry entry) {
+        boolean editor = competition.canEditCameras(player, entry);
+        boolean owner = entry.isMember(competition.nicknameKey(player.getName()));
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 27,
+                Component.text(editor ? "Camera Controls" : "Camera Views", NamedTextColor.AQUA));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.ENDER_EYE, editor ? "Submission Cameras" : "Saved Camera Views",
+                editor
+                        ? List.of("Choose a numbered slot.", "Replacing and removing require confirmation.")
+                        : List.of("Choose a saved camera view."),
+                NamedTextColor.AQUA));
+        for (int cameraSlot = 1; cameraSlot <= Entry.MAX_CAMERA_SLOTS; cameraSlot++) {
+            int inventorySlot = 9 + cameraSlot * 2;
+            boolean saved = entry.cameraPose(cameraSlot).isPresent();
+            if (saved) {
+                inventory.setItem(inventorySlot, item(Material.ENDER_EYE, "Camera " + cameraSlot,
+                        editor
+                                ? List.of("Preview, replace, or remove this slot.")
+                                : List.of("Preview this saved view."),
+                        NamedTextColor.GREEN));
+                session.actions.put(inventorySlot, new MenuAction(
+                        editor ? ActionType.OPEN_CAMERA_SLOT : ActionType.PREVIEW_CAMERA,
+                        entry.id(), null, cameraSlot));
+            } else if (editor) {
+                inventory.setItem(inventorySlot, item(Material.LIME_DYE, "Save Camera " + cameraSlot,
+                        List.of("Save your current view to this slot."), NamedTextColor.GREEN));
+                session.actions.put(inventorySlot, new MenuAction(ActionType.SAVE_CAMERA, entry.id(), null, cameraSlot));
+            } else {
+                inventory.setItem(inventorySlot, item(Material.GRAY_DYE, "Camera " + cameraSlot + " Empty",
+                        List.of("No saved view in this slot."), NamedTextColor.GRAY));
+            }
+        }
+        inventory.setItem(26, item(owner ? Material.NETHER_STAR : Material.COMPASS,
+                owner ? "Back to Build Options" : "Back to Main Menu", List.of(), NamedTextColor.GOLD));
+        session.actions.put(26, new MenuAction(owner ? ActionType.OPEN_ENTRY : ActionType.OPEN_MAIN, entry.id(), null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
+    private void openCameraSlotControls(Player player, Entry entry, int cameraSlot) {
+        if (!competition.canEditCameras(player, entry) || entry.cameraPose(cameraSlot).isEmpty()) {
+            openCameraControls(player, entry);
+            return;
+        }
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 9,
+                Component.text("Camera " + cameraSlot, NamedTextColor.AQUA));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(1, item(Material.ENDER_EYE, "Preview Camera",
+                List.of("View this saved angle."), NamedTextColor.AQUA));
+        session.actions.put(1, new MenuAction(ActionType.PREVIEW_CAMERA, entry.id(), null, cameraSlot));
+        inventory.setItem(3, item(Material.LIME_DYE, "Replace Camera",
+                List.of("Replace this slot with your current view."), NamedTextColor.YELLOW));
+        session.actions.put(3, new MenuAction(ActionType.CONFIRM_REPLACE_CAMERA, entry.id(), null, cameraSlot));
+        inventory.setItem(5, item(Material.RED_DYE, "Remove Camera",
+                List.of("Clear this slot after confirmation."), NamedTextColor.RED));
+        session.actions.put(5, new MenuAction(ActionType.CONFIRM_REMOVE_CAMERA, entry.id(), null, cameraSlot));
+        inventory.setItem(8, item(Material.ARROW, "Back to Cameras", List.of(), NamedTextColor.GOLD));
+        session.actions.put(8, new MenuAction(ActionType.OPEN_CAMERA_CONTROLS, entry.id(), null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
+    private void openCameraReplaceConfirmation(Player player, Entry entry, int cameraSlot) {
+        openCameraConfirmation(
+                player,
+                entry,
+                cameraSlot,
+                "Replace camera " + cameraSlot + "?",
+                Material.LIME_DYE,
+                "Replace saved view",
+                List.of("This overwrites only camera slot " + cameraSlot + "."),
+                "Confirm Replace",
+                ActionType.REPLACE_CAMERA
+        );
+    }
+
+    private void openCameraRemoveConfirmation(Player player, Entry entry, int cameraSlot) {
+        openCameraConfirmation(
+                player,
+                entry,
+                cameraSlot,
+                "Remove camera " + cameraSlot + "?",
+                Material.RED_DYE,
+                "Remove saved view",
+                List.of("This clears only camera slot " + cameraSlot + "."),
+                "Confirm Remove",
+                ActionType.REMOVE_CAMERA
+        );
+    }
+
+    public void openActiveCameraRemovalConfirmation(Player player) {
+        competition.activeCameraPreview(player).ifPresentOrElse(context -> {
+            if (!competition.canEditCameras(player, context.entry())) {
+                player.sendMessage(Component.text("Only an entry owner may remove this camera.", NamedTextColor.RED));
+                return;
+            }
+            openCameraConfirmation(
+                    player,
+                    context.entry(),
+                    context.oneBasedIndex(),
+                    "Remove camera " + context.oneBasedIndex() + "?",
+                    Material.RED_DYE,
+                    "Remove active camera",
+                    List.of("The preview will close after removal."),
+                    "Confirm Remove",
+                    ActionType.REMOVE_ACTIVE_CAMERA
+            );
+        }, () -> player.sendMessage(Component.text("That camera preview is no longer active.", NamedTextColor.RED)));
+    }
+
+    private void openCameraConfirmation(
+            Player player,
+            Entry entry,
+            int cameraSlot,
+            String menuTitle,
+            Material warningMaterial,
+            String warningTitle,
+            List<String> warningLore,
+            String confirmTitle,
+            ActionType confirmAction
+    ) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = Bukkit.createInventory(holder, 9, Component.text(menuTitle, NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(2, item(warningMaterial, warningTitle, warningLore, NamedTextColor.RED));
+        inventory.setItem(4, item(Material.LIME_CONCRETE, confirmTitle, List.of("Click to continue."), NamedTextColor.GREEN));
+        session.actions.put(4, new MenuAction(confirmAction, entry.id(), null, cameraSlot));
+        inventory.setItem(6, item(Material.RED_CONCRETE, "Back Without Changes", List.of(), NamedTextColor.RED));
+        session.actions.put(6, new MenuAction(ActionType.OPEN_CAMERA_CONTROLS, entry.id(), null, 0));
+        sessions.put(player.getUniqueId(), session);
+        player.openInventory(inventory);
+    }
+
     public void openVisits(Player player, int page) {
         List<Entry> entries = competition.allEntries().stream()
                 .sorted(Comparator.comparing((Entry entry) -> entry.category().displayName())
@@ -499,6 +665,43 @@ public final class MenuModule implements Listener {
                 player.closeInventory();
                 competition.teleportToEntry(player, entry, true);
             });
+            case ENTER_SURVIVAL -> {
+                player.closeInventory();
+                competition.teleportSurvival(player);
+            }
+            case OPEN_CAMERA_CONTROLS -> competition.entry(action.entryId).ifPresent(entry -> openCameraControls(player, entry));
+            case OPEN_CAMERA_SLOT -> competition.entry(action.entryId)
+                    .ifPresent(entry -> openCameraSlotControls(player, entry, action.page));
+            case PREVIEW_CAMERA -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.previewCamera(player, entry, action.page);
+            });
+            case SAVE_CAMERA -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.recordCamera(player, action.page);
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (player.isOnline() && !competition.isCameraPreviewing(player)) {
+                        competition.entry(entry.id()).ifPresent(updated -> openCameraControls(player, updated));
+                    }
+                }, 1L);
+            });
+            case CONFIRM_REPLACE_CAMERA -> competition.entry(action.entryId)
+                    .ifPresent(entry -> openCameraReplaceConfirmation(player, entry, action.page));
+            case REPLACE_CAMERA -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.recordCamera(player, action.page);
+            });
+            case CONFIRM_REMOVE_CAMERA -> competition.entry(action.entryId)
+                    .ifPresent(entry -> openCameraRemoveConfirmation(player, entry, action.page));
+            case REMOVE_CAMERA -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.removeCamera(player, action.page);
+            });
+            case REMOVE_ACTIVE_CAMERA -> {
+                player.closeInventory();
+                competition.removeActiveCameraPreview(player, action.entryId, action.page);
+            }
+            case CLOSE_MENU -> player.closeInventory();
             case EDIT_SUBMISSION -> competition.entry(action.entryId).ifPresent(entry -> {
                 player.closeInventory();
                 openSubmissionDialog(player, entry, false);
@@ -706,6 +909,17 @@ public final class MenuModule implements Listener {
         CREATE_ENTRY,
         ENTER_BUILD,
         VISIT_ENTRY,
+        ENTER_SURVIVAL,
+        OPEN_CAMERA_CONTROLS,
+        OPEN_CAMERA_SLOT,
+        PREVIEW_CAMERA,
+        SAVE_CAMERA,
+        CONFIRM_REPLACE_CAMERA,
+        REPLACE_CAMERA,
+        CONFIRM_REMOVE_CAMERA,
+        REMOVE_CAMERA,
+        REMOVE_ACTIVE_CAMERA,
+        CLOSE_MENU,
         EDIT_SUBMISSION,
         RESET_ENTRY,
         SUBMIT_ENTRY,

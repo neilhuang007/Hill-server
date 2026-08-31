@@ -7,6 +7,11 @@ $PaperUrl = 'https://fill-data.papermc.io/v1/objects/a8c9140c3075bd7c04973e9cdc4
 $PaperSha256 = 'a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629'
 $AuthUrl = 'https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download'
 $AuthSha256 = 'de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630'
+$ChunkyProjectId = 'fALzjamp'
+$ChunkyVersionId = 'MdY6JATr'
+$ChunkyFilename = 'Chunky-Bukkit-1.5.3.jar'
+$ChunkyUrl = 'https://cdn.modrinth.com/data/fALzjamp/versions/MdY6JATr/Chunky-Bukkit-1.5.3.jar'
+$ChunkySha512 = '43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422'
 $HubArchiveName = 'Hill175-Exhibition-Hub-2026-08-26.zip'
 $HubArchiveRoot = 'Hill175 Exhibition Hub 2026-08-26'
 $HubSha256 = 'd6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de'
@@ -24,7 +29,28 @@ try {
         throw 'Paper SHA-256 checksum mismatch.'
     }
 
+    $ChunkyAsset = Join-Path $Assets $ChunkyFilename
+    if (-not (Test-Path $ChunkyAsset)) {
+        Invoke-WebRequest -Uri $ChunkyUrl -OutFile $ChunkyAsset
+    }
+    if ((Get-FileHash $ChunkyAsset -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
+        Remove-Item -LiteralPath $ChunkyAsset -Force -ErrorAction SilentlyContinue
+        Invoke-WebRequest -Uri $ChunkyUrl -OutFile $ChunkyAsset
+    }
+    if ((Get-FileHash $ChunkyAsset -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
+        throw 'Chunky SHA-512 checksum mismatch.'
+    }
+
     Copy-Item -LiteralPath 'build\libs\Hill-server-1.0-SNAPSHOT.jar' -Destination (Join-Path $Runtime 'plugins\Hill175.jar') -Force
+    foreach ($ExistingChunky in Get-ChildItem -LiteralPath (Join-Path $Runtime 'plugins') -Filter '*chunky*.jar' -File -ErrorAction SilentlyContinue) {
+        if ($ExistingChunky.Name -ne $ChunkyFilename) {
+            throw "Unexpected Chunky plugin jar already exists: $($ExistingChunky.FullName). Remove it deliberately before installing pinned $ChunkyFilename."
+        }
+    }
+    Copy-Item -LiteralPath $ChunkyAsset -Destination (Join-Path $Runtime "plugins\$ChunkyFilename") -Force
+    if ((Get-FileHash (Join-Path $Runtime "plugins\$ChunkyFilename") -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
+        throw 'Installed Chunky SHA-512 checksum mismatch.'
+    }
     Copy-Item -LiteralPath 'server-config\server.properties' -Destination (Join-Path $Runtime 'server.properties') -Force
     Copy-Item -LiteralPath 'server-config\spigot.yml' -Destination (Join-Path $Runtime 'spigot.yml') -Force
     $PluginData = Join-Path $Runtime 'plugins\Hill175'
@@ -34,6 +60,10 @@ try {
         Copy-Item -LiteralPath 'structure.nbt' -Destination (Join-Path $Runtime 'structure.nbt') -Force
     }
     Set-Content -LiteralPath (Join-Path $Runtime 'eula.txt') -Value 'eula=true'
+
+    & (Join-Path $Root 'scripts\prepare-local-survival-worldgen.ps1') `
+        -Runtime $Runtime `
+        -Manifest (Join-Path $Root 'server-assets\survival-worldgen-manifest.tsv')
 
     $AuthArchive = Join-Path $Assets 'Small-Medieval-Church-1.0.5.zip'
     if (-not (Test-Path $AuthArchive)) {
@@ -46,7 +76,7 @@ try {
     $AuthTarget = Join-Path $Runtime 'hill_auth'
     $ModernAuthTarget = Join-Path $Runtime 'world\dimensions\minecraft\hill_auth'
     $AuthInstallMarker = Join-Path $Assets '.small-medieval-church-1.0.5-installed'
-    if (-not (Test-Path $AuthInstallMarker)) {
+    if ((-not (Test-Path $AuthInstallMarker)) -or ((-not (Test-Path $AuthTarget)) -and (-not (Test-Path $ModernAuthTarget)))) {
         # The local Paper process must be stopped before replacing this immutable scenery world.
         Remove-Item -LiteralPath $AuthTarget -Recurse -Force -ErrorAction SilentlyContinue
         Remove-Item -LiteralPath $ModernAuthTarget -Recurse -Force -ErrorAction SilentlyContinue
@@ -84,7 +114,7 @@ try {
             $InstalledHubSha = ([string]$MarkerContent).Trim()
         }
     }
-    if ($InstalledHubSha -ne $HubSha256) {
+    if (($InstalledHubSha -ne $HubSha256) -or ((-not (Test-Path $HubTarget)) -and (-not (Test-Path $ModernHubTarget)))) {
         $RunningPaper = Get-CimInstance Win32_Process | Where-Object {
             $_.Name -in @('java.exe', 'javaw.exe') -and $_.CommandLine -match '(?i)-jar\s+[^\r\n]*paper\.jar'
         }

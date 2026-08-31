@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily Hill175 Paper runtime backup
+
+[Timer]
+OnCalendar=*-*-* 04:25:00
+RandomizedDelaySec=30m
+Persistent=false
+Unit=hill175-backup.service
+
+[Install]
+WantedBy=timers.target
