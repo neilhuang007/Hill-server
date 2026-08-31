@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
@@ -201,10 +202,6 @@ public final class ServerListener implements Listener {
             }
             return;
         }
-        if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
-            event.setCancelled(true);
-            menus.openCameraControls(player);
-        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -231,7 +228,9 @@ public final class ServerListener implements Listener {
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_ITEM_ID)) {
                 event.setCancelled(true);
-                menus.openCameraControls(player);
+                if (event.getAction().isRightClick()) {
+                    competition.useCameraItem(player);
+                }
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {

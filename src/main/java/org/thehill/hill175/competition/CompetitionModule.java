@@ -67,6 +67,7 @@ public final class CompetitionModule {
     private static final Set<String> RESERVED_NICKNAMES = Set.of("hilljourney", "hillplace", "hillpeople", "hillsurvival");
     private static final int MAX_TITLE_LENGTH = 80;
     private static final int MAX_DESCRIPTION_LENGTH = 750;
+    private static final long CAMERA_CAPTURE_SILENCE_NANOS = 750_000_000L;
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
     private static final String CAMERA_MARKER_ENTRY_PREFIX = "hill175_camera_entry_";
     private static final String CAMERA_MARKER_INDEX_PREFIX = "hill175_camera_index_";
@@ -95,6 +96,7 @@ public final class CompetitionModule {
     private final Map<UUID, PreviewState> activePreviewsByPlayer = new HashMap<>();
     private final Map<UUID, BossBar> previewBossBarsByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastPreviewExitAtNanosByPlayer = new HashMap<>();
+    private final Map<UUID, Long> lastCameraItemUseAtNanosByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastAuthenticationReminderAtNanosByPlayer = new HashMap<>();
 
     public CompetitionModule(
@@ -131,6 +133,7 @@ public final class CompetitionModule {
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         activeKitByPlayer.remove(player.getUniqueId());
         lastPreviewExitAtNanosByPlayer.remove(player.getUniqueId());
+        lastCameraItemUseAtNanosByPlayer.remove(player.getUniqueId());
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
         clearCameraPreview(player);
         clearSurvivalState(player);
@@ -158,6 +161,7 @@ public final class CompetitionModule {
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         activeKitByPlayer.remove(player.getUniqueId());
         lastPreviewExitAtNanosByPlayer.remove(player.getUniqueId());
+        lastCameraItemUseAtNanosByPlayer.remove(player.getUniqueId());
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
         clearCameraPreview(player);
     }
@@ -367,7 +371,7 @@ public final class CompetitionModule {
         message(player, NamedTextColor.WHITE, "Create up to two entries in different categories. Teams may have up to two people.");
         message(player, NamedTextColor.WHITE, "Build only in your entry. Visitors can fly and observe but cannot modify blocks.");
         message(player, NamedTextColor.WHITE, "Living mobs, portals, explosions, destructive commands, and bypass attempts are blocked.");
-        message(player, NamedTextColor.WHITE, "Use Camera Controls to save, preview, and remove up to three submission views.");
+        message(player, NamedTextColor.WHITE, "Right-click Capture Camera View to save up to three submission views; click a camera marker to preview it.");
         message(player, NamedTextColor.WHITE, "Use /help, the Competition Compass, or Entry Controls instead of remembering long command chains.");
         message(player, NamedTextColor.GRAY, "Main exhibition hub: the Hill 175 project world.");
     }
@@ -806,6 +810,19 @@ public final class CompetitionModule {
         return recordCamera(player, slot);
     }
 
+    public void useCameraItem(Player player) {
+        Optional<Entry> current = currentEntry(player);
+        if (current.isPresent() && canEditCameras(player, current.get())) {
+            long now = System.nanoTime();
+            Long previousUse = lastCameraItemUseAtNanosByPlayer.put(player.getUniqueId(), now);
+            if (previousUse == null || now - previousUse >= CAMERA_CAPTURE_SILENCE_NANOS) {
+                recordCamera(player);
+            }
+            return;
+        }
+        previewNextCamera(player);
+    }
+
     public boolean recordCamera(Player player, int oneBasedSlot) {
         Optional<Entry> current = requireCurrentEditableEntry(player);
         if (current.isEmpty()) {
@@ -1065,6 +1082,7 @@ public final class CompetitionModule {
         activePreviewsByPlayer.clear();
         previewBossBarsByPlayer.clear();
         lastPreviewExitAtNanosByPlayer.clear();
+        lastCameraItemUseAtNanosByPlayer.clear();
     }
 
     private boolean teleportEndingCameraPreview(Player player, Location target) {
@@ -1366,8 +1384,8 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
-        player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Camera Controls",
-                "Right-click to save, preview, or manage camera poses."));
+        player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Capture Camera View",
+                "Right-click once to save your exact position and view."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
         player.getInventory().setItem(8, competitionItem(Material.NETHER_STAR, ENTRY_MENU_ITEM_ID, "Entry Controls",
@@ -1379,8 +1397,8 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
-        player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Camera Views",
-                "Right-click to choose a saved camera view."));
+        player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Next Camera View",
+                "Right-click to view the next saved camera, or click a marker."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
         player.getInventory().setItem(8, competitionItem(owner ? Material.NETHER_STAR : Material.COMPASS,
@@ -1852,7 +1870,7 @@ public final class CompetitionModule {
 
     private void sendOwnerEntryTip(Player player) {
         message(player, NamedTextColor.GRAY,
-                "Tip: /hub returns to the lobby. Open Build Options through Entry Controls; the Camera remains in your hotbar.");
+                "Tip: stand where you want the view, aim, then right-click Capture Camera View. Click its marker to preview it.");
     }
 
     private void sendVisitorEntryTip(Player player) {
@@ -1873,7 +1891,7 @@ public final class CompetitionModule {
             CameraPose pose = entry.cameraPose(markerNumber).orElseThrow();
             Location markerLocation = new Location(world, pose.x(), pose.y() - 1.6, pose.z(), pose.yaw(), pose.pitch());
             world.spawn(markerLocation, ArmorStand.class, stand -> {
-                stand.customName(Component.text("Camera " + markerNumber, NamedTextColor.AQUA));
+                stand.customName(Component.text("Camera " + markerNumber + " - Click to view", NamedTextColor.AQUA));
                 stand.setCustomNameVisible(true);
                 stand.setVisible(false);
                 stand.setBasePlate(false);
@@ -1884,7 +1902,7 @@ public final class CompetitionModule {
                 stand.setRemoveWhenFarAway(false);
                 stand.setCanPickupItems(false);
                 stand.setMarker(false);
-                stand.setSmall(true);
+                stand.setSmall(false);
                 stand.addScoreboardTag(CAMERA_MARKER_TAG);
                 stand.addScoreboardTag(cameraMarkerEntryTag(entry.id()));
                 stand.addScoreboardTag(CAMERA_MARKER_INDEX_PREFIX + markerNumber);
@@ -1923,7 +1941,10 @@ public final class CompetitionModule {
     }
 
     private boolean shouldShowCameraMarkers(Player viewer, Entry entry) {
-        if (!entry.isMember(nicknameKey(viewer.getName())) && !viewer.hasPermission("hill175.staff")) {
+        boolean viewingEntry = currentEntry(viewer)
+                .map(current -> current.id().equals(entry.id()))
+                .orElse(false);
+        if (!viewingEntry && !viewer.hasPermission("hill175.staff")) {
             return false;
         }
         PreviewState preview = activePreviewsByPlayer.get(viewer.getUniqueId());

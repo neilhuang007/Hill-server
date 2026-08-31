@@ -173,14 +173,14 @@ async function nearestCategoryNpc() {
     .sort((left, right) => left.position.distanceTo(bot.entity.position) - right.position.distanceTo(bot.entity.position))[0];
 }
 
-async function nearestCameraMarker() {
+async function nearestCameraMarker(targetBot = bot) {
   await waitFor(
-    () => Object.values(bot.entities).some((entity) => entity.name === "armor_stand"),
+    () => Object.values(targetBot.entities).some((entity) => entity.name === "armor_stand"),
     "a saved camera marker",
   );
-  return Object.values(bot.entities)
+  return Object.values(targetBot.entities)
     .filter((entity) => entity.name === "armor_stand")
-    .sort((left, right) => left.position.distanceTo(bot.entity.position) - right.position.distanceTo(bot.entity.position))[0];
+    .sort((left, right) => left.position.distanceTo(targetBot.entity.position) - right.position.distanceTo(targetBot.entity.position))[0];
 }
 
 async function approachEntity(entity) {
@@ -689,30 +689,17 @@ async function verifyVisitorCannotRemoveCamera(entryTitle) {
     );
     await delay(500);
 
-    const visitorHotbar = visitor.inventory.slots.slice(36, 45);
-    const cameraSlot = visitorHotbar.findIndex((item) => item?.name === "ender_eye");
-    if (cameraSlot < 0) {
-      throw new Error("Visitor did not receive the Camera Views item");
-    }
-    visitor.setQuickBarSlot(cameraSlot);
-    visitor._client.write("held_item_slot", { slotId: cameraSlot });
-    await delay(150);
-    const cameraViews = await waitForBotWindow(
-      visitor,
-      () => visitor.activateItem(),
-      "visitor Camera Views menu",
-    );
-    visitor.deactivateItem();
-    if (!windowTitle(cameraViews).includes("Camera Views")
-      || cameraViews.slots[11]?.name !== "ender_eye") {
-      throw new Error(`Visitor camera UI exposed the wrong controls: ${windowTitle(cameraViews)} [${topInventorySummary(cameraViews)}]`);
-    }
-
+    const marker = await nearestCameraMarker(visitor);
     const previewStart = visitorTranscript.length;
-    visitor.clickWindow(11, 0, 0);
+    visitor._client.write("use_entity", {
+      target: marker.id,
+      hand: 0,
+      location: { x: 0, y: 1, z: 0 },
+      usingSecondaryAction: false,
+    });
     await waitFor(
       () => visitorTranscript.slice(previewStart).some((line) => line.includes("Previewing camera slot 1")),
-      "visitor camera preview",
+      "visitor camera-marker preview",
     );
     await delay(500);
     if (visitor.inventory.slots.slice(36, 45).some((item) => item?.name === "red_dye")) {
@@ -767,28 +754,20 @@ async function cameraViewScenario() {
   const savedFeetPosition = bot.entity.position.clone();
   const saveTranscriptStart = transcript.length;
   await holdHotbarItem("ender_eye");
-  const cameraMenu = await waitForWindow(
-    () => bot.activateItem(),
-    "Camera Controls menu",
-  );
-  bot.deactivateItem();
-  if (!windowTitle(cameraMenu).includes("Camera Controls")
-    || cameraMenu.slots[11]?.name !== "lime_dye") {
-    throw new Error(`Camera Controls did not offer explicit empty slot 1: ${windowTitle(cameraMenu)} [${topInventorySummary(cameraMenu)}]`);
-  }
-  const refreshedCameraMenu = await waitForWindow(
-    () => bot.clickWindow(11, 0, 0),
-    "Camera Controls after saving slot 1",
-  );
+  const openedDuringCapture = [];
+  const onCaptureWindowOpen = (window) => openedDuringCapture.push(window);
+  bot.on("windowOpen", onCaptureWindowOpen);
+  bot.activateItem();
   await waitFor(
     () => transcript.slice(saveTranscriptStart).some((line) => line.includes("Camera 1/3 saved")),
-    "camera pose save from explicit slot 1",
+    "direct camera pose capture",
   );
-  if (!windowTitle(refreshedCameraMenu).includes("Camera Controls")
-    || refreshedCameraMenu.slots[11]?.name !== "ender_eye") {
-    throw new Error("Saved camera slot 1 did not become a preview/manage control");
+  bot.deactivateItem();
+  await delay(250);
+  bot.removeListener("windowOpen", onCaptureWindowOpen);
+  if (openedDuringCapture.length !== 0) {
+    throw new Error(`Direct camera capture opened ${openedDuringCapture.length} GUI windows`);
   }
-  bot.closeWindow(refreshedCameraMenu);
 
   const previewTranscriptStart = transcript.length;
   let bossBarPackets = 0;
@@ -897,7 +876,7 @@ async function cameraViewScenario() {
     "active camera removal",
   );
 
-  console.log("PASS: explicit camera slots, fixed client camera, locked view, marker clicks, both exits, and owner-only removal UI worked");
+  console.log("PASS: direct camera capture, fixed client camera, locked view, owner/visitor marker clicks, both exits, and owner-only removal UI worked");
 }
 
 async function cameraHeldUseScenario() {
@@ -934,25 +913,23 @@ async function cameraHeldUseScenario() {
   }
 
   const cameraSaves = transcript.slice(transcriptStart)
-    .filter((line) => line.includes("Camera pose") && line.includes("saved"));
+    .filter((line) => /Camera [1-3]\/3 (saved|updated)\./.test(line));
   const failures = [];
   if (cameraMaterial === "spyglass") {
     failures.push("Camera Controls still uses the zooming spyglass");
   }
-  if (cameraSaves.length > 1) {
-    failures.push(`one held camera use saved ${cameraSaves.length} poses`);
+  if (cameraSaves.length !== 1) {
+    failures.push(`one held camera use saved ${cameraSaves.length} poses instead of exactly one`);
   }
   if (cameraMaterial === "ender_eye") {
-    if (opened.length !== 1) {
-      failures.push(`one held Camera Controls use opened ${opened.length} menus instead of exactly one`);
-    } else if (!windowTitle(opened[0]).includes("Camera")) {
-      failures.push(`Camera Controls opened the wrong menu: ${windowTitle(opened[0])}`);
+    if (opened.length !== 0) {
+      failures.push(`direct camera capture opened ${opened.length} menus instead of none`);
     }
   }
   if (failures.length > 0) {
     throw new Error(failures.join("; "));
   }
-  console.log("PASS: held Camera Controls input opened one non-zoom management menu and saved no duplicate poses");
+  console.log("PASS: one held camera-item use captured one view directly, opened no GUI, and saved no duplicates");
 }
 
 async function movePlayerLinearly(target) {

@@ -61,7 +61,7 @@ Run against Minecraft Java Edition 26.2.
 
 ## Camera and submission
 
-1. Hold the Camera (Ender Eye) and repeatedly right-click; confirm exactly one Camera Controls UI opens and no spyglass zoom occurs.
+1. Hold Capture Camera View (Ender Eye) and repeatedly right-click; confirm exactly one view is saved, no GUI opens, and no spyglass zoom occurs.
 2. Save views into explicit slots 1, 2, and 3. Confirm a populated slot offers preview, replace, and remove controls, with confirmation before replacement or removal.
 3. Run `/camera list`, then `/camera remove 2` and save a replacement into slot 2.
 4. Preview a saved slot; confirm it begins at the exact saved eye viewpoint, yaw, and pitch without shifting vertically into a block. Confirm it displays `Previewing camera slot …` as a title plus a persistent status bar.

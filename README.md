@@ -36,7 +36,7 @@ Production copies `server-config/spigot.yml` with `commands.log: false` so Paper
 - Compass entry/visitor GUI with player heads and an Entry Controls GUI for reset, submission lock, delete, and category change instead of separate hotbar items.
 - Owner Creative Mode inside an owned entry; Spectator Mode outside it and while visiting.
 - Reset, delete, category switch, team invite/accept/leave, title, description, submit, and unlock flows.
-- Up to three explicitly numbered camera poses per entry, managed through the Camera Controls UI with confirmation before replacement or removal.
+- Up to three camera poses per entry: right-click the Capture Camera View item to save the exact current view, then click a world marker to preview it. `/camera` remains available for optional slot management.
 - Full-screen, no-zoom camera preview mode with title and persistent status bar, exact position/angle lock, clickable camera markers, an exit item, and an owner-only remove-current-camera item.
 - Reset operations stay in a tracked in-progress state until world restoration finishes, then restore returning owners to Creative Mode.
 - Block/entity/command/portal/explosion protections.
