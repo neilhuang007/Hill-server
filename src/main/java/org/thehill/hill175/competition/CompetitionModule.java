@@ -16,6 +16,8 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
@@ -68,6 +70,8 @@ public final class CompetitionModule {
     private static final int MAX_TITLE_LENGTH = 80;
     private static final int MAX_DESCRIPTION_LENGTH = 750;
     private static final long CAMERA_CAPTURE_SILENCE_NANOS = 750_000_000L;
+    private static final double CAMERA_MARKER_SCALE = 1.25D;
+    private static final double CAMERA_MARKER_HEAD_HEIGHT = 1.6D;
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
     private static final String CAMERA_MARKER_ENTRY_PREFIX = "hill175_camera_entry_";
     private static final String CAMERA_MARKER_INDEX_PREFIX = "hill175_camera_index_";
@@ -1889,7 +1893,14 @@ public final class CompetitionModule {
         }
         for (int markerNumber : entry.savedCameraSlots()) {
             CameraPose pose = entry.cameraPose(markerNumber).orElseThrow();
-            Location markerLocation = new Location(world, pose.x(), pose.y() - 1.6, pose.z(), pose.yaw(), pose.pitch());
+            Location markerLocation = new Location(
+                    world,
+                    pose.x(),
+                    pose.y() - CAMERA_MARKER_HEAD_HEIGHT * CAMERA_MARKER_SCALE,
+                    pose.z(),
+                    pose.yaw(),
+                    pose.pitch()
+            );
             world.spawn(markerLocation, ArmorStand.class, stand -> {
                 stand.customName(Component.text("Camera " + markerNumber + " - Click to view", NamedTextColor.AQUA));
                 stand.setCustomNameVisible(true);
@@ -1903,6 +1914,10 @@ public final class CompetitionModule {
                 stand.setCanPickupItems(false);
                 stand.setMarker(false);
                 stand.setSmall(false);
+                AttributeInstance scale = stand.getAttribute(Attribute.SCALE);
+                if (scale != null) {
+                    scale.setBaseValue(CAMERA_MARKER_SCALE);
+                }
                 stand.addScoreboardTag(CAMERA_MARKER_TAG);
                 stand.addScoreboardTag(cameraMarkerEntryTag(entry.id()));
                 stand.addScoreboardTag(CAMERA_MARKER_INDEX_PREFIX + markerNumber);

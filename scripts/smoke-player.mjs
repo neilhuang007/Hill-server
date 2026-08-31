@@ -178,9 +178,15 @@ async function nearestCameraMarker(targetBot = bot) {
     () => Object.values(targetBot.entities).some((entity) => entity.name === "armor_stand"),
     "a saved camera marker",
   );
-  return Object.values(targetBot.entities)
+  const marker = Object.values(targetBot.entities)
     .filter((entity) => entity.name === "armor_stand")
     .sort((left, right) => left.position.distanceTo(targetBot.entity.position) - right.position.distanceTo(targetBot.entity.position))[0];
+  await waitFor(
+    () => marker.attributes?.["generic.scale"]?.value >= 1.2,
+    "an expanded camera-marker hitbox",
+    3_000,
+  );
+  return marker;
 }
 
 async function approachEntity(entity) {
