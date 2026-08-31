@@ -880,8 +880,7 @@ public final class WorldModule {
         try (var paths = Files.walk(source)) {
             for (Path sourcePath : paths.toList()) {
                 Path relative = source.relativize(sourcePath);
-                String name = relative.getFileName() == null ? "" : relative.getFileName().toString();
-                if (name.equals("uid.dat") || name.equals("session.lock")) {
+                if (shouldSkipWorldClonePath(relative)) {
                     continue;
                 }
                 Path targetPath = target.resolve(relative);
@@ -893,6 +892,13 @@ public final class WorldModule {
                 }
             }
         }
+    }
+
+    static boolean shouldSkipWorldClonePath(Path relative) {
+        String name = relative.getFileName() == null ? "" : relative.getFileName().toString();
+        return name.equals("uid.dat")
+                || name.equals("session.lock")
+                || relative.equals(Path.of("data", "paper", "metadata.dat"));
     }
 
     private void deleteMigratedHubImport(Path target, String hubName) {
