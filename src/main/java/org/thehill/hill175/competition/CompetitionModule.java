@@ -37,6 +37,7 @@ import org.thehill.hill175.auth.sso.MicrosoftSsoService;
 import org.thehill.hill175.auth.sso.VerifiedSession;
 import org.thehill.hill175.data.CompetitionStore;
 import org.thehill.hill175.data.SurvivalInventoryStore;
+import org.thehill.hill175.data.SurvivalPlayerState;
 import org.thehill.hill175.model.Account;
 import org.thehill.hill175.model.BuildRegion;
 import org.thehill.hill175.model.CameraPose;
@@ -74,8 +75,6 @@ public final class CompetitionModule {
     public static final String CAMPUS_CHART_ITEM_ID = "campus-chart";
     private static final Pattern NICKNAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{3,16}$");
     private static final Set<String> RESERVED_NICKNAMES = Set.of("hilljourney", "hillplace", "hillpeople", "hillsurvival");
-    private static final int MAX_TITLE_LENGTH = 80;
-    private static final int MAX_DESCRIPTION_LENGTH = 750;
     private static final int CAMPUS_CHART_SLOT = 1;
     private static final long CAMERA_CAPTURE_SILENCE_NANOS = 750_000_000L;
     private static final float CAMERA_MARKER_HITBOX_WIDTH = 0.8F;
@@ -109,7 +108,6 @@ public final class CompetitionModule {
     private final Map<UUID, CampusChartMap> campusChartMapsByEntry = new HashMap<>();
     private final Map<UUID, PreviewState> activePreviewsByPlayer = new HashMap<>();
     private final Map<UUID, BossBar> previewBossBarsByPlayer = new HashMap<>();
-    private final Map<UUID, Long> lastPreviewExitAtNanosByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastCameraItemUseAtNanosByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastAuthenticationReminderAtNanosByPlayer = new HashMap<>();
 
@@ -161,7 +159,6 @@ public final class CompetitionModule {
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         activeKitByPlayer.remove(player.getUniqueId());
-        lastPreviewExitAtNanosByPlayer.remove(player.getUniqueId());
         lastCameraItemUseAtNanosByPlayer.remove(player.getUniqueId());
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
         clearCameraPreview(player);
@@ -195,7 +192,6 @@ public final class CompetitionModule {
         nextCameraWriteIndexByPlayer.remove(player.getUniqueId());
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         activeKitByPlayer.remove(player.getUniqueId());
-        lastPreviewExitAtNanosByPlayer.remove(player.getUniqueId());
         lastCameraItemUseAtNanosByPlayer.remove(player.getUniqueId());
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
         clearCameraPreview(player);
@@ -228,13 +224,13 @@ public final class CompetitionModule {
         }
     }
 
-    public String displayName(String nicknameKey) {
+    public String displayName(String participantKey) {
         if (schoolSessions != null) {
-            return schoolSessions.nameLookup(nicknameKey).orElse("Unverified legacy participant");
+            return schoolSessions.nameLookup(participantKey).orElse("Unverified legacy participant");
         }
-        return store.account(nicknameKey)
+        return store.account(participantKey)
                 .map(Account::displayName)
-                .orElse(nicknameKey);
+                .orElse(participantKey);
     }
 
     public void register(Player player, String nicknameArgument, String password, String repeatedPassword) {
@@ -428,11 +424,10 @@ public final class CompetitionModule {
         player.setGravity(false);
         player.setAllowFlight(true);
         player.setFlying(true);
-        PreviewState active = ensureCameraAnchor(player, preview);
-        if (!samePose(player.getLocation(), active.bodyLocation(), 0.001, 0.01f)) {
-            player.teleport(active.bodyLocation());
+        if (!samePose(player.getLocation(), preview.bodyLocation(), 0.001, 0.01f)) {
+            player.teleport(preview.bodyLocation());
         }
-        focusCamera(player, active);
+        focusCamera(player, preview);
     }
 
     private String authenticationHint(Player player) {
@@ -591,7 +586,7 @@ public final class CompetitionModule {
                     "This People build was spawned from the server's Hill School campus template.");
         }
         boolean owner = entry.isMember(participantKey(player));
-        if (owner && !visiting && !entry.submitted() && !worlds.isResetting(entry.id())) {
+        if (!visiting && canEditEntry(player, entry)) {
             setOwnerMode(player);
             giveEntryOwnerItems(player, entry);
             message(player, NamedTextColor.GREEN, "Owner Mode: you may build inside this entry.");
@@ -635,9 +630,12 @@ public final class CompetitionModule {
             return;
         }
         boolean fromSurvival = worlds.isSurvivalWorld(player.getWorld());
+        SurvivalPlayerState survivalState = survivalInventories.load(player.getUniqueId())
+                .orElseGet(SurvivalPlayerState::firstEntryDefaults);
         Location target = fromSurvival
                 ? player.getLocation()
-                : survivalInventories.lastLocation(player)
+                : survivalState.location()
+                        .flatMap(location -> location.resolve(Bukkit::getWorld))
                         .filter(location -> worlds.isSurvivalWorld(location.getWorld()))
                         .orElseGet(worlds::survivalSpawn);
         if (!teleportEndingCameraPreview(player, target)) {
@@ -646,7 +644,7 @@ public final class CompetitionModule {
         }
         currentEntryByPlayer.remove(player.getUniqueId());
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-        restoreSurvivalInventory(player);
+        survivalState.applyTo(player);
         survivalInventories.clearDeathPending(player.getUniqueId());
         setSurvivalMode(player);
         activeKitByPlayer.put(player.getUniqueId(), SURVIVAL_KIT);
@@ -714,11 +712,8 @@ public final class CompetitionModule {
         if (worlds.isSurvivalWorld(location)) {
             return true;
         }
-        String key = participantKey(player);
         return entryAt(location)
-                .filter(entry -> entry.isMember(key))
-                .filter(entry -> !entry.submitted())
-                .filter(entry -> !worlds.isResetting(entry.id()))
+                .filter(entry -> canEditEntry(player, entry))
                 .isPresent();
     }
 
@@ -733,7 +728,7 @@ public final class CompetitionModule {
             currentEntryByPlayer.remove(player.getUniqueId());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
             if (!SURVIVAL_KIT.equals(activeKitByPlayer.get(player.getUniqueId()))) {
-                restoreSurvivalInventory(player);
+                survivalInventories.restore(player);
                 activeKitByPlayer.put(player.getUniqueId(), SURVIVAL_KIT);
             }
             setSurvivalMode(player);
@@ -744,9 +739,7 @@ public final class CompetitionModule {
             Entry activeEntry = entry.get();
             currentEntryByPlayer.put(player.getUniqueId(), activeEntry.id());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-            boolean ownerMode = activeEntry.isMember(participantKey(player))
-                    && !activeEntry.submitted()
-                    && !worlds.isResetting(activeEntry.id());
+            boolean ownerMode = canEditEntry(player, activeEntry);
             boolean entryOwner = activeEntry.isMember(participantKey(player));
             String desiredKit = ownerMode
                     ? ownerKit(activeEntry)
@@ -784,22 +777,13 @@ public final class CompetitionModule {
         }
     }
 
-    public void resetCurrentEntry(Player player) {
-        Optional<Entry> current = requireCurrentEditableEntry(player);
-        current.ifPresent(entry -> resetEntry(player, entry));
-    }
-
     public void deleteCurrentEntry(Player player) {
-        Optional<Entry> current = requireCurrentEditableEntry(player);
+        Optional<Entry> current = requireCurrentEntry(player);
         current.ifPresent(entry -> deleteEntry(player, entry));
     }
 
     public void switchCurrentEntry(Player player, Category newCategory) {
-        Optional<Entry> current = requireCurrentEditableEntry(player);
-        if (current.isEmpty()) {
-            return;
-        }
-        switchEntry(player, current.get(), newCategory);
+        requireCurrentEntry(player).ifPresent(entry -> switchEntry(player, entry, newCategory));
     }
 
     public void switchEntry(Player player, Entry entry, Category newCategory) {
@@ -865,22 +849,17 @@ public final class CompetitionModule {
     }
 
     public void setTitle(Player player, String title) {
-        Optional<Entry> current = requireCurrentEditableEntry(player);
+        Optional<Entry> current = requireCurrentEntry(player);
         current.ifPresent(entry -> setTitle(player, entry, title));
     }
 
     public void setDescription(Player player, String description) {
-        Optional<Entry> current = requireCurrentEditableEntry(player);
+        Optional<Entry> current = requireCurrentEntry(player);
         current.ifPresent(entry -> setDescription(player, entry, description));
     }
 
-    public void submit(Player player) {
-        Optional<Entry> current = requireCurrentOwnedEntry(player);
-        current.ifPresent(entry -> submitEntry(player, entry));
-    }
-
     public void unlock(Player player) {
-        Optional<Entry> current = requireCurrentOwnedEntry(player);
+        Optional<Entry> current = requireCurrentEntry(player);
         current.ifPresent(entry -> unlockEntry(player, entry));
     }
 
@@ -890,13 +869,13 @@ public final class CompetitionModule {
             return false;
         }
         int slot = current.get().firstEmptyCameraSlot()
-                .orElseGet(() -> normalizedCameraWriteIndex(player, current.get()));
-        return recordCamera(player, slot);
+                .orElseGet(() -> nextCameraWriteIndexByPlayer.getOrDefault(player.getUniqueId(), 1));
+        return recordCamera(player, current.get(), slot);
     }
 
     public void useCameraItem(Player player) {
         Optional<Entry> current = currentEntry(player);
-        if (current.isPresent() && canEditCameras(player, current.get())) {
+        if (current.isPresent() && canEditEntry(player, current.get())) {
             long now = System.nanoTime();
             Long previousUse = lastCameraItemUseAtNanosByPlayer.put(player.getUniqueId(), now);
             if (previousUse == null || now - previousUse >= CAMERA_CAPTURE_SILENCE_NANOS) {
@@ -912,7 +891,10 @@ public final class CompetitionModule {
         if (current.isEmpty()) {
             return false;
         }
-        Entry entry = current.get();
+        return recordCamera(player, current.get(), oneBasedSlot);
+    }
+
+    private boolean recordCamera(Player player, Entry entry, int oneBasedSlot) {
         if (oneBasedSlot < 1 || oneBasedSlot > Entry.MAX_CAMERA_SLOTS) {
             message(player, NamedTextColor.RED, "Camera slot must be 1, 2, or 3.");
             return false;
@@ -963,11 +945,8 @@ public final class CompetitionModule {
         return entry.map(value -> new CameraPreviewContext(value, preview.oneBasedIndex()));
     }
 
-    public boolean canEditCameras(Player player, Entry entry) {
-        return isAuthenticated(player)
-                && entry.isMember(participantKey(player))
-                && !entry.submitted()
-                && !worlds.isResetting(entry.id());
+    public boolean canEditEntry(Player player, Entry entry) {
+        return editableEntryAccess(player, entry) == EntryAccess.ALLOWED;
     }
 
     public boolean removeActiveCameraPreview(Player player, UUID entryId, int oneBasedIndex) {
@@ -977,7 +956,7 @@ public final class CompetitionModule {
             return false;
         }
         Optional<Entry> current = store.entry(entryId);
-        if (current.isEmpty() || !canEditCameras(player, current.get())) {
+        if (current.isEmpty() || !canEditEntry(player, current.get())) {
             message(player, NamedTextColor.RED, "Only an entry owner may remove an unlocked camera pose.");
             return false;
         }
@@ -995,7 +974,6 @@ public final class CompetitionModule {
             refreshMovementMode(player, player.getLocation());
         }
         nextCameraWriteIndexByPlayer.put(player.getUniqueId(), oneBasedIndex);
-        lastPreviewExitAtNanosByPlayer.put(player.getUniqueId(), System.nanoTime());
         message(player, NamedTextColor.GREEN, "Camera pose " + oneBasedIndex + " removed.");
         return true;
     }
@@ -1026,41 +1004,24 @@ public final class CompetitionModule {
             return;
         }
         Entry entry = current.get();
-        if (entry.cameraPoses().isEmpty()) {
-            message(player, NamedTextColor.YELLOW, "Save a camera pose first.");
-            return;
-        }
         int nextIndex = nextSavedCameraIndex(entry, nextPreviewIndexByPlayer.getOrDefault(player.getUniqueId(), 0));
         if (nextIndex < 0) {
             message(player, NamedTextColor.YELLOW, "Save a camera pose first.");
             return;
         }
-        CameraPose pose = entry.cameraPose(nextIndex + 1).orElseThrow();
-        Optional<Location> target = worlds.safeCameraTeleport(entry, pose, player.getEyeHeight(true));
-        if (target.isEmpty()) {
-            message(player, NamedTextColor.RED,
-                    "That camera pose is now obstructed or unsafe. Clear the viewpoint or save a replacement pose.");
-            return;
-        }
-        if (!beginCameraPreview(player, entry, nextIndex + 1, target.get())) {
-            message(player, NamedTextColor.RED, "The camera teleport was interrupted. Try the preview again.");
-            return;
-        }
-        nextPreviewIndexByPlayer.put(player.getUniqueId(), (nextIndex + 1) % Entry.MAX_CAMERA_SLOTS);
-        announceCameraPreview(player, nextIndex + 1, entry.cameraPoses().size());
+        previewCamera(player, entry, nextIndex + 1);
     }
 
     public void previewCamera(Player player, Entry entry, int oneBasedIndex) {
         if (!mayPreviewEntry(player, entry)) {
             return;
         }
-        int index = oneBasedIndex - 1;
-        if (index < 0 || index >= Entry.MAX_CAMERA_SLOTS || entry.cameraPose(oneBasedIndex).isEmpty()) {
+        Optional<CameraPose> pose = entry.cameraPose(oneBasedIndex);
+        if (pose.isEmpty()) {
             message(player, NamedTextColor.RED, "No camera pose exists at index " + oneBasedIndex + ".");
             return;
         }
-        CameraPose pose = entry.cameraPose(oneBasedIndex).orElseThrow();
-        Optional<Location> target = worlds.safeCameraTeleport(entry, pose, player.getEyeHeight(true));
+        Optional<Location> target = worlds.safeCameraTeleport(entry, pose.get(), player.getEyeHeight(true));
         if (target.isEmpty()) {
             message(player, NamedTextColor.RED,
                     "That camera pose is now obstructed or unsafe. Clear the viewpoint or save a replacement pose.");
@@ -1070,7 +1031,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "The camera teleport was interrupted. Try the preview again.");
             return;
         }
-        nextPreviewIndexByPlayer.put(player.getUniqueId(), (index + 1) % Entry.MAX_CAMERA_SLOTS);
+        nextPreviewIndexByPlayer.put(player.getUniqueId(), oneBasedIndex % Entry.MAX_CAMERA_SLOTS);
         announceCameraPreview(player, oneBasedIndex, entry.cameraPoses().size());
     }
 
@@ -1121,18 +1082,6 @@ public final class CompetitionModule {
         return preview != null && System.nanoTime() - preview.startedAtNanos() >= 150_000_000L;
     }
 
-    public boolean acceptsCameraItemLeftClick(Player player) {
-        Long lastExit = lastPreviewExitAtNanosByPlayer.get(player.getUniqueId());
-        return lastExit == null || System.nanoTime() - lastExit >= 150_000_000L;
-    }
-
-    public Optional<Location> cameraPreviewLocation(Player player) {
-        PreviewState preview = activePreviewsByPlayer.get(player.getUniqueId());
-        return preview == null
-                ? Optional.empty()
-                : Optional.of(preview.bodyLocation().clone());
-    }
-
     public boolean exitCameraPreview(Player player) {
         PreviewState preview = clearCameraPreview(player);
         if (preview == null) {
@@ -1145,7 +1094,6 @@ public final class CompetitionModule {
             return false;
         }
         restoreEntryKitAfterPreview(player, preview);
-        lastPreviewExitAtNanosByPlayer.put(player.getUniqueId(), System.nanoTime());
         message(player, NamedTextColor.AQUA, "Camera preview closed.");
         return true;
     }
@@ -1165,7 +1113,6 @@ public final class CompetitionModule {
         }
         activePreviewsByPlayer.clear();
         previewBossBarsByPlayer.clear();
-        lastPreviewExitAtNanosByPlayer.clear();
         lastCameraItemUseAtNanosByPlayer.clear();
         if (schoolSessions != null) {
             schoolSessions.close();
@@ -1204,11 +1151,12 @@ public final class CompetitionModule {
             message(inviter, NamedTextColor.RED, "You cannot invite yourself or another account linked to your Hill identity.");
             return;
         }
-        if (entriesFor(targetKey).size() >= 2) {
+        List<Entry> memberships = entriesFor(targetKey);
+        if (memberships.size() >= 2) {
             message(inviter, NamedTextColor.RED, "That participant already has two entries.");
             return;
         }
-        if (entriesFor(targetKey).stream().anyMatch(existing -> existing.category() == entry.category())) {
+        if (memberships.stream().anyMatch(existing -> existing.category() == entry.category())) {
             message(inviter, NamedTextColor.RED, "That participant already has an entry in this category.");
             return;
         }
@@ -1248,8 +1196,9 @@ public final class CompetitionModule {
             message(target, NamedTextColor.RED, "That entry is submitted. A member must unlock it before changing the team.");
             return;
         }
-        if (entriesFor(targetKey).size() >= 2
-                || entriesFor(targetKey).stream().anyMatch(existing -> existing.category() == entry.category())
+        List<Entry> memberships = entriesFor(targetKey);
+        if (memberships.size() >= 2
+                || memberships.stream().anyMatch(existing -> existing.category() == entry.category())
                 || !entry.addMember(targetKey)) {
             message(target, NamedTextColor.RED, "You cannot join this entry.");
             return;
@@ -1279,9 +1228,9 @@ public final class CompetitionModule {
         notifyEntry(entry, player.getName() + " left the team.");
     }
 
-    public List<Entry> entriesFor(String nicknameKey) {
+    public List<Entry> entriesFor(String participantKey) {
         return store.entries().stream()
-                .filter(entry -> entry.isMember(nicknameKey))
+                .filter(entry -> entry.isMember(participantKey))
                 .sorted(Comparator.comparing(Entry::category))
                 .toList();
     }
@@ -1415,8 +1364,7 @@ public final class CompetitionModule {
             return;
         }
         String normalized = title.trim();
-        if (normalized.isEmpty() || normalized.length() > MAX_TITLE_LENGTH) {
-            message(player, NamedTextColor.RED, "Title must contain 1-" + MAX_TITLE_LENGTH + " characters.");
+        if (!validateSubmissionText(player, "Title", normalized, Entry.MAX_TITLE_LENGTH)) {
             return;
         }
         entry.title(normalized);
@@ -1429,13 +1377,38 @@ public final class CompetitionModule {
             return;
         }
         String normalized = description.trim();
-        if (normalized.isEmpty() || normalized.length() > MAX_DESCRIPTION_LENGTH) {
-            message(player, NamedTextColor.RED, "Description must contain 1-" + MAX_DESCRIPTION_LENGTH + " characters.");
+        if (!validateSubmissionText(player, "Description", normalized, Entry.MAX_DESCRIPTION_LENGTH)) {
             return;
         }
         entry.description(normalized);
         store.saveEntry(entry);
         message(player, NamedTextColor.GREEN, "Project description saved.");
+    }
+
+    public DetailsUpdateResult saveSubmissionDetails(Player player, Entry entry, String title, String description) {
+        if (!ensureEditableEntryAccess(player, entry)) {
+            return DetailsUpdateResult.ACCESS_DENIED;
+        }
+        String normalizedTitle = title.trim();
+        String normalizedDescription = description.trim();
+        if (!validateSubmissionText(player, "Title", normalizedTitle, Entry.MAX_TITLE_LENGTH)
+                || !validateSubmissionText(player, "Description", normalizedDescription, Entry.MAX_DESCRIPTION_LENGTH)) {
+            return DetailsUpdateResult.INVALID_DETAILS;
+        }
+        entry.title(normalizedTitle);
+        entry.description(normalizedDescription);
+        store.saveEntry(entry);
+        message(player, NamedTextColor.GREEN,
+                "Submission details saved. Use Entry Controls to open Build Options and submit when your cameras are ready.");
+        return DetailsUpdateResult.SAVED;
+    }
+
+    private boolean validateSubmissionText(Player player, String label, String text, int maximumLength) {
+        if (text.isEmpty() || text.length() > maximumLength) {
+            message(player, NamedTextColor.RED, label + " must contain 1-" + maximumLength + " characters.");
+            return false;
+        }
+        return true;
     }
 
     public void submitEntry(Player player, Entry entry) {
@@ -1522,7 +1495,7 @@ public final class CompetitionModule {
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
         boolean owner = entry.isMember(participantKey(player));
-        if (canEditCameras(player, entry)) {
+        if (canEditEntry(player, entry)) {
             player.getInventory().setItem(4, competitionItem(Material.RED_DYE, CAMERA_PREVIEW_REMOVE_ITEM_ID,
                     "Remove This Camera", "Right-click to remove this exact camera pose after confirmation."));
         }
@@ -1607,26 +1580,20 @@ public final class CompetitionModule {
         }
     }
 
-    private Optional<Entry> requireCurrentOwnedEntry(Player player) {
-        if (!isAuthenticated(player)) {
-            message(player, NamedTextColor.RED, "Authenticate first.");
-            return Optional.empty();
-        }
+    private Optional<Entry> requireCurrentEntry(Player player) {
         Optional<Entry> current = currentEntry(player);
-        if (current.isEmpty() || !current.get().isMember(participantKey(player))) {
+        if (current.isEmpty()) {
             message(player, NamedTextColor.RED, "Open one of your entries first.");
-            return Optional.empty();
         }
         return current;
     }
 
+    private Optional<Entry> requireCurrentOwnedEntry(Player player) {
+        return requireCurrentEntry(player).filter(entry -> ensureOwnedEntryAccess(player, entry));
+    }
+
     private Optional<Entry> requireCurrentEditableEntry(Player player) {
-        Optional<Entry> current = requireCurrentOwnedEntry(player);
-        if (current.isPresent() && current.get().submitted()) {
-            message(player, NamedTextColor.RED, "This entry is submitted and locked. Use /entry unlock first.");
-            return Optional.empty();
-        }
-        return current;
+        return requireCurrentEntry(player).filter(entry -> ensureEditableEntryAccess(player, entry));
     }
 
     private String requireMemberKey(Player player) {
@@ -1638,28 +1605,34 @@ public final class CompetitionModule {
     }
 
     private boolean ensureOwnedEntryAccess(Player player, Entry entry) {
-        if (!isAuthenticated(player)) {
-            message(player, NamedTextColor.RED, "Authenticate first.");
-            return false;
-        }
-        if (!entry.isMember(participantKey(player))) {
-            message(player, NamedTextColor.RED, "That is not one of your entries.");
-            return false;
-        }
-        return true;
+        return ensureEntryAccess(player, ownedEntryAccess(player, entry));
     }
 
     private boolean ensureEditableEntryAccess(Player player, Entry entry) {
-        if (!ensureOwnedEntryAccess(player, entry)) {
-            return false;
+        return ensureEntryAccess(player, editableEntryAccess(player, entry));
+    }
+
+    private EntryAccess ownedEntryAccess(Player player, Entry entry) {
+        if (!isAuthenticated(player)) {
+            return EntryAccess.UNAUTHENTICATED;
+        }
+        return entry.isMember(participantKey(player)) ? EntryAccess.ALLOWED : EntryAccess.NOT_OWNER;
+    }
+
+    private EntryAccess editableEntryAccess(Player player, Entry entry) {
+        EntryAccess ownership = ownedEntryAccess(player, entry);
+        if (ownership != EntryAccess.ALLOWED) {
+            return ownership;
         }
         if (entry.submitted()) {
-            message(player, NamedTextColor.RED, "This entry is submitted and locked. Use /entry unlock first.");
-            return false;
+            return EntryAccess.SUBMITTED;
         }
-        if (worlds.isResetting(entry.id())) {
-            message(player, NamedTextColor.YELLOW,
-                    "This entry is already being reset or changed. Please wait for it to finish.");
+        return worlds.isResetting(entry.id()) ? EntryAccess.RESETTING : EntryAccess.ALLOWED;
+    }
+
+    private boolean ensureEntryAccess(Player player, EntryAccess access) {
+        if (access != EntryAccess.ALLOWED) {
+            message(player, access.color, access.message);
             return false;
         }
         return true;
@@ -1742,10 +1715,6 @@ public final class CompetitionModule {
         }
         player.setRemainingAir(player.getMaximumAir());
         player.setFireTicks(0);
-    }
-
-    private void restoreSurvivalInventory(Player player) {
-        survivalInventories.restore(player);
     }
 
     private void saveSurvivalState(Player player) {
@@ -1835,29 +1804,28 @@ public final class CompetitionModule {
         });
     }
 
-    private PreviewState ensureCameraAnchor(Player player, PreviewState preview) {
+    private Entity ensureCameraAnchor(Player player, PreviewState preview) {
         Entity anchor = Bukkit.getEntity(preview.cameraAnchorId());
         if (anchor == null || !anchor.isValid()) {
             anchor = spawnCameraAnchor(preview.cameraLocation());
             PreviewState updated = preview.withCameraAnchor(anchor.getUniqueId());
             activePreviewsByPlayer.put(player.getUniqueId(), updated);
-            return updated;
+            return anchor;
         }
         if (!samePose(anchor.getLocation(), preview.cameraLocation(), 0.001, 0.01f)) {
             anchor.teleport(preview.cameraLocation());
         }
         anchor.setRotation(preview.cameraLocation().getYaw(), preview.cameraLocation().getPitch());
-        return preview;
+        return anchor;
     }
 
     private void focusCamera(Player player, PreviewState preview) {
-        PreviewState active = ensureCameraAnchor(player, preview);
-        Entity anchor = Bukkit.getEntity(active.cameraAnchorId());
-        if (anchor != null && cameraBridge.focus(player, anchor)) {
+        Entity anchor = ensureCameraAnchor(player, preview);
+        if (cameraBridge.focus(player, anchor)) {
             return;
         }
-        if (!samePose(player.getLocation(), active.bodyLocation(), 0.001, 0.01f)) {
-            player.teleport(active.bodyLocation());
+        if (!samePose(player.getLocation(), preview.bodyLocation(), 0.001, 0.01f)) {
+            player.teleport(preview.bodyLocation());
         }
     }
 
@@ -1924,7 +1892,7 @@ public final class CompetitionModule {
         }
         Entry restoredEntry = entry.get();
         boolean owner = restoredEntry.isMember(participantKey(player));
-        if (owner && !restoredEntry.submitted() && !worlds.isResetting(restoredEntry.id())) {
+        if (canEditEntry(player, restoredEntry)) {
             setOwnerMode(player);
             giveEntryOwnerItems(player, restoredEntry);
         } else {
@@ -1948,23 +1916,21 @@ public final class CompetitionModule {
 
     private void synchronizeEntryModes(Entry entry) {
         for (Player online : Bukkit.getOnlinePlayers()) {
-            String nicknameKey = participantKey(online);
+            String memberKey = participantKey(online);
             if (isCameraPreviewing(online)) {
                 continue;
             }
-            if (!entry.isMember(nicknameKey) && !entry.region().contains(online.getLocation())) {
+            if (!entry.isMember(memberKey) && !entry.region().contains(online.getLocation())) {
                 continue;
             }
-            if (entry.isMember(nicknameKey)
-                    && !entry.submitted()
-                    && !worlds.isResetting(entry.id())
+            if (canEditEntry(online, entry)
                     && entry.region().contains(online.getLocation())) {
                 setOwnerMode(online);
                 giveEntryOwnerItems(online, entry);
             } else if (online.getLocation().getWorld() != null
                     && entry.worldName().equals(online.getLocation().getWorld().getName())) {
                 setVisitorMode(online);
-                giveEntryVisitorItems(online, entry, entry.isMember(nicknameKey));
+                giveEntryVisitorItems(online, entry, entry.isMember(memberKey));
             }
         }
     }
@@ -2202,14 +2168,6 @@ public final class CompetitionModule {
         }
     }
 
-    private int normalizedCameraWriteIndex(Player player, Entry entry) {
-        int next = nextCameraWriteIndexByPlayer.getOrDefault(player.getUniqueId(), 1);
-        if (next < 1 || next > Entry.MAX_CAMERA_SLOTS) {
-            return 1;
-        }
-        return next;
-    }
-
     private static int nextSavedCameraIndex(Entry entry, int startIndex) {
         int start = Math.floorMod(startIndex, Entry.MAX_CAMERA_SLOTS);
         for (int offset = 0; offset < Entry.MAX_CAMERA_SLOTS; offset++) {
@@ -2244,6 +2202,26 @@ public final class CompetitionModule {
             return "unknown";
         }
         return player.getAddress().getAddress().getHostAddress();
+    }
+
+    public enum DetailsUpdateResult {
+        SAVED, INVALID_DETAILS, ACCESS_DENIED
+    }
+
+    private enum EntryAccess {
+        ALLOWED(null, null),
+        UNAUTHENTICATED(NamedTextColor.RED, "Authenticate first."),
+        NOT_OWNER(NamedTextColor.RED, "That is not one of your entries."),
+        SUBMITTED(NamedTextColor.RED, "This entry is submitted and locked. Use /entry unlock first."),
+        RESETTING(NamedTextColor.YELLOW, "This entry is already being reset or changed. Please wait for it to finish.");
+
+        private final NamedTextColor color;
+        private final String message;
+
+        EntryAccess(NamedTextColor color, String message) {
+            this.color = color;
+            this.message = message;
+        }
     }
 
     private record TeamInvite(UUID entryId, String inviterKey, Instant expiresAt) {

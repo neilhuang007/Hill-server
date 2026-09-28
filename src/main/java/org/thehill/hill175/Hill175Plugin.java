@@ -146,10 +146,10 @@ public final class Hill175Plugin extends JavaPlugin {
 
     private void removeForbiddenMobsAndPrimedTnt() {
         for (var world : Bukkit.getWorlds()) {
+            if (worlds.isSurvivalWorld(world)) {
+                continue;
+            }
             for (var entity : world.getEntities()) {
-                if (worlds != null && worlds.isSurvivalWorld(entity.getWorld())) {
-                    continue;
-                }
                 if (entity instanceof Mob && !entity.getScoreboardTags().contains("hill175_category_npc")) {
                     entity.remove();
                 } else if (entity.getType() == EntityType.TNT) {

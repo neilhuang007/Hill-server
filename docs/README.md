@@ -6,6 +6,7 @@
 - [Player workflow and commands](operations/player-guide.md)
 - [Microsoft SSO setup for Hill IT](operations/microsoft-sso-setup.md)
 - [Microsoft SSO architecture and limits](architecture/microsoft-sso.md)
+- [Server architecture and code hygiene review](architecture/code-hygiene-review-20260928.md)
 - [SSO implementation review](operations/microsoft-sso-verification-20260928.md)
 - [Smoke tests](SMOKE_TEST.md)
 - [Survival world generation](SURVIVAL_WORLDGEN.md)

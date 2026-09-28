@@ -40,7 +40,7 @@ public record SurvivalLocationSnapshot(
         ));
     }
 
-    Optional<Location> resolve(Function<String, World> worlds) {
+    public Optional<Location> resolve(Function<String, World> worlds) {
         World world = worlds.apply(worldName);
         if (world == null) {
             return Optional.empty();

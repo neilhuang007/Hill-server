@@ -10,6 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.PluginManager;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.MockedStatic;
 import org.thehill.hill175.auth.IdentityLinker;
 import org.thehill.hill175.auth.PasswordHasher;
@@ -18,6 +20,7 @@ import org.thehill.hill175.auth.sso.VerifiedSession;
 import org.thehill.hill175.auth.sso.MicrosoftSsoService;
 import org.thehill.hill175.data.CompetitionStore;
 import org.thehill.hill175.model.BuildRegion;
+import org.thehill.hill175.model.CameraPose;
 import org.thehill.hill175.model.Category;
 import org.thehill.hill175.model.Entry;
 import org.thehill.hill175.world.WorldModule;
@@ -40,6 +43,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -99,6 +103,90 @@ class SchoolParticipantOwnershipTest {
         f.entry(Category.JOURNEY, "javabuilder");
         Player java = f.player("JavaBuilder");
         assertFalse(f.competition.mayBuild(java, java.getLocation()));
+    }
+
+    @Test
+    void savesBothSubmissionFieldsTogetherWithOneWrite() throws Exception {
+        Fixture f = new Fixture();
+        Entry entry = f.entry(Category.JOURNEY, PARTICIPANT);
+        Player player = f.player("JavaBuilder");
+
+        assertEquals(CompetitionModule.DetailsUpdateResult.SAVED,
+                f.competition.saveSubmissionDetails(player, entry, "  Our Hill  ", "  A restored chapel.  "));
+
+        assertEquals("Our Hill", entry.title());
+        assertEquals("A restored chapel.", entry.description());
+        verify(f.store, times(1)).saveEntry(entry);
+    }
+
+    @Test
+    void invalidSubmissionDetailsDoNotPartiallyUpdateTheEntry() throws Exception {
+        Fixture f = new Fixture();
+        Entry entry = f.entry(Category.JOURNEY, PARTICIPANT);
+        entry.title("Original title");
+        entry.description("Original description");
+        Player player = f.player("JavaBuilder");
+
+        for (String invalidDescription : List.of("  ", "x".repeat(Entry.MAX_DESCRIPTION_LENGTH + 1))) {
+            assertEquals(CompetitionModule.DetailsUpdateResult.INVALID_DETAILS,
+                    f.competition.saveSubmissionDetails(player, entry, "New title", invalidDescription));
+        }
+        assertEquals(CompetitionModule.DetailsUpdateResult.INVALID_DETAILS,
+                f.competition.saveSubmissionDetails(player, entry, "x".repeat(Entry.MAX_TITLE_LENGTH + 1), "New description"));
+
+        assertEquals("Original title", entry.title());
+        assertEquals("Original description", entry.description());
+        verify(f.store, never()).saveEntry(any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(EditRestriction.class)
+    void commandAndDialogEditsEnforceTheSameAccessRules(EditRestriction restriction) throws Exception {
+        Fixture f = new Fixture();
+        Entry entry = f.entry(Category.JOURNEY,
+                restriction == EditRestriction.OTHER_OWNER ? "entra:school-tenant:other-student" : PARTICIPANT);
+        entry.title("Original title");
+        entry.description("Original description");
+        Player player = f.player("JavaBuilder");
+        switch (restriction) {
+            case UNAUTHENTICATED -> f.sessions.clear();
+            case SUBMITTED -> entry.submit(Instant.now());
+            case RESETTING -> when(f.worlds.isResetting(entry.id())).thenReturn(true);
+            case OTHER_OWNER -> { }
+        }
+
+        assertFalse(f.competition.canEditEntry(player, entry));
+        assertFalse(f.competition.mayBuild(player, player.getLocation()));
+        assertEquals(CompetitionModule.DetailsUpdateResult.ACCESS_DENIED,
+                f.competition.saveSubmissionDetails(player, entry, "New title", "New description"));
+        f.competition.setTitle(player, "New command title");
+        f.competition.setDescription(player, "New command description");
+
+        assertEquals("Original title", entry.title());
+        assertEquals("Original description", entry.description());
+        assertEquals(restriction == EditRestriction.SUBMITTED, entry.submitted());
+        verify(f.store, never()).saveEntry(any());
+    }
+
+    @Test
+    void cameraCommandsCannotChangeAnEntryDuringReset() throws Exception {
+        Fixture f = new Fixture();
+        Entry entry = f.entry(Category.JOURNEY, PARTICIPANT);
+        CameraPose pose = new CameraPose(entry.worldName(), 10, 72, 10, 0, 0);
+        entry.setCameraPose(1, pose);
+        Player player = f.player("JavaBuilder");
+        when(f.worlds.isResetting(entry.id())).thenReturn(true);
+
+        assertFalse(f.competition.recordCamera(player));
+        assertFalse(f.competition.recordCamera(player, 1));
+        assertFalse(f.competition.removeCamera(player, 1));
+
+        assertEquals(pose, entry.cameraPose(1).orElseThrow());
+        verify(f.store, never()).saveEntry(any());
+    }
+
+    private enum EditRestriction {
+        UNAUTHENTICATED, OTHER_OWNER, SUBMITTED, RESETTING
     }
 
     private final class Fixture {

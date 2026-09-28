@@ -1,7 +1,5 @@
 package org.thehill.hill175.data;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -167,12 +165,6 @@ public final class SurvivalInventoryStore {
             logger.warning("Ignoring invalid survival inventory file for " + playerId + ": " + file);
         }
         return state;
-    }
-
-    public synchronized Optional<Location> lastLocation(Player player) {
-        return load(player.getUniqueId())
-                .flatMap(SurvivalPlayerState::location)
-                .flatMap(location -> location.resolve(Bukkit::getWorld));
     }
 
     private Path playerFile(UUID playerId) {

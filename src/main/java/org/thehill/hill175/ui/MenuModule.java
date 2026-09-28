@@ -42,8 +42,6 @@ import java.util.UUID;
 
 public final class MenuModule implements Listener {
     private static final int VISIT_PAGE_SIZE = 45;
-    private static final int TITLE_MAX_LENGTH = 80;
-    private static final int DESCRIPTION_MAX_LENGTH = 750;
     private static final Key SAVE_SUBMISSION_ACTION = Key.key("hill175", "save_submission");
     private static final Key CANCEL_SUBMISSION_ACTION = Key.key("hill175", "cancel_submission");
 
@@ -116,10 +114,6 @@ public final class MenuModule implements Listener {
                             }
                         }
                 );
-    }
-
-    public void openEntry(Player player, Entry entry) {
-        openEntryDetails(player, entry);
     }
 
     public void openEntryDetails(Player player, Entry entry) {
@@ -245,7 +239,7 @@ public final class MenuModule implements Listener {
     }
 
     private void openCameraControls(Player player, Entry entry) {
-        boolean editor = competition.canEditCameras(player, entry);
+        boolean editor = competition.canEditEntry(player, entry);
         boolean owner = entry.isMember(competition.participantKey(player));
         HillMenuHolder holder = new HillMenuHolder();
         Inventory inventory = Bukkit.createInventory(holder, 27,
@@ -287,7 +281,7 @@ public final class MenuModule implements Listener {
     }
 
     private void openCameraSlotControls(Player player, Entry entry, int cameraSlot) {
-        if (!competition.canEditCameras(player, entry) || entry.cameraPose(cameraSlot).isEmpty()) {
+        if (!competition.canEditEntry(player, entry) || entry.cameraPose(cameraSlot).isEmpty()) {
             openCameraControls(player, entry);
             return;
         }
@@ -342,7 +336,7 @@ public final class MenuModule implements Listener {
 
     public void openActiveCameraRemovalConfirmation(Player player) {
         competition.activeCameraPreview(player).ifPresentOrElse(context -> {
-            if (!competition.canEditCameras(player, context.entry())) {
+            if (!competition.canEditEntry(player, context.entry())) {
                 player.sendMessage(Component.text("Only an entry owner may remove this camera.", NamedTextColor.RED));
                 return;
             }
@@ -589,12 +583,12 @@ public final class MenuModule implements Listener {
                         DialogInput.text("title", Component.text("Entry title", NamedTextColor.WHITE))
                                 .width(360)
                                 .initial(initialTitle)
-                                .maxLength(TITLE_MAX_LENGTH)
+                                .maxLength(Entry.MAX_TITLE_LENGTH)
                                 .build(),
                         DialogInput.text("description", Component.text("Description", NamedTextColor.WHITE))
                                 .width(360)
                                 .initial(initialDescription)
-                                .maxLength(DESCRIPTION_MAX_LENGTH)
+                                .maxLength(Entry.MAX_DESCRIPTION_LENGTH)
                                 .multiline(TextDialogInput.MultilineOptions.create(12, 140))
                                 .build()
                 ))
@@ -791,36 +785,20 @@ public final class MenuModule implements Listener {
             String description = response == null ? null : response.getText("description");
             title = title == null ? "" : title.trim();
             description = description == null ? "" : description.trim();
-            if (!competition.isAuthenticated(player)
-                    || !entry.isMember(competition.participantKey(player))
-                    || entry.submitted()) {
-                player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                        .append(Component.text("This entry is no longer available for editing.", NamedTextColor.RED)
-                                .decoration(TextDecoration.BOLD, false)));
-                return;
-            }
-            if (title.isEmpty() || description.isEmpty()
-                    || title.length() > TITLE_MAX_LENGTH
-                    || description.length() > DESCRIPTION_MAX_LENGTH) {
-                player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                        .append(Component.text("Both fields are required. Title is limited to " + TITLE_MAX_LENGTH
-                                        + " characters and description to " + DESCRIPTION_MAX_LENGTH + ".", NamedTextColor.RED)
-                                .decoration(TextDecoration.BOLD, false)));
+            CompetitionModule.DetailsUpdateResult result = competition.saveSubmissionDetails(player, entry, title, description);
+            if (result == CompetitionModule.DetailsUpdateResult.INVALID_DETAILS) {
                 openSubmissionDialog(
                         player,
                         entry,
                         prompt.newlyCreated(),
-                        title.substring(0, Math.min(title.length(), TITLE_MAX_LENGTH)),
-                        description.substring(0, Math.min(description.length(), DESCRIPTION_MAX_LENGTH))
+                        title.substring(0, Math.min(title.length(), Entry.MAX_TITLE_LENGTH)),
+                        description.substring(0, Math.min(description.length(), Entry.MAX_DESCRIPTION_LENGTH))
                 );
                 return;
             }
-            competition.setTitle(player, entry, title);
-            competition.setDescription(player, entry, description);
-            player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                    .append(Component.text("Submission details saved. Use Entry Controls to open Build Options and submit when your cameras are ready.", NamedTextColor.GREEN)
-                            .decoration(TextDecoration.BOLD, false)));
-            Bukkit.getScheduler().runTaskLater(plugin, () -> openEntryDetails(player, entry), 1L);
+            if (result == CompetitionModule.DetailsUpdateResult.SAVED) {
+                Bukkit.getScheduler().runTaskLater(plugin, () -> openEntryDetails(player, entry), 1L);
+            }
         });
     }
 

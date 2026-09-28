@@ -9,6 +9,8 @@ import java.util.UUID;
 
 public final class Entry {
     public static final int MAX_CAMERA_SLOTS = 3;
+    public static final int MAX_TITLE_LENGTH = 80;
+    public static final int MAX_DESCRIPTION_LENGTH = 750;
 
     private final UUID id;
     private Category category;
@@ -53,16 +55,16 @@ public final class Entry {
         return Set.copyOf(members);
     }
 
-    public boolean addMember(String nicknameKey) {
-        return members.size() < 2 && members.add(nicknameKey);
+    public boolean addMember(String participantKey) {
+        return members.size() < 2 && members.add(participantKey);
     }
 
-    public boolean removeMember(String nicknameKey) {
-        return members.remove(nicknameKey);
+    public boolean removeMember(String participantKey) {
+        return members.remove(participantKey);
     }
 
-    public boolean isMember(String nicknameKey) {
-        return members.contains(nicknameKey);
+    public boolean isMember(String participantKey) {
+        return members.contains(participantKey);
     }
 
     public String worldName() {

@@ -2,7 +2,7 @@ package org.thehill.hill175.auth;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-/** Keeps an unimplemented provider from silently falling back to development approval. */
+/** Selects the development linker; Microsoft authentication is configured through the environment. */
 public final class IdentityLinkerFactory {
     private IdentityLinkerFactory() {
     }
@@ -11,7 +11,7 @@ public final class IdentityLinkerFactory {
         String provider = config.getString("authentication.provider", "");
         if (!"always-approve-development-stub".equals(provider)) {
             throw new IllegalStateException("Unsupported authentication.provider: " + provider
-                    + ". Microsoft SSO is planned but is not implemented in this release.");
+                    + ". For Microsoft SSO, configure HILL175_AUTH_MODE=microsoft and the required environment settings.");
         }
         if (!config.getBoolean("authentication.development-stub-acknowledged", false)) {
             throw new IllegalStateException("Development identity linking must be explicitly acknowledged.");
