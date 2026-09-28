@@ -9,6 +9,8 @@ records were used in development. See the [setup guide](microsoft-sso-setup.md).
 
 - `gradlew.bat clean test jar`: **79 Java tests passed**, including 37 new tests.
 - Environment preflight: **5 Python tests passed**.
+- Backup isolation: **2 Linux integration tests passed** with mocked services/Borg,
+  including recovery after failed archive creation. These root-only tests skip on Windows.
 - Bash and PowerShell operation scripts parsed successfully.
 - Maintained document links, whitespace and source/artifact/credential scan passed.
 - The packaged JAR contains the pinned OIDC dependencies and license notices.
@@ -46,6 +48,44 @@ One reuse suggestion was deliberately skipped: centralizing the small NPC-team
 presentation block would couple authentication to the broader NPC configuration
 module. Its cached private-viewer setup remains separate. No unrelated campus
 geometry, frozen revisions or player saves were rewritten.
+
+## Deployed demo verification
+
+| Item | Verified value |
+| --- | --- |
+| Application build commit | `659fa2b` |
+| Backup correction commit | `ce121c3` |
+| Service | `hill175.service`, active; Paper 26.2 build 119 / JDK 25 |
+| Authentication | Explicit `HILL175_AUTH_MODE=development` in protected systemd environment |
+| Plugin SHA-256 | `ca2c146addbe8a25d1f79b03b98258105b3e12fec9fdb314b0c8e325a2ab0239` |
+| Verified Hill Borg archive | `hill175-verified-2026-09-28T20-36-59Z` |
+| Archive fingerprint | `38a2b95f3027e215abaa0ab234fb6b54d2cbc78b3cf66bee483aede7370bbf71` |
+| Campus | Frozen v19 at two blocks/metre, 25 region files; existing pin unchanged |
+
+The server pulled GitHub source and passed all **79 Java tests** during its JDK 25
+build. Its installed JAR matches the local build hash exactly. Both deployment
+Python suites also passed on Linux. Configuration/assets/log verification passed,
+and the installed backup script matches the corrected source. Later documentation
+commits do not change this JAR.
+
+Live protocol smoke checks passed through a temporary PuTTY SSH forward:
+authentication-lobby restriction, owner/visitor camera entry and both exit controls,
+People campus creation, chart, reset and re-entry at `(228.5, 86, 154.5)` on grass.
+The temporary test tunnel was closed. This does not resolve the earlier direct
+network connectivity limitation or replace real-client visual acceptance.
+
+The first pre-SSO backup run exposed a legacy shared-environment collision:
+`SRV_DIR` redirected the snapshot to the other Minecraft installation. That
+archive is **not** a verified Hill backup. The corrected script resolves Hill's
+namespaced settings after reading credentials. The new cold snapshot above
+contains `/opt/hill175` (**3.82 GB / 2,694 files**); archive listing and dry-run
+extraction verified its plugin and competition data. It is a post-deployment
+snapshot, not a retroactive pre-deployment recovery point. The earlier v19 report
+now carries the same backup qualification.
+
+Server logs are retained at `/opt/hill175/assets/deploy-sso-20260928.log` and
+`/opt/hill175/assets/verify-sso-20260928.log`. Local smoke logs remain ignored under
+`runtime/campus-reconstruction/server-integration-20260928/sso-*-smoke.log`.
 
 ## External acceptance still required
 

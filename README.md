@@ -17,7 +17,7 @@ continues to use development authentication until IT setup and a real-client pil
 - [SSO validation and review](docs/operations/microsoft-sso-verification-20260928.md)
 - [Player workflow and commands](docs/operations/player-guide.md)
 - [Smoke tests](docs/SMOKE_TEST.md)
-- [Latest deployment verification](docs/operations/deployment-verification-20260928.md)
+- [Campus and camera deployment record](docs/operations/deployment-verification-20260928.md)
 - [Repository conventions](CONTRIBUTING.md) and [documentation index](docs/README.md)
 
 ## Build
