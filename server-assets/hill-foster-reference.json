@@ -1,0 +1,1359 @@
+{
+  "name": "Foster Dormitory - pitch portals and measured T roof",
+  "revision": "2026-09-08-foster-v14-2x",
+  "parent_id": "16001511600621C-2c9084ad78",
+  "school_names": [
+    "Foster Dormitory"
+  ],
+  "school_map_numbers": [
+    36
+  ],
+  "source_index_0based": 31,
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_foster_details",
+  "study_margin_m": 12,
+  "geometry": {
+    "origin_xz_m": [
+      329.8364569848136,
+      53.495088452237866
+    ],
+    "axis_degrees": -33.88230409560611,
+    "main_roof_threshold_navd88_m": 72.5,
+    "entrance_floor_navd88_m": 68.1,
+    "basement_floor_navd88_m": 65.1,
+    "upper_floor_plates_navd88_m": [
+      71.0
+    ],
+    "source_roof_max_navd88_m": 76.3451
+  },
+  "materials": {
+    "facade": "bricks",
+    "foundation": "stone_bricks",
+    "roof_family": "stone_brick",
+    "trim": "quartz_block"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.26,
+    "trim_family": "quartz",
+    "glass_block": "white_stained_glass_pane"
+  },
+  "vanilla_state_replacements": {
+    "dark_oak_planks": "pale_oak_planks",
+    "dark_oak_door": "pale_oak_door"
+  },
+  "window_rows": [
+    {
+      "side": "north",
+      "at_m": 1.05,
+      "centres_m": [
+        1.35,
+        3.7,
+        6.05,
+        8.4,
+        10.75,
+        13.1
+      ],
+      "sill_navd88_m": 68.75,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "four_visible_count_six_interpreted_through_tree_occlusion",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "west_wing",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "north",
+      "at_m": 0.1,
+      "centres_m": [
+        35.25,
+        37.76,
+        40.27,
+        42.78,
+        45.29,
+        47.8
+      ],
+      "sill_navd88_m": 68.75,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "photo_count_with_interpreted_metric_positions",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "east_wing",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "surface_tolerance_by_centre_m": {
+        "47.8": 0.85
+      }
+    },
+    {
+      "side": "north",
+      "at_m": 0.7,
+      "centres_m": [
+        19.0,
+        21.9,
+        24.8,
+        27.7
+      ],
+      "sill_navd88_m": 68.75,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "photo_count_with_interpreted_metric_positions",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "centre",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "north",
+      "at_m": 1.05,
+      "centres_m": [
+        1.35,
+        3.7,
+        6.05,
+        8.4,
+        10.75,
+        13.1
+      ],
+      "sill_navd88_m": 71.65,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "four_visible_count_six_interpreted_through_tree_occlusion",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "west_wing",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "north",
+      "at_m": 0.1,
+      "centres_m": [
+        35.25,
+        37.76,
+        40.27,
+        42.78,
+        45.29,
+        47.8
+      ],
+      "sill_navd88_m": 71.65,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "photo_count_with_interpreted_metric_positions",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "east_wing",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "surface_tolerance_by_centre_m": {
+        "47.8": 0.85
+      }
+    },
+    {
+      "side": "north",
+      "at_m": 0.7,
+      "centres_m": [
+        19.0,
+        21.9,
+        24.8,
+        27.7
+      ],
+      "sill_navd88_m": 71.65,
+      "width_m": 1.05,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "photo_count_with_interpreted_metric_positions",
+      "source_refs": [
+        "drone_238",
+        "drone_240"
+      ],
+      "part": "centre",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "north",
+      "at_m": 2.6,
+      "centres_m": [
+        15.75,
+        31.65
+      ],
+      "sill_navd88_m": 71.65,
+      "width_m": 0.85,
+      "height_m": 1.15,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "photo_count_with_interpreted_metric_positions",
+      "source_refs": [
+        "drone_238"
+      ],
+      "part": "above_separate_entrance_portals",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.33,
+      "centres_m": [
+        1.35,
+        3.7,
+        6.05,
+        8.4,
+        10.75,
+        13.1
+      ],
+      "sill_navd88_m": 65.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.31,
+      "centres_m": [
+        35.25,
+        37.76,
+        40.27,
+        42.78,
+        45.29,
+        47.0
+      ],
+      "sill_navd88_m": 65.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "east_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "raster_corner_adjustment": "Final proposed rear sash centre shifts 0.8 m west to seat glazing on connected measured wall cells; the former centre hit an isolated one-neighbor source-footprint tip. Count, width, storeys, footprint and roof are unchanged. No rear source aperture measurement is claimed."
+    },
+    {
+      "side": "south",
+      "at_m": 22.3881,
+      "centres_m": [
+        19.87,
+        23.85,
+        27.83
+      ],
+      "sill_navd88_m": 65.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_end",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "west",
+      "at_m": 18.07,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 65.85,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 29.63,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 65.85,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.33,
+      "centres_m": [
+        1.35,
+        3.7,
+        6.05,
+        8.4,
+        10.75,
+        13.1
+      ],
+      "sill_navd88_m": 68.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.31,
+      "centres_m": [
+        35.25,
+        37.76,
+        40.27,
+        42.78,
+        45.29,
+        47.0
+      ],
+      "sill_navd88_m": 68.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "east_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "raster_corner_adjustment": "Final proposed rear sash centre shifts 0.8 m west to seat glazing on connected measured wall cells; the former centre hit an isolated one-neighbor source-footprint tip. Count, width, storeys, footprint and roof are unchanged. No rear source aperture measurement is claimed."
+    },
+    {
+      "side": "south",
+      "at_m": 22.3881,
+      "centres_m": [
+        19.87,
+        23.85,
+        27.83
+      ],
+      "sill_navd88_m": 68.85,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_end",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "west",
+      "at_m": 18.07,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 68.85,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 29.63,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 68.85,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.33,
+      "centres_m": [
+        1.35,
+        3.7,
+        6.05,
+        8.4,
+        10.75,
+        13.1
+      ],
+      "sill_navd88_m": 71.75,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "south",
+      "at_m": 12.31,
+      "centres_m": [
+        35.25,
+        37.76,
+        40.27,
+        42.78,
+        45.29,
+        47.0
+      ],
+      "sill_navd88_m": 71.75,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "east_wing_rear",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "raster_corner_adjustment": "Final proposed rear sash centre shifts 0.8 m west to seat glazing on connected measured wall cells; the former centre hit an isolated one-neighbor source-footprint tip. Count, width, storeys, footprint and roof are unchanged. No rear source aperture measurement is claimed."
+    },
+    {
+      "side": "south",
+      "at_m": 22.3881,
+      "centres_m": [
+        19.87,
+        23.85,
+        27.83
+      ],
+      "sill_navd88_m": 71.75,
+      "width_m": 1.0,
+      "height_m": 1.45,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_end",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "west",
+      "at_m": 18.07,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 71.75,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 29.63,
+      "centres_m": [
+        13.4,
+        16.5,
+        19.6
+      ],
+      "sill_navd88_m": 71.75,
+      "width_m": 0.9,
+      "height_m": 1.4,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "rear_T_return",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "west",
+      "at_m": 0.02,
+      "centres_m": [
+        2.6,
+        6.4,
+        10.15
+      ],
+      "sill_navd88_m": 65.75,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_end_3_sash_groups",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 49.2803,
+      "centres_m": [
+        2.5,
+        6.2,
+        10.0
+      ],
+      "sill_navd88_m": 65.8,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "unseen_east_end_proposal",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "surface_at_by_centre_m": {
+        "2.5": 47.7,
+        "6.2": 49.2803,
+        "10.0": 47.9
+      },
+      "surface_note": "The measured east end steps in plan; each proposed window uses its own actual wall plane. These are geometry corrections, not photographed aperture measurements."
+    },
+    {
+      "side": "west",
+      "at_m": 0.02,
+      "centres_m": [
+        2.6,
+        6.4,
+        10.15
+      ],
+      "sill_navd88_m": 68.75,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_end_3_sash_groups",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 49.2803,
+      "centres_m": [
+        2.5,
+        6.2,
+        10.0
+      ],
+      "sill_navd88_m": 68.8,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "unseen_east_end_proposal",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "surface_at_by_centre_m": {
+        "2.5": 47.7,
+        "6.2": 49.2803,
+        "10.0": 47.9
+      },
+      "surface_note": "The measured east end steps in plan; each proposed window uses its own actual wall plane. These are geometry corrections, not photographed aperture measurements."
+    },
+    {
+      "side": "west",
+      "at_m": 0.02,
+      "centres_m": [
+        2.6,
+        6.4,
+        10.15
+      ],
+      "sill_navd88_m": 71.65,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "west_end_3_sash_groups",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75
+    },
+    {
+      "side": "east",
+      "at_m": 49.2803,
+      "centres_m": [
+        2.5,
+        6.2,
+        10.0
+      ],
+      "sill_navd88_m": 71.7,
+      "width_m": 1,
+      "height_m": 1.5,
+      "lights": 1,
+      "shape": "rectangular",
+      "evidence_status": "interpreted_typology_for_unseen_or_uncounted_facade",
+      "source_refs": [],
+      "part": "unseen_east_end_proposal",
+      "metric_status": "proposal; physical measurements of apertures are unavailable",
+      "requires_native_visual_audit": true,
+      "surface_tolerance_m": 0.75,
+      "surface_at_by_centre_m": {
+        "2.5": 47.7,
+        "6.2": 49.2803,
+        "10.0": 47.9
+      },
+      "surface_note": "The measured east end steps in plan; each proposed window uses its own actual wall plane. These are geometry corrections, not photographed aperture measurements."
+    }
+  ],
+  "pitch_portals": [
+    {
+      "centre_m": 15.75,
+      "at_m": 0.2,
+      "floor_navd88_m": 68.1,
+      "source_ref": "drone_238",
+      "shape": "rounded segmental interpretation; not Rolfe triangular pediment"
+    },
+    {
+      "centre_m": 31.65,
+      "at_m": 0.2,
+      "floor_navd88_m": 68.1,
+      "source_ref": "drone_238",
+      "shape": "rounded segmental interpretation; not Rolfe triangular pediment"
+    }
+  ],
+  "rear_door": {
+    "side": "south",
+    "at_m": 22.3881,
+    "centre_m": 23.85,
+    "floor_navd88_m": 65.1,
+    "width_m": 1.05,
+    "height_m": 2.15,
+    "evidence_status": "unseen rear access interpretation"
+  },
+  "attic_vent": {
+    "centre_m": 23.85,
+    "at_m": 0.65,
+    "sill_navd88_m": 74.1,
+    "width_m": 0.8,
+    "height_m": 0.8,
+    "source_ref": "drone_238",
+    "metric_status": "photo-proportional; stair-cut voxel diamond"
+  },
+  "central_canopy": {
+    "bounds_uv_m": [
+      17.77,
+      -1.0,
+      29.93,
+      0.85
+    ],
+    "eave_navd88_m": 70.95,
+    "ridge_navd88_m": 71.15,
+    "posts_uv_m": [
+      [
+        18.07,
+        -0.8
+      ],
+      [
+        29.63,
+        -0.8
+      ]
+    ],
+    "source_ref": "drone_238",
+    "metric_status": "observed shallow canopy; depth and two edge supports interpreted"
+  },
+  "chimneys": [
+    {
+      "bounds_uv_m": [
+        21.75,
+        10.4,
+        22.85,
+        11.35
+      ],
+      "top_navd88_m": 77.15,
+      "source_ref": "drone_238",
+      "evidence_status": "photo-interpreted squat near-spine stack; plan position uncertain by ~2 m"
+    },
+    {
+      "bounds_uv_m": [
+        23.55,
+        19.0,
+        24.65,
+        19.95
+      ],
+      "top_navd88_m": 77.45,
+      "source_ref": "drone_238",
+      "evidence_status": "photo-interpreted rear-spine stack; plan position uncertain by ~2 m"
+    }
+  ],
+  "roof_interpretation": {
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "major_faces": [
+      6,
+      14,
+      11,
+      2,
+      4,
+      0,
+      12,
+      15,
+      13,
+      8,
+      10
+    ],
+    "ground_faces": [
+      1,
+      3,
+      7
+    ],
+    "entry_canopy_faces_retained": [
+      5,
+      9
+    ],
+    "rule": "Keep all major source planes and T roof valleys; three individually identified grade-level source faces become separate path/terrace. Add one bounded photographed central canopy."
+  },
+  "ground_evidence": {
+    "source": "housing-entrance-ground-profiles.json",
+    "measured_front_grade_navd88_range_m": [
+      67.9,
+      68.24
+    ],
+    "front_terrain_evidence": "30 samples across full front 1\u201318 m outward remain ~68 m; raised pitch/terrace verified independently of building roof.",
+    "rear_grade_navd88_m": 64.85,
+    "note": "Clip below-grade windows and buried floor plates to local DEM, preserve exposed basement rather than raising entire terrain to entrance."
+  },
+  "evidence": [
+    {
+      "source_ref": "drone_238",
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "time_seconds": 238,
+      "file": "runtime/research/campus-full-detail-20260905/drone-238s.png",
+      "crops": [
+        "runtime/research/campus-full-detail-20260905/foster-rolfe-pitch-238s-crop.png",
+        "runtime/research/campus-full-detail-20260905/dell-sherrill-238s-crop.png"
+      ],
+      "role": "school video; current uploaded 2026, capture date unspecified; high oblique from northeast"
+    },
+    {
+      "source_ref": "drone_240",
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "time_seconds": 240,
+      "file": "runtime/research/campus-full-detail-20260905/drone-240s.png",
+      "role": "independent nearby aerial observation of same elevations"
+    },
+    {
+      "source_ref": "masterplan_2013",
+      "url": "https://www.slideshare.net/slideshow/hilll-school-master-plan-2013/58408750",
+      "author_printed": "Scott Simons Architects / The Hill School Campus Master Plan",
+      "files": [
+        "runtime/research/campus-full-detail-20260905/masterplan-page-09.jpg",
+        "runtime/research/campus-full-detail-20260905/masterplan-page-10.jpg",
+        "runtime/research/campus-full-detail-20260905/masterplan-page-11.jpg",
+        "runtime/research/campus-full-detail-20260905/masterplan-page-12.jpg",
+        "runtime/research/campus-full-detail-20260905/masterplan-page-28.jpg",
+        "runtime/research/campus-full-detail-20260905/masterplan-page-33.jpg"
+      ],
+      "role": "architect-authored primary planning document, obtained from third-party reprint; proposed work is not current as-built evidence"
+    },
+    {
+      "source_ref": "school_aerial_2026",
+      "url": "https://resources.finalsite.net/images/v1781199127/thehillorg/w4u9jqyl7pydvhxczw5z/2026-Aerial-Campus.jpg",
+      "file": "runtime/research/campus-priority-20260905/campus-2026-aerial-original.jpg",
+      "role": "school SW oblique; house details mostly occluded or small"
+    }
+  ],
+  "material_review": {
+    "status": "Native-approved red brick/light-gray roof and flush white stained panes. V8 adds 28 authorised diagonal return panes to V7; final native review pending.",
+    "catalogue": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+    "catalogue_sha256": "3567cfef8042cda27bc5f76627d7fe3cfb5a4f28daca25b9e914661af1e6dec1",
+    "comparison_register": "runtime/research/campus-material-audit-20260905/photo-texture-comparison.json",
+    "vanilla_client_jar_sha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0",
+    "selected": {
+      "facade": {
+        "block": "bricks",
+        "reason": "Architect-authored 2013 plan explicitly calls Foster and Rolfe red brick, distinct from darker historic quad. Brick bond is retained. Blue shadow in the drone frame is not a reflectance measurement."
+      },
+      "roof": {
+        "block_family": "stone_brick",
+        "reason": "Weathered gray overlapping units. Measured drone roof ROI gives stone bricks deltaE00 0.918 vs deepslate tiles 24.685; stone bricks also provide matching stair/slab geometry. Slate versus replacement shingle not independently confirmed."
+      },
+      "trim": {
+        "block": "quartz_block",
+        "reason": "White painted surround and fascia; compact smooth vanilla trim with compatible slabs/stairs. Native white render, not inferred limestone substrate."
+      },
+      "doors": {
+        "block": "pale_oak_door",
+        "reason": "Operable pale painted-looking vanilla timber door; exact painted blue-gray finish is not available without replacing original textures."
+      },
+      "glazing": {
+        "block": "white_stained_glass_pane",
+        "reason": "v4 original-client native comparison at actual facade scale gave a continuous pale perimeter with transparent centre; clear panes and isolated rails remained visually empty."
+      }
+    },
+    "photo_samples": [
+      {
+        "id": "foster_east_wing_shadowed_wall",
+        "file": "runtime/research/campus-full-detail-20260905/foster-rolfe-pitch-238s-crop.png",
+        "file_sha256": "2fe6fffe36335e4ad2e1ad278f6b88fbb176a94cfeee21c3d399f57ab166d0ec",
+        "rectangle_pixels_xyxy": [
+          521,
+          183,
+          602,
+          190
+        ],
+        "statistics": {
+          "pixels": 567,
+          "srgb_median": [
+            48.0,
+            44.0,
+            60.0
+          ],
+          "srgb_mean_linear_light": [
+            48.49,
+            43.83,
+            59.82
+          ],
+          "srgb_p10_p90": [
+            [
+              43.0,
+              38.0,
+              54.0
+            ],
+            [
+              51.4,
+              47.0,
+              64.0
+            ]
+          ],
+          "lab_d65_median": [
+            19.0388,
+            5.8356,
+            -9.5018
+          ],
+          "lab_d65_linear_mean": [
+            19.0291,
+            6.0954,
+            -9.3859
+          ],
+          "lab_pixel_std": [
+            2.0133,
+            1.2644,
+            1.2219
+          ]
+        },
+        "candidate_family": "brick",
+        "ranking": [
+          {
+            "block": "brown_terracotta",
+            "delta_e_2000_raw": 18.424,
+            "delta_e_2000_equal_lightness": 18.089
+          },
+          {
+            "block": "red_terracotta",
+            "delta_e_2000_raw": 28.167,
+            "delta_e_2000_equal_lightness": 24.79
+          },
+          {
+            "block": "bricks",
+            "delta_e_2000_raw": 30.426,
+            "delta_e_2000_equal_lightness": 19.392
+          },
+          {
+            "block": "mud_bricks",
+            "delta_e_2000_raw": 31.107,
+            "delta_e_2000_equal_lightness": 21.199
+          },
+          {
+            "block": "terracotta",
+            "delta_e_2000_raw": 31.77,
+            "delta_e_2000_equal_lightness": 23.558
+          }
+        ],
+        "status": "image appearance under directional light; not calibrated reflectance"
+      },
+      {
+        "id": "foster_east_wing_weathered_gray_roof",
+        "file": "runtime/research/campus-full-detail-20260905/foster-rolfe-pitch-238s-crop.png",
+        "file_sha256": "2fe6fffe36335e4ad2e1ad278f6b88fbb176a94cfeee21c3d399f57ab166d0ec",
+        "rectangle_pixels_xyxy": [
+          522,
+          123,
+          607,
+          145
+        ],
+        "statistics": {
+          "pixels": 1870,
+          "srgb_median": [
+            123.0,
+            121.0,
+            123.0
+          ],
+          "srgb_mean_linear_light": [
+            127.04,
+            125.31,
+            126.11
+          ],
+          "srgb_p10_p90": [
+            [
+              79.0,
+              79.0,
+              83.0
+            ],
+            [
+              163.0,
+              162.0,
+              159.0
+            ]
+          ],
+          "lab_d65_median": [
+            51.0546,
+            1.155,
+            -0.8213
+          ],
+          "lab_d65_linear_mean": [
+            52.6983,
+            0.806,
+            -0.1997
+          ],
+          "lab_pixel_std": [
+            11.8552,
+            0.7689,
+            2.3999
+          ]
+        },
+        "candidate_family": "slate_shingle",
+        "ranking": [
+          {
+            "block": "stone_bricks",
+            "delta_e_2000_raw": 0.916,
+            "delta_e_2000_equal_lightness": 0.492
+          },
+          {
+            "block": "stone",
+            "delta_e_2000_raw": 1.205,
+            "delta_e_2000_equal_lightness": 1.195
+          },
+          {
+            "block": "tuff_bricks",
+            "delta_e_2000_raw": 10.552,
+            "delta_e_2000_equal_lightness": 6.064
+          },
+          {
+            "block": "cobbled_deepslate",
+            "delta_e_2000_raw": 17.011,
+            "delta_e_2000_equal_lightness": 1.351
+          },
+          {
+            "block": "polished_deepslate",
+            "delta_e_2000_raw": 18.69,
+            "delta_e_2000_equal_lightness": 1.09
+          },
+          {
+            "block": "deepslate_bricks",
+            "delta_e_2000_raw": 19.002,
+            "delta_e_2000_equal_lightness": 1.053
+          },
+          {
+            "block": "deepslate_tiles",
+            "delta_e_2000_raw": 24.69,
+            "delta_e_2000_equal_lightness": 1.002
+          },
+          {
+            "block": "gray_concrete",
+            "delta_e_2000_raw": 24.789,
+            "delta_e_2000_equal_lightness": 3.066
+          }
+        ],
+        "status": "image appearance under directional light; not calibrated reflectance"
+      },
+      {
+        "id": "foster_white_portal_in_blue_shadow",
+        "file": "runtime/research/campus-full-detail-20260905/foster-rolfe-pitch-238s-crop.png",
+        "file_sha256": "2fe6fffe36335e4ad2e1ad278f6b88fbb176a94cfeee21c3d399f57ab166d0ec",
+        "rectangle_pixels_xyxy": [
+          274,
+          195,
+          278,
+          214
+        ],
+        "statistics": {
+          "pixels": 76,
+          "srgb_median": [
+            152.0,
+            161.5,
+            181.0
+          ],
+          "srgb_mean_linear_light": [
+            141.69,
+            151.56,
+            170.72
+          ],
+          "srgb_p10_p90": [
+            [
+              92.5,
+              98.0,
+              117.5
+            ],
+            [
+              164.0,
+              177.0,
+              196.0
+            ]
+          ],
+          "lab_d65_median": [
+            66.2715,
+            0.732,
+            -11.2002
+          ],
+          "lab_d65_linear_mean": [
+            62.4783,
+            0.5708,
+            -11.1953
+          ],
+          "lab_pixel_std": [
+            12.1227,
+            1.4329,
+            0.909
+          ]
+        },
+        "candidate_family": "pale_cut_stone",
+        "ranking": [
+          {
+            "block": "smooth_stone",
+            "delta_e_2000_raw": 9.397,
+            "delta_e_2000_equal_lightness": 8.968
+          },
+          {
+            "block": "diorite",
+            "delta_e_2000_raw": 14.785,
+            "delta_e_2000_equal_lightness": 8.739
+          },
+          {
+            "block": "polished_diorite",
+            "delta_e_2000_raw": 15.392,
+            "delta_e_2000_equal_lightness": 8.278
+          },
+          {
+            "block": "light_gray_concrete",
+            "delta_e_2000_raw": 17.637,
+            "delta_e_2000_equal_lightness": 14.895
+          },
+          {
+            "block": "white_concrete",
+            "delta_e_2000_raw": 18.649,
+            "delta_e_2000_equal_lightness": 8.49
+          },
+          {
+            "block": "white_terracotta",
+            "delta_e_2000_raw": 22.391,
+            "delta_e_2000_equal_lightness": 20.156
+          },
+          {
+            "block": "calcite",
+            "delta_e_2000_raw": 22.456,
+            "delta_e_2000_equal_lightness": 11.041
+          },
+          {
+            "block": "quartz_bricks",
+            "delta_e_2000_raw": 24.31,
+            "delta_e_2000_equal_lightness": 12.89
+          },
+          {
+            "block": "quartz_pillar",
+            "delta_e_2000_raw": 24.358,
+            "delta_e_2000_equal_lightness": 12.495
+          },
+          {
+            "block": "quartz_block",
+            "delta_e_2000_raw": 24.368,
+            "delta_e_2000_equal_lightness": 12.729
+          },
+          {
+            "block": "smooth_quartz",
+            "delta_e_2000_raw": 24.41,
+            "delta_e_2000_equal_lightness": 12.613
+          }
+        ],
+        "status": "image appearance under directional light; not calibrated reflectance"
+      }
+    ],
+    "rules": []
+  },
+  "assembly_ownership": {
+    "basis": "Retain actual source footprint; narrow building perimeter, bounded entrance terrace only",
+    "source_footprint_buffer_m": 0.75,
+    "site_polygon_uv_m": [
+      [
+        0,
+        -0.65
+      ],
+      [
+        13.35,
+        -0.65
+      ],
+      [
+        13.35,
+        -1.85
+      ],
+      [
+        33.65,
+        -1.85
+      ],
+      [
+        33.65,
+        -0.65
+      ],
+      [
+        49,
+        -0.65
+      ],
+      [
+        49,
+        1.05
+      ],
+      [
+        0,
+        1.05
+      ]
+    ],
+    "do_not_own_study_margin": true
+  },
+  "uncertainties": [
+    "Aperture dimensions are proportional interpretations, not measured openings.",
+    "West pitch wing has four clearly visible sash groups; six per floor are interpreted through tree occlusion.",
+    "Rear and end facade window rows and basement door are explicitly uncounted typological proposals from the saved survey research.",
+    "Rear grade drops to about 64.85 m; basement floor 65.1 m is interpreted while front grade is independently sampled at 67.90-68.24 m.",
+    "Two small stack silhouettes appear on Foster behind the centre gable in frame 238; their UV placement and height remain approximate.",
+    "Canopy supports and depth are interpreted; rounded Foster portal tops are confirmed at drone resolution, without copying Rolfe pediments.",
+    "Roof cover appears weathered gray; slate versus replacement shingle is unverified.",
+    "V8 source roof planes and physical roof tops are retained. Rounded portal shape and visible grid steps remain voxel approximations."
+  ],
+  "camera_views": [
+    {
+      "name": "foster-pitch-full",
+      "eye_uv_navd88_m": [
+        24.0,
+        -24.0,
+        80.0
+      ],
+      "target_uv_navd88_m": [
+        24.0,
+        5.0,
+        71.8
+      ],
+      "fov": 68
+    },
+    {
+      "name": "foster-pitch-rounded-portal-close",
+      "eye_uv_navd88_m": [
+        17.5,
+        -10.0,
+        70.7
+      ],
+      "target_uv_navd88_m": [
+        17.5,
+        1.0,
+        70.5
+      ],
+      "fov": 72
+    },
+    {
+      "name": "foster-west-end-and-pitch",
+      "eye_uv_navd88_m": [
+        -9.5,
+        -9.0,
+        72.4
+      ],
+      "target_uv_navd88_m": [
+        9.0,
+        5.0,
+        71.0
+      ],
+      "fov": 78
+    },
+    {
+      "name": "foster-rear-daylight-basement",
+      "eye_uv_navd88_m": [
+        24.0,
+        39.0,
+        68.3
+      ],
+      "target_uv_navd88_m": [
+        24.0,
+        17.0,
+        69.5
+      ],
+      "fov": 84
+    },
+    {
+      "name": "foster-east-return-grade",
+      "eye_uv_navd88_m": [
+        59.0,
+        17.0,
+        70.0
+      ],
+      "target_uv_navd88_m": [
+        39.0,
+        10.0,
+        70.0
+      ],
+      "fov": 78
+    },
+    {
+      "name": "foster-roof-valleys-and-stacks",
+      "eye_uv_navd88_m": [
+        47.0,
+        31.0,
+        88.0
+      ],
+      "target_uv_navd88_m": [
+        24.0,
+        10.0,
+        74.3
+      ],
+      "fov": 74
+    }
+  ],
+  "window_construction": "White stained panes occupy the actual wall/frame. Inward L-returns connect diagonal sash edges to intact jambs, without a duplicate timber layer. Inner head/sill supports sit outside the glazed vertical interval after v13 native showed the completed former caps obscured too much glass. The two one-neighbor footprint tips remain brick, with the same counted front sashes on the adjoining connected boundary and three unobserved final rear sash centres shifted 0.8 m west. All pane perimeter contacts, outer walls, source roof planes and physical roof tops are audited independently.",
+  "sash_treatment": "white_pane",
+  "eave_bands": [
+    {
+      "name": "photographed_west_pitch_eave",
+      "side": "north",
+      "at_v_m": 1.05,
+      "ends_u_m": [
+        0.4,
+        13.5
+      ],
+      "wall_tolerance_m": 0.55,
+      "top_navd88_m": 74.0,
+      "basis": "source face 4 eave 73.914-74.044 m; level thin board interpreted from school drone"
+    },
+    {
+      "name": "photographed_east_pitch_eave",
+      "side": "north",
+      "at_v_m": 0.1,
+      "ends_u_m": [
+        33.85,
+        47.6
+      ],
+      "wall_tolerance_m": 0.45,
+      "top_navd88_m": 73.5,
+      "basis": "source face 6 eave ~73.54 m; level thin board interpreted from school drone"
+    },
+    {
+      "name": "unseen_west_rear_eave",
+      "side": "south",
+      "at_v_m": 12.3,
+      "ends_u_m": [
+        0.4,
+        13.5
+      ],
+      "wall_tolerance_m": 0.45,
+      "top_navd88_m": 74.0,
+      "basis": "source face 0 rear edge ~74.07-74.10 m; trim continuation is typological"
+    },
+    {
+      "name": "unseen_east_rear_eave",
+      "side": "south",
+      "at_v_m": 12.3,
+      "ends_u_m": [
+        34.4,
+        47.9
+      ],
+      "wall_tolerance_m": 0.45,
+      "top_navd88_m": 74.0,
+      "basis": "source face 2 rear edge ~74.10 m; trim continuation is typological"
+    },
+    {
+      "name": "unseen_rear_T_eave",
+      "side": "south",
+      "at_v_m": 22.4,
+      "ends_u_m": [
+        18.3,
+        29.4
+      ],
+      "wall_tolerance_m": 0.4,
+      "top_navd88_m": 74.0,
+      "basis": "source face 12 rear edge ~73.99 m; trim continuation is typological"
+    }
+  ],
+  "window_raster_corner_policy": "Keep isolated one-neighbor footprint tips as brick. The final east-wing front sash retains its photographed count and original along-facade width; its local wall search extends 0.10 m deeper to reach the adjoining actual boundary. Rear final centres move 0.8 m west as explicitly provisional geometry."
+}

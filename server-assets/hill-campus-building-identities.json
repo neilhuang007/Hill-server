@@ -1,0 +1,1421 @@
+{
+  "schema_version": 1,
+  "research_date": "2026-09-05",
+  "purpose": "Evidence-backed school names for the campus base-building index. Identity matches are spatial research findings, not surveyed individual floor plans or native Minecraft acceptance.",
+  "coordinate_order": "longitude, latitude; EPSG:4326",
+  "centroid_method": "Polygon area centroid computed in EPSG:6347 from the unmodified local county footprint, then transformed to EPSG:4326. Decimal precision does not indicate survey accuracy.",
+  "join_key": "roofer_parent_id is the unique local footprint key. county_structure_id alone is not unique and must not be used to merge different campus footprints.",
+  "verified_status_meaning": "Current official school map and earlier explicit facilities plan agree on location, outline/adjoining landmarks and identity when compared with georeferenced county geometry over the cached 2021 PEMA orthophoto. Whole-outline status identifies the source footprint; it does not certify every minor roof projection or current use of every room.",
+  "references": {
+    "school_map_2026": {
+      "url": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+      "landing_url": "https://www.thehill.org/about/our-campus",
+      "local_visual": "runtime/research/hill-reference-20260904/campus-map-2026-labeled.png",
+      "local_core_zoom": "runtime/research/campus-priority-20260905/campus-map-core-2026-zoom.png"
+    },
+    "school_facilities_plan_2021": {
+      "url": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+      "local_pdf": "runtime/research/campus-priority-20260905/campus-map-2021-address.pdf",
+      "local_west_zoom": "runtime/research/campus-priority-20260905/campus-map-2021-west-zoom.png",
+      "note": "July2021 facilities plan uses different numbering from current2026 map. Crosswalk uses the plan legend and positions, not equal numbers."
+    },
+    "school_aerial_2026": {
+      "url": "https://resources.finalsite.net/images/v1781199127/thehillorg/w4u9jqyl7pydvhxczw5z/2026-Aerial-Campus.jpg",
+      "local_file": "runtime/research/campus-priority-20260905/campus-2026-aerial-original.jpg",
+      "supports": "Current core massing: Athey/Dining, Hunt, Ryan, arts center and large sports roofs."
+    },
+    "school_dormitory_description": {
+      "url": "https://www.thehill.org/student-life/boarding-student-life/dormitories",
+      "note": "Primary page indexed immediately before September2026 redesign: Davy between CFTA and Sweeney, Hunt on Quad, Dutch west, Dell east. Current2026 map is the current naming authority."
+    },
+    "county_source_geometry": {
+      "url": "https://services1.arcgis.com/kOChldNuKsox8qZD/arcgis/rest/services/Montgomery_County_Building_Outlines/FeatureServer/6",
+      "local_file": "runtime/campus-reconstruction/roofer-chapel-trial/inputs/hill-buildings-full-unique-epsg6347.geojson",
+      "local_index": "runtime/research/campus-priority-20260905/campus-footprint-source-index.json"
+    },
+    "county_orthophoto_match": {
+      "local_core_plot": "runtime/research/campus-priority-20260905/campus-footprint-index-core.png",
+      "local_west_plot": "runtime/research/campus-priority-20260905/campus-footprint-index-west.png",
+      "local_east_plot": "runtime/research/campus-priority-20260905/campus-footprint-index-east.png",
+      "imagery_file": "runtime/campus-data/imagery/hill-campus-pema-2021-1m.png",
+      "imagery_extent_epsg6347": [
+        445691.8327,
+        4454966.46235,
+        447442.348,
+        4456893.92865
+      ],
+      "note": "Cached PEMA2021 image is an older geometric cross-check, not current facade condition. Figure labels are source feature indices, not school map numbers."
+    },
+    "lehrman_contractor": {
+      "url": "https://wohlsenconstruction.com/project/the-hill-school-lehrman-pavilion/",
+      "local_file": "runtime/research/campus-priority-20260905/lehrman.html",
+      "local_photos": [
+        "runtime/research/campus-priority-20260905/lehrman-1.jpg",
+        "runtime/research/campus-priority-20260905/lehrman-2.jpg"
+      ],
+      "supports": "Round south viewing pavilion and joined long north bar; county source rings omit connection/porch sections."
+    },
+    "school_athletics_facilities": {
+      "url": "https://www.thehill.org/athletics/facilities",
+      "supports": "Lehrman location and viewing balcony; Madden2023 construction with enclosed press box and filming platform. Tennis text mentions a team shed but does not establish Kipp footprint."
+    },
+    "expanded_identity_comparisons": {
+      "local_directory": "runtime/research/quad-landscape-20260905",
+      "local_files": [
+        "identity-business-office-county-ortho.png",
+        "identity-east-faculty-village-county-ortho.png",
+        "identity-lehrman-county-ortho.png",
+        "identity-tennis-pavilion-county-ortho.png",
+        "facilities-business-office-2021-detail.png",
+        "facilities-east-campus-2021-detail.png",
+        "facilities-lehrman-2021-detail.png",
+        "current-map-east-village-detail.png",
+        "current-map-business-office-detail.png",
+        "current-map-lehrman-detail.png",
+        "current-map-tennis-pavilion-detail.png"
+      ],
+      "note": "Current map identity, explicit2021 facilities-plan labels, and county outlines over2021 orthophoto independently compared. Images are evidence crops, not survey-accurate map artwork."
+    },
+    "kipp_published_site_plan_2023": {
+      "url": "https://www.pottstown.org/AgendaCenter/ViewFile/Item/14290?fileID=6442",
+      "local_pdf": "runtime/research/quad-landscape-20260905/kipp-site-plan-cs101-2023.pdf",
+      "note": "Printed CF-001 Phasing Plan dated20June2023; PDF internal titleCS-101. Langan drawing uses SchraderGroup footprint. Design dimensions and floors explicit; project-coordinate registration approximate, plan vertical datum not stated."
+    },
+    "madden_dedication_2023": {
+      "url": "https://www.thehill.org/about-us/news/detail/~board/archive-news/post/dedication-of-madden-stadium-is-celebrated-with-first-ever-friday-night-lights-football-game",
+      "note": "School primary account identifies September8,2023dedication and FrankPuccio66press-box name."
+    },
+    "current_pavilion_coordinate_proposals": {
+      "local_file": "runtime/research/quad-landscape-20260905/current-pavilion-proposals.json",
+      "note": "Separate interpreted polygons and levels for Kipp and Madden press box. Neither has an accepted county parent. World or facade completion not asserted."
+    }
+  },
+  "buildings": [
+    {
+      "school_map_number": 6,
+      "name": "Alumni Chapel",
+      "status": "verified_whole_outline",
+      "county_structure_id": "1600151160068C",
+      "roofer_parent_id": "1600151160068C-6108d587dc",
+      "centroid_lonlat": [
+        -75.6351593685645,
+        40.245103367709575
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 64,
+      "evidence": [
+        "school_map_2026",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Existing measured-terrain landmark validation and current official map agree; listed for campus positioning only."
+    },
+    {
+      "school_map_number": 48,
+      "name": "Class of 1960 Alumni House",
+      "status": "verified_whole_outline",
+      "county_structure_id": "1600151120011C",
+      "roofer_parent_id": "1600151120011C-e738fb4171",
+      "centroid_lonlat": [
+        -75.63702350889349,
+        40.24429526139131
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 84,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry"
+      ],
+      "match_note": "715 High Street, independently confirmed against architect photographs and October2021 Street View during the Alumni House v3 native Minecraft study."
+    },
+    {
+      "school_map_number": 1,
+      "name": "Meigs House - Admission Office",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600620C",
+      "roofer_parent_id": "16001511600620C-fff89cfae9",
+      "centroid_lonlat": [
+        -75.632810686,
+        40.244375802
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 24,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Detached house east of the Quadrivium and south of the soccer pitch; facilities-plan number33."
+    },
+    {
+      "school_map_number": 2,
+      "name": "John P. Ryan Library",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-567a5eddd9",
+      "centroid_lonlat": [
+        -75.633547259,
+        40.244895587
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 73,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Distinct irregular library outline on the east side of the Quad; facilities-plan number27."
+    },
+    {
+      "school_map_number": 3,
+      "name": "Athey Academic Center",
+      "status": "verified_shared_outline",
+      "county_structure_id": "16001511600613C",
+      "roofer_parent_id": "16001511600613C-92645e8573",
+      "centroid_lonlat": [
+        -75.634596952,
+        40.244516974
+      ],
+      "centroid_scope": "shared county outline, not this named subpart",
+      "source_feature_index": 32,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Northern steep-roof bar of the shared Athey/Dining aggregate, forming the south edge of the Quad. The county ring includes the open smaller court; Athey-only polygon is not supplied."
+    },
+    {
+      "school_map_number": 4,
+      "name": "Dining Hall - Millhiser Family Dining Room",
+      "status": "verified_shared_outline",
+      "county_structure_id": "16001511600613C",
+      "roofer_parent_id": "16001511600613C-92645e8573",
+      "centroid_lonlat": [
+        -75.634596952,
+        40.244516974
+      ],
+      "centroid_scope": "shared county outline, not this named subpart",
+      "source_feature_index": 32,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southern lower portion of the shared Athey/Dining aggregate, across an open smaller court from Athey. Dining-only polygon is not supplied."
+    },
+    {
+      "school_map_number": 7,
+      "name": "Warner Center for Spiritual Life and Equity",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006389O",
+      "roofer_parent_id": "160015116006389O-f1989780fb",
+      "centroid_lonlat": [
+        -75.63564755,
+        40.245769631
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 40,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Small footprint southwest of Mercer and north of Dutch Village. Explicit facilities-plan number25 is Warner Spiritual Life Center. County DESCRIPTION classifies it as a detached garage; that assessment use label is not the current school identity."
+    },
+    {
+      "school_map_number": 8,
+      "name": "Davy Hall Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600633C",
+      "roofer_parent_id": "16001511600633C-c14400ca75",
+      "centroid_lonlat": [
+        -75.633635536,
+        40.24603983
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 44,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Long detached north-south building west of the Dell Pond, between CFTA and Sweeney. Facilities-plan number79 is Temporary Dellside Dormitory. County GYM/POOL label is misleading for current identity."
+    },
+    {
+      "school_map_number": 9,
+      "name": "Center For The Arts (CFTA)",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160031040003",
+      "roofer_parent_id": "160031040003-894f07a81a",
+      "centroid_lonlat": [
+        -75.632876685,
+        40.246670708
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 104,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Large square/rounded-corner outline north of the Dell Pond, east of its parking lot, with the tall fly-tower mass visible in current aerial; facilities-plan number1."
+    },
+    {
+      "school_map_number": 12,
+      "name": "David H. Mercer Field House and Jerry Day '37 Squash Center",
+      "status": "verified_shared_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-1f19950994",
+      "centroid_lonlat": [
+        -75.63478288,
+        40.246021782
+      ],
+      "centroid_scope": "shared county outline, not this named subpart",
+      "source_feature_index": 48,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Western field-house and attached sports portions in a larger county aggregate also containing Sweeney. School map12 and13 are separate names within this parent; individual internal divisions are not supplied."
+    },
+    {
+      "school_map_number": 13,
+      "name": "Sweeney Gymnasium",
+      "status": "verified_shared_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-1f19950994",
+      "centroid_lonlat": [
+        -75.63478288,
+        40.246021782
+      ],
+      "centroid_scope": "shared county outline, not this named subpart",
+      "source_feature_index": 48,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Eastern gym portion of the large sports aggregate behind Hunt Upper School. Shares a county parent with Mercer/squash. Facilities-plan number3 explicitly combines Mercer and Sweeney; individual dividing wall is not supplied."
+    },
+    {
+      "school_map_number": 14,
+      "name": "Edward Tuck Hall Arena and Thomas Eccleston Jr. Rink",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16003036400434C",
+      "roofer_parent_id": "16003036400434C-c86ee564a0",
+      "centroid_lonlat": [
+        -75.634650183,
+        40.24646952
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 97,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Large detached rectangular arena north of Mercer and west of Annan, immediately south of the street; facilities-plan number2."
+    },
+    {
+      "school_map_number": 15,
+      "name": "Annan Building",
+      "status": "verified_whole_outline",
+      "county_structure_id": "1600303920031C",
+      "roofer_parent_id": "1600303920031C-4b7d18d798",
+      "centroid_lonlat": [
+        -75.634039539,
+        40.246384769
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 100,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "L-shaped/stepped building between the arena and Davy, immediately north of the main gym aggregate; facilities-plan number4."
+    },
+    {
+      "school_map_number": 29,
+      "name": "Hunt Upper School Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-d4f3b48752",
+      "centroid_lonlat": [
+        -75.634231144,
+        40.245462546
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 77,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Distinct long U-shaped building with red roof on the north side of the Quad, opposite Athey; facilities-plan number26. Do not substitute the far-east footprint with county UPPER SCHOOL BLDG#24 label."
+    },
+    {
+      "school_map_number": 30,
+      "name": "Wendell Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600617C",
+      "roofer_parent_id": "16001511600617C-403d7b1a51",
+      "centroid_lonlat": [
+        -75.632977229,
+        40.245168323
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 65,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Long detached building northeast of Ryan, on the west edge of the soccer pitch; facilities-plan number32."
+    },
+    {
+      "school_map_number": 31,
+      "name": "Ferenbach Dormitory - Dell Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600641C",
+      "roofer_parent_id": "16001511600641C-fab9d4a2e4",
+      "centroid_lonlat": [
+        -75.631485564,
+        40.245668968
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 68,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southwestern of the four Dell Village dormitory houses; facilities-plan36C and current map31 agree."
+    },
+    {
+      "school_map_number": 32,
+      "name": "Senter Dormitory - Dell Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600641C",
+      "roofer_parent_id": "16001511600641C-d333862570",
+      "centroid_lonlat": [
+        -75.631562024,
+        40.24589198
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 42,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Northwestern of the four Dell Village dormitory houses, closest to the pond-side path; facilities-plan36A and current map32 agree."
+    },
+    {
+      "school_map_number": 33,
+      "name": "Lowndes Dormitory - Dell Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600641C",
+      "roofer_parent_id": "16001511600641C-6607e4a8a8",
+      "centroid_lonlat": [
+        -75.631235093,
+        40.245952147
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 43,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Northeastern of the four Dell Village dormitory houses; facilities-plan36B and current map33 agree."
+    },
+    {
+      "school_map_number": 34,
+      "name": "Scheerer Dormitory - Dell Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600641C",
+      "roofer_parent_id": "16001511600641C-7e1d6bacf8",
+      "centroid_lonlat": [
+        -75.631158181,
+        40.245731059
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 70,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southeastern of the four Dell Village dormitory houses; facilities-plan36D and current map34 agree."
+    },
+    {
+      "school_map_number": 36,
+      "name": "Foster Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600621C",
+      "roofer_parent_id": "16001511600621C-2c9084ad78",
+      "centroid_lonlat": [
+        -75.630989614,
+        40.244741512
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 31,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Eastern T-shaped dormitory on the east edge of the soccer pitch; facilities-plan38 and current map36 agree. County spells the name FORSTER."
+    },
+    {
+      "school_map_number": 37,
+      "name": "Rolfe Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600625C",
+      "roofer_parent_id": "16001511600625C-c108a9b9b6",
+      "centroid_lonlat": [
+        -75.631839712,
+        40.24449211
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 25,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southern T-shaped dormitory at the High Street side of the soccer pitch; facilities-plan37 and current map37 agree."
+    },
+    {
+      "school_map_number": 41,
+      "name": "Sherrerd Dormitory - Dutch Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-07f1d5b7e0",
+      "centroid_lonlat": [
+        -75.636535677,
+        40.245203223
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 75,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southwestern of the four Dutch Village dormitories, west of Robins; facilities-plan19A is explicitly Sherrerd."
+    },
+    {
+      "school_map_number": 42,
+      "name": "Johnson Dormitory - Dutch Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-36b81aa17d",
+      "centroid_lonlat": [
+        -75.636302035,
+        40.245372854
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 58,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Northwestern of the four Dutch Village dormitories; facilities-plan19B is explicitly Johnson."
+    },
+    {
+      "school_map_number": 43,
+      "name": "Markle Dormitory - Dutch Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-53c8a9efca",
+      "centroid_lonlat": [
+        -75.635976754,
+        40.2453688
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 59,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Northeastern Dutch Village dormitory, north of Robins and west of the Chapel; facilities-plan19C is explicitly Markle."
+    },
+    {
+      "school_map_number": 44,
+      "name": "Robins Dormitory - Dutch Village",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-451a0df37b",
+      "centroid_lonlat": [
+        -75.635861116,
+        40.245107526
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 74,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Southeastern Dutch Village dormitory immediately west of the Chapel tennis courts; facilities-plan19D is explicitly Robins."
+    },
+    {
+      "school_map_number": 45,
+      "name": "Hillrest Dormitory",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-c7b546273e",
+      "centroid_lonlat": [
+        -75.636381353,
+        40.244808152
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 36,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Small detached house south of Dutch Village and southwest of the Chapel tennis courts; facilities-plan15 is Hillrest House Dormitory."
+    },
+    {
+      "school_map_number": 46,
+      "name": "The Sherrill Guest House",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600619C",
+      "roofer_parent_id": "16001511600619C-b4c5171aed",
+      "centroid_lonlat": [
+        -75.631784447,
+        40.245657972
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 67,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Small house immediately west of the Dell Village dormitory group, northeast of the soccer pitch; facilities-plan35 is Guest House. Current school map provides the Sherrill name."
+    },
+    {
+      "school_map_number": 47,
+      "name": "Music House",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600622C",
+      "roofer_parent_id": "16001511600622C-57b5b354dc",
+      "centroid_lonlat": [
+        -75.633265453,
+        40.245415828
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 66,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Small detached house north of Wendell, near the lane from Ryan to the Dell; facilities-plan31 and current map47 agree."
+    },
+    {
+      "school_map_number": 50,
+      "name": "Shirley Quadrivium Center",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600615C",
+      "roofer_parent_id": "16001511600615C-ee30229dd5",
+      "centroid_lonlat": [
+        -75.63377512,
+        40.244227356
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 86,
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Long joined academic frontage east of Dining Hall and west of Meigs, along High Street. Current roof/aerial and facilities-plan29 establish the joined structure; county ARTS & CRAFTS name describes only an older identity."
+    },
+    {
+      "school_map_number": 39,
+      "name": "Thomas House",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600610C",
+      "roofer_parent_id": "16001511600610C-e7f1a01cbc",
+      "centroid_lonlat": [
+        -75.63720866396228,
+        40.24538452432041
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 61,
+      "atlas_label": 62,
+      "bounds_xz_m": [
+        -180.12958911195932,
+        -36.18164917117263,
+        -168.48987409984687,
+        -13.675946436484352
+      ],
+      "centre_xz_m": [
+        -174.31549845103424,
+        -24.93304423803472
+      ],
+      "source_county_area_m2": 180.0496870883567,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 55.080002,
+        "ridge_navd88_m": 71.394852,
+        "rmse_m": 1.361994
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 labels 9A and 9B join one narrow duplex outline immediately west/southwest of Pine Court. Current 2026 map39 agrees. Not the apartments north of Pine Court."
+    },
+    {
+      "school_map_number": 40,
+      "name": "Pine Court Faculty Village - western joined pair",
+      "status": "verified_group_component",
+      "county_structure_id": "16001511600611C",
+      "roofer_parent_id": "16001511600611C-a5bb4f8f72",
+      "centroid_lonlat": [
+        -75.63707177943078,
+        40.24578906840808
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 71,
+      "atlas_label": 72,
+      "bounds_xz_m": [
+        -174.25198322692708,
+        -81.53347668258884,
+        -146.29437710947514,
+        -53.117408312062025
+      ],
+      "centre_xz_m": [
+        -162.6673876396923,
+        -69.853101970066
+      ],
+      "source_county_area_m2": 343.74264966179777,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 52.630001,
+        "ridge_navd88_m": 70.739136,
+        "rmse_m": 1.256008
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 8A (units1/2) and 8B (units3/4) occupy the west L-shaped source ring. Current map40 labels the larger group. No separate footprint split asserted."
+    },
+    {
+      "school_map_number": 40,
+      "name": "Pine Court Faculty Village - eastern joined pair",
+      "status": "verified_group_component",
+      "county_structure_id": "16001511600611C",
+      "roofer_parent_id": "16001511600611C-50fbc7ea98",
+      "centroid_lonlat": [
+        -75.63660317456355,
+        40.245726337166595
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 69,
+      "atlas_label": 70,
+      "bounds_xz_m": [
+        -137.33689530205746,
+        -76.6452890969916,
+        -113.14552657880168,
+        -44.36437975505077
+      ],
+      "centre_xz_m": [
+        -122.79535146162686,
+        -62.88670511489231
+      ],
+      "source_county_area_m2": 355.1574665830267,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 55.310001,
+        "ridge_navd88_m": 71.776268,
+        "rmse_m": 1.257732
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 8C (units5/6) and 8D (units7/8) occupy the east L-shaped source ring. Both Pine Court parent rings are required."
+    },
+    {
+      "school_map_number": 51,
+      "name": "Gatehouse",
+      "status": "verified_whole_outline",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-143655d070",
+      "centroid_lonlat": [
+        -75.63063925447909,
+        40.24695077181628
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 51,
+      "atlas_label": 52,
+      "bounds_xz_m": [
+        382.82883950152814,
+        -200.60341469473832,
+        386.4805068877305,
+        -197.1366968495886
+      ],
+      "centre_xz_m": [
+        384.64962979671077,
+        -198.85596882772822
+      ],
+      "source_county_area_m2": 12.55479623750991,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 60.41,
+        "ridge_navd88_m": null,
+        "rmse_m": 0.26932
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 star42 (Gate House - Main Entrance), current 2026 map51 and the tiny county outline agree at the entrance junction. The roughly 170 m2 house 56 m east is 2021 Dellfield House41, not Gatehouse."
+    },
+    {
+      "school_map_number": 38,
+      "name": "Feroe House - Head of School Residence",
+      "status": "verified_whole_outline",
+      "county_structure_id": "16001511600623C",
+      "roofer_parent_id": "16001511600623C-ba74e78741",
+      "centroid_lonlat": [
+        -75.63718461552074,
+        40.244879552115194
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 30,
+      "atlas_label": 31,
+      "bounds_xz_m": [
+        -183.26893014563714,
+        21.67399470019981,
+        -161.13090164296096,
+        43.21378610844279
+      ],
+      "centre_xz_m": [
+        -172.27055636479326,
+        31.13878387588019
+      ],
+      "source_county_area_m2": 266.5437014470878,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 53.34,
+        "ridge_navd88_m": 73.331978,
+        "rmse_m": 1.571725
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 building11 and current 2026 map38 agree west of Hillrest/Dutch Village, north of Alumni House. County Feroe label corroborates this spatial match."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - southwest duplex",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-ddefd3570f",
+      "centroid_lonlat": [
+        -75.63001953016506,
+        40.24536482792668
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 15,
+      "atlas_label": 16,
+      "bounds_xz_m": [
+        428.2544624184887,
+        -32.78206132961583,
+        446.5114555789737,
+        -13.118601072279164
+      ],
+      "centre_xz_m": [
+        437.38935274915383,
+        -22.75663549348152
+      ],
+      "source_county_area_m2": 245.91243715029375,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 65.889999,
+        "ridge_navd88_m": 76.728462,
+        "rmse_m": 1.503395
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Current map35 shows the seven-outline courtyard group south of Green Street. Facilities 2021 46A (units4/5) is the southwestern duplex in the four-building western row. It matches this county parent, not the nearby houses across Green Street."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - west south-middle duplex",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-b790426980",
+      "centroid_lonlat": [
+        -75.62995781086809,
+        40.245552299524014
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 16,
+      "atlas_label": 17,
+      "bounds_xz_m": [
+        433.73061304767185,
+        -53.582977734873566,
+        451.6452127008292,
+        -34.033221968551
+      ],
+      "centre_xz_m": [
+        442.6396682482377,
+        -43.573666010704514
+      ],
+      "source_county_area_m2": 240.88297453382674,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 66.279999,
+        "ridge_navd88_m": 77.271118,
+        "rmse_m": 0.346644
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 46B (units6/7) is second from south in the four-building western row, within current map35 courtyard group."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - west north-middle duplex",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-c0e2b642d9",
+      "centroid_lonlat": [
+        -75.62991409936805,
+        40.245747406921716
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 6,
+      "atlas_label": 7,
+      "bounds_xz_m": [
+        438.4079984153486,
+        -74.55415865484106,
+        454.4395670996559,
+        -56.14079194886578
+      ],
+      "centre_xz_m": [
+        446.357675868661,
+        -65.23848454156429
+      ],
+      "source_county_area_m2": 245.19947541993105,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 65.93,
+        "ridge_navd88_m": 76.791725,
+        "rmse_m": 1.223869
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 46C (units8/9) is second from north in the four-building western row, within current map35 courtyard group."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - northwest duplex",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-8e22af513e",
+      "centroid_lonlat": [
+        -75.62990192888215,
+        40.245947752387245
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 9,
+      "atlas_label": 10,
+      "bounds_xz_m": [
+        440.3456056958555,
+        -96.88940783688128,
+        454.6673847565584,
+        -78.81656518895775
+      ],
+      "centre_xz_m": [
+        447.39190759504754,
+        -87.4847781847053
+      ],
+      "source_county_area_m2": 247.98388982144243,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 65.089996,
+        "ridge_navd88_m": 76.075829,
+        "rmse_m": 0.521526
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 46D (units10/11) is the northern duplex adjacent to Green Street. Current map35 and orthophoto agree on the courtyard group."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - south single house",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-47b633ec2f",
+      "centroid_lonlat": [
+        -75.62977202410323,
+        40.24531605107654
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 14,
+      "atlas_label": 15,
+      "bounds_xz_m": [
+        452.2751606549402,
+        -25.28156790240835,
+        464.2560539455201,
+        -9.993659058996506
+      ],
+      "centre_xz_m": [
+        458.4493363525352,
+        -17.341734958587907
+      ],
+      "source_county_area_m2": 133.09739838319965,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 65.540001,
+        "ridge_navd88_m": 75.169525,
+        "rmse_m": 0.702831
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 47 (unit3) is the single house at the courtyard south edge, east of the southwestern duplex. Current map35 groups it with the other six county outlines."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - north middle single house",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-e070cb1680",
+      "centroid_lonlat": [
+        -75.62953277504354,
+        40.245914729301475
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 8,
+      "atlas_label": 9,
+      "bounds_xz_m": [
+        473.09629294523586,
+        -91.37846114032695,
+        484.5065461575603,
+        -76.2617091543706
+      ],
+      "centre_xz_m": [
+        478.8022201976237,
+        -83.81984457469017
+      ],
+      "source_county_area_m2": 125.72257838153641,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 66.129997,
+        "ridge_navd88_m": 75.922707,
+        "rmse_m": 0.365467
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 48 (unit12) is the western of the two single houses at the courtyard north edge, east of the northwest duplex. Current map35 courtyard shape and county orthophoto agree."
+    },
+    {
+      "school_map_number": 35,
+      "name": "East Campus Faculty Village - northeast single house",
+      "status": "verified_group_component",
+      "county_structure_id": "160006438008",
+      "roofer_parent_id": "160006438008-5e66af9ae7",
+      "centroid_lonlat": [
+        -75.62938593346117,
+        40.24589579438396
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 7,
+      "atlas_label": 8,
+      "bounds_xz_m": [
+        485.7626472033657,
+        -89.27655835348287,
+        496.8305558716959,
+        -74.15967340707891
+      ],
+      "centre_xz_m": [
+        491.2966282495223,
+        -81.71812651266941
+      ],
+      "source_county_area_m2": 124.98775662313193,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 66.68,
+        "ridge_navd88_m": 76.67971,
+        "rmse_m": 1.822131
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Facilities 2021 49 (unit13) is the eastern of the two single houses at the courtyard north edge. Current map35 courtyard shape and county orthophoto agree. Household counts describe physical housing units, not current occupants."
+    },
+    {
+      "school_map_number": 25,
+      "name": "Lehrman '56 Pavilion - south round viewing pavilion",
+      "status": "verified_group_component",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-081aa7dcac",
+      "centroid_lonlat": [
+        -75.62929142188207,
+        40.24994272796989
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 53,
+      "atlas_label": 54,
+      "bounds_xz_m": [
+        491.9520367720619,
+        -538.4065835403986,
+        506.61427476107724,
+        -523.9154593852372
+      ],
+      "centre_xz_m": [
+        499.3085754306619,
+        -531.087732710498
+      ],
+      "source_county_area_m2": 149.38298964842818,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 74.970001,
+        "ridge_navd88_m": null,
+        "rmse_m": 0.927214
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match",
+        "lehrman_contractor",
+        "school_athletics_facilities"
+      ],
+      "match_note": "Facilities 2021 62 and current map25 show the round southern end of one long pavilion. The county orthophoto has this circular ring and separate north bar54. Wohlsen contractor photos and school facilities description confirm the southern upper viewing balcony. Raw county rings omit the short connection and overhanging porch; this is not complete current building geometry."
+    },
+    {
+      "school_map_number": 25,
+      "name": "Lehrman '56 Pavilion - north service bar",
+      "status": "verified_group_component",
+      "county_structure_id": "160015116006",
+      "roofer_parent_id": "160015116006-f7611d45c7",
+      "centroid_lonlat": [
+        -75.62912883815955,
+        40.25011151493126
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 54,
+      "atlas_label": 55,
+      "bounds_xz_m": [
+        501.59303893291434,
+        -563.1282680685858,
+        524.6978321331706,
+        -536.5319162583803
+      ],
+      "centre_xz_m": [
+        513.1401878837404,
+        -549.8306707094456
+      ],
+      "source_county_area_m2": 230.73533885159702,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 75.07,
+        "ridge_navd88_m": 80.008766,
+        "rmse_m": 0.539474
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match",
+        "lehrman_contractor",
+        "school_athletics_facilities"
+      ],
+      "match_note": "Facilities 2021 62 and current map25 identify the long north bar attached to the south round pavilion53, between Cunningham Field and Hauser Track. Both source parents are needed; county gap between them must not be interpreted as two detached buildings."
+    },
+    {
+      "school_map_number": 49,
+      "name": "Hillhouse & Moore Business Office",
+      "status": "verified_whole_outline",
+      "county_structure_id": "1600151000041C",
+      "roofer_parent_id": "1600151000041C-510dc616b8",
+      "centroid_lonlat": [
+        -75.63747646048488,
+        40.244342286733826
+      ],
+      "centroid_scope": "county source outline",
+      "source_feature_index": 3,
+      "atlas_label": 4,
+      "bounds_xz_m": [
+        -205.8648799390116,
+        78.22216594947739,
+        -189.03278998793704,
+        103.05837129740581
+      ],
+      "centre_xz_m": [
+        -197.10463085034402,
+        90.79576995348414
+      ],
+      "source_county_area_m2": 324.58231990306206,
+      "source_roof": {
+        "source_parent_exists": true,
+        "reconstruction_success": true,
+        "ground_navd88_m": 48.77,
+        "ridge_navd88_m": 61.246059,
+        "rmse_m": 0.431629
+      },
+      "evidence": [
+        "school_map_2026",
+        "school_facilities_plan_2021",
+        "county_source_geometry",
+        "county_orthophoto_match"
+      ],
+      "match_note": "Current map49 is the western large joined frontage immediately east of Bailey Street, west of the smaller709/711HighStreet houses and Alumni House715. Facilities 2021 63 explicitly gives701&703HighStreet Business Office and Faculty Housing; its parcel/location and larger joined outline match source3. County Advanced Eye Care/Anton Corp label is an older assessment use, not current school identity. No internal Hillhouse/Moore split or current residential room use is asserted."
+    }
+  ],
+  "rejected_name_matches": [
+    {
+      "county_structure_id": "1600151160061C",
+      "roofer_parent_id": "1600151160061C-551ba4628e",
+      "county_name": "UPPER SCHOOL BLDG #24",
+      "centroid_lonlat": [
+        -75.629952749,
+        40.246919416
+      ],
+      "rejected_current_identity": "Hunt Upper School Dormitory",
+      "reason": "This small footprint is near the east campus entrance/faculty area. Hunt is the large U-shaped Quad building, source index77. The current name of this eastern footprint is unresolved here."
+    }
+  ],
+  "unresolved": [
+    {
+      "school_map_number": 19,
+      "name": "Reese '75 Tennis Center / Kipp '46 Pavilion",
+      "county_structure_id": null,
+      "roofer_parent_id": null,
+      "status": "county_parent_absent_design_plan_geometry_approximately_registered",
+      "evidence": [
+        "school_map_2026",
+        "school_athletics_facilities",
+        "expanded_identity_comparisons",
+        "kipp_published_site_plan_2023",
+        "current_pavilion_coordinate_proposals"
+      ],
+      "reason": "No matching current Kipp county ring is accepted. Published Langan20June2023 plan supplies122x42ft main footprint and212/226ft design floors, now approximately registered atXZ[371.002,-286.740]. Current2026aerial verifies completed three-gable pavilion. Separate non_county_structures proposal records placement/height uncertainty; do not rename old county80/81/82."
+    },
+    {
+      "school_map_number": 26,
+      "name": "Madden Stadium - enclosed press box and filming platform",
+      "county_structure_id": null,
+      "roofer_parent_id": null,
+      "status": "county_parent_absent_photo_geometry_proposed",
+      "evidence": [
+        "school_map_2026",
+        "school_athletics_facilities",
+        "madden_dedication_2023",
+        "current_pavilion_coordinate_proposals"
+      ],
+      "reason": "Current stadium press box verified by school dedication and drone views; no accepted older county ring. Separate photo-interpreted12x3.5m elevated-box proposal is centredXZ[478.625,-490.028], approximately5m horizontal uncertainty. The entire stand is not one enclosed building."
+    }
+  ],
+  "limitations": [
+    "No Chrome/Google Maps interaction was performed by this research agent. Google building-ring cross-check remains a separate root-agent review.",
+    "County labels and numbering are not school map labels; duplicates and stale assessment uses exist.",
+    "Athey and Dining share one source parent, as do Mercer/squash and Sweeney. Do not use the aggregate centroid as an asserted named-part center, and do not stamp one facade over the entire aggregate.",
+    "This index intentionally omits unverified names and exact splits. It may be expanded after additional evidence.",
+    "Expanded2026 named-building coverage is36map groups across42unique county parents. Kipp Pavilion19 and Madden26press-box geometry remain explicit limitations. This is identity/footprint coverage, not a claim that all current campus structures or facades have been modeled."
+  ],
+  "coverage": {
+    "official_named_enclosed_building_or_pavilion_map_numbers": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      12,
+      13,
+      14,
+      15,
+      19,
+      25,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51
+    ],
+    "verified_map_groups": 36,
+    "named_records": 44,
+    "unique_county_parents": 42,
+    "unresolved_named_pavilions": [
+      19
+    ],
+    "additional_current_stadium_structure_geometry_needed": [
+      26
+    ],
+    "not_a_facade_or_world_completion_claim": true,
+    "official_building_map_groups_with_measured_or_interpreted_footprint_proposals": 37,
+    "additional_interpreted_current_structure_ids": [
+      "kipp_46_pavilion",
+      "madden_puccio_66_press_box"
+    ]
+  },
+  "non_county_structures": [
+    {
+      "id": "kipp_46_pavilion",
+      "school_map_number": 19,
+      "name": "Kipp '46 Pavilion - Reese '75 Tennis Center",
+      "county_structure_id": null,
+      "roofer_parent_id": null,
+      "status": "design_plan_geometry_approximately_registered_current_existence_photo_verified",
+      "bounds_xz_m": [
+        351.825,
+        -295.961,
+        390.315,
+        -277.837
+      ],
+      "centre_xz_m": [
+        371.002,
+        -286.74
+      ],
+      "horizontal_uncertainty_m": 2.5,
+      "geometry_proposal_file": "runtime/research/quad-landscape-20260905/current-pavilion-proposals.json",
+      "evidence": [
+        "kipp_published_site_plan_2023",
+        "school_aerial_2026",
+        "school_map_2026"
+      ]
+    },
+    {
+      "id": "madden_puccio_66_press_box",
+      "school_map_number": 26,
+      "name": "Frank Puccio '66 Press Box and filming platform - Madden Stadium",
+      "county_structure_id": null,
+      "roofer_parent_id": null,
+      "status": "photo_interpreted_approximate_geometry",
+      "bounds_xz_m": [
+        473.654,
+        -495.894,
+        483.595,
+        -484.161
+      ],
+      "centre_xz_m": [
+        478.625,
+        -490.028
+      ],
+      "horizontal_uncertainty_m": 5,
+      "geometry_proposal_file": "runtime/research/quad-landscape-20260905/current-pavilion-proposals.json",
+      "evidence": [
+        "madden_dedication_2023",
+        "school_athletics_facilities",
+        "current_pavilion_coordinate_proposals"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,244 @@
+{
+  "name": "Hill \u2014 Hunt Upper School",
+  "revision": "2026-09-05-hunt-hall-6-2x-vanilla",
+  "parent_id": "160015116006-d4f3b48752",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "materials": {
+    "facade": "bricks",
+    "foundation": "mud_bricks",
+    "roof_family": "waxed_cut_copper"
+  },
+  "geometry": {
+    "origin_xz_m": [
+      42.599311524,
+      -47.518360512
+    ],
+    "axis_degrees": 4.85104021430072,
+    "main_roof_threshold_navd88_m": 75,
+    "quad_floor_navd88_m": 66.1,
+    "arcade_bounds_uv_m": [
+      14,
+      14.2,
+      61.5,
+      17.7
+    ],
+    "arcade_centres_u_m": [
+      16.7,
+      22.0,
+      27.3,
+      32.6,
+      37.9,
+      43.2,
+      48.5,
+      53.8,
+      59.1
+    ],
+    "central_bay_u_m": 37.5,
+    "floor_plates_navd88_m": [
+      62.4,
+      66.1,
+      70.1,
+      74.1,
+      78.2
+    ],
+    "window_sills_navd88_m": [
+      70.7,
+      74.6
+    ],
+    "long_front_window_centres_u_m": [
+      15.4,
+      18,
+      20.7,
+      23.3,
+      26,
+      28.6,
+      31.3,
+      33.9,
+      36.6,
+      39.2,
+      41.9,
+      44.5,
+      47.2,
+      49.8,
+      52.5,
+      55.1,
+      57.8,
+      60.4
+    ],
+    "south_single_dormer_centres_u_m": [
+      14.5,
+      17.25,
+      20,
+      22.75,
+      25.5,
+      28.25,
+      31,
+      33.75,
+      41.25,
+      44,
+      46.75,
+      49.5,
+      52.25,
+      55,
+      57.75,
+      60.5
+    ],
+    "north_box_dormer_centres_u_m": [
+      17,
+      24,
+      31,
+      44,
+      51,
+      58
+    ],
+    "north_gable_roof_planes": [
+      {
+        "u_min": 0,
+        "u_max": 6.2,
+        "face_index": 23
+      },
+      {
+        "u_min": 6.2,
+        "u_max": 12.5,
+        "face_index": 40
+      },
+      {
+        "u_min": 61.5,
+        "u_max": 66.8,
+        "face_index": 47
+      },
+      {
+        "u_min": 66.8,
+        "u_max": 73.5,
+        "face_index": 18
+      }
+    ],
+    "north_roof_repair": {
+      "maximum_v_m": 5,
+      "reject_below_navd88_m": 75,
+      "method": "Extrapolate the nearest credible source roof plane into the low north patches. Those patches conflict with photographs of a continuous multi-storey building; this is a photo-informed correction, not new survey data."
+    }
+  },
+  "assembly_site_bounds_uv_m": [
+    [
+      0,
+      -6,
+      75,
+      0
+    ],
+    [
+      14,
+      17.7,
+      61.5,
+      22
+    ]
+  ],
+  "window_reveal": {
+    "trim_family": "mud_brick",
+    "trim_width_m": 0.24,
+    "glass_recess_m": 0.0,
+    "construction": "Panes sit in the outer masonry frame. Extra edge panes bridge one-cell diagonal gaps inside the reveal; nothing is attached outside the building.",
+    "trim_block": "terracotta"
+  },
+  "camera_views": [
+    {
+      "name": "hunt-quad-front",
+      "eye_uv_navd88_m": [
+        37.5,
+        72,
+        72
+      ],
+      "target_uv_navd88_m": [
+        37.5,
+        15,
+        76
+      ],
+      "fov": 75
+    },
+    {
+      "name": "hunt-arcade-detail",
+      "eye_uv_navd88_m": [
+        34,
+        37,
+        68
+      ],
+      "target_uv_navd88_m": [
+        37.5,
+        15,
+        72.7
+      ],
+      "fov": 80
+    },
+    {
+      "name": "hunt-north",
+      "eye_uv_navd88_m": [
+        41,
+        -32,
+        68
+      ],
+      "target_uv_navd88_m": [
+        38,
+        4,
+        72
+      ],
+      "fov": 84
+    },
+    {
+      "name": "hunt-west-wing",
+      "eye_uv_navd88_m": [
+        -20,
+        38,
+        74
+      ],
+      "target_uv_navd88_m": [
+        7,
+        14,
+        75
+      ],
+      "fov": 78
+    },
+    {
+      "name": "hunt-roof-overview",
+      "eye_uv_navd88_m": [
+        8,
+        65,
+        118
+      ],
+      "target_uv_navd88_m": [
+        38,
+        12,
+        73
+      ],
+      "fov": 78
+    }
+  ],
+  "uncertainties": [
+    "Hunt's source Roofer RMSE is 1.550174 m, selected with insufficient coverage; small roof details are less reliable than Ryan or Athey.",
+    "Low north roof patches are explicitly corrected by nearest credible roof-plane extrapolation. Raw source geometry remains unchanged and correction counts are recorded.",
+    "Arcade/window/dormer rhythm and finished-floor heights are photo interpretations for the first native comparison, not certified architectural dimensions.",
+    "North stair-tower shapes, retaining-wall terraces, fine roof ornament and concealed facades require further photo comparison.",
+    "Warm red slopes use ordinary waxed cut-copper blocks, slabs and stairs as a visual approximation of the photographed roof, not a claim about its actual installed material. Green cornices use waxed oxidized copper. Brick is confined to photographed brick walls and brick paving.",
+    "Interior floor plates are unfurnished construction proxies.",
+    "This revision uses only original Minecraft textures. Terracotta dressed trim and mud-brick partial blocks approximate the warm masonry; colour is a visual interpretation, not an exact texture match."
+  ],
+  "evidence": [
+    {
+      "source": "runtime/research/hunt-hall-20260905/hunt-roof-measurements.json",
+      "supports": "Exact parent identity, 75.353 by 26.319 m oriented envelope, taller end-wing ridges and lower connecting roof."
+    },
+    {
+      "source": "runtime/research/hunt-hall-20260905/wohlsen-quad-front.jpg",
+      "supports": "Stone round arcade, brick upper walls, red dormered roof, copper-green cornice and central ornamental bay."
+    },
+    {
+      "source": "runtime/research/hunt-hall-20260905/isett-north-building.jpeg",
+      "supports": "North lower masonry storey, brick walls, stair towers, retaining-wall drop and distinct north-side window rhythms."
+    }
+  ],
+  "vanilla_state_replacements": {
+    "smooth_red_sandstone": "terracotta",
+    "smooth_red_sandstone_stairs": "mud_brick_stairs",
+    "smooth_red_sandstone_slab": "mud_brick_slab"
+  }
+}

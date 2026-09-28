@@ -1,0 +1,44 @@
+{
+  "format": "hill-alumni-house-profile-v1",
+  "revision": "2026-09-05-alumni-house-6-2x-vanilla",
+  "building": "Class of 1960 Alumni House",
+  "address": "715 High Street, Pottstown, PA 19464",
+  "parent_id": "1600151120011C-e738fb4171",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25.0,
+  "floor_navd88_m": 53.15,
+  "front_wall_v_m": 1.8,
+  "brick_to_shingle_navd88_m": 59.0,
+  "porch_deck_navd88_m": 53.15,
+  "porch_eave_navd88_m": 56.15,
+  "porch_post_u_m": [
+    0.5,
+    2.7,
+    5.0,
+    7.4,
+    10.2
+  ],
+  "materials": {
+    "masonry": "bricks",
+    "gable": "birch_planks",
+    "trim": "smooth_sandstone",
+    "timber": "birch_planks",
+    "roof_family": "stone_brick",
+    "window": "glass_pane"
+  },
+  "sources": {
+    "current_identity": "https://www.thehill.org/admission/visiting-campus/campus-map",
+    "address_map": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+    "architect": "https://www.jamesbradberry.com/new-page",
+    "front_photo": "https://images.squarespace-cdn.com/content/v1/5988a923c534a5f2895959c1/1541532697942-UB6KC7K5VBA4ZJ3WVLMT/Hill%2BAlumni%2BExt%2BAlt%2B2.jpg"
+  },
+  "uncertainties": [
+    "LiDAR roof fit RMSE is 0.410 m; this is not facade dimensional accuracy.",
+    "Porch wrap, finished floor, openings, chimney and trim dimensions are interpreted from photographs.",
+    "The architect image is an undated renovated exterior; 2009 listing photos only confirm enduring forms.",
+    "North/rear and much of the west elevation remain unverified; no claim of complete photographic equivalence.",
+    "Vanilla blocks approximate painted timber, fishscale shingles and slate; no texture pack or fantasy blocks.",
+    "Interior is an unfurnished shell with floor plates, not an interior reconstruction.",
+    "Retaining wall, sidewalk and approach dimensions are interpreted from the photographer's street-wide image, checked against October 2021 Street View; not surveyed."
+  ]
+}

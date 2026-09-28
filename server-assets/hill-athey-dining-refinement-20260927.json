@@ -1,0 +1,1173 @@
+{
+  "name": "Athey Academic Center and Dining Hall exterior refinement",
+  "revision": "2026-09-27-athey-dining-v19-2x",
+  "parent_id": "16001511600613C-92645e8573",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "geometry": {
+    "origin_xz_m": [
+      22,
+      37
+    ],
+    "axis_degrees": 18.25
+  },
+  "source_cityjson": "runtime/campus-reconstruction/roofer-chapel-trial/campus-model/hill-campus-roofer.city.json",
+  "measured_terrain_manifest": "runtime/campus-reconstruction/measured-terrain-academic-quad-v1/hill-academic-quad-measured-terrain.manifest.json",
+  "baseline_study": "runtime/campus-reconstruction/athey-dining-v6-2x",
+  "baseline_archive_sha256": "b63750c8b8fb5ce76be445d5eeb1d693c65b9ba8df5f879da5a2f2f28d2681b4",
+  "source_packet": "runtime/research/dining-hall-reference-20260915/dining-hall-reference-packet-20260916.json",
+  "source_packet_sha256": "d302d1ebdb6a11b73a4e9c06bf4aa87b5920ff768494b11b445c33494e5f1b7c",
+  "material_review": {
+    "status": "bounded source palette awaiting native comparison",
+    "reference_packet": "dining-hall-reference-packet-20260916.json",
+    "scope": "Athey pane returns, south recessed arcade/shell and single stair, north working entry, and Dining conservative rear openings; ordinary brick/pale masonry/dark gray glazing retained.",
+    "west_canopy_decision": "2026-09-27 direct landmark adjudication supersedes the old west-link sequence label: frames 91/92 cross the EAST gallery. Both gallery roofs are pale in the 2026 aerial. Use smooth-quartz full/stair/slab family with identical occupied geometry."
+  },
+  "materials": {
+    "facade": "bricks",
+    "trim": "smooth_sandstone",
+    "trim_slab": "smooth_sandstone_slab",
+    "glazing": "gray_stained_glass_pane",
+    "west_canopy_roof_family": "smooth_quartz"
+  },
+  "mutation_regions": [
+    {
+      "name": "athey_exterior",
+      "bounds_uv_m": [
+        -1,
+        -10,
+        79,
+        24
+      ],
+      "height_navd88_m": [
+        66,
+        89
+      ]
+    },
+    {
+      "name": "court_landing_gallery_ground",
+      "bounds_uv_m": [
+        16.1,
+        12,
+        57,
+        36.5
+      ],
+      "height_navd88_m": [
+        60,
+        76
+      ]
+    },
+    {
+      "name": "dining_rear_completion",
+      "bounds_uv_m": [
+        5,
+        39,
+        59,
+        73
+      ],
+      "height_navd88_m": [
+        66,
+        80
+      ]
+    },
+    {
+      "name": "north_entry_landing",
+      "bounds_uv_m": [
+        34,
+        -11,
+        41,
+        -3
+      ],
+      "height_navd88_m": [
+        60,
+        74
+      ]
+    }
+  ],
+  "court": {
+    "bounds_uv_m": [
+      21.8,
+      21,
+      52.2,
+      35.7
+    ],
+    "action": "Preserve accepted paving/grade and all source52 fringe; explicit face10 spur exception removes only above-grade photographed contradiction. Small complete surface seal stays wholly within brick field and clear of both pale crossings."
+  },
+  "dining_front": {
+    "clear_bounds_uv_m": [
+      17.6,
+      35.7,
+      57.1,
+      39.7
+    ],
+    "base_navd88_m": 66,
+    "clear_top_navd88_m": 73.5,
+    "ends_u_m": [
+      18.0,
+      51.75
+    ],
+    "wall_v_m": 36.15,
+    "back_v_m": 38.6,
+    "roof_navd88_m": 72.75,
+    "coping_navd88_m": 73,
+    "notches_u_m": [
+      [
+        25.0,
+        26.0
+      ],
+      [
+        31.0,
+        32.0
+      ],
+      [
+        37.0,
+        38.0
+      ],
+      [
+        43.0,
+        44.0
+      ],
+      [
+        49.0,
+        50.0
+      ]
+    ],
+    "openings": [
+      {
+        "center_u_m": 22.1,
+        "width_m": 4.8,
+        "sill_navd88_m": 69.5,
+        "head_navd88_m": 72,
+        "observation_status": "Inferred western continuation of photographed lower-bay rhythm; exact registration unresolved"
+      },
+      {
+        "center_u_m": 28.1,
+        "width_m": 4.8,
+        "sill_navd88_m": 69.5,
+        "head_navd88_m": 72,
+        "observation_status": "Inferred regular continuation; exact count unresolved"
+      },
+      {
+        "center_u_m": 34.1,
+        "width_m": 4.8,
+        "sill_navd88_m": 69.5,
+        "head_navd88_m": 72,
+        "observation_status": "Inferred regular continuation; exact count unresolved"
+      },
+      {
+        "center_u_m": 40.1,
+        "width_m": 4.8,
+        "sill_navd88_m": 69.5,
+        "head_navd88_m": 72,
+        "observation_status": "Shape observed in eastern crop; UV center is interpreted"
+      },
+      {
+        "center_u_m": 46.1,
+        "width_m": 4.8,
+        "sill_navd88_m": 69.5,
+        "head_navd88_m": 72,
+        "observation_status": "Complete plus clipped bay evidence; UV center and elevation total are interpreted"
+      }
+    ],
+    "front_controls_uv_m": [
+      [
+        18,
+        36.15
+      ],
+      [
+        51.75,
+        36.15
+      ],
+      [
+        51.75,
+        36.95
+      ],
+      [
+        56.5,
+        36.95
+      ]
+    ],
+    "east_end_u_m": 56.5
+  },
+  "upper_front": {
+    "clear_bounds_uv_m": [
+      18,
+      38.0,
+      56.0,
+      39.75
+    ],
+    "ends_u_m": [
+      18.5,
+      55.25
+    ],
+    "wall_v_m": 38.7,
+    "base_navd88_m": 69.5,
+    "top_navd88_m": 76.0,
+    "openings": [
+      {
+        "center_u_m": 22.1,
+        "width_m": 2.5,
+        "sill_navd88_m": 73.5,
+        "head_navd88_m": 75.6,
+        "observation_status": "Inferred continuation; western openings unseen"
+      },
+      {
+        "center_u_m": 28.1,
+        "width_m": 2.5,
+        "sill_navd88_m": 73.5,
+        "head_navd88_m": 75.6,
+        "observation_status": "Inferred continuation; western openings unseen"
+      },
+      {
+        "center_u_m": 34.1,
+        "width_m": 2.5,
+        "sill_navd88_m": 73.5,
+        "head_navd88_m": 75.6,
+        "observation_status": "Inferred continuation; total unresolved"
+      },
+      {
+        "center_u_m": 40.1,
+        "width_m": 2.5,
+        "sill_navd88_m": 73.5,
+        "head_navd88_m": 75.6,
+        "observation_status": "Rectangle observed in eastern crop; UV position interpreted"
+      },
+      {
+        "center_u_m": 46.1,
+        "width_m": 2.5,
+        "sill_navd88_m": 73.5,
+        "head_navd88_m": 75.6,
+        "observation_status": "Rectangle observed in eastern crop; UV position interpreted"
+      }
+    ]
+  },
+  "east_link": {
+    "floor_navd88_m": 69.5,
+    "pier_centres_v_m": [
+      17.5,
+      19.5,
+      21.5,
+      23.5,
+      25.5,
+      27.5,
+      29.5,
+      31.5,
+      33.5,
+      35.5
+    ],
+    "pier_rows_u_m": [
+      52.9,
+      56.4
+    ],
+    "pier_width_m": 0.5,
+    "roof_extension_bounds_uv_m": [
+      52.5,
+      34.4,
+      56.8,
+      36.5
+    ],
+    "count_status": "Two interpreted rows of ten 0.5m square shaft positions, clipped at measured endpoints. The close drone sequence belongs to EAST, adjudicated by Quadrivium and Ryan landmarks in the frozen 2026-09-27 east-gallery packet. Both passages remain open under user instruction.",
+    "roof_exception": "Source faces 26/31 terminate near V34.68. Extend the same low canopy to the measured face10 attachment near V36.5, with a shallow hipped end to H72.95. This bounded 1.8m source gap contradicts the continuous photographed roof."
+  },
+  "source_exceptions": [
+    "Straighten the front screen approximately 0.4m inward from near-constant face10 north edge so every cardinal raster corner lies in the source footprint; retain existing court fringe.",
+    "Face10 low roof backing and its measured stepped eastern end are regularized only within the original source footprint. Coping top is 73.25m versus measured H72.94..72.98.",
+    "Recessed straight north wall at V38.7 terminates below NAVD88 76.0 to retain all original main-roof occupied top shapes. Broad lower bays open through the screen into recessed glazing; entry layout inferred from dark source recesses.",
+    "East-link roof gap to face10 closed only within U52.5..56.8,V34.4..36.5; original source tops elsewhere retain measured height and occupied shape.",
+    "User explicitly requires BOTH courtyard side passages to remain traversable. West lower source enclosure on faces5/32 becomes supported open colonnade; every existing roof cell and measured roof shape is retained. Pier centers are inferred.",
+    "V5 removes only the face10 spur above finished paving inside U24.8..28.3,V34.9..35.8. Sourceface52 and all22originalfringe columns outside this named exception remain protected; every v4cell outside spur/surface-medallion masks is unchanged."
+  ],
+  "uncertainties": [
+    "This is the photographed Dining court frontage and east connector, not a completed survey of the full Dining complex.",
+    "Frames88-89 now directly establish at least four lower bays and four upper openings; the chosen five plus five rhythm remains inferred beyond those minima and UV registration remains approximate.",
+    "Pier centers and two-row total are interpreted from a photographed minimum of ten shafts; endpoint details remain obscured.",
+    "West lower enclosure and both pier schedules follow the explicit user walk-through requirement; exact hidden original pier counts, Dining rear openings, interior plans and materials remain unresolved.",
+    "Accepted Athey and its pre-existing bounded limitations remain unchanged outside the Dining patch; existing court grade and all terrain are preserved.",
+    "Round courtyard inset is a photo-registered paving interpretation, clipped around retained crossing strips. Fine school-emblem detail and lettering are below this resolution.",
+    "V6 relocates only the paving seal into the source-supported uninterrupted brick field. Every v5 connector, facade, roof, source fringe and crossing-strip state/role remains exact. The seal is a coarse pale/gray ring with muted gray center, not exact crest art.",
+    "Thin glass returns address raster reveal gaps. A small subset occupy shared-corner cells intersecting the measured footprint rather than its center-sample mask.",
+    "Low-U west end receives eight restrained rectangular groups aligned with retained storey levels. This is an explicitly inferred completion; no exact unseen opening schedule is claimed, and the measured west body/roof and east face57 bay remain fixed.",
+    "Final court correction supersedes the old five-door/five-stair schedule: approximately nine pointed openings into one recessed walk, a single central stair, and two grass-free mulch/shrub strips. Opening centers and width at this scale are photo-registered interpretations.",
+    "East-gallery roof finish alone is corrected to pale quartz by source landmark adjudication. Every roof shape, coordinate and attachment remains exact; measured body and main weather roofs retain their original states."
+  ],
+  "camera_views": [
+    {
+      "name": "quad-reference",
+      "eye_uv_navd88_m": [
+        84,
+        -31,
+        71.4
+      ],
+      "target_uv_navd88_m": [
+        31,
+        1,
+        76.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "quad-straight",
+      "eye_uv_navd88_m": [
+        37,
+        -52,
+        69.1
+      ],
+      "target_uv_navd88_m": [
+        37,
+        1,
+        76.8
+      ],
+      "fov": 70
+    },
+    {
+      "name": "east-return",
+      "eye_uv_navd88_m": [
+        88,
+        17,
+        71.2
+      ],
+      "target_uv_navd88_m": [
+        74,
+        5.8,
+        75
+      ],
+      "fov": 72
+    },
+    {
+      "name": "south-court",
+      "eye_uv_navd88_m": [
+        36,
+        33,
+        71.2
+      ],
+      "target_uv_navd88_m": [
+        37,
+        14,
+        78.2
+      ],
+      "fov": 80
+    },
+    {
+      "name": "roof-overview",
+      "eye_uv_navd88_m": [
+        97,
+        -35,
+        111
+      ],
+      "target_uv_navd88_m": [
+        35,
+        23,
+        75
+      ],
+      "fov": 55
+    },
+    {
+      "name": "window-reveal-detail",
+      "eye_uv_navd88_m": [
+        27,
+        -12,
+        74.0
+      ],
+      "target_uv_navd88_m": [
+        24,
+        -1,
+        74.2
+      ],
+      "fov": 66
+    },
+    {
+      "name": "dining-court-overview",
+      "eye_uv_navd88_m": [
+        31,
+        20,
+        77
+      ],
+      "target_uv_navd88_m": [
+        36,
+        38,
+        72.6
+      ],
+      "fov": 72
+    },
+    {
+      "name": "dining-connector-broadside",
+      "eye_uv_navd88_m": [
+        32,
+        25.7,
+        71.7
+      ],
+      "target_uv_navd88_m": [
+        54.6,
+        26,
+        71.5
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-screen-close",
+      "eye_uv_navd88_m": [
+        42.5,
+        28,
+        71.4
+      ],
+      "target_uv_navd88_m": [
+        43,
+        37,
+        71.8
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-east-roof-close",
+      "eye_uv_navd88_m": [
+        62,
+        29,
+        78.5
+      ],
+      "target_uv_navd88_m": [
+        54.6,
+        26,
+        72.8
+      ],
+      "fov": 77
+    },
+    {
+      "name": "dining-roof-oblique",
+      "eye_uv_navd88_m": [
+        75,
+        83,
+        101
+      ],
+      "target_uv_navd88_m": [
+        34,
+        42,
+        74
+      ],
+      "fov": 67
+    },
+    {
+      "name": "dining-south-limitations",
+      "eye_uv_navd88_m": [
+        38,
+        91,
+        69
+      ],
+      "target_uv_navd88_m": [
+        34,
+        57,
+        72
+      ],
+      "fov": 72
+    },
+    {
+      "name": "dining-east-passage-walk",
+      "eye_uv_navd88_m": [
+        54.65,
+        17.5,
+        70.31
+      ],
+      "target_uv_navd88_m": [
+        54.65,
+        34,
+        70.31
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-west-passage-walk",
+      "eye_uv_navd88_m": [
+        19.4,
+        17.5,
+        70.31
+      ],
+      "target_uv_navd88_m": [
+        19.4,
+        34,
+        70.31
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-west-court-broadside",
+      "eye_uv_navd88_m": [
+        38,
+        26,
+        72.5
+      ],
+      "target_uv_navd88_m": [
+        19.4,
+        26,
+        71.7
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-west-opposite-roof",
+      "eye_uv_navd88_m": [
+        8,
+        26,
+        78
+      ],
+      "target_uv_navd88_m": [
+        19.4,
+        26,
+        72.5
+      ],
+      "fov": 77
+    },
+    {
+      "name": "athey-west-return",
+      "eye_uv_navd88_m": [
+        -13,
+        10,
+        72.0
+      ],
+      "target_uv_navd88_m": [
+        2,
+        6,
+        76.5
+      ],
+      "fov": 76
+    },
+    {
+      "name": "dining-west-rear-close",
+      "eye_uv_navd88_m": [
+        -5,
+        57,
+        71
+      ],
+      "target_uv_navd88_m": [
+        20,
+        57,
+        71.5
+      ],
+      "fov": 74
+    },
+    {
+      "name": "dining-east-rear-close",
+      "eye_uv_navd88_m": [
+        73,
+        57,
+        71
+      ],
+      "target_uv_navd88_m": [
+        45,
+        57,
+        71.5
+      ],
+      "fov": 74
+    },
+    {
+      "name": "recessed-court-reference88",
+      "eye_uv_navd88_m": [
+        47.0,
+        31.0,
+        74.0
+      ],
+      "target_uv_navd88_m": [
+        32.0,
+        16.5,
+        73.0
+      ],
+      "fov": 78
+    },
+    {
+      "name": "athey-north-working-entry",
+      "eye_uv_navd88_m": [
+        37,
+        -14,
+        69
+      ],
+      "target_uv_navd88_m": [
+        37,
+        -5.1,
+        68.5
+      ],
+      "fov": 66
+    },
+    {
+      "name": "athey-recessed-vault-walk",
+      "eye_uv_navd88_m": [
+        29.8,
+        15.4,
+        72.1
+      ],
+      "target_uv_navd88_m": [
+        43,
+        15.4,
+        72.1
+      ],
+      "fov": 76
+    },
+    {
+      "name": "athey-court-source88-matched",
+      "eye_uv_navd88_m": [
+        24,
+        30,
+        74
+      ],
+      "target_uv_navd88_m": [
+        46,
+        24,
+        72.5
+      ],
+      "fov": 78
+    }
+  ],
+  "west_link": {
+    "floor_navd88_m": 69.5,
+    "pier_centres_v_m": [
+      17.5,
+      19.5,
+      21.5,
+      23.5,
+      25.5,
+      27.5,
+      29.5,
+      31.5,
+      33.5,
+      35.5
+    ],
+    "pier_rows_u_m": [
+      16.8,
+      21.0
+    ],
+    "pier_width_m": 0.5,
+    "authorization": "Explicit user requires both courtyard side passages to be walk-throughable. Hidden west enclosure is opened with inferred structural piers; measured roof shape preserved."
+  },
+  "walking_routes": [
+    {
+      "name": "east-longitudinal-covered-passage",
+      "waypoints_uv_m": [
+        [
+          54.65,
+          17.2
+        ],
+        [
+          54.65,
+          35.4
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-longitudinal-covered-passage",
+      "waypoints_uv_m": [
+        [
+          19.4,
+          17.2
+        ],
+        [
+          19.4,
+          35.1
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-1",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          18.5
+        ],
+        [
+          56.4,
+          18.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-2",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          20.5
+        ],
+        [
+          56.4,
+          20.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-3",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          22.8
+        ],
+        [
+          56.4,
+          22.8
+        ]
+      ],
+      "floor_navd88_m": 69.5,
+      "source_note": "Level route through same bay, offset 0.3m south around preserved low Athey fringe"
+    },
+    {
+      "name": "east-broadside-bay-4",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          24.5
+        ],
+        [
+          56.4,
+          24.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-5",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          26.5
+        ],
+        [
+          56.4,
+          26.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-6",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          28.5
+        ],
+        [
+          56.4,
+          28.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-7",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          30.5
+        ],
+        [
+          56.4,
+          30.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-8",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          32.5
+        ],
+        [
+          56.4,
+          32.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "east-broadside-bay-9",
+      "waypoints_uv_m": [
+        [
+          52.8,
+          34.5
+        ],
+        [
+          56.4,
+          34.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-1",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          18.8
+        ],
+        [
+          21.3,
+          18.8
+        ]
+      ],
+      "floor_navd88_m": 69.5,
+      "source_note": "Level route through same bay, offset 0.3m south around preserved low Athey attachment"
+    },
+    {
+      "name": "west-broadside-bay-2",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          20.5
+        ],
+        [
+          21.3,
+          20.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-3",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          22.5
+        ],
+        [
+          21.3,
+          22.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-4",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          24.5
+        ],
+        [
+          21.3,
+          24.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-5",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          26.5
+        ],
+        [
+          21.3,
+          26.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-6",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          28.5
+        ],
+        [
+          21.3,
+          28.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-7",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          30.5
+        ],
+        [
+          21.3,
+          30.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-8",
+      "waypoints_uv_m": [
+        [
+          17.2,
+          32.5
+        ],
+        [
+          21.3,
+          32.5
+        ]
+      ],
+      "floor_navd88_m": 69.5
+    },
+    {
+      "name": "west-broadside-bay-9",
+      "waypoints_uv_m": [
+        [
+          19.4,
+          34.5
+        ],
+        [
+          21.3,
+          34.5
+        ]
+      ],
+      "floor_navd88_m": 69.5,
+      "source_note": "Measured west roof narrows south of face32 endpoint; this crossing follows remaining face5 span"
+    }
+  ],
+  "source_addendum": {
+    "path": "runtime/research/dining-hall-reference-20260915/dining-hall-drone-addendum-20260916.json",
+    "sha256": "3045b6ab739afa556380a96e6adeac6446f9c34c5dd6476f850fa9e7a1fccd44"
+  },
+  "site_detail_addendum": {
+    "path": "runtime/research/dining-hall-reference-20260915/dining-hall-court-site-addendum-20260916.json",
+    "sha256": "5efaf5629433a69dadc65a3e22d650e983378797e608aeccc9fcb50bcf8fb942"
+  },
+  "court_spur_exception": {
+    "bounds_uv_m": [
+      24.8,
+      34.9,
+      28.3,
+      35.8
+    ],
+    "height_navd88_m": [
+      69,
+      74
+    ],
+    "source_face_id": 10,
+    "authorization": "Photo88/89 contradicts triangular capped facade extrusion. Remove only above-paving face10 spur; reinstate surface paving, keep all below-grade cells and source52 exact."
+  },
+  "court_seal": {
+    "center_uv_m": [
+      44,
+      24.5
+    ],
+    "radius_m": 1.4,
+    "registration": "Photo-interpreted center, placement corrected entirely into Athey-side brick field; largest allowed radius clear of both pale crossings; no exact emblem claim"
+  },
+  "seal_placement_addendum": {
+    "path": "runtime/research/dining-hall-reference-20260915/dining-hall-seal-placement-addendum-20260916.json",
+    "sha256": "ab9c0e3caa3d6815386a15f5cd2b07c6fcd23b2727d45849e08a976b3fec8706"
+  },
+  "source_cityjson_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+  "exterior_refinement": {
+    "athey_profile": "runtime/campus-reconstruction/athey-frame-v4-2x/profile.json",
+    "athey_profile_sha256": "5318e730568ce5a10f645eab6786d031b789e1dd94636286cd30040b80967bc4",
+    "dining_rear": {
+      "width_m": 1.4,
+      "height_m": 1.6,
+      "spacing_m": 4.0,
+      "sills_navd88_m": [
+        67.1,
+        70.7
+      ]
+    },
+    "west_end_inferred": {
+      "centers_v_m": [
+        2.5,
+        8.3
+      ],
+      "sills_navd88_m": [
+        67.4,
+        71.5,
+        75.5,
+        79.5
+      ],
+      "width_m": 2.0,
+      "height_m": 1.9
+    },
+    "recessed_court": {
+      "arch_centers_u_m": [
+        25,
+        27.5,
+        30,
+        33.5,
+        37,
+        40.5,
+        44,
+        46.5,
+        49
+      ],
+      "arch_width_m": 2.8,
+      "shell_front_v_m": 16.5,
+      "recess_back_v_m": 14.5,
+      "stair_u_bounds_m": [
+        34.2,
+        39.8
+      ],
+      "stair_v_bounds_m": [
+        18.3,
+        21.0
+      ],
+      "landing_feet_y": 92,
+      "court_feet_y": 89,
+      "confidence": "Full official2026 aerial resolves approximatelynine openings: fivebroad andfournarrow interleaved. Plan centers/widths are photo-registered estimates;88/89directlyresolve fourbroad. Userconfirmed curvedcoveringoverrecessedwalkway, nograss.",
+      "arch_widths_m": {
+        "27.5": 1.2,
+        "33.5": 1.2,
+        "40.5": 1.2,
+        "46.5": 1.2
+      },
+      "planting": {
+        "shrubs": [
+          [
+            24.8,
+            19.6,
+            1.4,
+            0.65
+          ],
+          [
+            30.3,
+            19.6,
+            1.2,
+            0.65
+          ],
+          [
+            44.2,
+            19.6,
+            1.5,
+            0.65
+          ],
+          [
+            49,
+            19.6,
+            1.3,
+            0.65
+          ]
+        ],
+        "ornamental_tree_uv_m": [
+          28.0,
+          19.6
+        ],
+        "source": "Official88 shows roundedshrubgroups andoneornamentaltree; exactcenters photo-estimated andclippedtotheexistingcurbstrip, notgrass."
+      }
+    },
+    "north_entry": {
+      "landing_bounds_xz_blocks": [
+        116,
+        79,
+        120,
+        88
+      ],
+      "threshold_feet_y": 85
+    },
+    "upper_flank_regularization": {
+      "u_runs_m": [
+        [
+          21.8,
+          31.8
+        ],
+        [
+          42.2,
+          52.2
+        ]
+      ],
+      "wall_front_v_m": 14.2,
+      "window_centers_u_m": [
+        25,
+        30,
+        44,
+        49
+      ],
+      "preserve_roof_states": true,
+      "source": "court_correction_packet upper_south_facade; straight flanks and continuous bands within surveyed envelope, central crossgable retained"
+    },
+    "east_gallery_roof_palette": {
+      "bounds_uv_m": [
+        52,
+        15,
+        57,
+        36.5
+      ],
+      "proxy_family": "smooth_quartz",
+      "source": "east_gallery_source_packet; official 91/92 seconds is EAST by Quadrivium/Ryan landmarks; 2026 aerial shows both roofs pale",
+      "rule": "Exact roof occupancy and all state shape properties remain unchanged; full and slab pale surfaces include retained endpoint and extension contacts.",
+      "source_faces": [
+        26,
+        31
+      ],
+      "height_y_blocks": [
+        94,
+        99
+      ],
+      "measured_endpoint_note": "Measured faces 26/31 start at V13.7799/13.9263, north of the photo-registered V15 control. Include their exact source roof cells so the Athey attachment remains coherently pale; do not recolor low ground fragments at Y88..92."
+    }
+  },
+  "assembly_site_bounds_uv_m": [
+    [
+      16.1,
+      12,
+      57,
+      36.5
+    ],
+    [
+      34,
+      -11,
+      41,
+      -3
+    ]
+  ],
+  "foundation_repair_cells": [
+    [
+      70,
+      82,
+      157
+    ],
+    [
+      70,
+      83,
+      157
+    ],
+    [
+      70,
+      84,
+      157
+    ],
+    [
+      70,
+      85,
+      157
+    ],
+    [
+      70,
+      86,
+      157
+    ],
+    [
+      70,
+      87,
+      157
+    ]
+  ],
+  "core_source_packet": {
+    "path": "runtime/research/core-demo-20260927/core-building-controls.json",
+    "sha256": "c7c8393c6cf079e57198b91aa99c9b7192e021d6fb7d7cef324ffc72429243a2"
+  },
+  "court_correction_evidence": {
+    "source_frames": [
+      {
+        "path": "runtime\\research\\dining-hall-reference-20260915\\drone-sequence-20260916\\drone-088s.png",
+        "sha256": "6187252f8f0f8ffde526f6c96dc81cab8b22bb7b6edea13991461563c59ef6bd"
+      },
+      {
+        "path": "runtime\\research\\dining-hall-reference-20260915\\drone-sequence-20260916\\drone-089s.png",
+        "sha256": "9501abe48d97b98b9786a919c9ead73fd0283aa2d0a9454225d4ce7d8cfea06b"
+      }
+    ],
+    "user_control": "Curved covering over the recessed walkway; no grass",
+    "source_interpretation": "Onebroadcentralstair U34.2..39.8/runV18.3..21; ninephoto-registered openings into continuousraised covered corridor, deepinward lowerarcade and actualvaults. Upper sourcevolume and weatherroofsretained. Fresh native candidate."
+  },
+  "court_correction_packet": {
+    "path": "runtime/research/core-demo-20260927/court-correction/court-correction-controls.json",
+    "sha256": "7206b3b20f8df2ac343644ac96e86521d1a11254bf6ba791a8919d807c60cd96"
+  },
+  "east_gallery_source_packet": {
+    "path": "runtime/research/core-demo-20260927/court-correction/athey-east-gallery-garden-connection-v1.json",
+    "sha256": "43abb6c166970c7a7d0f48fa9c8c1aa4685ca53f778535535f5dff905217ed80"
+  }
+}

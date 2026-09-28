@@ -1,0 +1,2158 @@
+{
+  "name": "Meigs House \u2014 current 1925 Admission Office",
+  "revision": "2026-09-08-meigs-v4-2x-continuous-porch-final-backing",
+  "parent_id": "16001511600620C-fff89cfae9",
+  "school_names": [
+    "Meigs House",
+    "Admission Office"
+  ],
+  "school_map_numbers": [
+    1
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_meigs_details",
+  "study_margin_m": 15,
+  "geometry": {
+    "origin_xz_m": [
+      190.09379838969858,
+      79.00767000443916
+    ],
+    "axis_degrees": -2.9638715990677253,
+    "entrance_floor_navd88_m": 68.0,
+    "upper_floor_navd88_m": 71.05,
+    "attic_floor_navd88_m": 74.1,
+    "main_roof_threshold_navd88_m": 72.8,
+    "source_footprint_bounds_uv_m": [
+      0,
+      0,
+      19.388448849541135,
+      16.49344388173492
+    ],
+    "source_main_ridge_navd88_m": 78.622719,
+    "source_roof_rmse_m": 1.141459,
+    "porch_eave_navd88_m": 70.95,
+    "porch_inner_navd88_m": 71.55,
+    "north_wall_v_m": 3.8
+  },
+  "materials": {
+    "facade": "white_terracotta",
+    "foundation": "stone",
+    "roof_family": "spruce",
+    "trim": "quartz_block",
+    "glass": "white_stained_glass_pane",
+    "porch_post": "pale_oak_fence",
+    "railing": "pale_oak_fence",
+    "chimney": "mud_bricks"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_family": "quartz",
+    "trim_width_m": 0.15,
+    "glass_block": "white_stained_glass_pane",
+    "sash_proxy": "Outer wall pane sheet; white pane borders provide fine sash and meeting rails, with one authorised corner return at diagonal raster joins."
+  },
+  "material_review": {
+    "status": "appearance_proxy_verified_native_review_pending",
+    "reviewer": "east_faculty_house",
+    "source_photo": "meigs_campaign_2024",
+    "date": "2026-09-07",
+    "custom_textures": false,
+    "repeatable_roles": true,
+    "wall_choice": "white_terracotta",
+    "roof_choice": "spruce",
+    "lighting_caution": "Photo pixels are appearance under unknown light; shaded porch ROI is not a second intrinsic wall colour.",
+    "reference_verifier": "Sol xhigh /root/reference_research",
+    "verification_date": "2026-09-08",
+    "verification_note": "Spruce accepted as original-texture appearance proxy; real roofing product and gray drone appearance remain unresolved. North/campaign-western-half orientation remains moderate-confidence inference. Face2 correction stays onlyV<=4.3m."
+  },
+  "material_evidence": [
+    {
+      "component": "stucco",
+      "actual_observed": "Buff/tan stippled stucco-like rendered wall; substrate/product not established.",
+      "vanilla_proxy": "white_terracotta",
+      "sample_ids": [
+        "meigs_lit_textured_wall",
+        "meigs_shaded_textured_wall"
+      ],
+      "reason": "Lit wall favours muted white terracotta (raw/equal-L 5.337/4.892). Its fine, low-amplitude noise preserves a rendered surface without invented stone/brick courses. Real stipple is stronger; slight pink bias remains. Deep porch shade is handled by native light, not a dark brown wall material.",
+      "comparison": [
+        {
+          "sample_id": "meigs_lit_textured_wall",
+          "statistics": {
+            "pixels": 465,
+            "srgb_median": [
+              204.0,
+              177.0,
+              153.0
+            ],
+            "srgb_mean_linear_light": [
+              195.8,
+              172.67,
+              150.49
+            ],
+            "srgb_p10_p90": [
+              [
+                140.8,
+                106.4,
+                78.4
+              ],
+              [
+                226.0,
+                208.0,
+                190.6
+              ]
+            ],
+            "lab_d65_median": [
+              73.9223,
+              6.0272,
+              15.8805
+            ],
+            "lab_d65_linear_mean": [
+              72.0191,
+              4.8524,
+              14.4762
+            ],
+            "lab_pixel_std": [
+              15.0242,
+              3.5925,
+              4.4901
+            ]
+          },
+          "ranking": [
+            {
+              "block": "white_terracotta",
+              "delta_e_2000_raw": 5.337,
+              "delta_e_2000_equal_lightness": 4.892,
+              "delta_l_star": 2.87
+            },
+            {
+              "block": "diorite",
+              "delta_e_2000_raw": 12.778,
+              "delta_e_2000_equal_lightness": 12.025,
+              "delta_l_star": 5.915
+            },
+            {
+              "block": "calcite",
+              "delta_e_2000_raw": 16.721,
+              "delta_e_2000_equal_lightness": 11.609,
+              "delta_l_star": 17.534
+            },
+            {
+              "block": "white_concrete",
+              "delta_e_2000_raw": 16.95,
+              "delta_e_2000_equal_lightness": 14.334,
+              "delta_l_star": 12.859
+            },
+            {
+              "block": "light_gray_terracotta",
+              "delta_e_2000_raw": 22.688,
+              "delta_e_2000_equal_lightness": 7.371,
+              "delta_l_star": -24.343
+            },
+            {
+              "block": "brown_concrete",
+              "delta_e_2000_raw": 43.754,
+              "delta_e_2000_equal_lightness": 7.596,
+              "delta_l_star": -43.12
+            }
+          ]
+        },
+        {
+          "sample_id": "meigs_shaded_textured_wall",
+          "statistics": {
+            "pixels": 1353,
+            "srgb_median": [
+              98.0,
+              72.0,
+              42.0
+            ],
+            "srgb_mean_linear_light": [
+              99.74,
+              73.02,
+              42.53
+            ],
+            "srgb_p10_p90": [
+              [
+                90.0,
+                66.0,
+                37.0
+              ],
+              [
+                110.0,
+                81.0,
+                48.0
+              ]
+            ],
+            "lab_d65_median": [
+              32.6987,
+              7.1183,
+              22.1877
+            ],
+            "lab_d65_linear_mean": [
+              33.2098,
+              7.3685,
+              22.549
+            ],
+            "lab_pixel_std": [
+              2.4955,
+              0.7432,
+              1.0665
+            ]
+          },
+          "ranking": [
+            {
+              "block": "brown_concrete",
+              "delta_e_2000_raw": 5.83,
+              "delta_e_2000_equal_lightness": 4.752,
+              "delta_l_star": -4.311
+            },
+            {
+              "block": "light_gray_terracotta",
+              "delta_e_2000_raw": 16.081,
+              "delta_e_2000_equal_lightness": 9.73,
+              "delta_l_star": 14.466
+            },
+            {
+              "block": "white_terracotta",
+              "delta_e_2000_raw": 40.618,
+              "delta_e_2000_equal_lightness": 6.789,
+              "delta_l_star": 41.679
+            },
+            {
+              "block": "diorite",
+              "delta_e_2000_raw": 44.999,
+              "delta_e_2000_equal_lightness": 16.185,
+              "delta_l_star": 44.724
+            },
+            {
+              "block": "white_concrete",
+              "delta_e_2000_raw": 49.624,
+              "delta_e_2000_equal_lightness": 18.45,
+              "delta_l_star": 51.669
+            },
+            {
+              "block": "calcite",
+              "delta_e_2000_raw": 51.121,
+              "delta_e_2000_equal_lightness": 15.8,
+              "delta_l_star": 56.343
+            }
+          ]
+        }
+      ],
+      "texture": {
+        "block": "minecraft:white_terracotta",
+        "families": [
+          "pale_cut_stone",
+          "terracotta_finish"
+        ],
+        "texture": "assets/minecraft/textures/block/white_terracotta.png",
+        "texture_sha256": "9feeb13f19514ea58a5b6e942df7a8595330e61173f8d0a13c83b78acd1bd62e",
+        "statistics": {
+          "pixels": 256,
+          "srgb_median": [
+            210.0,
+            177.0,
+            161.0
+          ],
+          "srgb_mean_linear_light": [
+            209.64,
+            178.06,
+            161.36
+          ],
+          "srgb_p10_p90": [
+            [
+              207.0,
+              175.0,
+              159.5
+            ],
+            [
+              212.0,
+              182.0,
+              163.0
+            ]
+          ],
+          "lab_d65_median": [
+            74.6485,
+            9.4633,
+            12.6313
+          ],
+          "lab_d65_linear_mean": [
+            74.8891,
+            8.8111,
+            12.7724
+          ],
+          "lab_pixel_std": [
+            0.8116,
+            0.8167,
+            0.5729
+          ]
+        },
+        "shape_variants": []
+      }
+    },
+    {
+      "component": "roof",
+      "actual_observed": "Brown overlapping small roof units in campaign photo; school drone roof appears gray in different light/date, exact product unresolved.",
+      "vanilla_proxy": "spruce_planks/spruce_slab/spruce_stairs",
+      "reason": "Expanded construction candidates make spruce the closest raw photo match (4.661) with horizontal fine courses and full/slab/stair forms. Mud bricks are close in colour but their large block bond is less like narrow overlapping roof units. Gray stone/tuff show large chroma errors. This is a wood-textured visual proxy, not identification of real wood roofing; original grain and seam period remain approximations.",
+      "sample_ids": [
+        "meigs_brown_roof"
+      ],
+      "comparison": [
+        {
+          "block": "spruce_planks",
+          "delta_e_2000_raw": 4.661,
+          "delta_e_2000_equal_lightness": 3.945,
+          "texture_sha256": "a1e4cd5b1eb20bc03e8d1f3fdae59034363c3b2dde7f505694e4323222e00e21"
+        },
+        {
+          "block": "mud_bricks",
+          "delta_e_2000_raw": 5.57,
+          "delta_e_2000_equal_lightness": 1.968,
+          "texture_sha256": "b9d94455caf0651b7ff777f2f85a92f4d67d04ae669cd4f65c308595ec9d38fa"
+        },
+        {
+          "block": "oak_planks",
+          "delta_e_2000_raw": 17.717,
+          "delta_e_2000_equal_lightness": 7.984,
+          "texture_sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3"
+        },
+        {
+          "block": "dark_oak_planks",
+          "delta_e_2000_raw": 16.973,
+          "delta_e_2000_equal_lightness": 2.868,
+          "texture_sha256": "665f44b119f5a21711c4cb83749d871635134c001cb0c14761c4f02a40dd8645"
+        },
+        {
+          "block": "tuff_bricks",
+          "delta_e_2000_raw": 19.445,
+          "delta_e_2000_equal_lightness": 19.342,
+          "texture_sha256": "4889db8fab0b3ef4b0cc3ef0d7df469ac3b89233dbeb09fdfecb4f2900b2eaf8"
+        },
+        {
+          "block": "stone_bricks",
+          "delta_e_2000_raw": 20.104,
+          "delta_e_2000_equal_lightness": 17.531,
+          "texture_sha256": "24415444c9e4815aad4a3a349ecbfc0e027b96be25ac5b7c273c06f16c4fdd2f"
+        },
+        {
+          "block": "waxed_exposed_cut_copper",
+          "delta_e_2000_raw": 13.092,
+          "delta_e_2000_equal_lightness": 4.046,
+          "texture_sha256": "7d2bd18a2b2d92204face126960c1afdf9564d48be015dc9cce9c63435bdf43f"
+        },
+        {
+          "block": "brown_terracotta",
+          "delta_e_2000_raw": 15.093,
+          "delta_e_2000_equal_lightness": 4.924,
+          "texture_sha256": "e162788c4a41a06711dcef4572ca4f4dfee090463fdd0d523ff98d00458b1daf"
+        }
+      ],
+      "texture": {
+        "block": "minecraft:spruce_planks",
+        "families": [
+          "clapboard_timber"
+        ],
+        "texture": "assets/minecraft/textures/block/spruce_planks.png",
+        "texture_sha256": "a1e4cd5b1eb20bc03e8d1f3fdae59034363c3b2dde7f505694e4323222e00e21",
+        "statistics": {
+          "pixels": 256,
+          "srgb_median": [
+            122.0,
+            90.0,
+            52.0
+          ],
+          "srgb_mean_linear_light": [
+            116.54,
+            86.16,
+            49.46
+          ],
+          "srgb_p10_p90": [
+            [
+              85.0,
+              58.0,
+              31.0
+            ],
+            [
+              136.0,
+              101.0,
+              58.0
+            ]
+          ],
+          "lab_d65_median": [
+            40.7332,
+            8.3841,
+            26.8806
+          ],
+          "lab_d65_linear_mean": [
+            38.9987,
+            7.9229,
+            26.0687
+          ],
+          "lab_pixel_std": [
+            6.0595,
+            1.2158,
+            2.8815
+          ]
+        },
+        "shape_variants": [
+          "spruce_stairs",
+          "spruce_slab"
+        ]
+      }
+    },
+    {
+      "component": "pale painted trim",
+      "actual_observed": "White/light painted post shafts, capitals, fascia, sills, sash, balusters.",
+      "vanilla_proxy": "quartz head/sill/fascia and pale_oak_fence post/railing",
+      "reason": "Quartz equal-L error1.319 matches warm white trim. Pale-oak fence shafts permit a0.125m visible post rather than0.5m full cubes; timber joints and slightly undersized width remain visible compromises. White pane sash technique uses prior native Unit3/Foster evidence.",
+      "sample_ids": [
+        "meigs_white_post"
+      ],
+      "comparison": [
+        {
+          "block": "white_concrete",
+          "delta_e_2000_raw": 11.121,
+          "delta_e_2000_equal_lightness": 7.401,
+          "delta_l_star": 11.862
+        },
+        {
+          "block": "pale_oak_planks",
+          "delta_e_2000_raw": 11.214,
+          "delta_e_2000_equal_lightness": 4.017,
+          "delta_l_star": 15.23
+        },
+        {
+          "block": "quartz_block",
+          "delta_e_2000_raw": 12.605,
+          "delta_e_2000_equal_lightness": 1.319,
+          "delta_l_star": 18.55
+        },
+        {
+          "block": "birch_planks",
+          "delta_e_2000_raw": 14.525,
+          "delta_e_2000_equal_lightness": 14.518,
+          "delta_l_star": -0.608
+        }
+      ]
+    },
+    {
+      "component": "chimney",
+      "actual_observed": "At least two warm masonry stack portions with shallow projecting caps in campaign photo. Masonry product not confirmed.",
+      "vanilla_proxy": "mud_bricks with mud_brick_slab caps",
+      "reason": "Warm small coursed masonry texture is a visual proxy for the photographed stack, not a claim of earth bricks. Position/top heights photo estimated; no measured face confidently assigned."
+    }
+  ],
+  "roof_evidence": {
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "all_original_faces": [
+      {
+        "uv_polygon_m": [
+          [
+            14.85686,
+            12.93653
+          ],
+          [
+            14.67694,
+            14.59076
+          ],
+          [
+            14.61309,
+            16.48949
+          ],
+          [
+            18.29882,
+            16.49344
+          ],
+          [
+            18.30153,
+            13.50922
+          ],
+          [
+            18.07662,
+            13.4397
+          ],
+          [
+            17.99211,
+            13.32508
+          ],
+          [
+            17.99256,
+            13.41373
+          ],
+          [
+            16.21017,
+            12.863
+          ],
+          [
+            14.85686,
+            12.93653
+          ]
+        ],
+        "navd88_min_m": 71.2234,
+        "navd88_max_m": 72.4679,
+        "area_m2": 12.324615899271441,
+        "slope_degrees": 17.250260050216866,
+        "height_plane_xz": [
+          -0.3081674005804038,
+          -0.03809618227642031,
+          139.29983381562042
+        ],
+        "face_id_0based": 0,
+        "fingerprint": "ca56d2cd38a13d77"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            12.09098,
+            5.6802
+          ],
+          [
+            11.53808,
+            3.81985
+          ],
+          [
+            9.99731,
+            4.0238
+          ],
+          [
+            9.98019,
+            7.01901
+          ],
+          [
+            10.43402,
+            7.34416
+          ],
+          [
+            12.09098,
+            5.6802
+          ]
+        ],
+        "navd88_min_m": 76.5064,
+        "navd88_max_m": 78.6212,
+        "area_m2": 5.2861979239497705,
+        "slope_degrees": 44.939554546023196,
+        "height_plane_xz": [
+          -0.9972409528761487,
+          0.03604831825866617,
+          275.3800526287208
+        ],
+        "face_id_0based": 1,
+        "fingerprint": "b33fa0c6e7946890"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            12.74594,
+            3.65992
+          ],
+          [
+            18.05374,
+            2.95726
+          ],
+          [
+            18.04864,
+            7.83615
+          ],
+          [
+            19.3801,
+            7.83956
+          ],
+          [
+            19.36907,
+            2.43533
+          ],
+          [
+            13.50206,
+            2.44075
+          ],
+          [
+            12.74594,
+            3.65992
+          ]
+        ],
+        "navd88_min_m": 66.94500000000001,
+        "navd88_max_m": 72.2568,
+        "area_m2": 11.302514607408948,
+        "slope_degrees": 44.4946187951,
+        "height_plane_xz": [
+          0.04662986761183503,
+          0.9814055164832017,
+          -21.769461448901453
+        ],
+        "face_id_0based": 2,
+        "fingerprint": "78ed93e7e3fde624"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            18.04864,
+            7.83615
+          ],
+          [
+            18.04407,
+            12.22511
+          ],
+          [
+            18.30239,
+            12.48837
+          ],
+          [
+            18.30294,
+            11.99783
+          ],
+          [
+            19.38845,
+            11.99707
+          ],
+          [
+            19.3801,
+            7.83956
+          ],
+          [
+            18.04864,
+            7.83615
+          ]
+        ],
+        "navd88_min_m": 66.13680000000001,
+        "navd88_max_m": 67.0053,
+        "area_m2": 5.657618730075377,
+        "slope_degrees": 11.418723234239406,
+        "height_plane_xz": [
+          -0.10455334390362281,
+          -0.1728082308197494,
+          103.65138682512827
+        ],
+        "face_id_0based": 3,
+        "fingerprint": "aed6e9180a6b9a31"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            1.914,
+            11.52178
+          ],
+          [
+            2.91615,
+            11.05948
+          ],
+          [
+            2.72111,
+            8.71261
+          ],
+          [
+            2.85759,
+            7.48462
+          ],
+          [
+            2.60811,
+            7.35303
+          ],
+          [
+            2.60086,
+            7.26629
+          ],
+          [
+            1.93151,
+            7.795
+          ],
+          [
+            0.38208,
+            7.79099
+          ],
+          [
+            0.37656,
+            9.53371
+          ],
+          [
+            0.66139,
+            9.54841
+          ],
+          [
+            0.70194,
+            16.49344
+          ],
+          [
+            1.97738,
+            16.49104
+          ],
+          [
+            1.914,
+            11.52178
+          ]
+        ],
+        "navd88_min_m": 73.4499,
+        "navd88_max_m": 74.2791,
+        "area_m2": 14.817752357509532,
+        "slope_degrees": 18.008987845924285,
+        "height_plane_xz": [
+          0.3238785547032826,
+          -0.028075385412729623,
+          14.086026459107918
+        ],
+        "face_id_0based": 4,
+        "fingerprint": "0576f40cd7e2b624"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            9.94073,
+            3.19977
+          ],
+          [
+            8.59282,
+            3.2486
+          ],
+          [
+            8.32028,
+            3.51973
+          ],
+          [
+            7.99758,
+            5.6857
+          ],
+          [
+            9.97964,
+            7.12773
+          ],
+          [
+            9.98019,
+            7.01901
+          ],
+          [
+            9.99731,
+            4.0238
+          ],
+          [
+            9.89849,
+            4.03692
+          ],
+          [
+            9.94073,
+            3.19977
+          ]
+        ],
+        "navd88_min_m": 76.6924,
+        "navd88_max_m": 78.6212,
+        "area_m2": 5.797928891437286,
+        "slope_degrees": 43.85832072745157,
+        "height_plane_xz": [
+          0.9593968262001733,
+          -0.05410767200553068,
+          -109.06786013020034
+        ],
+        "face_id_0based": 5,
+        "fingerprint": "46bd7c7c3cef1439"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            7.48588,
+            2.25706
+          ],
+          [
+            7.49722,
+            0.0
+          ],
+          [
+            0.01227,
+            0.01096
+          ],
+          [
+            0.01,
+            0.44826
+          ],
+          [
+            5.11977,
+            1.6846
+          ],
+          [
+            5.32466,
+            1.38332
+          ],
+          [
+            5.66038,
+            1.81536
+          ],
+          [
+            7.48588,
+            2.25706
+          ]
+        ],
+        "navd88_min_m": 68.2376,
+        "navd88_max_m": 70.6326,
+        "area_m2": 9.98878014086297,
+        "slope_degrees": 17.724308321061564,
+        "height_plane_xz": [
+          0.3157711993904992,
+          -0.049375898877660175,
+          12.124152394281023
+        ],
+        "face_id_0based": 6,
+        "fingerprint": "4a84fb6dbb3341dd"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            9.97894,
+            2.44404
+          ],
+          [
+            9.94073,
+            3.19977
+          ],
+          [
+            9.89849,
+            4.03692
+          ],
+          [
+            9.99731,
+            4.0238
+          ],
+          [
+            11.53808,
+            3.81985
+          ],
+          [
+            12.74594,
+            3.65992
+          ],
+          [
+            13.50206,
+            2.44075
+          ],
+          [
+            9.97894,
+            2.44404
+          ]
+        ],
+        "navd88_min_m": 70.3742,
+        "navd88_max_m": 71.7008,
+        "area_m2": 4.399086699725503,
+        "slope_degrees": 20.668287678553277,
+        "height_plane_xz": [
+          -0.3772241622072958,
+          -0.003004928154739517,
+          147.45890934059275
+        ],
+        "face_id_0based": 7,
+        "fingerprint": "34f29f3f8575cfb3"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            11.40609,
+            13.16535
+          ],
+          [
+            11.39783,
+            13.15297
+          ],
+          [
+            10.3923,
+            11.65886
+          ],
+          [
+            10.17093,
+            11.68083
+          ],
+          [
+            9.02251,
+            12.95531
+          ],
+          [
+            9.00603,
+            13.23716
+          ],
+          [
+            11.33339,
+            13.24172
+          ],
+          [
+            11.40609,
+            13.16535
+          ]
+        ],
+        "navd88_min_m": 74.4588,
+        "navd88_max_m": 74.6776,
+        "area_m2": 2.244134881250599,
+        "slope_degrees": 7.139019320053526,
+        "height_plane_xz": [
+          0.029219919041551374,
+          0.1217920933843133,
+          57.61066445937156
+        ],
+        "face_id_0based": 8,
+        "fingerprint": "44bd8ea904551ec0"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            11.40609,
+            13.16535
+          ],
+          [
+            11.33339,
+            13.24172
+          ],
+          [
+            11.55407,
+            13.24215
+          ],
+          [
+            11.5575,
+            16.4861
+          ],
+          [
+            14.61309,
+            16.48949
+          ],
+          [
+            14.67694,
+            14.59076
+          ],
+          [
+            14.85686,
+            12.93653
+          ],
+          [
+            14.72597,
+            12.94361
+          ],
+          [
+            11.54807,
+            13.11621
+          ],
+          [
+            11.53771,
+            13.02733
+          ],
+          [
+            11.40609,
+            13.16535
+          ]
+        ],
+        "navd88_min_m": 71.3794,
+        "navd88_max_m": 72.5454,
+        "area_m2": 10.901237337879254,
+        "slope_degrees": 17.724691362635728,
+        "height_plane_xz": [
+          0.3157766067483039,
+          -0.049389010415783384,
+          12.124079283634108
+        ],
+        "face_id_0based": 9,
+        "fingerprint": "6da2ea37e089502a"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            11.53771,
+            13.02733
+          ],
+          [
+            12.09114,
+            12.44639
+          ],
+          [
+            14.76326,
+            9.64189
+          ],
+          [
+            15.05321,
+            9.33749
+          ],
+          [
+            15.13064,
+            9.25622
+          ],
+          [
+            14.86551,
+            8.98605
+          ],
+          [
+            14.87497,
+            8.70209
+          ],
+          [
+            14.90443,
+            7.82811
+          ],
+          [
+            6.68882,
+            7.80709
+          ],
+          [
+            6.70093,
+            8.85355
+          ],
+          [
+            6.70773,
+            9.44876
+          ],
+          [
+            9.47816,
+            10.3004
+          ],
+          [
+            10.3923,
+            11.65886
+          ],
+          [
+            11.39783,
+            13.15297
+          ],
+          [
+            11.40609,
+            13.16535
+          ],
+          [
+            11.53771,
+            13.02733
+          ]
+        ],
+        "navd88_min_m": 74.659,
+        "navd88_max_m": 78.59740000000001,
+        "area_m2": 25.577905300756758,
+        "slope_degrees": 36.351800453677455,
+        "height_plane_xz": [
+          -0.036967956264653205,
+          -0.7350368395749212,
+          149.43681856026356
+        ],
+        "face_id_0based": 10,
+        "fingerprint": "285d3672ba6509fe"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            14.72597,
+            12.94361
+          ],
+          [
+            14.76326,
+            9.64189
+          ],
+          [
+            12.09114,
+            12.44639
+          ],
+          [
+            11.53771,
+            13.02733
+          ],
+          [
+            11.54807,
+            13.11621
+          ],
+          [
+            14.72597,
+            12.94361
+          ]
+        ],
+        "navd88_min_m": 74.6559,
+        "navd88_max_m": 77.7643,
+        "area_m2": 5.404058020794927,
+        "slope_degrees": 44.284117567322255,
+        "height_plane_xz": [
+          0.9745464455725619,
+          -0.03878927153666223,
+          -118.93859026828822
+        ],
+        "face_id_0based": 11,
+        "fingerprint": "12cfba44509c0ba8"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            14.76326,
+            9.64189
+          ],
+          [
+            14.72597,
+            12.94361
+          ],
+          [
+            14.85686,
+            12.93653
+          ],
+          [
+            16.21017,
+            12.863
+          ],
+          [
+            17.99256,
+            13.41373
+          ],
+          [
+            17.99211,
+            13.32508
+          ],
+          [
+            18.07662,
+            13.4397
+          ],
+          [
+            18.30153,
+            13.50922
+          ],
+          [
+            18.30239,
+            12.48837
+          ],
+          [
+            18.04407,
+            12.22511
+          ],
+          [
+            15.13064,
+            9.25622
+          ],
+          [
+            15.05321,
+            9.33749
+          ],
+          [
+            14.76326,
+            9.64189
+          ]
+        ],
+        "navd88_min_m": 74.2425,
+        "navd88_max_m": 77.7643,
+        "area_m2": 8.358762627510012,
+        "slope_degrees": 44.5197163231834,
+        "height_plane_xz": [
+          -0.9825438627145227,
+          0.04039575452594235,
+          275.9639613957249
+        ],
+        "face_id_0based": 12,
+        "fingerprint": "937f062e651927bf"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            18.04864,
+            7.83615
+          ],
+          [
+            14.90443,
+            7.82811
+          ],
+          [
+            14.87497,
+            8.70209
+          ],
+          [
+            14.86551,
+            8.98605
+          ],
+          [
+            15.13064,
+            9.25622
+          ],
+          [
+            18.04407,
+            12.22511
+          ],
+          [
+            18.04864,
+            7.83615
+          ]
+        ],
+        "navd88_min_m": 74.5091,
+        "navd88_max_m": 78.8211,
+        "area_m2": 8.80328189103685,
+        "slope_degrees": 44.49390517283021,
+        "height_plane_xz": [
+          -0.04364433018582231,
+          -0.9815183164165927,
+          172.23450788915764
+        ],
+        "face_id_0based": 13,
+        "fingerprint": "d44e8a46af6152de"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            5.90998,
+            14.36771
+          ],
+          [
+            5.86888,
+            16.48375
+          ],
+          [
+            8.12994,
+            16.47944
+          ],
+          [
+            8.12714,
+            13.94898
+          ],
+          [
+            7.34586,
+            14.81596
+          ],
+          [
+            6.76762,
+            14.63547
+          ],
+          [
+            5.90998,
+            14.36771
+          ]
+        ],
+        "navd88_min_m": 75.7816,
+        "navd88_max_m": 78.0201,
+        "area_m2": 4.400396283449378,
+        "slope_degrees": 44.41379372969753,
+        "height_plane_xz": [
+          -0.9795380068063465,
+          0.020093531156613942,
+          268.86348014596274
+        ],
+        "face_id_0based": 14,
+        "fingerprint": "9a558cb34815679d"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            4.82076,
+            10.18102
+          ],
+          [
+            2.91615,
+            11.05948
+          ],
+          [
+            1.914,
+            11.52178
+          ],
+          [
+            1.97738,
+            16.49104
+          ],
+          [
+            5.86888,
+            16.48375
+          ],
+          [
+            5.90998,
+            14.36771
+          ],
+          [
+            6.00262,
+            9.60727
+          ],
+          [
+            5.35666,
+            9.70784
+          ],
+          [
+            4.82076,
+            10.18102
+          ]
+        ],
+        "navd88_min_m": 73.8914,
+        "navd88_max_m": 77.53320000000001,
+        "area_m2": 23.682977619395515,
+        "slope_degrees": 41.14295231543845,
+        "height_plane_xz": [
+          0.8713713714249577,
+          -0.0634252807614335,
+          -88.1654817713974
+        ],
+        "face_id_0based": 15,
+        "fingerprint": "adcdc8556838d9b5"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            8.59282,
+            3.2486
+          ],
+          [
+            3.30722,
+            3.44026
+          ],
+          [
+            3.18649,
+            4.52626
+          ],
+          [
+            2.46166,
+            5.59162
+          ],
+          [
+            2.60086,
+            7.26629
+          ],
+          [
+            2.60811,
+            7.35303
+          ],
+          [
+            2.85759,
+            7.48462
+          ],
+          [
+            3.4538,
+            7.7989
+          ],
+          [
+            6.68882,
+            7.80709
+          ],
+          [
+            14.90443,
+            7.82811
+          ],
+          [
+            18.04864,
+            7.83615
+          ],
+          [
+            18.05374,
+            2.95726
+          ],
+          [
+            12.74594,
+            3.65992
+          ],
+          [
+            11.53808,
+            3.81985
+          ],
+          [
+            12.09098,
+            5.6802
+          ],
+          [
+            10.43402,
+            7.34416
+          ],
+          [
+            9.98019,
+            7.01901
+          ],
+          [
+            9.97964,
+            7.12773
+          ],
+          [
+            7.99758,
+            5.6857
+          ],
+          [
+            8.32028,
+            3.51973
+          ],
+          [
+            8.59282,
+            3.2486
+          ]
+        ],
+        "navd88_min_m": 73.83250000000001,
+        "navd88_max_m": 78.5999,
+        "area_m2": 55.85565706125377,
+        "slope_degrees": 44.268701114298814,
+        "height_plane_xz": [
+          0.047128563983454434,
+          0.9736532785280592,
+          -14.875918127596082
+        ],
+        "face_id_0based": 16,
+        "fingerprint": "b7c70035d04af896"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            6.70773,
+            9.44876
+          ],
+          [
+            6.52815,
+            9.39349
+          ],
+          [
+            6.0963,
+            9.59262
+          ],
+          [
+            6.00262,
+            9.60727
+          ],
+          [
+            5.90998,
+            14.36771
+          ],
+          [
+            6.76762,
+            14.63547
+          ],
+          [
+            7.34586,
+            14.81596
+          ],
+          [
+            8.12714,
+            13.94898
+          ],
+          [
+            8.12642,
+            13.23538
+          ],
+          [
+            9.00603,
+            13.23716
+          ],
+          [
+            9.02251,
+            12.95531
+          ],
+          [
+            10.17093,
+            11.68083
+          ],
+          [
+            10.3923,
+            11.65886
+          ],
+          [
+            9.47816,
+            10.3004
+          ],
+          [
+            6.70773,
+            9.44876
+          ]
+        ],
+        "navd88_min_m": 76.5171,
+        "navd88_max_m": 77.53320000000001,
+        "area_m2": 15.572329724165336,
+        "slope_degrees": 12.224737314798608,
+        "height_plane_xz": [
+          -0.21479786557029668,
+          -0.028342020104267007,
+          122.26163853465842
+        ],
+        "face_id_0based": 17,
+        "fingerprint": "9509a9f887668e73"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            6.52815,
+            9.39349
+          ],
+          [
+            6.70773,
+            9.44876
+          ],
+          [
+            6.70093,
+            8.85355
+          ],
+          [
+            6.68882,
+            7.80709
+          ],
+          [
+            3.4538,
+            7.7989
+          ],
+          [
+            2.85759,
+            7.48462
+          ],
+          [
+            2.72111,
+            8.71261
+          ],
+          [
+            2.91615,
+            11.05948
+          ],
+          [
+            4.82076,
+            10.18102
+          ],
+          [
+            5.35666,
+            9.70784
+          ],
+          [
+            6.00262,
+            9.60727
+          ],
+          [
+            6.0963,
+            9.59262
+          ],
+          [
+            6.52815,
+            9.39349
+          ]
+        ],
+        "navd88_min_m": 75.6068,
+        "navd88_max_m": 79.2146,
+        "area_m2": 9.346617752172893,
+        "slope_degrees": 45.261933511025404,
+        "height_plane_xz": [
+          -0.05369832442435592,
+          -1.0077556144177622,
+          176.6004518675082
+        ],
+        "face_id_0based": 18,
+        "fingerprint": "46858f717aa048c3"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            0.0,
+            2.45744
+          ],
+          [
+            0.27974,
+            2.47181
+          ],
+          [
+            0.01,
+            0.44826
+          ],
+          [
+            0.0,
+            2.45744
+          ]
+        ],
+        "navd88_min_m": 67.6249,
+        "navd88_max_m": 67.6425,
+        "area_m2": 0.2810952591030491,
+        "slope_degrees": 2.3091926294801044,
+        "height_plane_xz": [
+          -0.03890950918855849,
+          0.010589790385238107,
+          74.18123683656881
+        ],
+        "face_id_0based": 19,
+        "fingerprint": "763c7224befc6702"
+      },
+      {
+        "uv_polygon_m": [
+          [
+            0.39882,
+            2.47803
+          ],
+          [
+            0.38208,
+            7.79099
+          ],
+          [
+            1.93151,
+            7.795
+          ],
+          [
+            2.60086,
+            7.26629
+          ],
+          [
+            2.46166,
+            5.59162
+          ],
+          [
+            3.18649,
+            4.52626
+          ],
+          [
+            3.30722,
+            3.44026
+          ],
+          [
+            8.59282,
+            3.2486
+          ],
+          [
+            9.94073,
+            3.19977
+          ],
+          [
+            9.97894,
+            2.44404
+          ],
+          [
+            7.48495,
+            2.44637
+          ],
+          [
+            7.48588,
+            2.25706
+          ],
+          [
+            5.66038,
+            1.81536
+          ],
+          [
+            5.32466,
+            1.38332
+          ],
+          [
+            5.11977,
+            1.6846
+          ],
+          [
+            0.01,
+            0.44826
+          ],
+          [
+            0.27974,
+            2.47181
+          ],
+          [
+            0.39882,
+            2.47803
+          ]
+        ],
+        "navd88_min_m": 70.8415,
+        "navd88_max_m": 71.62530000000001,
+        "area_m2": 26.98815980871888,
+        "slope_degrees": 5.431403441293168,
+        "height_plane_xz": [
+          0.061885298664951724,
+          0.07218433350420062,
+          53.340042468693206
+        ],
+        "face_id_0based": 20,
+        "fingerprint": "92d1623700986771"
+      }
+    ],
+    "original_footprint_polygons": [
+      {
+        "exterior_uv_m": [
+          [
+            0.38208,
+            7.79099
+          ],
+          [
+            0.39882,
+            2.47803
+          ],
+          [
+            0.27974,
+            2.47181
+          ],
+          [
+            0.0,
+            2.45744
+          ],
+          [
+            0.01,
+            0.44826
+          ],
+          [
+            0.01227,
+            0.01096
+          ],
+          [
+            7.49722,
+            0.0
+          ],
+          [
+            7.48588,
+            2.25706
+          ],
+          [
+            7.48495,
+            2.44637
+          ],
+          [
+            9.97894,
+            2.44404
+          ],
+          [
+            13.50206,
+            2.44075
+          ],
+          [
+            19.36907,
+            2.43533
+          ],
+          [
+            19.3801,
+            7.83956
+          ],
+          [
+            19.38845,
+            11.99707
+          ],
+          [
+            18.30294,
+            11.99783
+          ],
+          [
+            18.30239,
+            12.48837
+          ],
+          [
+            18.30153,
+            13.50922
+          ],
+          [
+            18.29882,
+            16.49344
+          ],
+          [
+            14.61309,
+            16.48949
+          ],
+          [
+            11.5575,
+            16.4861
+          ],
+          [
+            11.55407,
+            13.24215
+          ],
+          [
+            11.33339,
+            13.24172
+          ],
+          [
+            9.00603,
+            13.23716
+          ],
+          [
+            8.12642,
+            13.23538
+          ],
+          [
+            8.12714,
+            13.94898
+          ],
+          [
+            8.12994,
+            16.47944
+          ],
+          [
+            5.86888,
+            16.48375
+          ],
+          [
+            1.97738,
+            16.49104
+          ],
+          [
+            0.70194,
+            16.49344
+          ],
+          [
+            0.66139,
+            9.54841
+          ],
+          [
+            0.37656,
+            9.53371
+          ],
+          [
+            0.38208,
+            7.79099
+          ]
+        ],
+        "holes_uv_m": []
+      }
+    ],
+    "porch_replaced_source_ids": [
+      6,
+      7,
+      19,
+      20
+    ],
+    "unchanged_source_ids": [
+      0,
+      1,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      17,
+      18
+    ],
+    "unresolved_low_east_source_ids": [
+      2,
+      3
+    ],
+    "correction_rule": "Exact sourcefootprint remains. Porch6/7/19/20 and onlynorthV<=4.3m sectionof2 are normalised against photographed continuous shallow cover (campaign andschooldrone). Originalpolygons/planes are retained inprovenance. Remainingface2 andface3 easternfragments unchanged/unresolved. Mainroof andlarge measured dormer retained; smallnorthdormer is labelledphoto-authored.",
+    "partially_replaced_source_faces": [
+      {
+        "face_id": 2,
+        "section": "north stripV<=4.3m",
+        "reason": "Officialdrone confirms continuous northporch, contradicting near-ground portion ofsource2."
+      },
+      {
+        "face_id": 16,
+        "section": "small_dormer.bounds_uv_m only where authored roof rises above source16",
+        "reason": "separately observed smaller north dormer"
+      }
+    ]
+  },
+  "orientation": {
+    "front": "north",
+    "status": "moderate_confidence_geometric_inference",
+    "reason": "Meigs lies west of Rolfe/south ofpitch. Official2026 drone candidate at that location shows a large north dormer plus a smaller western dormer and wrapping porch. The campaign crop is compatible with the western half of that north front; compass and metric registration remain uncalibrated."
+  },
+  "openings": [
+    {
+      "id": "north-upper-west-central",
+      "side": "north",
+      "at_m": 3.8,
+      "centres_m": [
+        5.7,
+        9.15
+      ],
+      "sill_navd88_m": 71.55,
+      "width_m": 1.05,
+      "height_m": 1.8,
+      "status": "two_complete_campaign_openings; positions_estimated"
+    },
+    {
+      "id": "north-upper-photo-edge-east",
+      "side": "north",
+      "at_m": 3.8,
+      "centres_m": [
+        12.0
+      ],
+      "sill_navd88_m": 71.55,
+      "width_m": 1.05,
+      "height_m": 1.8,
+      "status": "partial_cut_campaign_left_edge; existence_supported_width_position_estimated"
+    },
+    {
+      "id": "north-upper-photo-edge-west",
+      "side": "north",
+      "at_m": 3.8,
+      "centres_m": [
+        4.0
+      ],
+      "sill_navd88_m": 71.55,
+      "width_m": 0.9,
+      "height_m": 1.8,
+      "status": "branch_obscured_campaign_right_edge; metric_estimate"
+    },
+    {
+      "id": "north-large-dormer-glazing",
+      "side": "north",
+      "at_m": 3.8,
+      "centres_m": [
+        10.0
+      ],
+      "sill_navd88_m": 75.2,
+      "width_m": 1.65,
+      "height_m": 1.5,
+      "status": "dormer_group_photo_observed; measured_roof_faces1_5_control; internal_light_count_unresolved"
+    },
+    {
+      "id": "north-small-dormer-glazing",
+      "side": "north",
+      "at_m": 4.25,
+      "centres_m": [
+        5.2
+      ],
+      "sill_navd88_m": 74.8,
+      "width_m": 0.8,
+      "height_m": 1.5,
+      "status": "small_dormer_observed_in_school_drone; metric_estimate"
+    }
+  ],
+  "small_dormer": {
+    "bounds_uv_m": [
+      4.2,
+      4.25,
+      6.2,
+      6.55
+    ],
+    "ridge_navd88_m": 77.1,
+    "eave_navd88_m": 75.7,
+    "front_base_navd88_m": 74.55,
+    "source_refs": [
+      "school_drone238",
+      "meigs_campaign_2024"
+    ],
+    "status": "photo_interpreted_not_a_retained_measured_facet"
+  },
+  "porch": {
+    "source_ids": [
+      6,
+      7,
+      19,
+      20
+    ],
+    "posts_uv_m": [
+      [
+        0.45,
+        0.55
+      ],
+      [
+        3.55,
+        0.65
+      ],
+      [
+        7.15,
+        2.65
+      ],
+      [
+        9.5,
+        2.7
+      ],
+      [
+        12.8,
+        2.75
+      ],
+      [
+        0.65,
+        3.45
+      ],
+      [
+        0.65,
+        6.85
+      ],
+      [
+        16.0,
+        2.65
+      ],
+      [
+        18.7,
+        2.75
+      ]
+    ],
+    "entry_side": "west",
+    "entry_door_uv_m": [
+      2.6,
+      6.25
+    ],
+    "entry_width_m": 1.1,
+    "stair_bounds_uv_m": [
+      -1.45,
+      5.4,
+      0.4,
+      7.6
+    ],
+    "stair_risers": 3,
+    "stair_rise_m": 0.25,
+    "rails": [
+      {
+        "side": "north",
+        "at_m": 0.55,
+        "ends_m": [
+          0.45,
+          7.15
+        ]
+      },
+      {
+        "side": "north",
+        "at_m": 2.65,
+        "ends_m": [
+          7.5,
+          18.7
+        ]
+      },
+      {
+        "side": "west",
+        "at_m": 0.65,
+        "ends_m": [
+          0.9,
+          5.1
+        ]
+      }
+    ],
+    "status": "open_wrap_porch_observed; post_spacing_access_and_metric_extents_interpreted_from_partial_photo_and_source_lowroof_plan"
+  },
+  "chimneys": [
+    {
+      "bounds_uv_m": [
+        12.9,
+        6.6,
+        13.75,
+        7.8
+      ],
+      "top_navd88_m": 79.45,
+      "status": "photo_count; metric_position_inferred"
+    },
+    {
+      "bounds_uv_m": [
+        6.1,
+        8.1,
+        7.15,
+        9.2
+      ],
+      "top_navd88_m": 80.05,
+      "status": "photo_count; metric_position_inferred"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "meigs_campaign_2024",
+      "url": "https://resources.finalsite.net/images/v1706640886/thehillorg/jw0ysayvvi02ln5dsucr/FY24HTFlipCampaignInsertPRINTedits.pdf",
+      "page_0based": 14,
+      "file": "runtime/research/campus-full-detail-20260905/meigs-campaign-2024.pdf",
+      "extracted_photo": "runtime/research/campus-full-detail-20260905/meigs-campaign-xref-63.jpeg",
+      "role": "school publication describing renovation of 1925 admission house; image has substantial tree occlusion",
+      "supports": "Current1925house identity; tan stucco, white porch/posts/railing, two complete upper openings plus partial edges, two partial dormer/gables, at leasttwo chimney portions. Independently viewed."
+    },
+    {
+      "id": "school_drone238",
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "time_seconds": 238,
+      "file": "runtime/research/campus-full-detail-20260905/drone-238s.png",
+      "crops": [
+        "runtime/research/campus-full-detail-20260905/foster-rolfe-pitch-238s-crop.png",
+        "runtime/research/campus-full-detail-20260905/dell-sherrill-238s-crop.png"
+      ],
+      "role": "school video; current uploaded 2026, capture date unspecified; high oblique from northeast",
+      "supports": "Moderately confident Meigs candidate west ofRolfe/south ofpitch: roof/dormer/porch configuration; low pixel detail, not surveyed aperture counts. Exact crop in meigs-v1-research-2x."
+    },
+    {
+      "id": "school_map_2026",
+      "url": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+      "file": "runtime/research/hill-reference-20260904/campus-map-2026.pdf",
+      "role": "current identity; illustrated geometry is not survey",
+      "supports": "Meigs#1 current identity and location."
+    },
+    {
+      "id": "measured",
+      "file": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+      "record": "building_records[parent_id=16001511600620C-fff89cfae9]",
+      "supports": "Exact localframe/footprint/21orderedsourcefaces andNAVD88datum."
+    },
+    {
+      "id": "material_audit",
+      "file": "runtime/research/campus-material-audit-20260905/photo-texture-comparison.json",
+      "supports": "Original clienttexturecolour andlighting-separatedROImeasurements."
+    }
+  ],
+  "uncertainties": [
+    "Current1925AdmissionMeigs only. Historic oldMeigsmansion destroyed1973 is excluded.",
+    "North facade/campaignwestern-half alignment is moderate-confidence inference, not calibrated photographic registration.",
+    "South/east/west beyond visible porch are not independently resolved; no mirrored window rows are generated. Partial photo edge windows are explicitly estimated.",
+    "Major roof planes retain source geometry with1.141459mRMSE. Eastern remainder offace2 andface3 remain unresolved and unmodified; no occupancy or roofidentity is inferred from them.",
+    "Porch plan is constrained by exact measured lowerface masks but its continuous heights, posts, rails, entrance and threequarter-metre steps are photo/grade interpretations.",
+    "Small north dormer is independently photo observed in schooldrone; exactmetricbounds are authored. Existing large dormer1/5 is retained measured roof.",
+    "Two chimney portions are visible but sourceface correspondence is unresolved. Stack planpositions and heights are estimates.",
+    "Real stucco substrate/roofingproduct/trimpaint are unknown. Originalvanilla proxy names do not establish real materialidentity.",
+    "Spruce roof matches the warm campaignROI but the schooldrone roof appears gray; lighting/date/aging are not resolved. Native comparison required.",
+    "White-pane repeated0.5m border grid approximates sash rails; paleoakposts are narrow but undersize versus photo. No customtextures or checkerboard mixtures.",
+    "The photographed planar north stucco wall is interpreted atV3.8m behind irregular measured roof edges. It is not surveyed: the original roof polygon cannot safely be reused as a deep jagged window plane. Western photoedge opening is fitted atU4.0m within that supported wall."
+  ],
+  "camera_views": [
+    {
+      "name": "meigs-campaign-north-west",
+      "eye_uv_navd88_m": [
+        2.5,
+        -20,
+        71.0
+      ],
+      "target_uv_navd88_m": [
+        7.5,
+        3.5,
+        73.0
+      ],
+      "fov": 48
+    },
+    {
+      "name": "meigs-north-full",
+      "eye_uv_navd88_m": [
+        10,
+        -27,
+        72.0
+      ],
+      "target_uv_navd88_m": [
+        9.5,
+        5.0,
+        73.0
+      ],
+      "fov": 57
+    },
+    {
+      "name": "meigs-northwest-porch",
+      "eye_uv_navd88_m": [
+        -12,
+        -9,
+        71.0
+      ],
+      "target_uv_navd88_m": [
+        4.8,
+        4.4,
+        70.8
+      ],
+      "fov": 59
+    },
+    {
+      "name": "meigs-entry-close",
+      "eye_uv_navd88_m": [
+        -7,
+        3.3,
+        69.7
+      ],
+      "target_uv_navd88_m": [
+        1.8,
+        5.5,
+        69.6
+      ],
+      "fov": 64
+    },
+    {
+      "name": "meigs-roof-audit",
+      "eye_uv_navd88_m": [
+        -6,
+        -8,
+        84.0
+      ],
+      "target_uv_navd88_m": [
+        9.0,
+        7.3,
+        75.0
+      ],
+      "fov": 61
+    },
+    {
+      "name": "meigs-unseen-east-south",
+      "eye_uv_navd88_m": [
+        30,
+        28,
+        73.0
+      ],
+      "target_uv_navd88_m": [
+        11,
+        10,
+        72.0
+      ],
+      "fov": 60
+    }
+  ],
+  "native_geometry_reviews": [
+    {
+      "revision": "v1",
+      "screenshots": "runtime/campus-reconstruction/chapel-native-qa/runs/meigs-v1-2x-20260908/screenshots",
+      "inspected_views": 6,
+      "v2_corrections": [
+        "Fascia only on the exterior footprint edge, preserving shingle colour at the inner roof edge.",
+        "Same193 documented porch-top columns; shallow rise follows the exact stepped outside outline and interpreted wall, with one level exterior fascia.",
+        "Quarter-course laps close physical contacts across roof steps.",
+        "A narrow inner cover return below the unchanged main roof meets the interpreted north wall.",
+        "The north wall continues to its roof underside; thin exterior soffits are permitted only where a full inset wall backs them.",
+        "Dormer/main eave trim is restricted to the main roof and each column is processed once; it no longer recolours the lower porch or descends to roof backing on a duplicate pass.",
+        "Post capitals use an inner-corner stair so every neighbouring roof face can meet them while the lower body contacts the shaft."
+      ],
+      "unchanged_controls": "Exact source footprint and all857 source-height columns outside the documented porch/small-dormer masks.",
+      "remaining_uncertainty": "Uncalibrated campaign orientation and partial apertures; unseen elevations, actual roof product and precise porch dimensions remain unresolved.",
+      "export_validation_note": "Intermediatev2 was withheld for12 roof contact defects. V3 passed all376 roof contact pairs; final soffit audit then found3 backing cells became dormer panes after the early soffit pass. V4 evaluates that backing after openings exist and retains full exterior substrate at those3 positions."
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "name": "Hill \u2014 John P. Ryan Library",
+  "revision": "2026-09-05-ryan-library-6-2x-vanilla",
+  "assembly_site_bounds_uv_m": [
+    [
+      -18,
+      -43,
+      2,
+      1
+    ]
+  ],
+  "parent_id": "160015116006-567a5eddd9",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "materials": {
+    "facade": "mud_bricks",
+    "foundation": "mud_bricks",
+    "roof_family": "stone_brick"
+  },
+  "geometry": {
+    "origin_xz_m": [
+      115.249079686,
+      42.994671715
+    ],
+    "axis_degrees": 23.95049970400529,
+    "main_roof_threshold_navd88_m": 78,
+    "axis_description": "U ESE across the hall, V SSW along it; main hall spans V -42.15 to 0. Source research positive-NNE V is negated here.",
+    "west_wall_u_m": 1.35,
+    "arcade_bounds_uv_m": [
+      -3,
+      -33,
+      1.35,
+      -10
+    ],
+    "arcade_centres_v_m": [
+      -30.7,
+      -26.1,
+      -21.5,
+      -16.9,
+      -12.3
+    ],
+    "landing_navd88_m": 69.7,
+    "canopy_navd88_m": 74.65,
+    "arcade_parapet_navd88_m": 75.1,
+    "upper_window_sill_navd88_m": 75.5
+  },
+  "window_reveal": {
+    "trim_family": "mud_brick",
+    "glass_recess_m": 0.0,
+    "trim_width_m": 0.26,
+    "construction": "Panes sit in the outer masonry frame. Extra edge panes bridge one-cell diagonal gaps inside the reveal; nothing is attached outside the building.",
+    "trim_block": "terracotta"
+  },
+  "camera_views": [
+    {
+      "name": "ryan-west-front",
+      "eye_uv_navd88_m": [
+        -29,
+        -21.5,
+        70.5
+      ],
+      "target_uv_navd88_m": [
+        1,
+        -21.5,
+        75
+      ],
+      "fov": 75
+    },
+    {
+      "name": "ryan-west-arcade",
+      "eye_uv_navd88_m": [
+        -14,
+        -21.5,
+        69.6
+      ],
+      "target_uv_navd88_m": [
+        -1,
+        -21.5,
+        72.2
+      ],
+      "fov": 80
+    },
+    {
+      "name": "ryan-south-end",
+      "eye_uv_navd88_m": [
+        4,
+        19,
+        73
+      ],
+      "target_uv_navd88_m": [
+        8,
+        -1,
+        75.8
+      ],
+      "fov": 72
+    },
+    {
+      "name": "ryan-east-addition",
+      "eye_uv_navd88_m": [
+        43,
+        -16,
+        72
+      ],
+      "target_uv_navd88_m": [
+        24,
+        -21,
+        72.3
+      ],
+      "fov": 76
+    },
+    {
+      "name": "ryan-roof-overview",
+      "eye_uv_navd88_m": [
+        -25,
+        -59,
+        105
+      ],
+      "target_uv_navd88_m": [
+        12,
+        -20,
+        74
+      ],
+      "fov": 72
+    }
+  ],
+  "evidence": [
+    {
+      "source": "runtime/research/ryan-library-20260905/ryan-roof-measurements.json",
+      "supports": "Measured main pitched roof, eastern low addition, ground outline. Ridge attribute 85.44722 m; geometry max 87.1301 m includes small upper features."
+    },
+    {
+      "url": "https://wohlsenconstruction.com/project/the-hill-school-john-p-ryan-library/",
+      "supports": "Five west arcade arches and upper traceried groups, brownstone and dressed stone, broad staircase, distinct low eastern addition."
+    },
+    {
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "supports": "2026 footage at 18\u201324 seconds confirms open arcade, separate flat gravel roof, stairs and current planting; 99 seconds shows the south-end five-light groups."
+    }
+  ],
+  "uncertainties": [
+    "Facade dimensions are photograph interpretations, not measured architectural drawings; measured LiDAR roof-fit RMSE is 0.583213 m.",
+    "Arcade projection and 69.7 m landing are estimated against photographs and adjacent DEM, with roughly 1 m plan and 0.8 m threshold uncertainty.",
+    "North lower openings and concealed eastern walls are incomplete; the first study is an exterior starting point for native visual iteration.",
+    "Simple floor plates and entrance panels do not reconstruct the library interior, shelves or circulation.",
+    "Planting is limited to broad interpreted beds; individual species and positions are not surveyed.",
+    "This revision uses only original Minecraft textures. Terracotta dressed trim and mud-brick partial blocks approximate the warm masonry; colour is a visual interpretation, not an exact texture match."
+  ],
+  "vanilla_state_replacements": {
+    "smooth_red_sandstone": "terracotta",
+    "smooth_red_sandstone_stairs": "mud_brick_stairs",
+    "smooth_red_sandstone_slab": "mud_brick_slab"
+  }
+}

@@ -1,0 +1,732 @@
+{
+  "name": "Center For The Arts - pond screen, lobby and measured auditorium",
+  "revision": "2026-09-16-cfta-5-2x-drone-roof-grid-face7-wall-return",
+  "parent_id": "160031040003-894f07a81a",
+  "school_names": [
+    "Center For The Arts (CFTA)"
+  ],
+  "school_map_numbers": [
+    9
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_cfta_details",
+  "study_margin_m": 32,
+  "geometry": {
+    "origin_xz_m": [
+      0,
+      0
+    ],
+    "axis_degrees": 9,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 56.65
+  },
+  "materials": {
+    "facade": "terracotta",
+    "foundation": "mud_bricks",
+    "roof_family": "deepslate_tile",
+    "screen": "quartz_bricks",
+    "coarse_red": "red_terracotta",
+    "flytower": "terracotta",
+    "glass": "gray_stained_glass_pane",
+    "glass_block": "light_gray_stained_glass_pane",
+    "railing": "iron_bars"
+  },
+  "material_review": {
+    "status": "Sol xhigh bounded CFTA palette applied",
+    "source_packet_sha256": "386a6ca8fa41bcf75d5b30cb2e8ec10094b702cd22dba46906542a9763a7e49b",
+    "materials_are_visual_proxies": true,
+    "actual_pale_and_red_unit_products_unresolved": true,
+    "native_corrections": "Gray fields and sparse white pane grid; red terracotta coarse fields; source faces3/4/7 light-gray surfaces at retained shapes; red/pale perimeter cap materials only."
+  },
+  "reference_packet": {
+    "path": "runtime/research/campus-full-detail-20260905/cfta-reference-packet-20260916.json",
+    "sha256": "386a6ca8fa41bcf75d5b30cb2e8ec10094b702cd22dba46906542a9763a7e49b"
+  },
+  "registration_source": {
+    "path": "runtime/research/campus-full-detail-20260905/institutional-facades.json",
+    "sha256": "46d88480940568c0da0cbcc72cee0592c97de11daca416d2bada791a129d1532",
+    "superseded_east_glass_control": "Do not use old U188.42/V-174.6 glazing; follow packet curved enclosure"
+  },
+  "source_roof_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+  "lobby_roof_extensions": [
+    {
+      "id": "lobby_front_notch_roof_apron",
+      "polygon_uv_m": [
+        [
+          150.599,
+          -173.994
+        ],
+        [
+          150.651,
+          -176.57
+        ],
+        [
+          182.833,
+          -175.961
+        ],
+        [
+          182.833,
+          -174.35
+        ],
+        [
+          150.599,
+          -174.35
+        ]
+      ],
+      "height_navd88_m": 68.54,
+      "authorization": "Keep face 9 unchanged, then add only the roof/ceiling cells between its recessed U150.6..182.83 stepped edge and the outer limit near V=-174.35. This shallow apron encloses the photo/LiDAR-supported straight glass wall at V=-174.6. Do not extend it west of the source step, east into the rounded return, or forward to the screen at V=-171.9."
+    }
+  ],
+  "southeast_enclosure_path_uv_m": [
+    [
+      182.833,
+      -175.961
+    ],
+    [
+      186.997,
+      -177.001
+    ],
+    [
+      187.303,
+      -177.331
+    ],
+    [
+      188.901,
+      -187.148
+    ]
+  ],
+  "screen_roof_tie_centres_u_m": [
+    159.0,
+    163.0,
+    167.0,
+    171.0,
+    175.0,
+    179.0
+  ],
+  "cfta_controls": {
+    "id": "cfta",
+    "parent_ids": [
+      "160031040003-894f07a81a"
+    ],
+    "school_numbers": [
+      9
+    ],
+    "name": "Center For The Arts",
+    "stage": "front_screen_registered_to_raw_lidar_and_two_county_photos; native_audit_still_required",
+    "geometry": {
+      "origin_xz_m": [
+        0,
+        0
+      ],
+      "axis_degrees": 9.0,
+      "pond_facade_v_m": -171.9,
+      "pond_facade_u_range_m": [
+        126.97,
+        193.58
+      ],
+      "outer_screen_plane_note": "Frame top and sill returns span approximatelyV-172.4..-171.3, partly thickness and slight residual angle. Use nominalV-171.9 with about0.5m structural depth; preserve source wall line after local visual fit.",
+      "outer_screen_thickness_m": 0.5,
+      "recessed_glazing_plane_v_m": -174.6,
+      "nominal_screen_to_glass_recess_m": 2.7,
+      "pond_entrance_floor_navd88_m": 56.65,
+      "pond_terrace_navd88_m": 56.3,
+      "upper_lobby_floor_navd88_m": 59.9,
+      "second_lobby_floor_navd88_m": 63.6,
+      "front_parapet_navd88_m": 69.84,
+      "front_fascia_bottom_navd88_m": 66.6,
+      "recessed_lobby_roof_navd88_m": 68.54,
+      "west_annex_roof_navd88_m": 67.42,
+      "auditorium_roof_navd88_m": [
+        71.87,
+        73.29
+      ],
+      "fly_tower_roof_navd88_m": 80.01,
+      "fly_tower_parapet_navd88_m": 81.23,
+      "fly_tower_uv_bounds_m": [
+        157.7,
+        -218.1,
+        185.8,
+        -206.1
+      ],
+      "note": "The source enclosed roof footprint begins nearU133/V-174 and ends nearU187/V-177; it is not the boundary of the free-standing screen. Its five upper openings are about4.9m apart. The screen fascia is about3.24m deep vertically, from66.60 to69.84, while the recessed roof is68.54."
+    },
+    "facades": [
+      {
+        "id": "south_pond",
+        "plane": {
+          "axis": "v",
+          "at_m": -171.9,
+          "along_axis": "u",
+          "range_m": [
+            126.97,
+            193.58
+          ],
+          "outward_sign": 1
+        },
+        "opening_plane_policy": "Pale structure at the outer screen plane; glass panes are in the recessed glass wall with their own connected surrounds/mullions. Do not float panes in the gap. Five west openings are apertures in the screen, not projecting masonry window boxes.",
+        "glazing_groups": [
+          {
+            "id": "west_upper_five_apertures",
+            "centres_u_m": [
+              134.66,
+              139.52,
+              144.43,
+              149.42,
+              154.12
+            ],
+            "bottom_navd88_m": 63.6,
+            "top_navd88_m": 66.6,
+            "width_m": 2.7,
+            "height_m": 3.0,
+            "count_status": "Exactly five regular upper west apertures in both county photos; independent rawLiDAR sill clusters give the listed positions. Approximate4.9m pitch.",
+            "glass_plane_v_m": -174.6
+          },
+          {
+            "id": "west_lower_five_glass_block_bays",
+            "centres_u_m": [
+              134.66,
+              139.52,
+              144.43,
+              149.42,
+              154.12
+            ],
+            "bottom_navd88_m": 59.95,
+            "top_navd88_m": 62.8,
+            "width_m": 3.55,
+            "height_m": 2.85,
+            "count_status": "Five lower glass-block bays aligned with upper apertures. Railing and rising stair landings obscure some lower extent; bottom59.95 is the common lobby floor interpretation.",
+            "glass_plane_v_m": -174.6,
+            "notes": "Large lower screen portals also expose red infill beneath glass blocks down to the stepped terrace. Do not put five same-height ground entrances across the slope."
+          },
+          {
+            "id": "far_west_tall_portal",
+            "u_range_m": [
+              127.7,
+              131.4
+            ],
+            "bottom_navd88_m": 59.9,
+            "top_navd88_m": 64.9,
+            "status": "Tall opening at extreme west, separate from the five regular upper windows; photo-proportioned top."
+          },
+          {
+            "id": "main_curtain_wall",
+            "u_range_m": [
+              158.3,
+              181.7
+            ],
+            "bottom_navd88_m": 59.9,
+            "top_navd88_m": 68.4,
+            "outer_screen_aperture_top_navd88_m": 66.6,
+            "glass_plane_v_m": -174.6,
+            "vertical_mullion_pitch_m": 1.11,
+            "horizontal_mullion_levels_navd88_m": [
+              59.9,
+              61.12,
+              62.4,
+              63.6,
+              64.85,
+              66.05,
+              67.3,
+              68.4
+            ],
+            "upper_photo_cell_count": 21,
+            "count_status": "About21 narrow top-row cells on the county pond photo; cell count inferred at limited pixels. Main screen masks the upper glass between66.60and68.40 from low front view; do not fill that behind-screen space with opaque wall. Lower glass has door leaves and balcony interruption."
+          },
+          {
+            "id": "east_bay_two_levels",
+            "centres_u_m": [
+              188.42
+            ],
+            "bottoms_navd88_m": [
+              60.05,
+              63.6
+            ],
+            "width_m": 5.0,
+            "heights_m": [
+              3.0,
+              3.0
+            ],
+            "glass_plane_v_m": -174.6,
+            "count_status": "One broad eastern opening at each lobby level; sill cluster atU188.42 independently measured. Lower ground void is separate, not a third apartment window."
+          }
+        ],
+        "ground_entrance_doors": {
+          "centres_u_m": [
+            167.6,
+            171.0,
+            174.9
+          ],
+          "width_m": 2.0,
+          "bottom_navd88_m": 56.65,
+          "height_m": 2.4,
+          "plane_v_m": -174.6,
+          "shape": "rect",
+          "note": "Exactly three double-door sets in red brick infill beneath the broad curtain wall. Centers derived from county photo with LiDARanchored approximate perspective; allow0.7m local correction."
+        },
+        "rounded_stair_balcony_drum": {
+          "centre_uv_m": [
+            162.2,
+            -174.2
+          ],
+          "outer_radius_m": 1.8,
+          "lower_glass_block_bottom_navd88_m": 59.95,
+          "lower_glass_block_top_navd88_m": 62.0,
+          "pale_circular_parapet_navd88_m": [
+            62.0,
+            63.55
+          ],
+          "upper_rail_top_navd88_m": 64.5,
+          "status": "Photo-derived approximate drum between west bays and main lobby; upper rail wraps around a rounded balcony. Plan\u00b11m: use roof/point fits and native view to refine, not a precision-survey claim."
+        },
+        "balcony": {
+          "u_range_m": [
+            132.0,
+            188.0
+          ],
+          "deck_navd88_m": 59.9,
+          "rail_top_navd88_m": 60.95,
+          "front_plane_v_m": -172.9,
+          "notes": "Continuous thin pale railing across lower west/lobby front; exact ends follow landings and corner. Use ordinary connected railing components after palette shortlist."
+        },
+        "source_images": [
+          "runtime/research/campus-full-detail-20260905/county-8182573471-1024.jpg",
+          "runtime/research/campus-full-detail-20260905/county-6767681947-1024.jpg",
+          "runtime/research/campus-priority-20260905/cfta.jpg"
+        ]
+      },
+      {
+        "id": "rounded_southeast_corner",
+        "observed": "Convex pale corner with tall curtain glazing, about4columns by6rows externally visible. Glazing belongs to curved wall, not a projected box. Outer front screen terminates ahead of this curved enclosed wall.",
+        "source_enclosed_roof_corner_xz_m": [
+          [
+            216.14,
+            -156.59
+          ],
+          [
+            215.85,
+            -155.29
+          ],
+          [
+            212.74,
+            -145.85
+          ],
+          [
+            212.38,
+            -145.57
+          ],
+          [
+            208.11,
+            -145.19
+          ]
+        ],
+        "glazing_bottom_navd88_m": 59.95,
+        "glazing_top_navd88_m": 67.85,
+        "railing_stair": "External stair climbs the east slope; exact landings still require local terrain join."
+      },
+      {
+        "id": "north_fly_tower",
+        "observed": "Essentially closed red/pink masonry tall flytower, no repeated residential windows.",
+        "status": "Current aerial massing verified; service doors unresolved."
+      },
+      {
+        "id": "west_parking_side",
+        "observed": "Low red annex with short horizontal windows, entrance court at southwest.",
+        "proposed_strip_window_bottom_navd88_m": 64.6,
+        "proposed_strip_window_height_m": 0.85,
+        "status": "No exact count/positions claimed from occluded aerial."
+      }
+    ],
+    "site_joins": [
+      {
+        "id": "pond_terrace",
+        "bounds_uv_m": [
+          157.8,
+          -172.5,
+          194.0,
+          -166.8
+        ],
+        "height_navd88_m": 56.3,
+        "actual_surface": "pale paved terrace with water-edge retaining wall",
+        "evidence": "Dense rawsurface returns around56.25\u201356.35, east of front stairs. Exact water edge needs orthophoto/ground integration."
+      },
+      {
+        "id": "front_west_stair_and_landings",
+        "bounds_uv_m": [
+          127,
+          -171.5,
+          158,
+          -168.4
+        ],
+        "direction_down": "positive_u",
+        "width_m": 3.1,
+        "profile_u_h_m": [
+          [
+            127,
+            59.85
+          ],
+          [
+            132,
+            59.85
+          ],
+          [
+            138,
+            58.35
+          ],
+          [
+            142,
+            58.35
+          ],
+          [
+            145,
+            57.55
+          ],
+          [
+            150,
+            57.5
+          ],
+          [
+            152,
+            56.85
+          ],
+          [
+            156,
+            56.8
+          ],
+          [
+            158,
+            56.3
+          ]
+        ],
+        "evidence": "Direct stair-surface return profile, not bare-earthDEM. Preserve alternating flights and landings, keep a connecting thin pale guard. The earlier negativeV stair direction is superseded."
+      },
+      {
+        "id": "door_threshold_join",
+        "terrace_navd88_m": 56.3,
+        "door_threshold_navd88_m": 56.65,
+        "step_m": 0.35,
+        "status": "Photo+nearbyDEM estimate; threshold is hidden from class2 returns, so adapt to exact reviewed doorway landing."
+      }
+    ],
+    "uncertainties": [
+      "Pale facade material species remains unresolved: samples show coursed units, distinct red coarse lower masonry and ordinary red brick at door infill. Do not name limestone/sandstone solely by color.",
+      "Direct LiDAR establishes screen top/sill positions and stepped ground; most thin facade tops, drum and doors use photo interpretation. Their uncertainty is explicit in registration_revision.",
+      "A provisional four-point perspective rectification is NOT a calibrated photogrammetric model. Use the rawLiDAR positions over a conflicting approximate photo projection; do not silently move all source roof walls to the screen.",
+      "Side/back entrance counts remain unresolved; no all-sides acceptance is claimed."
+    ],
+    "previous_minecraft_palette_do_not_apply": {
+      "facade_piers": "light_gray_concrete",
+      "pale_trim": "quartz_block",
+      "red_lower_infill": "terracotta",
+      "auditorium_and_fly_tower": "terracotta",
+      "flat_roofs": "gray_concrete",
+      "window": "glass_pane",
+      "railing": "iron_bars",
+      "stairs": "smooth_quartz_stairs"
+    },
+    "material_selection_status": "deferred_to_documented_material_register_and_root_quantitative_shortlist",
+    "registration_revision": {
+      "version": 2,
+      "supersedes": "cfta-registration-v1-superseded.json",
+      "reason": "The pale front screen is a separate structure outside the enclosed roof footprint. Using the roof ring both shortened and recessed the whole front, and roof68.54 was mistaken for screen top69.84. First photo-center picks were also a few pixels off; larger source crops and LiDAR reveal approximately4.9m west-bay spacing.",
+      "raw_lidar_report": "runtime/research/campus-full-detail-20260905/cfta-lidar-detail-report.json",
+      "figures": [
+        "runtime/research/campus-full-detail-20260905/cfta-lidar-front-plan.png",
+        "runtime/research/campus-full-detail-20260905/cfta-lidar-front-elevations.png",
+        "runtime/research/campus-full-detail-20260905/cfta-west-window-count-grid.png"
+      ],
+      "uncertainty_m": {
+        "screen_sill_plan": 0.25,
+        "screen_top_h": 0.15,
+        "photo_aperture_top_h": 0.3,
+        "recessed_glass_plane": 0.4,
+        "photo_door_centres": 0.7,
+        "drum_plan": 1.0,
+        "door_threshold_h": 0.3
+      }
+    }
+  },
+  "uncertainties": [
+    "Bounded pond-facade and massing study; side/back opening counts, service entrances and interiors remain unresolved.",
+    "All ten source roof faces remain exact. One additive apron fills only the documented front lobby notch; the separate screen is a second authorized outside-roof structure.",
+    "Screen and west opening counts/centres are LiDAR supported; widths, doors, curve subdivision, drum and railing extent retain source tolerances.",
+    "No east flat glass sheet at superseded V-174.6 control; glazing follows measured curved enclosure behind outer screen aperture.",
+    "Fine 1.11m mullions use ordinary pane texture at two-block scale; six gap ties are photo-informed interpreted supports, not an exact count.",
+    "Panes stop at H68.0 beneath a backed cap at measured H68.5 roof; no pane pushes through roof.",
+    "Three lower double-door sets are fixed scaled glazing. Interior rooms, working scaled door leaves and external east stair remain unfinished.",
+    "Original quartz-brick/mud-brick/terracotta textures are material appearance proxies, not claims of actual species.",
+    "Existing source base/datum/terrain retained; only pond terrace, west stairs and door apron locally authored from source controls.",
+    "The 258-264s drone sequence informs upper wall/roof relationships. Trees still conceal lower parking-side doors/stairs; no hidden counts invented.",
+    "The six rooftop boxes are interpreted 2x1.5x0.5m white objects on existing face3 caps; neither equipment type nor exact surveyed location is claimed.",
+    "Main and curved curtain fields use six/four sparse principal pane groups, an interpreted block-scale rhythm rather than exact fine source counts.",
+    "Grey source faces3/4/7 and red/pale roof perimeter recoloring preserve occupied block shapes and heights; lower face8/9 fields stay under the base packet."
+  ],
+  "camera_views": [
+    {
+      "name": "cfta-pond-overview",
+      "eye_uv_navd88_m": [
+        172,
+        -133,
+        64
+      ],
+      "target_uv_navd88_m": [
+        160,
+        -176,
+        65
+      ],
+      "fov": 74
+    },
+    {
+      "name": "cfta-west-five-pairs",
+      "eye_uv_navd88_m": [
+        143,
+        -153,
+        63
+      ],
+      "target_uv_navd88_m": [
+        143,
+        -174,
+        63
+      ],
+      "fov": 76
+    },
+    {
+      "name": "cfta-curtain-doors",
+      "eye_uv_navd88_m": [
+        171,
+        -155,
+        60.5
+      ],
+      "target_uv_navd88_m": [
+        171,
+        -174,
+        62
+      ],
+      "fov": 76
+    },
+    {
+      "name": "cfta-southeast-curve",
+      "eye_uv_navd88_m": [
+        204,
+        -164,
+        64
+      ],
+      "target_uv_navd88_m": [
+        186,
+        -178,
+        64
+      ],
+      "fov": 74
+    },
+    {
+      "name": "cfta-stair-grade",
+      "eye_uv_navd88_m": [
+        143,
+        -153,
+        58.5
+      ],
+      "target_uv_navd88_m": [
+        143,
+        -170,
+        58.5
+      ],
+      "fov": 74
+    },
+    {
+      "name": "cfta-roof-source",
+      "eye_uv_navd88_m": [
+        211,
+        -150,
+        96
+      ],
+      "target_uv_navd88_m": [
+        167,
+        -194,
+        72
+      ],
+      "fov": 72
+    },
+    {
+      "name": "cfta-west-back-limited",
+      "eye_uv_navd88_m": [
+        130,
+        -205,
+        69
+      ],
+      "target_uv_navd88_m": [
+        150,
+        -202,
+        68
+      ],
+      "fov": 76
+    },
+    {
+      "name": "cfta-county-like-pond-oblique",
+      "eye_uv_navd88_m": [
+        218,
+        -149,
+        60
+      ],
+      "target_uv_navd88_m": [
+        167,
+        -183,
+        66
+      ],
+      "fov": 74
+    }
+  ],
+  "reference_addenda": [
+    {
+      "path": "runtime/research/campus-full-detail-20260905/cfta-drone-native-addendum-20260916.json",
+      "sha256": "96841d69838ee8ad09f54f7b418ba474094df82d78d627868403f1d968371cf4"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+      "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+    }
+  ],
+  "auditorium_east_wall_control": {
+    "endpoints_uv_m": [
+      [
+        185.714,
+        -206.11
+      ],
+      [
+        186.184,
+        -181.705
+      ]
+    ],
+    "removal_bounds_uv_m": [
+      185.4,
+      -206.2,
+      187.6,
+      -181.6
+    ],
+    "correction_v_range_m": [
+      -190.4,
+      -183.5
+    ],
+    "height_zone_navd88_m": [
+      68.5,
+      73.5
+    ],
+    "authority": {
+      "path": "runtime/research/campus-full-detail-20260905/cfta-drone-native-addendum-20260916.json",
+      "sha256": "96841d69838ee8ad09f54f7b418ba474094df82d78d627868403f1d968371cf4"
+    },
+    "rule": "Only the documented local excursion is corrected under the unchanged face7 roof. Low faces5/6, foundations and terrain remain untouched."
+  },
+  "roof_surface_material_control": {
+    "source_face_ids": [
+      3,
+      4,
+      7
+    ],
+    "field_state_replacements": {
+      "deepslate_tiles": "smooth_stone",
+      "deepslate_tile_slab": "smooth_stone_slab",
+      "deepslate_tile_stairs": "stone_brick_stairs"
+    },
+    "authority": {
+      "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+      "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+    },
+    "perimeter_authority": {
+      "path": "runtime/research/campus-full-detail-20260905/cfta-drone-native-addendum-20260916.json",
+      "sha256": "96841d69838ee8ad09f54f7b418ba474094df82d78d627868403f1d968371cf4"
+    },
+    "exclusions": "Faces8/9 receive no broad field recolor; all shape properties and heights retained."
+  },
+  "interpreted_rooftop_boxes": [
+    {
+      "centre_uv_m": [
+        163.2,
+        -213.1
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    },
+    {
+      "centre_uv_m": [
+        171.5,
+        -213.1
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    },
+    {
+      "centre_uv_m": [
+        179.8,
+        -213.1
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    },
+    {
+      "centre_uv_m": [
+        163.2,
+        -209.3
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    },
+    {
+      "centre_uv_m": [
+        171.5,
+        -209.3
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    },
+    {
+      "centre_uv_m": [
+        179.8,
+        -209.3
+      ],
+      "size_uv_m": [
+        2,
+        1.5
+      ],
+      "height_m": 0.5,
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+        "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+      }
+    }
+  ]
+}

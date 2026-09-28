@@ -1,0 +1,671 @@
+{
+  "name": "East Campus Faculty Village \u2014 Unit 3 south single house",
+  "revision": "2026-09-08-east-faculty3-v8-2x-brow-closure-bevelled-rake",
+  "parent_id": "160006438008-47b633ec2f",
+  "school_names": [
+    "East Campus Faculty Village",
+    "Unit 3"
+  ],
+  "school_map_numbers": [
+    35
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_east_faculty3_details",
+  "study_margin_m": 17,
+  "geometry": {
+    "origin_xz_m": [
+      454.6204382103378,
+      -25.41819484233224
+    ],
+    "axis_degrees": 9.142918904139906,
+    "main_roof_threshold_navd88_m": 71.5,
+    "entrance_floor_navd88_m": 66.9,
+    "upper_floor_navd88_m": 69.75,
+    "main_body_bounds_uv_m": [
+      2.55,
+      0.01,
+      9.7972,
+      12.25
+    ],
+    "front_projection_bounds_uv_m": [
+      5.75,
+      7.6,
+      9.7972,
+      13.88
+    ],
+    "source_footprint_bounds_uv_m": [
+      0,
+      0,
+      9.79720134,
+      14.75986515
+    ],
+    "source_roof_ridge_navd88_m": 75.1702,
+    "source_roof_rmse_m": 0.702831,
+    "main_roof_eave_navd88_m": 73.08,
+    "front_roof_eave_navd88_m": 72.8,
+    "front_roof_ridge_navd88_m": 74.6,
+    "plinth_top_navd88_m": 67.6,
+    "porch_eave_navd88_m": 69.55,
+    "porch_inner_roof_navd88_m": 69.95
+  },
+  "materials": {
+    "facade": "white_terracotta",
+    "foundation": "tuff",
+    "roof_family": "stone_brick",
+    "trim": "quartz_block",
+    "gable_infill": "oak_planks",
+    "glass": "white_stained_glass_pane"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.16,
+    "trim_family": "quartz",
+    "glass_block": "white_stained_glass_pane",
+    "horizontal_sash_rail_proxy": "Original white pane perimeter texture; repeated 0.5 m grid edges approximate the photographed meeting rails. No opaque intermediate cubes.",
+    "sash_proxy": "Single white-stained-pane sheet in outer aperture cells; no duplicate front posts or additional full-cell glass setback.",
+    "physical_mesh_limit": "The white pane is in the outer wall cell. Vanilla pane mesh remains at its centre, 0.25m behind a full-block face at 2blocks/m; no extra full-cell reveal is authored. Smooth proxy cladding accentuates this remaining optical recess."
+  },
+  "material_evidence": [
+    {
+      "component": "siding",
+      "actual_observed": "Tan horizontal lap-profile siding. Product and substrate unverified.",
+      "vanilla_proxy": "white_terracotta",
+      "sample_ids": [
+        "east3_lit_clapboard",
+        "east3_lit_front_clapboard"
+      ],
+      "delta_e_2000_raw": [
+        7.616,
+        14.492
+      ],
+      "delta_e_2000_equal_lightness": [
+        6.594,
+        7.288
+      ],
+      "reason": "Native v3 birch reads yellow/olive. Original white terracotta has lower raw and equal-lightness color error in both source siding ROIs than birch. At the matching-distance camera, its subdued warm beige field is the better compromise. Its smooth texture loses photographed narrow horizontal lap courses; the proxy does not imply actual clay siding. Stripped birch remains yellow, oak is darker and strongly chromatic, and pale oak is too light and pink-gray. No checkerboard mixture or custom texture is used.",
+      "candidate_comparison": {
+        "birch_planks": {
+          "original_texture": "assets/minecraft/textures/block/birch_planks.png",
+          "texture_sha256": "e1559eaabbee0c1ea0fca983e3bcba1a188e0a29b6c25ea7d725651cc2569216",
+          "mean_lab": [
+            72.4085,
+            -1.8939,
+            30.2297
+          ],
+          "photo_comparisons": {
+            "east3_lit_clapboard": {
+              "block": "birch_planks",
+              "delta_e_2000_raw": 9.582,
+              "delta_e_2000_equal_lightness": 9.377,
+              "delta_l_star": 2.583
+            },
+            "east3_lit_front_clapboard": {
+              "block": "birch_planks",
+              "delta_e_2000_raw": 14.785,
+              "delta_e_2000_equal_lightness": 10.201,
+              "delta_l_star": 13.149
+            }
+          }
+        },
+        "stripped_birch_log": {
+          "original_texture": "assets/minecraft/textures/block/stripped_birch_log.png",
+          "texture_sha256": "961c85ae822ac1efdd9327337857d0e34d66b2a8c334c58d19e870e853ea65cc",
+          "mean_lab": [
+            72.5549,
+            -0.7016,
+            32.2359
+          ],
+          "photo_comparisons": {
+            "east3_lit_clapboard": {
+              "block": "stripped_birch_log",
+              "delta_e_2000_raw": 9.656,
+              "delta_e_2000_equal_lightness": 9.429,
+              "delta_l_star": 2.729
+            },
+            "east3_lit_front_clapboard": {
+              "block": "stripped_birch_log",
+              "delta_e_2000_raw": 15.069,
+              "delta_e_2000_equal_lightness": 10.497,
+              "delta_l_star": 13.295
+            }
+          }
+        },
+        "oak_planks": {
+          "original_texture": "assets/minecraft/textures/block/oak_planks.png",
+          "texture_sha256": "65665943ef9c8bcf63fc67d2083ed0c50243f724106d0e4bb1abea5d921b16d3",
+          "mean_lab": [
+            57.6263,
+            5.284,
+            32.7791
+          ],
+          "photo_comparisons": {
+            "east3_lit_clapboard": {
+              "block": "oak_planks",
+              "delta_e_2000_raw": 13.087,
+              "delta_e_2000_equal_lightness": 8.196,
+              "delta_l_star": -12.199
+            },
+            "east3_lit_front_clapboard": {
+              "block": "oak_planks",
+              "delta_e_2000_raw": 10.092,
+              "delta_e_2000_equal_lightness": 9.984,
+              "delta_l_star": -1.633
+            }
+          }
+        },
+        "pale_oak_planks": {
+          "original_texture": "assets/minecraft/textures/block/pale_oak_planks.png",
+          "texture_sha256": "d478269d770f5bbefc0373a597155329d2f8d089ab76376c14c7eec8e79ea66f",
+          "mean_lab": [
+            88.2456,
+            3.0801,
+            1.7985
+          ],
+          "photo_comparisons": {
+            "east3_lit_clapboard": {
+              "block": "pale_oak_planks",
+              "delta_e_2000_raw": 16.573,
+              "delta_e_2000_equal_lightness": 10.433,
+              "delta_l_star": 18.42
+            },
+            "east3_lit_front_clapboard": {
+              "block": "pale_oak_planks",
+              "delta_e_2000_raw": 23.196,
+              "delta_e_2000_equal_lightness": 8.783,
+              "delta_l_star": 28.986
+            }
+          }
+        },
+        "white_terracotta": {
+          "original_texture": "assets/minecraft/textures/block/white_terracotta.png",
+          "texture_sha256": "9feeb13f19514ea58a5b6e942df7a8595330e61173f8d0a13c83b78acd1bd62e",
+          "mean_lab": [
+            74.8891,
+            8.8111,
+            12.7724
+          ],
+          "photo_comparisons": {
+            "east3_lit_clapboard": {
+              "block": "white_terracotta",
+              "delta_e_2000_raw": 7.616,
+              "delta_e_2000_equal_lightness": 6.594,
+              "delta_l_star": 5.064
+            },
+            "east3_lit_front_clapboard": {
+              "block": "white_terracotta",
+              "delta_e_2000_raw": 14.492,
+              "delta_e_2000_equal_lightness": 7.288,
+              "delta_l_star": 15.629
+            }
+          }
+        }
+      },
+      "source_roi_lighting_note": "The return and front ROI means have L* 69.8256 and 59.2597 under different illumination. Raw distance mixes exposure and finish color; equal-L distance diagnoses hue/chroma only and is not an inferred exposure correction."
+    },
+    {
+      "component": "stone-pattern plinth",
+      "actual_observed": "Irregular gray/brown stone-pattern facing with mortar. Natural stone versus manufactured veneer unresolved.",
+      "vanilla_proxy": "tuff",
+      "sample_ids": [
+        "east3_stone_plinth"
+      ],
+      "delta_e_2000_raw": 12.131,
+      "delta_e_2000_equal_lightness": 7.956,
+      "reason": "Irregular mineral texture is more appropriate than regular brick courses. The Minecraft name is a visual proxy, not an identification of the photographed rock."
+    },
+    {
+      "component": "cream trim and porch posts",
+      "actual_observed": "Cream painted square posts, window trim, corner boards and fascia; substrate unknown.",
+      "vanilla_proxy": "quartz slab heads/sills/fascia; white-stained-pane sash edges; quartz porch posts",
+      "sample_ids": [
+        "east3_cream_post"
+      ],
+      "delta_e_2000_raw": 8.948,
+      "delta_e_2000_equal_lightness": 5.675,
+      "reason": "Native v4 showed that separate narrow posts forced the glass sheet too deep. V5 keeps the white pane border as the thin sash proxy directly in the outer wall aperture, with physically contacting slab heads/sills and connected turns. Repeated 0.5 m pane-grid borders approximate rather than exactly count the source meeting rails."
+    },
+    {
+      "component": "shingle roofing",
+      "actual_observed": "Mottled gray-brown overlapping shingle units; asphalt, wood or synthetic product unresolved.",
+      "vanilla_proxy": "stone_bricks, stone_brick_slab, stone_brick_stairs",
+      "sample_ids": [
+        "east3_porch_roof"
+      ],
+      "delta_e_2000_raw": 8.858,
+      "delta_e_2000_equal_lightness": 5.921,
+      "reason": "Native v2 tuff brick reads dark green; native v3 stone brick reads neutral gray. Stone brick has lower equal-lightness error than tuff (5.921 versus 6.338); deepslate families are much darker and copper introduces unsupported metal color. Retain the coherent stone-brick construction-unit family. Warm brown weathering is not fully reproduced, and no unsourced checkerboard or moss mixture is added. Porch roof remains one 0.25 m slab without shell backing.",
+      "candidate_comparison": [
+        {
+          "block": "tuff_bricks",
+          "delta_e_2000_raw": 6.454,
+          "delta_e_2000_equal_lightness": 6.338,
+          "delta_l_star": -1.295
+        },
+        {
+          "block": "stone_bricks",
+          "delta_e_2000_raw": 8.858,
+          "delta_e_2000_equal_lightness": 5.921,
+          "delta_l_star": 6.629
+        },
+        {
+          "block": "stone",
+          "delta_e_2000_raw": 9.457,
+          "delta_e_2000_equal_lightness": 5.7,
+          "delta_l_star": 7.567
+        },
+        {
+          "block": "deepslate_bricks",
+          "delta_e_2000_raw": 13.019,
+          "delta_e_2000_equal_lightness": 5.891,
+          "delta_l_star": -13.467
+        },
+        {
+          "block": "waxed_exposed_cut_copper",
+          "delta_e_2000_raw": 14.218,
+          "delta_e_2000_equal_lightness": 10.915,
+          "delta_l_star": 9.112
+        },
+        {
+          "block": "deepslate_tiles",
+          "delta_e_2000_raw": 18.392,
+          "delta_e_2000_equal_lightness": 5.885,
+          "delta_l_star": -21.279
+        }
+      ]
+    },
+    {
+      "component": "gable-tip shingle profile",
+      "actual_observed": "Paler small shingle-profile infill in two front gable tips.",
+      "vanilla_proxy": "oak_planks",
+      "reason": "The independently inspected small gable panel is tan-brown in shadow, not white/pink. Oak retains a timber-profile construction surface and is closer than pale oak30.941 or birch21.474 raw deltaE for this ROI. Fine fishscale curvature remains unresolved at this grid.",
+      "sample_ids": [
+        "east3_front_gable_shingle_new_roi"
+      ],
+      "photo_roi_xyxy": [
+        416,
+        43,
+        441,
+        60
+      ],
+      "photo_roi_mean_srgb": [
+        135.18,
+        117.26,
+        96.38
+      ],
+      "delta_e_2000_raw": 11.458,
+      "delta_e_2000_equal_lightness": 9.152
+    }
+  ],
+  "openings": [
+    {
+      "id": "front-projecting-ground-triple",
+      "side": "south",
+      "at_m": 13.88,
+      "centres_m": [
+        7.8
+      ],
+      "sill_navd88_m": 67.65,
+      "width_m": 2.45,
+      "height_m": 1.5,
+      "sashes": 3,
+      "status": "photo_count_metric_estimate",
+      "grid_fit_note": "The original 1.65 m photographic height estimate rounds to three full pane rows (1.5 m) beneath the fixed porch brow, keeping a contacting quarter-metre head instead of intersecting glazing with roof slabs."
+    },
+    {
+      "id": "front-projecting-upper-singles",
+      "side": "south",
+      "at_m": 13.88,
+      "centres_m": [
+        6.8,
+        8.65
+      ],
+      "sill_navd88_m": 70.55,
+      "width_m": 0.9,
+      "height_m": 1.65,
+      "sashes": 1,
+      "status": "photo_count_metric_estimate"
+    },
+    {
+      "id": "front-setback-upper-singles",
+      "side": "south",
+      "at_m": 12.25,
+      "centres_m": [
+        3.45,
+        5.0
+      ],
+      "sill_navd88_m": 70.55,
+      "width_m": 0.9,
+      "height_m": 1.7,
+      "sashes": 1,
+      "status": "photo_count_metric_estimate_reinterpreted_from_photo"
+    },
+    {
+      "id": "front-setback-ground-pair",
+      "side": "south",
+      "at_m": 12.25,
+      "centres_m": [
+        5.15
+      ],
+      "sill_navd88_m": 67.65,
+      "width_m": 1.0,
+      "height_m": 1.7,
+      "sashes": 2,
+      "status": "photo_partial_metric_estimate",
+      "grid_fit_note": "The partially visible pair is fitted 0.15 m right and 0.25 m narrower within its photo-estimated bounds, preserving a real wall jamb between the window and door."
+    },
+    {
+      "id": "west-ground-pairs",
+      "side": "west",
+      "at_m": 2.55,
+      "centres_m": [
+        10.13,
+        3.73
+      ],
+      "sill_navd88_m": 67.65,
+      "width_m": 1.65,
+      "height_m": 1.7,
+      "sashes": 2,
+      "status": "photo_partial_metric_estimate"
+    },
+    {
+      "id": "west-upper-near-corner-single",
+      "side": "west",
+      "at_m": 2.55,
+      "centres_m": [
+        11.23
+      ],
+      "sill_navd88_m": 70.55,
+      "width_m": 0.9,
+      "height_m": 1.7,
+      "sashes": 1,
+      "status": "photo_count_metric_estimate_reinterpreted_from_photo"
+    },
+    {
+      "id": "west-upper-rear-pair",
+      "side": "west",
+      "at_m": 2.55,
+      "centres_m": [
+        3.68
+      ],
+      "sill_navd88_m": 70.55,
+      "width_m": 1.6,
+      "height_m": 1.7,
+      "sashes": 2,
+      "status": "photo_partial_metric_estimate"
+    }
+  ],
+  "porch": {
+    "front_bounds_uv_m": [
+      0.0,
+      12.25,
+      5.75,
+      14.74
+    ],
+    "west_bounds_uv_m": [
+      0.0,
+      3.8,
+      2.55,
+      12.25
+    ],
+    "posts_uv_m": [
+      [
+        0.25,
+        14.45
+      ],
+      [
+        2.7,
+        14.45
+      ],
+      [
+        5.5,
+        14.45
+      ],
+      [
+        0.25,
+        10.8
+      ],
+      [
+        1.0,
+        7.2
+      ],
+      [
+        1.0,
+        4.1
+      ]
+    ],
+    "post_width_photo_estimate_m": 0.25,
+    "entry_door_uv_m": [
+      3.7,
+      12.25
+    ],
+    "entry_step_bounds_uv_m": [
+      1.35,
+      14.74,
+      4.35,
+      16.39
+    ],
+    "status": "open_wrap_porch_observed_positions_and_levels_estimated",
+    "entry_grid_fit_note": "Entry ensemble shifted 0.20 m within its photo-estimated location so the narrow sidelight clears the rasterised convex corner; preserves the measured plan and avoids a free pane replacing the corner board."
+  },
+  "chimney": {
+    "bounds_uv_m": [
+      1.7,
+      0.88,
+      2.65,
+      2.18
+    ],
+    "top_navd88_m": 74.5,
+    "status": "one_pale_external_chimney_observed_position_and_height_estimated"
+  },
+  "roof_evidence": {
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "source_face_ids_0based": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "ground_level_repair_ids": [
+      2,
+      4
+    ],
+    "major_plane_control_ids": [
+      1,
+      5
+    ],
+    "rule": "Exact source footprint remains the plan clipping mask. Main measured ridge level and about 30 degree pitch control the taller setback gable. Source single-ridge placement disagrees with the numbered photo's two front gables, so their intersecting surfaces are explicitly authored. No source face is silently treated as a surveyed chimney or dormer.",
+    "face_fingerprints": {
+      "0": "ae5134f066bf5e0f",
+      "1": "ffe4e73e00e8d63d",
+      "2": "62a066592d67a829",
+      "3": "b7cc033e622ed392",
+      "4": "16d86a3a7fc84d68",
+      "5": "8d39b7a3badf3859"
+    },
+    "orientation_correction": "Independent photo geometry review: the west return on image-left and east projecting gable on image-right imply a south front viewed from southwest. Measured low porch faces 0/3 lie at the southern end and support this orientation. Earlier north-front proposal is superseded, not treated as measured.",
+    "secondary_porch_orientation_source_ids": [
+      0,
+      3
+    ]
+  },
+  "evidence": [
+    {
+      "id": "east_photo_2",
+      "url": "https://wohlsenconstruction.com/wp-content/uploads/2016/03/the-hill-school-east-faculty-housing-East_Faculty_Housing_2.jpg",
+      "local": "runtime/research/campus-full-detail-20260905/east-faculty-wohlsen-2.jpg",
+      "supports": "Visible 3 on porch post; two gables, separately visible south/front and west openings, lap siding, irregular plinth, open porch, pale external chimney. Independently inspected 2026-09-07; south-front alignment inferred from visible handedness and southern measured porch faces."
+    },
+    {
+      "id": "contractor",
+      "url": "https://wohlsenconstruction.com/project/the-hill-school-east-faculty-housing/",
+      "supports": "Primary contractor identifies three single-family houses following four duplexes, with Hord Coplan & Macht as architect. Page rechecked 2026-09-07."
+    },
+    {
+      "id": "east_photo_1",
+      "url": "https://wohlsenconstruction.com/wp-content/uploads/2016/03/the-hill-school-east-faculty-housing-East_Faculty_Housing.jpg",
+      "local": "runtime/research/campus-full-detail-20260905/east-faculty-wohlsen-1.jpg",
+      "supports": "Independently inspected; a different numbered duplex, used only as family material corroboration. Its dormer, hip roof, doors and windows are not copied to Unit 3."
+    },
+    {
+      "id": "measured",
+      "local": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+      "record": "building_records[parent_id=160006438008-47b633ec2f]",
+      "supports": "County/Roofer plan, exact source-face order, ridge datum, normalized local metric frame and photographed identification."
+    },
+    {
+      "id": "material-comparison",
+      "local": "runtime/research/campus-material-audit-20260905/photo-texture-comparison.json",
+      "supports": "CIELAB D65 / CIEDE2000 vanilla original texture comparisons against separately labelled lit and shaded photo ROIs."
+    }
+  ],
+  "uncertainties": [
+    "Photo-to-parent match is high confidence from the visible Unit 3 number. South/front alignment is an explicit geometric inference from the west return and east projection; it corrects the inherited north-front assumption but is not photogrammetric registration.",
+    "South/front and west/return are individually photo interpreted. East and north have no reliable facade photographs; no speculative or mirrored apertures are generated there.",
+    "Openings, porch boundaries, post spacing, chimney position, entrance level and front gable relief are estimated in metres. Source roof RMSE is 0.703 m.",
+    "Major roof faces 1/5 contribute ridge datum and slope controls, but their missing western reconstruction prevents claiming an unchanged measured two-gable roof. Corrected surfaces have explicit provenance.",
+    "Southern lower source faces 0/3 support the front-porch orientation. All final roof cells are authored; original source planes/polygons and controls remain recorded. Chimney-to-source-face assignment is unresolved.",
+    "White-pane sash borders occupy the original outer wall aperture cells with no additional one-cell recess. Native pane-center placement and repeated texture borders remain grid-scale approximations.",
+    "Actual siding, stone veneer, roofing and trim products are unknown. Minecraft block names describe visual construction proxies only.",
+    "No dormer is evidenced on this single house; the nearby duplex dormer is deliberately not inherited.",
+    "The white-terracotta siding proxy improves muted beige color but does not reproduce the photographed horizontal lap courses. The stone-brick roof approximates gray units without fully matching brown weathering."
+  ],
+  "camera_views": [
+    {
+      "name": "east3-photo-southwest",
+      "eye_uv_navd88_m": [
+        -10,
+        27.5,
+        70.7
+      ],
+      "target_uv_navd88_m": [
+        4.9,
+        10.2,
+        70.6
+      ],
+      "fov": 57
+    },
+    {
+      "name": "east3-south-two-gables",
+      "eye_uv_navd88_m": [
+        5,
+        32,
+        70.3
+      ],
+      "target_uv_navd88_m": [
+        5.2,
+        12.6,
+        70.7
+      ],
+      "fov": 53
+    },
+    {
+      "name": "east3-west-porch-chimney",
+      "eye_uv_navd88_m": [
+        -15,
+        7.2,
+        70.2
+      ],
+      "target_uv_navd88_m": [
+        2.2,
+        7.2,
+        70.4
+      ],
+      "fov": 57
+    },
+    {
+      "name": "east3-entrance-close",
+      "eye_uv_navd88_m": [
+        -2.5,
+        20.4,
+        68.7
+      ],
+      "target_uv_navd88_m": [
+        3.5,
+        12.25,
+        68.6
+      ],
+      "fov": 62
+    },
+    {
+      "name": "east3-roof-audit",
+      "eye_uv_navd88_m": [
+        -9,
+        25.5,
+        80
+      ],
+      "target_uv_navd88_m": [
+        5.2,
+        8.2,
+        72.5
+      ],
+      "fov": 58
+    },
+    {
+      "name": "east3-unseen-east-north-audit",
+      "eye_uv_navd88_m": [
+        21,
+        -13,
+        72
+      ],
+      "target_uv_navd88_m": [
+        6,
+        5.5,
+        70.6
+      ],
+      "fov": 57
+    }
+  ],
+  "native_revision_evidence": {
+    "reviewed_v2_screenshots": "runtime/campus-reconstruction/chapel-native-qa/runs/east-faculty3-v2-2x-20260907/screenshots",
+    "corrections": [
+      "Pale0.125m vertical timber sash posts inside aperture cells, no fence crossbars, with physically supported connected glass one cell behind.",
+      "Quarter-metre single-slab porch roof with continuous cream outer fascia, removing shared-shell backing.",
+      "Neutral stone-brick roof for same-camera comparison against dark green v2 tuff.",
+      "Tan oak gable tip in place of pale pink-looking pale oak.",
+      "Chimney cap kept within chimney raster footprint.",
+      "Full dark door cube removed; thin flush timber skin and one operable lower door."
+    ],
+    "reviewed_v3_screenshots": "runtime/campus-reconstruction/chapel-native-qa/runs/east-faculty3-v3-2x-20260907/screenshots",
+    "reviewed_sash_comparison": "runtime/campus-reconstruction/chapel-native-qa/runs/foster-v4-sash-options-20260907/screenshots",
+    "v4_corrections": [
+      "White terracotta facade reduces the native yellow/olive cast after comparison with birch, stripped birch, oak and pale oak; horizontal lap texture remains a documented limitation.",
+      "White stained glass panes retain slender pale-oak posts and physical inset slab support, improving fine sash-edge and horizontal-rail visibility.",
+      "Stone-brick roof retained after raw/equal-lightness and native review; weathered brown variation remains unresolved."
+    ],
+    "reviewed_v4_screenshots": "runtime/campus-reconstruction/chapel-native-qa/runs/east-faculty3-v4-2x-20260907/screenshots",
+    "v5_corrections": [
+      "Move white panes directly into the outer wall aperture sheet and remove duplicate front fence posts; maintain sill/head support and thin entry door.",
+      "Two exposed yellow front strips originated in floor-role birch plate cells, not gable fishscale or different siding. Clad those visible front rim cells in the established facade finish, preserving internal floor and gable palette.",
+      "Roof, roof materials, occupied plan, porch, chimney and native cameras are unchanged."
+    ],
+    "v6_corrections": [
+      "Replace the overdeep generic reveal cut with a bounded 0.65 m residential wall cut; preserve adjacent perpendicular walls.",
+      "Use the shared authorised diagonal-corner and frame-return helpers after custom pane placement.",
+      "Check and close each vertical window perimeter with physically contacting head/sill slabs; repair the bay brow overwriting window heads.",
+      "Shift the photo-estimated entry ensemble 0.20 m inside the front wall so its narrow sidelight does not replace a rasterised convex corner board.",
+      "Fit the partially observed ground pair within a real door jamb and quantise the ground triple to three full pane rows beneath its fixed roof brow; close one embedded transom/sidelight cap corner."
+    ],
+    "v7_corrections": [
+      "Add concealed full wall backing behind thin window heads and sills, closing the unused half-slab volume against adjacent masonry. Preserve outer panes, visible caps, all roof-role cells/materials, footprint and native cameras."
+    ]
+  },
+  "native_geometry_reviews": [
+    {
+      "revision": "v7",
+      "screenshots": "runtime/campus-reconstruction/chapel-native-qa/runs/east-faculty3-v7-2x-20260908/screenshots",
+      "inspected_views": 6,
+      "concrete_corrections_for_v8": [
+        "Preserve occupied wall and pane-head cells where the exterior bay brow formerly overwrote them with top slabs. The brow remains outside the body.",
+        "Bevel full-block trim caps on the two observed gable rakes with uphill bottom stairs; maximum cap height and full wall backing remain unchanged."
+      ],
+      "remaining_likeness_limits": [
+        "Vanilla pane centre remains0.25m behind a full-block facade face at2x; no additional full-cell setback.",
+        "Smooth warm pink-taupe cladding still loses observed beige lap lines; palette review belongs to Sol.",
+        "Unseen east and north elevations remain unresolved."
+      ]
+    }
+  ]
+}

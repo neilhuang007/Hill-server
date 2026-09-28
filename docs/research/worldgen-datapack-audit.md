@@ -24,7 +24,7 @@ This gives students a visibly custom Overworld plus structure variety, and it al
 
 Do not combine the Terralith datapack with the ordinary Tectonic datapack. Terralith's official Modrinth page says datapack users must use Terratonic instead of Tectonic, and Terratonic's official page describes it as the Tectonic-compatible variant adjusted for Terralith biomes. Sources: [Terralith page](https://modrinth.com/datapack/terralith), [Terratonic page](https://modrinth.com/datapack/terratonic), [Tectonic page](https://modrinth.com/datapack/tectonic).
 
-Source basis: the exact Paper runtime is pinned locally to Paper `26.2` build `119`, and Paper's official Fill API records build `119` as `STABLE`, artifact `paper-26.2-119.jar`, SHA-256 `a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629`. Sources: local `build.gradle.kts`, local `scripts/install-server.sh`, and [Paper Fill API build 119](https://fill.papermc.io/v3/projects/paper/versions/26.2/builds/119).
+Source basis: the exact Paper runtime is pinned locally to Paper `26.2` build `119`, and Paper's official Fill API records build `119` as `STABLE`, artifact `paper-26.2-119.jar`, SHA-256 `a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629`. Sources: local `build.gradle.kts`, local `ops/install-server.sh`, and [Paper Fill API build 119](https://fill.papermc.io/v3/projects/paper/versions/26.2/builds/119).
 
 ## Local profile facts
 

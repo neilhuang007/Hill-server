@@ -1,0 +1,63 @@
+{
+  "name": "Alumni Chapel — small current-campus study",
+  "revision": "2026-09-04-study-11",
+  "scope": "Chapel and its immediate grounds only; expansion requires visual acceptance",
+  "coordinate_system": "VoxelEarth local metres: X east, Z south; local v follows the nave toward the southern entrance",
+  "blocks_per_metre": 2,
+  "materials": {
+    "masonry": "stone_bricks",
+    "real_masonry": "brownstone veneer and dimensional stone",
+    "trim": "smooth_sandstone",
+    "resource_pack": "server-assets/resourcepacks/hill-brownstone"
+  },
+  "geometry": {
+    "rotation_degrees": -8.5,
+    "floor_navd88_m": 66.0,
+    "nave_half_width_m": 4.75,
+    "aisle_outer_m": 8.0,
+    "nave_north_m": -2.0,
+    "old_south_m": 21.0,
+    "south_m": 28.5,
+    "addition_start_m": 20.8,
+    "addition_outer_bounds_u_m": [-9.0, 10.6],
+    "eave_m": 7.5,
+    "ridge_m": 10.5,
+    "tower_bounds_uv_m": [5.5, -1.5, 11.0, 4.5],
+    "tower_height_m": 16.0,
+    "turret_height_m": 17.0
+  },
+  "evidence": [
+    {
+      "url": "https://www.gkoarchitects.com/planning/lansdowne-borough-mp-fs-ns5h3",
+      "local_reference": "runtime/research/hill-reference-20260904/chapel-gko-2.jpg",
+      "supports": "Architect SP-1 graphic scale gives approximate 19.6 m transverse width and 7.7 m depth of proposed southern addition, with entrance steps projecting a further 4–5 m."
+    },
+    {
+      "source": "runtime/campus-reconstruction/roofer-chapel-trial/roofer-building-overlay-1m/hill-campus-roofer-lod22-buildings-only-1m.npz",
+      "building_id": 73,
+      "supports": "Original footprint, nave axis, ground elevation, approximately 10 m nave ridge and 17 m tower above its base"
+    },
+    {
+      "url": "https://www.thehill.org/student-life/spiritual-life",
+      "local_reference": "runtime/research/hill-reference-20260904/chapel-front-2025.jpg",
+      "supports": "Current south gable, entrance arch, large traceried upper window, pale surrounds, buttresses, iron railings, copper lanterns"
+    },
+    {
+      "url": "https://thewitmergroup.com/project/the-hill-school-alumni-chapel/",
+      "supports": "Brownstone masonry, stone tracery, copper flashings, asphalt replacement roof, eastern open arcade, square tower with slotted parapet and separate crenellated turret"
+    },
+    {
+      "url": "https://www.pottstown.org/AgendaCenter/ViewFile/Item/13647?fileID=6169",
+      "supports": "2023 proposed addition is on the southern side and has area 1,445 square feet"
+    }
+  ],
+  "uncertainties": [
+    "The addition is approximately 19.6 by 7.7 metres from GKO's scaled proposed SP-1 plan, with about 1 metre raster-reading uncertainty. Confirm against the built geometry before acceptance.",
+    "Facade opening sizes and rhythm are manually interpreted from photographs, not a measured architectural survey.",
+    "Ordinary stone-brick blocks use a local original brownstone pixel-art texture. This is a material interpretation, not a scanned texture; vanilla without the pack shows gray masonry.",
+    "Major tree crowns are inferred from unclassified LiDAR geometry and checked against broad planting masses on SP-1; species, trunk positions and fine crown shapes remain interpretations. Crown surfaces are smoothed at 1 metre and incomplete crop-edge trees are omitted.",
+    "Asphalt has no literal vanilla block; polished deepslate and matching slabs/stairs use the vanilla gray-concrete texture through local model definitions, preserving measured terrain elevations.",
+    "Smooth sandstone components use an original generated cut-brownstone albedo. The small metal clock and pale louver blades use explicit reserved trapdoor states and original JSON component models in the dedicated pack; they revert to trapdoors without this pack.",
+    "Beds and low shrubs follow visible front/east planting zones; their individual plant species and positions are interpreted rather than surveyed."
+  ]
+}

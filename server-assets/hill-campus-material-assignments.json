@@ -1,0 +1,808 @@
+{
+  "revision": "2026-09-07-existing-studies-material-review-1",
+  "source_config": "E:\\projects\\Hill-server\\server-assets\\hill-campus-context.json",
+  "source_config_sha256": "f931a6e25f2da07b99fc9bb2de91dfef7187ae9f32968b51ae5f24c30348df5c",
+  "scope": "Exact archived studies only; not a default palette for new individual facades.",
+  "catalogue": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+  "photo_comparisons": "runtime/research/campus-material-audit-20260905/photo-texture-comparison.json",
+  "primary_source_registers": [
+    "runtime/research/campus-full-detail-20260905/institutional-material-rois.json",
+    "runtime/research/campus-full-detail-20260905/housing-facades.json",
+    "runtime/research/campus-full-detail-20260905/housing-material-appearance.json"
+  ],
+  "policy": "Documented material and visible texture before raw colour error. Photo exposure is not intrinsic reflectance. Ordinary vanilla construction blocks only; no sandstone asserted. No automatic nearest-colour selection. Unresolved mixed facades await zoned individual reconstruction.",
+  "buildings": {
+    "1600151120011C-e738fb4171": {
+      "name": "Class of 1960 Alumni House",
+      "source_study": "runtime/campus-reconstruction/alumni-house-v6-2x",
+      "source_archive_sha256": "f53080991fc516a74053f4dbd0c5bf458e3f00314eb6b3339ab96274a7a4fcf0",
+      "status": "material_correction_pending_native",
+      "decision": "Keep photographed red brick. Change yellow gable/porch timber to pale oak: fishscale paint ROI raw DeltaE00 5.84; pale horizontal timber retains a cladding pattern. Replace eight unsupported sandstone trim blocks with smooth quartz. Fishscale scallops remain simplified.",
+      "rules": [
+        {
+          "id": "painted-gable-and-porch",
+          "roles": [
+            "facade",
+            "trim"
+          ],
+          "from": [
+            "birch_planks",
+            "birch_slab"
+          ],
+          "to_family": "pale_oak"
+        },
+        {
+          "id": "painted-shutter-geometry",
+          "roles": [
+            "trim"
+          ],
+          "from": [
+            "birch_trapdoor"
+          ],
+          "to": "pale_oak_trapdoor"
+        },
+        {
+          "id": "withdraw-unsupported-sandstone",
+          "roles": [
+            "trim"
+          ],
+          "from": [
+            "smooth_sandstone"
+          ],
+          "to": "smooth_quartz"
+        }
+      ],
+      "sample_ids": [
+        "alumni_front_brick_left",
+        "alumni_front_brick_right",
+        "alumni_gable_fishscale",
+        "alumni_porch_trim"
+      ],
+      "geometry_status": "previous_individual_study_requires_updated_native_review"
+    },
+    "chapel": {
+      "name": "Alumni Chapel",
+      "source_study": "runtime/campus-reconstruction/chapel-context-2x-v5",
+      "source_archive_sha256": "f2c5d408a042d75f476b27df959a0e6d6620b20da01016f1338a0b59eb95b171",
+      "status": "retained_existing_proxy_more_native_comparison_required",
+      "decision": "Brownstone identity is documented; retain muted coursed mud-brick appearance proxy and gray roof. Native mixed mud/stone/granite coupon was too patchy and rejected. This does not establish intrinsic stone colour or validate all existing detail.",
+      "rules": [],
+      "sample_ids": [
+        "mp_brownstone"
+      ],
+      "geometry_status": "previous_individual_study_requires_updated_native_review"
+    },
+    "16001511600613C-92645e8573": {
+      "name": "Athey Academic Center and Dining Hall envelope",
+      "source_study": "runtime/campus-reconstruction/athey-v8-2x",
+      "source_archive_sha256": "cb0f1af2214c97780ccd6f9c5048812c285f293559a4615760977121cd47702d",
+      "status": "material_correction_pending_native",
+      "decision": "Athey photographs support retaining red brick. Replace visibly coursed quartz trim with smoother quartz for pale flat painted/stone surrounds. Gray foundation versus reddish plinth requires a separately bounded individual facade pass, not a campus-wide replacement.",
+      "rules": [
+        {
+          "id": "smooth-pale-window-and-coping-trim",
+          "roles": [
+            "trim"
+          ],
+          "from": [
+            "quartz_block",
+            "quartz_slab",
+            "quartz_stairs"
+          ],
+          "to_family": "smooth_quartz"
+        }
+      ],
+      "sample_ids": [
+        "athey_brick_99",
+        "athey_brick_95",
+        "athey_plinth_99",
+        "athey_trim_99",
+        "athey_trim_95"
+      ],
+      "geometry_status": "previous_individual_study_requires_updated_native_review"
+    },
+    "160015116006-567a5eddd9": {
+      "name": "John P. Ryan Library",
+      "source_study": "runtime/campus-reconstruction/ryan-library-v6-2x",
+      "source_archive_sha256": "9f3a03238290eb74d3f03992671cdf21d0947fa4703fb1116c287cc8f0f868c0",
+      "status": "material_correction_pending_native",
+      "decision": "Documented ashlar brownstone: use stone-brick courses for the current muted gray-brown appearance (current ROI raw DeltaE00 9.295), rather than smooth flat light-gray terracotta despite its lower colour error. Lighten orange porch/panel terracotta to white terracotta (porch raw 5.644; panel equal-L 1.462). These are vanilla appearance substitutes, not geology claims.",
+      "rules": [
+        {
+          "id": "muted-coursed-ashlar",
+          "roles": [
+            "facade",
+            "trim"
+          ],
+          "from": [
+            "mud_bricks",
+            "mud_brick_stairs",
+            "mud_brick_slab"
+          ],
+          "to_family": "stone_brick"
+        },
+        {
+          "id": "pale-warm-porch-and-panels",
+          "roles": [
+            "facade",
+            "trim"
+          ],
+          "from": [
+            "terracotta"
+          ],
+          "to": "white_terracotta"
+        }
+      ],
+      "sample_ids": [
+        "ryan_ashlar_current",
+        "ryan_ashlar_west",
+        "ryan_porch_smooth",
+        "ryan_east_pale_panels"
+      ],
+      "geometry_status": "previous_individual_study_requires_updated_native_review"
+    },
+    "160015116006-d4f3b48752": {
+      "name": "Hunt Upper School",
+      "source_study": "runtime/campus-reconstruction/hunt-hall-v6-2x",
+      "source_archive_sha256": "1a2544f49c2847634f6e09b3bf32a8a2884111fe46f80bb061c2f4e0ae18200a",
+      "status": "material_correction_pending_native",
+      "decision": "Retain photographed red brick above and warm coursed stone proxy below. Orange overlapping roof tiles remain waxed-cut-copper as colour/shape proxy (raw DeltaE00 4.453 in one close ROI); actual roof product is not identified as copper. Change overly orange dressed surrounds to muted light-gray terracotta (raw 11.96 versus original terracotta 14.296).",
+      "rules": [
+        {
+          "id": "muted-dressed-stone-surrounds",
+          "roles": [
+            "trim"
+          ],
+          "from": [
+            "terracotta"
+          ],
+          "to": "light_gray_terracotta"
+        }
+      ],
+      "sample_ids": [
+        "hunt_arcade_brownstone_left",
+        "hunt_upper_brick_left",
+        "hunt_roof_shallow_tiles",
+        "hunt_dressed_window_stone",
+        "hunt_north_original_base_stone"
+      ],
+      "geometry_status": "previous_individual_study_requires_updated_native_review"
+    },
+    "16001511600620C-fff89cfae9": {
+      "name": "Meigs House - Admission Office",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600620C-fff89cfae9",
+      "source_archive_sha256": "79f1963de838f902ea13772c6a32ceb1477c8d50f31203daae81ffb5679771fb",
+      "status": "material_correction_pending_native",
+      "decision": "Photographed tan textured stucco is not exposed mud brick. White terracotta is a low-frequency tan finish proxy (lit ROI raw DeltaE00 5.337). Porch, brown roof and concealed base still require individual geometry and material zones.",
+      "rules": [
+        {
+          "id": "tan-stucco-wall",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "mud_bricks"
+          ],
+          "to": "white_terracotta"
+        }
+      ],
+      "sample_ids": [
+        "meigs_lit_textured_wall",
+        "meigs_shaded_textured_wall",
+        "meigs_brown_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006389O-f1989780fb": {
+      "name": "Warner Center for Spiritual Life and Equity",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006389O-f1989780fb",
+      "source_archive_sha256": "2d62898ae6d322e9521444e142cca5c9aa3f569754e64a100b401201f024703c",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600633C-c14400ca75": {
+      "name": "Davy Hall Dormitory",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600633C-c14400ca75",
+      "source_archive_sha256": "8b1f4e811d9982062355de5f481d03cc4c3f12567bfe166b8de5506ce0ad4deb",
+      "status": "material_correction_pending_native",
+      "decision": "Photographed reddish-gray coursed exterior is not verified red brick. Light-gray terracotta reduces the red bias but cannot reproduce masonry courses; use this only as an interim colour revision while the individual Davy model is refined. Dark small-unit roof changes to deepslate tile forms.",
+      "rules": [
+        {
+          "id": "muted-wall-colour",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "bricks"
+          ],
+          "to": "light_gray_terracotta"
+        },
+        {
+          "id": "dark-small-unit-roof",
+          "roles": [
+            "roof"
+          ],
+          "from": [
+            "stone_bricks",
+            "stone_brick_stairs",
+            "stone_brick_slab"
+          ],
+          "to_family": "deepslate_tile"
+        }
+      ],
+      "sample_ids": [
+        "davy_north_masonry",
+        "davy_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "160031040003-894f07a81a": {
+      "name": "Center For The Arts (CFTA)",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160031040003-894f07a81a",
+      "source_archive_sha256": "cb5182690809ee1fdbd2b2508ea84534afa3a5c4e179777e03a6cfb934b5a579",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-1f19950994": {
+      "name": "David H. Mercer Field House and Jerry Day '37 Squash Center / Sweeney Gymnasium",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-1f19950994",
+      "source_archive_sha256": "fafaa2b50f580150616bed3e529e12d3715e8c917ca8aa62d16e1d8e44e6f7d6",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16003036400434C-c86ee564a0": {
+      "name": "Edward Tuck Hall Arena and Thomas Eccleston Jr. Rink",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16003036400434C-c86ee564a0",
+      "source_archive_sha256": "5a652856c001820d3de39455e0dfb7597efa833c0c70a8a1b5c3d5c41355912e",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "1600303920031C-4b7d18d798": {
+      "name": "Annan Building",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/1600303920031C-4b7d18d798",
+      "source_archive_sha256": "df1f5c09c7c9e603c4f21bb453392f03f3cb230fac90c300c7b07a8e02cde37a",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600617C-403d7b1a51": {
+      "name": "Wendell Dormitory",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600617C-403d7b1a51",
+      "source_archive_sha256": "a2dd11d806326254dc36c09e7efb45a9e338e1a36091fb7892ca2c555ecf2abc",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600641C-fab9d4a2e4": {
+      "name": "Ferenbach Dormitory - Dell Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-fab9d4a2e4",
+      "source_archive_sha256": "1c23e70604d53acf3f7fdc4a3d2298a66c3ad083c1492bb3e24c332434066f34",
+      "status": "material_correction_pending_native",
+      "decision": "Individually visible pale horizontal upper cladding replaces pink solid terracotta with pale oak planks. Ferenbach lit ROI raw DeltaE00 3.919 supports this shared observed appearance. Lowndes lower wall remains concealed; retaining its existing lower proposal is not validation.",
+      "rules": [
+        {
+          "id": "pale-horizontal-upper-cladding",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "white_terracotta"
+          ],
+          "to": "pale_oak_planks"
+        }
+      ],
+      "sample_ids": [
+        "ferenbach_lit_clapboard",
+        "ferenbach_gray_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600641C-d333862570": {
+      "name": "Senter Dormitory - Dell Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-d333862570",
+      "source_archive_sha256": "a35b13108835f96a197f9b19c9306459eef3e6f21390702dcf4244febe19173c",
+      "status": "material_correction_pending_native",
+      "decision": "Individually visible pale horizontal upper cladding replaces pink solid terracotta with pale oak planks. Ferenbach lit ROI raw DeltaE00 3.919 supports this shared observed appearance. Lowndes lower wall remains concealed; retaining its existing lower proposal is not validation.",
+      "rules": [
+        {
+          "id": "pale-horizontal-upper-cladding",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "white_terracotta"
+          ],
+          "to": "pale_oak_planks"
+        }
+      ],
+      "sample_ids": [
+        "ferenbach_lit_clapboard",
+        "ferenbach_gray_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600641C-6607e4a8a8": {
+      "name": "Lowndes Dormitory - Dell Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-6607e4a8a8",
+      "source_archive_sha256": "93007fb6fcb0fed0f1ad333989b3296805d4971ed07032a31e18ac1137c3e3a7",
+      "status": "material_correction_pending_native",
+      "decision": "Individually visible pale horizontal upper cladding replaces pink solid terracotta with pale oak planks. Ferenbach lit ROI raw DeltaE00 3.919 supports this shared observed appearance. Lowndes lower wall remains concealed; retaining its existing lower proposal is not validation.",
+      "rules": [
+        {
+          "id": "pale-horizontal-upper-cladding",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "white_terracotta"
+          ],
+          "to": "pale_oak_planks"
+        }
+      ],
+      "sample_ids": [
+        "ferenbach_lit_clapboard",
+        "ferenbach_gray_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600641C-7e1d6bacf8": {
+      "name": "Scheerer Dormitory - Dell Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-7e1d6bacf8",
+      "source_archive_sha256": "b7068b50378fbab58737919e32fc0479a20a03c41d49cbbbdb49f26aae9b905d",
+      "status": "material_correction_pending_native",
+      "decision": "Individually visible pale horizontal upper cladding replaces pink solid terracotta with pale oak planks. Ferenbach lit ROI raw DeltaE00 3.919 supports this shared observed appearance. Lowndes lower wall remains concealed; retaining its existing lower proposal is not validation.",
+      "rules": [
+        {
+          "id": "pale-horizontal-upper-cladding",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "white_terracotta"
+          ],
+          "to": "pale_oak_planks"
+        }
+      ],
+      "sample_ids": [
+        "ferenbach_lit_clapboard",
+        "ferenbach_gray_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600621C-2c9084ad78": {
+      "name": "Foster Dormitory",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600621C-2c9084ad78",
+      "source_archive_sha256": "7b6a97956a375e30fedbe1f52a5b0644a3dab8656d95f53dbe71892b66a8a243",
+      "status": "observed_material_family_retained_geometry_incomplete",
+      "decision": "Architect master plan explicitly identifies these as red brick, distinct from the darker historic quad. Keep red bricks and weathered gray roof. Existing plain envelopes still require individual openings, portals, fascia and grade review.",
+      "rules": [],
+      "sample_ids": [
+        "rolfe_brick_oblique",
+        "rolfe_roof_oblique",
+        "rolfe_lit_brick_2013"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600625C-c108a9b9b6": {
+      "name": "Rolfe Dormitory",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600625C-c108a9b9b6",
+      "source_archive_sha256": "5f8d1c267ef05d95175406633f2670e3a25193e09c02a74916348afeab73857c",
+      "status": "observed_material_family_retained_geometry_incomplete",
+      "decision": "Architect master plan explicitly identifies these as red brick, distinct from the darker historic quad. Keep red bricks and weathered gray roof. Existing plain envelopes still require individual openings, portals, fascia and grade review.",
+      "rules": [],
+      "sample_ids": [
+        "rolfe_brick_oblique",
+        "rolfe_roof_oblique",
+        "rolfe_lit_brick_2013"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-07f1d5b7e0": {
+      "name": "Sherrerd Dormitory - Dutch Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-07f1d5b7e0",
+      "source_archive_sha256": "f4b05d9ae0a1b13b6aa2cbf5da0e2a389f999bed32c8bddc3f32221aea070f52",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-36b81aa17d": {
+      "name": "Johnson Dormitory - Dutch Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-36b81aa17d",
+      "source_archive_sha256": "a079da4684c06c0439cb9efda7247d024e07e0b57a7a44e08ced96cf2d677374",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-53c8a9efca": {
+      "name": "Markle Dormitory - Dutch Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-53c8a9efca",
+      "source_archive_sha256": "3b9c4125d64c59b173ae45b9ff951fc93b42df26c4e56f7624730d3e123e8414",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-451a0df37b": {
+      "name": "Robins Dormitory - Dutch Village",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-451a0df37b",
+      "source_archive_sha256": "513ddddbe9117bafabc37f56b77ce0e12cdfec45a41fa632430c6a9d60c781e2",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-c7b546273e": {
+      "name": "Hillrest Dormitory",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-c7b546273e",
+      "source_archive_sha256": "586b28141a23e119d1863a67d500cbe2beeeddda54452d51c371e69100ea9f6a",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600619C-b4c5171aed": {
+      "name": "The Sherrill Guest House",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600619C-b4c5171aed",
+      "source_archive_sha256": "1b06e5f99ecffc50dd23b6b4a3c862aa819dee04d5c9d0b793746b6a271c03d9",
+      "status": "material_correction_pending_native",
+      "decision": "Current drone shows red brick-like wall and dark steep small-unit roof. Replace the generic brown mud-brick wall and light gray roof accordingly; exact roof product is unverified.",
+      "rules": [
+        {
+          "id": "red-brick-exterior",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "mud_bricks"
+          ],
+          "to": "bricks"
+        },
+        {
+          "id": "dark-steep-roof",
+          "roles": [
+            "roof"
+          ],
+          "from": [
+            "stone_bricks",
+            "stone_brick_stairs",
+            "stone_brick_slab"
+          ],
+          "to_family": "deepslate_tile"
+        }
+      ],
+      "sample_ids": [
+        "sherrill_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600622C-57b5b354dc": {
+      "name": "Music House",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600622C-57b5b354dc",
+      "source_archive_sha256": "d54e30954d55904c8fe9b916910356710bc37bfb24ca51e828358ce954cdc337",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600615C-ee30229dd5": {
+      "name": "Shirley Quadrivium Center",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600615C-ee30229dd5",
+      "source_archive_sha256": "e21a6b07478e217275a97ad88fdd9082acd1e31a01e7f56904ea15263c851b63",
+      "status": "material_correction_pending_native",
+      "decision": "Documented dark reddish-brown brick: mud-brick vanilla family better matches three independent lit wall samples than red bricks (raw DeltaE00 3.589/4.796/6.38). Real material remains fired brick. Limestone and new pale masonry require distinct zones in the individual Quadrivium study.",
+      "rules": [
+        {
+          "id": "dark-brown-brick-appearance",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "bricks"
+          ],
+          "to": "mud_bricks"
+        }
+      ],
+      "sample_ids": [
+        "quad_link_red_brick",
+        "quad_historic_brick_sun",
+        "quad_end_brick_sun",
+        "quad_limestone_sun"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600610C-e7f1a01cbc": {
+      "name": "Thomas House",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600610C-e7f1a01cbc",
+      "source_archive_sha256": "cb9e327c25616686fcd87381d0b4af90cce3e603a687d959adc428a66c1c5902",
+      "status": "observed_material_family_retained_geometry_incomplete",
+      "decision": "Saved August 2019 Bailey Street View confirms red brick, white shutters/door pediments and gray small-unit roof. Retain existing brick/roof families; all openings and site details remain to be constructed separately.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope",
+      "additional_source": "runtime/research/campus-full-detail-20260905/thomas-bailey-streetview-2019.jpg"
+    },
+    "16001511600611C-a5bb4f8f72": {
+      "name": "Pine Court Faculty Village - western joined pair",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600611C-a5bb4f8f72",
+      "source_archive_sha256": "e5c2dbb324f9b9e9199d82a99b40b6ccae5a429381a2b7870108cd62abff9503",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600611C-50fbc7ea98": {
+      "name": "Pine Court Faculty Village - eastern joined pair",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600611C-50fbc7ea98",
+      "source_archive_sha256": "d54b285175582e413a73fb5128eed54b3c9d07ab50785625bc6f1df8561680ff",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-143655d070": {
+      "name": "Gatehouse",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-143655d070",
+      "source_archive_sha256": "a505e15eecdf8cea79300edfff8c9b9b396330b121ddfabc12e7108f4c6b3e15",
+      "status": "material_correction_pending_native",
+      "decision": "The booth has gray-taupe horizontal siding, distinct from the brick gate walls. Remove mud brick from the booth; light-gray concrete matches colour much better than timber alternatives (raw DeltaE00 6.54 vs oak14.318) but horizontal courses must still be authored. Tuff-brick gray-brown roof proxy preserves slab/stair geometry.",
+      "rules": [
+        {
+          "id": "gray-taupe-booth-siding-colour",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "mud_bricks"
+          ],
+          "to": "light_gray_concrete"
+        },
+        {
+          "id": "gray-brown-hip-roof",
+          "roles": [
+            "roof"
+          ],
+          "from": [
+            "stone_bricks",
+            "stone_brick_stairs",
+            "stone_brick_slab"
+          ],
+          "to_family": "tuff_brick"
+        }
+      ],
+      "sample_ids": [
+        "gatehouse_left_clapboard",
+        "gatehouse_right_clapboard",
+        "gatehouse_gray_hip_roof"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "16001511600623C-ba74e78741": {
+      "name": "Feroe House - Head of School Residence",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600623C-ba74e78741",
+      "source_archive_sha256": "a2b30c282864ed29a5b98134b45c567b1e6167b01d3d88201efb1d826c0c6e7f",
+      "status": "material_correction_pending_native",
+      "decision": "Bailey Street View shows cream smooth walls and gray-brown exposed stone, not red brick. Replace generic walls with smooth quartz. This envelope will be superseded by the individually built Feroe study after native review.",
+      "rules": [
+        {
+          "id": "cream-smooth-render",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "bricks"
+          ],
+          "to": "smooth_quartz"
+        }
+      ],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope",
+      "additional_source": "runtime/research/campus-full-detail-20260905/feroe-bailey-streetview-2019.jpg"
+    },
+    "160006438008-ddefd3570f": {
+      "name": "East Campus Faculty Village - southwest duplex",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-ddefd3570f",
+      "source_archive_sha256": "943df01019273bb702bae69e1c2b5de42973f53419bbb7edb2e3f4e0e533768a",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-b790426980": {
+      "name": "East Campus Faculty Village - west south-middle duplex",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-b790426980",
+      "source_archive_sha256": "996c11932686ff7e7e97c09eae1609448b5712c55a7f7c015b98e21b10a06b2a",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-c0e2b642d9": {
+      "name": "East Campus Faculty Village - west north-middle duplex",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-c0e2b642d9",
+      "source_archive_sha256": "c3927ab2fdb819ca28cf4366d7aae0673a3532c699743f231673c8bc39756041",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-8e22af513e": {
+      "name": "East Campus Faculty Village - northwest duplex",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-8e22af513e",
+      "source_archive_sha256": "d899e63907243cec54e7eb522397a715eeb70be60d88aff63ea7d196f94403af",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-47b633ec2f": {
+      "name": "East Campus Faculty Village - south single house",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-47b633ec2f",
+      "source_archive_sha256": "6bb65075aacef18dec30ad98f5769fdd7ba8c47b7d3bff9cc534482c71f0a84b",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-e070cb1680": {
+      "name": "East Campus Faculty Village - north middle single house",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-e070cb1680",
+      "source_archive_sha256": "c70eb3dce8d82e5da1f553218834ae4a76c8b7363ea914ab7adcd1edcdf81845",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160006438008-5e66af9ae7": {
+      "name": "East Campus Faculty Village - northeast single house",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-5e66af9ae7",
+      "source_archive_sha256": "3256adec6ebe26990a64fe3117a784e0c8d7ae49fc376b431dc5bc5cf210999c",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-081aa7dcac": {
+      "name": "Lehrman '56 Pavilion - south round viewing pavilion",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-081aa7dcac",
+      "source_archive_sha256": "32994945746a2e0126875e559d5b5d70a48c95fb57c483a3efa7e3dc6e1f67cf",
+      "status": "material_correction_pending_native",
+      "decision": "Contractor specifies split-face block and Hardie trim. Larger warm coursed mud-brick texture is a better masonry proxy than small red bricks. Use dark deepslate tile roof forms; exposure differs between contractor and school photographs. Open viewing deck, white supports and blue awnings still require authored geometry.",
+      "rules": [
+        {
+          "id": "warm-splitface-masonry-proxy",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "bricks"
+          ],
+          "to": "mud_bricks"
+        },
+        {
+          "id": "dark-pavilion-roof",
+          "roles": [
+            "roof"
+          ],
+          "from": [
+            "stone_bricks",
+            "stone_brick_stairs",
+            "stone_brick_slab"
+          ],
+          "to_family": "deepslate_tile"
+        }
+      ],
+      "sample_ids": [
+        "lehrman_splitface_contractor",
+        "lehrman_splitface_sun",
+        "lehrman_roof_contractor",
+        "lehrman_roof_school"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "160015116006-f7611d45c7": {
+      "name": "Lehrman '56 Pavilion - north service bar",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-f7611d45c7",
+      "source_archive_sha256": "0f58274c0d38b4115d1c84b092ece86f051dd3c7c852e712dc91a4a1772e3514",
+      "status": "material_correction_pending_native",
+      "decision": "Contractor specifies split-face block and Hardie trim. Larger warm coursed mud-brick texture is a better masonry proxy than small red bricks. Use dark deepslate tile roof forms; exposure differs between contractor and school photographs. Open viewing deck, white supports and blue awnings still require authored geometry.",
+      "rules": [
+        {
+          "id": "warm-splitface-masonry-proxy",
+          "roles": [
+            "facade"
+          ],
+          "from": [
+            "bricks"
+          ],
+          "to": "mud_bricks"
+        },
+        {
+          "id": "dark-pavilion-roof",
+          "roles": [
+            "roof"
+          ],
+          "from": [
+            "stone_bricks",
+            "stone_brick_stairs",
+            "stone_brick_slab"
+          ],
+          "to_family": "deepslate_tile"
+        }
+      ],
+      "sample_ids": [
+        "lehrman_splitface_contractor",
+        "lehrman_splitface_sun",
+        "lehrman_roof_contractor",
+        "lehrman_roof_school"
+      ],
+      "geometry_status": "measured_envelope"
+    },
+    "1600151000041C-510dc616b8": {
+      "name": "Hillhouse & Moore Business Office",
+      "source_study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/1600151000041C-510dc616b8",
+      "source_archive_sha256": "93d89e6363f8f6b8e4f05e2826ca8b023c2acd3bfa84eec84c6fcc266b783947",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "measured_envelope"
+    },
+    "kipp_46_pavilion": {
+      "name": "Kipp '46 Pavilion - Reese '75 Tennis Center",
+      "source_study": "runtime/campus-reconstruction/current-pavilions-v1-2x/kipp_46_pavilion",
+      "source_archive_sha256": "b6be38e230179a7dcfd949215997d1e61f0a21c7bce53b80c019d175d46d8892",
+      "status": "unresolved_individual_exterior_or_zoning_required",
+      "decision": "Retained temporarily. No sufficiently resolved individual facade zoning has been approved for a blanket replacement. This is not a match or completion claim.",
+      "rules": [],
+      "sample_ids": [],
+      "geometry_status": "interpreted_structure"
+    },
+    "madden_puccio_66_press_box": {
+      "name": "Frank Puccio '66 Press Box and filming platform - Madden Stadium",
+      "source_study": "runtime/campus-reconstruction/current-pavilions-v1-2x/madden_puccio_66_press_box",
+      "source_archive_sha256": "007ccd903ba9f466c168fe520158d45191802c67b1274ab07bc92e8b4213cf3c",
+      "status": "observed_colour_family_retained_ribbed_geometry_incomplete",
+      "decision": "White vertically ribbed panels and blue lettering are visible. Keep current white/blue palette temporarily; the plain white concrete does not yet reproduce the photographed ribbing.",
+      "rules": [],
+      "sample_ids": [
+        "madden_ribbed_white",
+        "madden_ribbed_white_right",
+        "madden_seating"
+      ],
+      "geometry_status": "interpreted_structure"
+    }
+  }
+}

@@ -1,0 +1,908 @@
+{
+  "name": "Thomas House \u2014 shuttered brick residence",
+  "revision": "2026-09-08-thomas-v5-2x",
+  "parent_id": "16001511600610C-e7f1a01cbc",
+  "school_names": [
+    "Thomas House"
+  ],
+  "school_map_numbers": [
+    39
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_thomas_details",
+  "study_margin_m": 26,
+  "geometry": {
+    "origin_xz_m": [
+      -176.78742169444203,
+      -36.191610748952186
+    ],
+    "axis_degrees": 9.021358954853238,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 55.75,
+    "floor_status": "DTM interpretation: west approach 55.2\u201355.4 m, north/south 55.4 m, east 55.9 m; the hedge conceals actual thresholds."
+  },
+  "materials": {
+    "facade": "bricks",
+    "foundation": "bricks",
+    "roof_family": "stone_brick",
+    "trim": "smooth_quartz"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.0,
+    "trim_family": "smooth_quartz",
+    "trim_block": "smooth_quartz",
+    "glass_block": "white_stained_glass_pane"
+  },
+  "material_review": {
+    "status": "V4 original-texture palette retained; v5 repairs bounded pane-to-frame contacts and concealed caps. Native review pending.",
+    "actual_observed": "Dark red brick with pale mortar; white shutters and entrance pediments; gray overlapping hip roof; one short masonry chimney. Hedge obscures the base.",
+    "proxy_assignments": {
+      "wall_and_foundation": "original bricks; actual brick observed, no stone plinth invented",
+      "roof": "stone_brick stairs/slabs as medium-gray overlapping-unit proxy; actual product unknown",
+      "painted_trim": "smooth_quartz stairs/slabs and quartz pillars, used for geometry and pale paint appearance",
+      "shutters": "thin pale_oak_trapdoor panels; timber product and exact shutter substrate are unknown",
+      "door": "Thin pale_oak_trapdoor skin in the opening, with an operable birch_door lower panel; original textures represent painted joinery.",
+      "hedge": "oak_leaves: clipped foliage proxy, not identified species",
+      "glazing": "white_stained_glass_pane for pale sash lines; does not identify real glass composition."
+    },
+    "colour_evidence": "runtime/research/campus-full-detail-20260905/housing-material-appearance.json; Thomas brick and shutter samples",
+    "catalogue": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+    "caution": "Source RGB includes shadow/exposure/white balance. Colour alone is not material identity or intrinsic reflectance. Original Minecraft textures only."
+  },
+  "roof_evidence": {
+    "ledger": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+    "face_masks": "runtime/research/campus-full-detail-20260905/housing-major-roof-face-masks.json",
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "major_accepted_face_ids": [
+      7,
+      3,
+      6,
+      1
+    ],
+    "accepted_flat_end_faces": [
+      5,
+      4
+    ],
+    "high_fragment_ids": [
+      2,
+      9,
+      10,
+      13
+    ],
+    "low_full_height_wall_repair_ids": [
+      8,
+      11,
+      12
+    ],
+    "unmatched_secondary_fragment_repair_ids": [
+      0
+    ],
+    "measured_major_peak_navd88_m": 64.605,
+    "raw_max_navd88_m": 75.537,
+    "rule": "All 14 source faces are hash/polygon/plane checked. Keep exact footprint and major/flat roof surface controls; explicit high/low masks extend named adjacent planes. Fragment 0 identity is unresolved. One photographed bow-top dormer is authored, never a survey claim. Flat-end roof top heights remain while exposed backing is brick below one slab of coping."
+  },
+  "west_entries_v_m": [
+    1.65,
+    19.75
+  ],
+  "dormer": {
+    "centre_v_m": 8.45,
+    "width_m": 2.2,
+    "bounds_uv_m": [
+      0.55,
+      7.35,
+      2.45,
+      9.55
+    ],
+    "spring_navd88_m": 62.9,
+    "rise_m": 0.4,
+    "status": "One observed bow-top dormer; v2 narrows the pale border and gives its broader sash a compact quarter-metre brow, after native v1 review.",
+    "clear_glazing_width_m": 1.5,
+    "clear_glazing_height_m": 1.0
+  },
+  "chimney": {
+    "centre_uv_m": [
+      4.7,
+      10.85
+    ],
+    "status": "one short red chimney visible above roof; exact position interpreted"
+  },
+  "window_rows": [
+    {
+      "side": "west",
+      "at_m": 0.015,
+      "centres_m": [
+        1.65,
+        4.25,
+        7.65,
+        11.3,
+        15.1,
+        19.75
+      ],
+      "sill_navd88_m": 59.2,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": true,
+      "evidence": "far-left, near-centre and far-right groups visible; pole/pine-screened count and exact spacing interpreted"
+    },
+    {
+      "side": "west",
+      "at_m": 0.015,
+      "centres_m": [
+        4.25,
+        15.1
+      ],
+      "sill_navd88_m": 56.55,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": true,
+      "evidence": "lower openings partly hedge/pole concealed; metric interpretation"
+    },
+    {
+      "side": "west",
+      "at_m": 0.015,
+      "centres_m": [
+        7.65,
+        11.3
+      ],
+      "sill_navd88_m": 56.55,
+      "width_m": 1.75,
+      "height_m": 1.4,
+      "shutters": true,
+      "evidence": "broader near-centre lower sash is partly visible; screened counterpart interpreted"
+    },
+    {
+      "side": "east",
+      "at_m": 8.4,
+      "centres_m": [
+        2.3,
+        6.2,
+        10.7,
+        15.3,
+        19.5
+      ],
+      "sill_navd88_m": 56.6,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen elevation; interpreted residential apertures"
+    },
+    {
+      "side": "east",
+      "at_m": 8.4,
+      "centres_m": [
+        2.3,
+        6.2,
+        10.7,
+        15.3,
+        19.5
+      ],
+      "sill_navd88_m": 59.2,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen elevation; interpreted residential apertures"
+    },
+    {
+      "side": "north",
+      "at_m": 0.01,
+      "centres_m": [
+        2.6,
+        5.8
+      ],
+      "sill_navd88_m": 56.6,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen end elevation; interpreted"
+    },
+    {
+      "side": "north",
+      "at_m": 0.01,
+      "centres_m": [
+        2.6,
+        5.8
+      ],
+      "sill_navd88_m": 59.2,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen end elevation; interpreted"
+    },
+    {
+      "side": "south",
+      "at_m": 21.46,
+      "centres_m": [
+        2.6,
+        5.8
+      ],
+      "sill_navd88_m": 56.6,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen end elevation; interpreted"
+    },
+    {
+      "side": "south",
+      "at_m": 21.46,
+      "centres_m": [
+        2.6,
+        5.8
+      ],
+      "sill_navd88_m": 59.2,
+      "width_m": 1.05,
+      "height_m": 1.4,
+      "shutters": false,
+      "evidence": "unseen end elevation; interpreted"
+    }
+  ],
+  "evidence": [
+    {
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=YOcyA3Ibp7ZeEVWbmmm68Q&heading=90&pitch=0&fov=70",
+      "local": "runtime/research/campus-full-detail-20260905/thomas-bailey-streetview-2019.jpg",
+      "date": "2019-08",
+      "supports": "West long two-storey red-brick elevation, white shutters/frames, separate triangular door pediments at both ends, gray hip roof, one curved dormer, short chimney and hedge hiding the base."
+    },
+    {
+      "url": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+      "supports": "Campus identity and measured residence location."
+    }
+  ],
+  "uncertainties": [
+    "Only west facade is independently photographed. Pine, pole and hedge conceal several sash groups; exact west counts/spacing are partly interpreted.",
+    "North, east and south windows are individual typological proposals, not observed elevations. Only one front curved dormer is authored; unseen dormers are not invented.",
+    "The hedge hides threshold and lower wall. The 55.75 m entry/floor, steps and hedge line/height are terrain/photo interpretations. No gray-stone plinth is evidenced.",
+    "Exact roof product, painted shutter substrate, chimney position and foliage species are unresolved. Minecraft block names identify proxies only.",
+    "Fragment 0 might be an unobserved architectural detail or reconstruction error; this study extends accepted west roof face 7 over its small footprint and records that choice.",
+    "Curved dormer and pediment profiles, shutter panels and glass are quantised at 2 blocks/metre. Native v4 review is required."
+  ],
+  "camera_views": [
+    {
+      "name": "thomas-west-reference",
+      "eye_uv_navd88_m": [
+        -21,
+        10.6,
+        58.0
+      ],
+      "target_uv_navd88_m": [
+        2.0,
+        10.8,
+        59.4
+      ],
+      "fov": 67
+    },
+    {
+      "name": "thomas-west-clear",
+      "eye_uv_navd88_m": [
+        -11,
+        10.6,
+        59.0
+      ],
+      "target_uv_navd88_m": [
+        1.5,
+        10.8,
+        59.6
+      ],
+      "fov": 82
+    },
+    {
+      "name": "thomas-north-entry-close",
+      "eye_uv_navd88_m": [
+        -3.3,
+        2.6,
+        57.6
+      ],
+      "target_uv_navd88_m": [
+        0.1,
+        2.0,
+        58.0
+      ],
+      "fov": 75
+    },
+    {
+      "name": "thomas-south-return",
+      "eye_uv_navd88_m": [
+        -9,
+        31,
+        59.0
+      ],
+      "target_uv_navd88_m": [
+        3.5,
+        17.0,
+        59.0
+      ],
+      "fov": 72
+    },
+    {
+      "name": "thomas-east-return",
+      "eye_uv_navd88_m": [
+        27,
+        10.7,
+        59.0
+      ],
+      "target_uv_navd88_m": [
+        6.5,
+        10.7,
+        59.0
+      ],
+      "fov": 67
+    },
+    {
+      "name": "thomas-roof-overview",
+      "eye_uv_navd88_m": [
+        -9,
+        25,
+        75.0
+      ],
+      "target_uv_navd88_m": [
+        4.2,
+        10.7,
+        60.0
+      ],
+      "fov": 68
+    },
+    {
+      "name": "thomas-west-pane-jamb",
+      "eye_uv_navd88_m": [
+        -3.3,
+        15.2,
+        58.7
+      ],
+      "target_uv_navd88_m": [
+        0.3,
+        15.2,
+        58.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "thomas-east-pane-jamb",
+      "eye_uv_navd88_m": [
+        12.0,
+        10.7,
+        58.7
+      ],
+      "target_uv_navd88_m": [
+        8.0,
+        10.7,
+        58.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "thomas-dormer-backing",
+      "eye_uv_navd88_m": [
+        -3.0,
+        8.6,
+        63.0
+      ],
+      "target_uv_navd88_m": [
+        1.2,
+        8.5,
+        62.5
+      ],
+      "fov": 65
+    }
+  ],
+  "native_revision_notes": [
+    "V1 native showed a tall slit dormer, projecting plank door boxes, shelf-like pediments and excessive gray roof-edge backing. V2 changes only these details, shutter attachment and pale sash texture.",
+    "West source wall U is nearly continuous, not deeply stepped; retain its 9.02136-degree surveyed orientation and ordinary half-metre raster steps.",
+    "All shutters now select actual brick attachment columns; no shutter cell is intentionally placed over glazing.",
+    "V2 all-field top slabs were rejected for a daylight layer. V3 keeps the solid inner roof; perimeter top slabs require solid inward backing, with solid brick closures at raster corners. Window aperture edge cells are fully glazed.",
+    "The user-requested diagonal joint audit found six open north-window pane corners in v3. V4 adds one inward pane return per joint, bounded to each original window reveal, without overwriting masonry.",
+    "V5 restores the exact hash-bound v4 archive, adds 33 inward pane-to-jamb returns with full concealed caps, caps four old north returns, and completes one wall-plane hood/sill intersection. It preserves the authored roof and original glazing."
+  ],
+  "accepted_baseline": {
+    "archive": "runtime/campus-reconstruction/thomas-v4-2x/sample-blocks.npz",
+    "sha256": "a997a43517c52c5d40b9ce62f0ff8868f571a8513c3920def3af8a74a3bfc8ed",
+    "manifest": "runtime/campus-reconstruction/thomas-v4-2x/manifest.json",
+    "rule": "Exact native-reviewed v4 state archive; only the enumerated inward frame contacts below may change."
+  },
+  "frame_contact_repair": {
+    "baseline_horizontal_candidates": 33,
+    "baseline_vertical_candidates": 5,
+    "jamb_returns": [
+      {
+        "name": "west-v15",
+        "pane_xz": [
+          -358,
+          -42
+        ],
+        "return_xz": [
+          -358,
+          -41
+        ],
+        "jamb_xz": [
+          -359,
+          -41
+        ],
+        "ys": [
+          63,
+          64,
+          65,
+          68,
+          69,
+          70
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      },
+      {
+        "name": "west-v11-lower",
+        "pane_xz": [
+          -357,
+          -49
+        ],
+        "return_xz": [
+          -357,
+          -48
+        ],
+        "jamb_xz": [
+          -358,
+          -48
+        ],
+        "ys": [
+          63,
+          64,
+          65
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      },
+      {
+        "name": "north-u2",
+        "pane_xz": [
+          -349,
+          -72
+        ],
+        "return_xz": [
+          -349,
+          -71
+        ],
+        "jamb_xz": [
+          -348,
+          -71
+        ],
+        "ys": [
+          63,
+          64,
+          65,
+          68,
+          69,
+          70
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      },
+      {
+        "name": "east-v15",
+        "pane_xz": [
+          -343,
+          -41
+        ],
+        "return_xz": [
+          -343,
+          -42
+        ],
+        "jamb_xz": [
+          -342,
+          -42
+        ],
+        "ys": [
+          63,
+          64,
+          65,
+          68,
+          69,
+          70
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      },
+      {
+        "name": "east-v11",
+        "pane_xz": [
+          -341,
+          -49
+        ],
+        "return_xz": [
+          -342,
+          -49
+        ],
+        "jamb_xz": [
+          -342,
+          -48
+        ],
+        "ys": [
+          63,
+          64,
+          65,
+          68,
+          69,
+          70
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      },
+      {
+        "name": "east-v2",
+        "pane_xz": [
+          -339,
+          -66
+        ],
+        "return_xz": [
+          -339,
+          -67
+        ],
+        "jamb_xz": [
+          -338,
+          -67
+        ],
+        "ys": [
+          63,
+          64,
+          65,
+          68,
+          69,
+          70
+        ],
+        "status": "Pane to existing brick jamb; one inward empty raster corner, original outer pane retained."
+      }
+    ],
+    "caps": [
+      {
+        "xyz": [
+          -358,
+          62,
+          -41
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -358,
+          66,
+          -41
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -358,
+          67,
+          -41
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -358,
+          71,
+          -41
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -357,
+          62,
+          -48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -357,
+          66,
+          -48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -349,
+          62,
+          -71
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -349,
+          66,
+          -71
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -349,
+          67,
+          -71
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -349,
+          71,
+          -71
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -343,
+          62,
+          -42
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -343,
+          66,
+          -42
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -343,
+          67,
+          -42
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -343,
+          71,
+          -42
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -342,
+          62,
+          -49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -342,
+          66,
+          -49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -342,
+          67,
+          -49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -342,
+          71,
+          -49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -339,
+          62,
+          -67
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -339,
+          66,
+          -67
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -339,
+          67,
+          -67
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -339,
+          71,
+          -67
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of this newly added inward return."
+      },
+      {
+        "xyz": [
+          -343,
+          62,
+          -70
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of the north return already present in v4."
+      },
+      {
+        "xyz": [
+          -343,
+          66,
+          -70
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of the north return already present in v4."
+      },
+      {
+        "xyz": [
+          -343,
+          67,
+          -70
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of the north return already present in v4."
+      },
+      {
+        "xyz": [
+          -343,
+          71,
+          -70
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "block": "bricks",
+        "role": "facade",
+        "reason": "Concealed full head/sill of the north return already present in v4."
+      },
+      {
+        "xyz": [
+          -360,
+          67,
+          -34
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz_slab",
+          "Properties": {
+            "type": "bottom",
+            "waterlogged": "false"
+          }
+        },
+        "block": "smooth_quartz",
+        "role": "trim",
+        "reason": "Complete the wall-plane lower-half hood/sill intersection so the upper sash has direct contact; its full inward quartz backing and outer hood rake remain."
+      }
+    ],
+    "rule": "No original pane or roof-role cell is removed. Only these source-footprint cells change; connections are recomputed at export."
+  }
+}

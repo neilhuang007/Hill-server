@@ -1,0 +1,7 @@
+{
+  "world": "runtime/campus-reconstruction/campus-context-v14-2x/world",
+  "playable_dir": "runtime/campus-reconstruction/campus-playable-v14-2x",
+  "start_view": "runtime/campus-reconstruction/campus-context-v14-2x/quad-start.json",
+  "render_distance": 32,
+  "blocks_per_metre": 2
+}

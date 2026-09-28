@@ -1,0 +1,313 @@
+{
+  "name": "Athey Academic Center, Dining Hall and connecting court",
+  "revision": "2026-09-08-athey-frame-v4-2x",
+  "source_cityjson": "runtime/campus-reconstruction/roofer-chapel-trial/campus-model/hill-campus-roofer.city.json",
+  "parent_id": "16001511600613C-92645e8573",
+  "measured_terrain_manifest": "runtime/campus-reconstruction/measured-terrain-academic-quad-v1/hill-academic-quad-measured-terrain.manifest.json",
+  "geometry": {
+    "origin_xz_m": [
+      22.0,
+      37.0
+    ],
+    "axis_degrees": 18.25,
+    "main_roof_threshold_navd88_m": 80.5,
+    "window_sills_navd88_m": [
+      67.4,
+      71.5,
+      75.5,
+      79.5
+    ],
+    "flank_window_centres_u_m": [
+      5.5,
+      12.0,
+      18.5,
+      25.0,
+      30.0,
+      44.0,
+      49.0,
+      55.5,
+      62.0,
+      68.5
+    ],
+    "central_bay_u_m": 37.0,
+    "flank_window_width_m": 2.8,
+    "central_window_width_m": 5.6,
+    "window_height_m": 1.9,
+    "round_arch_height_m": 2.6,
+    "continuous_bands_navd88_m": [
+      70.4,
+      78.3
+    ],
+    "oculus_sill_navd88_m": 84.4,
+    "oculus_diameter_m": 1.5,
+    "court_bounds_uv_m": [
+      21.8,
+      21.0,
+      52.2,
+      35.7
+    ],
+    "covered_links": [
+      {
+        "name": "east",
+        "bounds_uv_m": [
+          52.0,
+          15.0,
+          57.0,
+          36.5
+        ],
+        "open_passage": true,
+        "confidence": "visible in the 2026 court approach"
+      },
+      {
+        "name": "west",
+        "bounds_uv_m": [
+          16.1,
+          15.0,
+          21.8,
+          35.8
+        ],
+        "open_passage": false,
+        "confidence": "roof measured; lower enclosure remains unresolved"
+      }
+    ]
+  },
+  "materials": {
+    "facade": "bricks",
+    "foundation": "stone_bricks",
+    "trim": "quartz_block",
+    "roof_family": "stone_brick"
+  },
+  "evidence": [
+    {
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "supports": "Higher resolution 2026 source, 1920x1080. Flush pale window surrounds, recessed multi-pane glazing, rounded lower arches and detailed east entrance."
+    },
+    {
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_480/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "supports": "Four-storey red-brown brick Athey, pale surrounds, grouped rectangular upper windows, round lower arches, central oculus, low Dining Hall and open east covered link"
+    },
+    {
+      "url": "https://resources.finalsite.net/images/v1706640886/thehillorg/jw0ysayvvi02ln5dsucr/FY24HTFlipCampaignInsertPRINTedits.pdf",
+      "supports": "Four-floor academic building; described renovation is primarily interior"
+    }
+  ],
+  "uncertainties": [
+    "Roof and ground envelope derive from LiDAR/Roofer; the 0.653 m reconstruction RMSE is not a facade survey accuracy.",
+    "Facade opening sizes, exact sill elevations, bay centres, stone species and minor trim are interpreted from the shaded 1080p video. The complete bay count is unresolved; this first facade layout requires native visual review.",
+    "The west covered link roof is measured but its lower enclosure is unverified; it is not opened solely by analogy to the east link.",
+    "Unfurnished floor plates are visual construction proxies. Interior room plans and furnishings are unmodeled. Dining Hall court facade still needs individual detailing.",
+    "East-bay roof/parapet and court grading are photo-informed overrides of the raw LiDAR shell. Their exact dimensions and masonry species remain estimates; see east_return and site_details.",
+    "Original vanilla brick, smooth quartz and gray glazing palette retained from the ground-v6 baseline. Narrow sash divisions are below the half-metre modelling resolution; pane texture is a scale proxy. No additional photographic evidence was gathered for this refinement. Dining Hall and hidden elevations remain unresolved."
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "floor_plates_navd88_m": [
+    70.9,
+    74.9,
+    78.9
+  ],
+  "camera_views": [
+    {
+      "name": "quad-reference",
+      "eye_uv_navd88_m": [
+        84,
+        -31,
+        71.4
+      ],
+      "target_uv_navd88_m": [
+        31,
+        1,
+        76.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "quad-straight",
+      "eye_uv_navd88_m": [
+        37,
+        -52,
+        69.1
+      ],
+      "target_uv_navd88_m": [
+        37,
+        1,
+        76.8
+      ],
+      "fov": 70
+    },
+    {
+      "name": "east-return",
+      "eye_uv_navd88_m": [
+        88,
+        17,
+        71.2
+      ],
+      "target_uv_navd88_m": [
+        74,
+        5.8,
+        75
+      ],
+      "fov": 72
+    },
+    {
+      "name": "south-court",
+      "eye_uv_navd88_m": [
+        36,
+        33,
+        71.2
+      ],
+      "target_uv_navd88_m": [
+        37,
+        14,
+        78.2
+      ],
+      "fov": 80
+    },
+    {
+      "name": "roof-overview",
+      "eye_uv_navd88_m": [
+        97,
+        -35,
+        111
+      ],
+      "target_uv_navd88_m": [
+        35,
+        23,
+        75
+      ],
+      "fov": 55
+    },
+    {
+      "name": "window-reveal-detail",
+      "eye_uv_navd88_m": [
+        27,
+        -12,
+        74.0
+      ],
+      "target_uv_navd88_m": [
+        24,
+        -1,
+        74.2
+      ],
+      "fov": 66
+    }
+  ],
+  "elevations": {
+    "north": {
+      "window_sills_navd88_m": [
+        67.4,
+        71.5,
+        75.5,
+        79.5
+      ],
+      "flank_window_centres_u_m": [
+        5.5,
+        12,
+        18.5,
+        25,
+        30,
+        44,
+        49,
+        55.5,
+        62,
+        68.5
+      ],
+      "lights": 2
+    },
+    "south": {
+      "window_sills_navd88_m": [
+        71.5,
+        75.5,
+        79.5
+      ],
+      "flank_window_centres_u_m": [
+        5.5,
+        12,
+        18.5,
+        25,
+        30,
+        44,
+        49,
+        55.5,
+        62,
+        68.5
+      ],
+      "lights": 3,
+      "transom_height_m": 1.45
+    }
+  },
+  "site_details": {
+    "court_plane_navd88_m": [
+      69.4,
+      0.005,
+      0.01
+    ],
+    "evidence": "The current court video shows engineered red paving with pale crossing strips. DTM undulations next to walls are regularized only inside that court."
+  },
+  "gable_coping_uv_m": [
+    [
+      10,
+      3.6
+    ],
+    [
+      37,
+      5.0
+    ],
+    [
+      65,
+      3.6
+    ]
+  ],
+  "east_return": {
+    "bay_bounds_uv_m": [
+      71.9,
+      -0.5,
+      75.5,
+      11.8
+    ],
+    "deck_navd88_m": 70.2,
+    "roof_navd88_m": 74.25,
+    "parapet_navd88_m": 75.1,
+    "parapet_notches_v_m": [
+      3.2,
+      7.2
+    ],
+    "bay_window_centres_v_m": [
+      2.0,
+      5.7
+    ],
+    "door_v_m": 9.4,
+    "geometry_evidence": "2026 drone 97 s shows a flat projecting bay and notched parapet, upper window groups, dark door, stone landing, steps and black rails. Dimensions are estimated. Corrects the local Roofer sloped bay while retaining its ground footprint."
+  },
+  "window_reveal": {
+    "trim_width_m": 0.26,
+    "glass_recess_m": 0.0,
+    "construction": "Panes sit in the outer masonry frame. Extra edge panes bridge one-cell diagonal gaps inside the reveal; nothing is attached outside the building."
+  },
+  "material_assignment_key": "16001511600613C-92645e8573",
+  "material_assignment_source_sha256": "cb0f1af2214c97780ccd6f9c5048812c285f293559a4615760977121cd47702d",
+  "terrain_bounds_m": [
+    -47,
+    -25,
+    110,
+    130
+  ],
+  "terrain_revision": {
+    "source": "E:/projects/Hill-server/runtime/campus-reconstruction/campus-full-detail-terrain-v2/terrain.npz",
+    "sha256": "856bbb182f037ed014e7146c03b7d7909c4b002cb7b3563b52eb5ee6aca46216",
+    "surface_datum": "Block top represents measured NAVD88 ground; no extra half-metre offset.",
+    "previous_study": "runtime/campus-reconstruction/campus-materials-v2-2x/02-athey-v8-2x"
+  },
+  "frame_refinement": {
+    "pane_sash_max_width_m": 3.0,
+    "baseline_study": "runtime/campus-reconstruction/campus-developed-ground-v6-2x/athey",
+    "baseline_archive_sha256": "f2ca05971205e4b0939ea5553750863f693f80ac24622e2c4f08ac228bc6b514",
+    "scope": "Athey opening construction only. Source placements, widths, heights, roof and ground controls retained. Sub-voxel sash divisions in groups up to three metres use the original pane texture; broad central structural groups retain quartz posts.",
+    "back_frame_ring": true,
+    "sill_construction": "Existing top sill slabs become inward-facing top stairs at the same physical upper Y. Air directly below live glazing is capped even when terrain metadata claims occupancy; one inward brick course backs the frame ring. No existing pane is replaced by a cap band.",
+    "fit_complete_frame_below_roof": true,
+    "roof_contact_construction": "Opening cuts require room for their entire existing head. The existing flat east bay override is used as the opening envelope instead of its obsolete Roofer ramp. Low-roof columns without head room retain the original roof and masonry; opening dimensions and roof controls remain unchanged.",
+    "remove_unbacked_bay_band": true,
+    "bay_band_construction": "Remove only disconnected full-quartz band components outside the measured footprint with no occupied face neighbour. These were created by an unmasked band beyond the masked bay wall; intended bay openings and roof controls remain unchanged."
+  }
+}

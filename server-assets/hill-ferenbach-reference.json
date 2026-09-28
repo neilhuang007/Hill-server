@@ -1,0 +1,432 @@
+{
+  "name": "Ferenbach Dormitory \u2014 source-bounded rough exterior",
+  "revision": "2026-09-27-ferenbach-v1-2x",
+  "parent_id": "16001511600641C-fab9d4a2e4",
+  "school_names": [
+    "Ferenbach Dormitory"
+  ],
+  "school_map_numbers": [
+    31
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_ferenbach_details",
+  "study_margin_m": 12,
+  "geometry": {
+    "origin_xz_m": [
+      300,
+      -66
+    ],
+    "axis_degrees": -12,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 65.5
+  },
+  "materials": {
+    "facade": "pale_oak_planks",
+    "foundation": "bricks",
+    "roof_family": "stone_brick"
+  },
+  "material_review": {
+    "status": "bounded draft proxies from individually observed material family",
+    "upper": "pale oak planks preserve a horizontal light tan cladding profile; actual siding substrate unknown",
+    "lower": "bricks are a reddish masonry proxy; lower material product unresolved",
+    "roof": "stone_brick cap states preserve source gray overlapping-unit silhouette; actual product unknown",
+    "glazing": "light_gray_stained_glass_pane reflects pale sash and gray reflections"
+  },
+  "source_roof_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+  "reference_inputs": [
+    {
+      "path": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+      "sha256": "23138b4c0c4d4d7945d2e215477195825e5b77aa6d851eabd01c7eb29f4d3dda"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/housing-material-evidence.json",
+      "sha256": "2668ec66c0f2c5d5aba9ee63c07064da22bdf5c2852275ff5007b5d796b0c155"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/housing-major-roof-face-masks.json",
+      "sha256": "dd5fd45ce1938e3c2ca05f553fa3e3fda70608aafb2f43f5cf970c3db7baf658"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/drone-238s.png",
+      "sha256": "04aa164635b5a695da9f66982df526862c838f96c6c6f0ac6434dff19e369852"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/drone-240s.png",
+      "sha256": "262483dba9d98610e40964ed322adcb37266c1c79c1370c5d41eb15d41d59d73"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/dell-sherrill-238s-crop.png",
+      "sha256": "17cea9a3e741b6518194b0751bb5c3d07ea60cb2eb22e6ca362fbb7655db72c4"
+    },
+    {
+      "path": "runtime/research/campus-priority-20260905/campus-2026-aerial-original.jpg",
+      "sha256": "fcf609c9cdac99ea54cc59ad143b04aa2d66f1963bac7f704973a9dfda85fcbe"
+    }
+  ],
+  "wall_outline_uv_m": [
+    [
+      -0.05,
+      3.8
+    ],
+    [
+      8.1,
+      3.8
+    ],
+    [
+      8.1,
+      8.85
+    ],
+    [
+      17.25,
+      8.85
+    ],
+    [
+      17.25,
+      9.95
+    ],
+    [
+      22.5,
+      9.95
+    ],
+    [
+      22.5,
+      15.0
+    ],
+    [
+      19.95,
+      15.0
+    ],
+    [
+      19.95,
+      20.25
+    ],
+    [
+      10.15,
+      20.25
+    ],
+    [
+      10.15,
+      19.1
+    ],
+    [
+      7.55,
+      19.1
+    ],
+    [
+      7.55,
+      17.05
+    ],
+    [
+      5.55,
+      17.05
+    ],
+    [
+      5.55,
+      15.65
+    ],
+    [
+      -0.05,
+      15.65
+    ],
+    [
+      -0.05,
+      11.4
+    ],
+    [
+      -0.7,
+      11.4
+    ],
+    [
+      -0.7,
+      7.6
+    ],
+    [
+      -0.05,
+      7.6
+    ]
+  ],
+  "wall_plane_evidence": "Dominant source edges bear approximately \u221212\u00b0 and +78\u00b0. Straight inset planes avoid dragging roof-segmentation noise down the facade. Roof cap, roof backing, physical placement and exact roof footprint remain unchanged. Setbacks of 0.4\u20131.2 m behind noisy source eaves are rough interpretations, not a survey of facade position.",
+  "assembly_site_bounds_uv_m": [
+    [
+      11.3,
+      8.0,
+      13.7,
+      8.9
+    ]
+  ],
+  "provisional_entrance": {
+    "centre_u_m": 12.5,
+    "plane_v_m": 8.85,
+    "clear_width_m": 2,
+    "standing_navd88_m": 65.5,
+    "status": "provisional_draft_anchor",
+    "evidence": "A courtyard-facing dormitory entrance is documented in the corroborative Dell portfolio and visible circulation surrounds this face; exact portal position is unresolved. This open draft threshold supplies a reviewable local seam, not a claimed recovered door."
+  },
+  "window_groups": [
+    {
+      "name": "west_corner_bay_lower_1",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 8.25,
+      "sill_navd88_m": 66.25,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_lower_2",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 9.5,
+      "sill_navd88_m": 66.25,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_lower_3",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 10.75,
+      "sill_navd88_m": 66.25,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_middle_1",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 8.25,
+      "sill_navd88_m": 69,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_middle_2",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 9.5,
+      "sill_navd88_m": 69,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_middle_3",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 10.75,
+      "sill_navd88_m": 69,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_upper_1",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 8.25,
+      "sill_navd88_m": 71.5,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_upper_2",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 9.5,
+      "sill_navd88_m": 71.5,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "west_corner_bay_upper_3",
+      "side": "west",
+      "at_m": -0.7,
+      "centre_m": 10.75,
+      "sill_navd88_m": 71.5,
+      "width_m": 0.65,
+      "height_m": 1.0,
+      "evidence": "Three levels and three forward lights observed; individual widths/heights/positions interpreted. Lower tier partly shadowed."
+    },
+    {
+      "name": "north_centre_pair_middle_10.3",
+      "side": "north",
+      "at_m": 8.85,
+      "centre_m": 10.3,
+      "sill_navd88_m": 69,
+      "width_m": 1.6,
+      "height_m": 1.0,
+      "evidence": "Paired upper and middle centre-wall groups observed, exact metric registration interpreted."
+    },
+    {
+      "name": "north_centre_pair_middle_15.8",
+      "side": "north",
+      "at_m": 8.85,
+      "centre_m": 15.8,
+      "sill_navd88_m": 69,
+      "width_m": 1.6,
+      "height_m": 1.0,
+      "evidence": "Paired upper and middle centre-wall groups observed, exact metric registration interpreted."
+    },
+    {
+      "name": "south_group_middle_12.5",
+      "side": "south",
+      "at_m": 20.25,
+      "centre_m": 12.5,
+      "sill_navd88_m": 69,
+      "width_m": 1.5,
+      "height_m": 1.0,
+      "evidence": "Grouped pitch-facing glazing observed; this limited two-group rhythm and exact registration are provisional, not full elevation counts."
+    },
+    {
+      "name": "south_group_middle_17.3",
+      "side": "south",
+      "at_m": 20.25,
+      "centre_m": 17.3,
+      "sill_navd88_m": 69,
+      "width_m": 1.5,
+      "height_m": 1.0,
+      "evidence": "Grouped pitch-facing glazing observed; this limited two-group rhythm and exact registration are provisional, not full elevation counts."
+    },
+    {
+      "name": "north_centre_pair_upper_10.3",
+      "side": "north",
+      "at_m": 8.85,
+      "centre_m": 10.3,
+      "sill_navd88_m": 71.5,
+      "width_m": 1.6,
+      "height_m": 1.0,
+      "evidence": "Paired upper and middle centre-wall groups observed, exact metric registration interpreted."
+    },
+    {
+      "name": "north_centre_pair_upper_15.8",
+      "side": "north",
+      "at_m": 8.85,
+      "centre_m": 15.8,
+      "sill_navd88_m": 71.5,
+      "width_m": 1.6,
+      "height_m": 1.0,
+      "evidence": "Paired upper and middle centre-wall groups observed, exact metric registration interpreted."
+    },
+    {
+      "name": "south_group_upper_12.5",
+      "side": "south",
+      "at_m": 20.25,
+      "centre_m": 12.5,
+      "sill_navd88_m": 71.5,
+      "width_m": 1.5,
+      "height_m": 1.0,
+      "evidence": "Grouped pitch-facing glazing observed; this limited two-group rhythm and exact registration are provisional, not full elevation counts."
+    },
+    {
+      "name": "south_group_upper_17.3",
+      "side": "south",
+      "at_m": 20.25,
+      "centre_m": 17.3,
+      "sill_navd88_m": 71.5,
+      "width_m": 1.5,
+      "height_m": 1.0,
+      "evidence": "Grouped pitch-facing glazing observed; this limited two-group rhythm and exact registration are provisional, not full elevation counts."
+    }
+  ],
+  "camera_views": [
+    {
+      "name": "north_courtyard_overview",
+      "eye_uv_navd88_m": [
+        12,
+        -15,
+        76
+      ],
+      "target_uv_navd88_m": [
+        12,
+        10,
+        70
+      ],
+      "fov": 65
+    },
+    {
+      "name": "north_entry_eye",
+      "eye_uv_navd88_m": [
+        12.5,
+        3,
+        67.12
+      ],
+      "target_uv_navd88_m": [
+        12.5,
+        10,
+        67.2
+      ],
+      "fov": 65
+    },
+    {
+      "name": "west_three_tier_bay",
+      "eye_uv_navd88_m": [
+        -16,
+        5,
+        72
+      ],
+      "target_uv_navd88_m": [
+        -0.7,
+        9.5,
+        69.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "south_pitch_side",
+      "eye_uv_navd88_m": [
+        13,
+        39,
+        77
+      ],
+      "target_uv_navd88_m": [
+        12,
+        14,
+        71
+      ],
+      "fov": 65
+    },
+    {
+      "name": "roof_mass_and_placement",
+      "eye_uv_navd88_m": [
+        37,
+        -5,
+        91
+      ],
+      "target_uv_navd88_m": [
+        10,
+        11,
+        72
+      ],
+      "fov": 65
+    },
+    {
+      "name": "northwest_corner",
+      "eye_uv_navd88_m": [
+        -13,
+        -9,
+        76
+      ],
+      "target_uv_navd88_m": [
+        4,
+        8,
+        70
+      ],
+      "fov": 65
+    }
+  ],
+  "uncertainties": [
+    "Rough exterior draft; exact lower masonry and upper siding products are unverified.",
+    "All aperture dimensions and registration are interpreted from small aerial pixels; no hidden east/west room-window rows are invented.",
+    "Observed projecting west corner bay retains three tiers; pale thin sash divisions are approximated at two blocks/metre.",
+    "Chimney position and open pergola geometry are unresolved and omitted; measured roof retained without speculative roof appendages.",
+    "Provisional north courtyard doorway/apron is an explicit construction anchor, not source-verified door geometry.",
+    "Interior program and floors beyond entry are unfinished; no interior route certification."
+  ]
+}

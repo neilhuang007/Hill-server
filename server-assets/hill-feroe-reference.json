@@ -1,0 +1,3296 @@
+{
+  "name": "Feroe House \u2014 Head of School Residence",
+  "revision": "2026-09-08-feroe-v7-2x",
+  "parent_id": "16001511600623C-ba74e78741",
+  "school_names": [
+    "Feroe House",
+    "Head of School Residence"
+  ],
+  "school_map_numbers": [
+    38
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_feroe_details",
+  "study_margin_m": 26,
+  "geometry": {
+    "origin_xz_m": [
+      -180,
+      22
+    ],
+    "axis_degrees": 10.102,
+    "axis_evidence": "Longest north wall has source bearing 10.105 degrees; long south run is 9.914 degrees. The 20.301-degree minimum-area rectangle is not the facade frame.",
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 56.75,
+    "floor_status": "Photo/DTM interpretation; north ground approximately 55.5\u201356.3m, south ground approximately 53.45m. Not a building floor survey."
+  },
+  "materials": {
+    "facade": "smooth_quartz",
+    "foundation": "tuff_bricks",
+    "roof_family": "stone_brick",
+    "trim": "quartz_block"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.0,
+    "trim_family": "smooth_quartz",
+    "trim_block": "smooth_quartz",
+    "glass_block": "glass_pane"
+  },
+  "material_review": {
+    "status": "Reviewed original-texture palette retained; v7 is an exact archive patch for verified frame, rear-reveal and low-roof glazing defects. Native review pending.",
+    "actual_materials": "Cream smooth rendered-looking main walls; cream painted joinery; irregular coursed gray/brown exposed stone; gray overlapping hip-roof units; white-painted deck railing. Species and proprietary products unverified.",
+    "proxy_assignments": {
+      "cream_render": "smooth_quartz: low-frequency warm pale original texture; does not imply real quartz walls",
+      "painted_panel_joinery": "quartz_block, quartz_pillar, smooth_quartz_stairs/slabs: geometric paint/joinery proxies",
+      "rough_gray_brown_base": "tuff_bricks: coherent muted coursed masonry texture, no claim of tuff geology",
+      "gray_shingle_roof": "stone_brick stairs/slabs: original medium-gray overlapping-unit proxy, no claim of a stone-brick roof",
+      "thin_pale_rail_members": "iron_bars with quartz newels and cap slabs; original textures only",
+      "slender_bay_columns": "pale_oak_fence: restrained pale timber-geometry proxy for the photographed painted columns; exact substrate unknown"
+    },
+    "colour_evidence": "runtime/research/campus-full-detail-20260905/housing-material-appearance.json; samples feroe_smooth_cream_wall, feroe_exposed_stone_lower_wall, feroe_painted_bay_panel, feroe_gray_hip_roof",
+    "catalogue": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+    "caution": "Photo RGB includes unknown exposure, illumination and white balance; raw DeltaE is diagnostic rather than reflectance matching."
+  },
+  "roof_evidence": {
+    "ledger": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+    "face_masks": "runtime/research/campus-full-detail-20260905/housing-major-roof-face-masks.json",
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "dominant_accepted_face_ids": [
+      9,
+      12,
+      3,
+      6,
+      8,
+      5
+    ],
+    "high_fragment_repair_ids": [
+      1,
+      2
+    ],
+    "measured_major_peak_navd88_m": 67.2192,
+    "raw_rejected_max_navd88_m": 75.2528,
+    "authored_rule": "Retain exact original footprint and accepted source surfaces outside a bounded west pediment. Replace only audited high fragments with an adjacent accepted plane. Low patches 4 and 11 are exposed deck/terrace interpretations. All authored surfaces are recorded separately."
+  },
+  "bay": {
+    "front_u_m": -0.33,
+    "centre_v_m": 9.83,
+    "width_m": 6.23,
+    "roof_bounds_uv_m": [
+      -0.8,
+      6.7,
+      3.15,
+      12.96
+    ],
+    "eave_navd88_m": 63.0,
+    "ridge_navd88_m": 65.85
+  },
+  "chimneys": [
+    {
+      "centre_uv_m": [
+        3.8,
+        5.6
+      ],
+      "width_m": 0.85,
+      "base_navd88_m": 63.6,
+      "top_navd88_m": 66.9,
+      "status": "Pale shaft observed; exact plan position and height interpreted"
+    },
+    {
+      "centre_uv_m": [
+        12.7,
+        16.15
+      ],
+      "width_m": 0.6,
+      "base_navd88_m": 63.4,
+      "top_navd88_m": 66.0,
+      "status": "Pale shaft observed on right roof; exact plan position and height interpreted"
+    }
+  ],
+  "interpreted_window_rows": [
+    {
+      "side": "north",
+      "at_m": -0.75,
+      "centres_m": [
+        8.1,
+        10.0,
+        14.2,
+        16.5,
+        18.0
+      ],
+      "sill_navd88_m": 57.35,
+      "width_m": 1.25,
+      "height_m": 1.55
+    },
+    {
+      "side": "north",
+      "at_m": 2.3,
+      "centres_m": [
+        4.1,
+        7.6,
+        10.7,
+        13.8
+      ],
+      "sill_navd88_m": 60.25,
+      "width_m": 1.25,
+      "height_m": 1.65
+    },
+    {
+      "side": "east",
+      "at_m": 15.2,
+      "centres_m": [
+        3.5
+      ],
+      "sill_navd88_m": 57.55,
+      "width_m": 1.25,
+      "height_m": 1.65
+    },
+    {
+      "side": "east",
+      "at_m": 15.2,
+      "centres_m": [
+        3.5
+      ],
+      "sill_navd88_m": 60.35,
+      "width_m": 1.25,
+      "height_m": 1.65
+    },
+    {
+      "side": "east",
+      "at_m": 16.25,
+      "centres_m": [
+        6.65,
+        9.3,
+        11.8,
+        14.6
+      ],
+      "sill_navd88_m": 57.55,
+      "width_m": 1.3,
+      "height_m": 1.7
+    },
+    {
+      "side": "east",
+      "at_m": 16.25,
+      "centres_m": [
+        6.65,
+        9.3,
+        11.8,
+        14.6
+      ],
+      "sill_navd88_m": 60.35,
+      "width_m": 1.3,
+      "height_m": 1.65
+    },
+    {
+      "side": "south",
+      "at_m": 12.94,
+      "centres_m": [
+        1.7,
+        4.2,
+        6.7
+      ],
+      "sill_navd88_m": 57.55,
+      "width_m": 1.4,
+      "height_m": 1.7
+    },
+    {
+      "side": "south",
+      "at_m": 12.94,
+      "centres_m": [
+        1.7,
+        4.2,
+        6.7
+      ],
+      "sill_navd88_m": 60.35,
+      "width_m": 1.4,
+      "height_m": 1.65
+    },
+    {
+      "side": "west",
+      "at_m": 9.8,
+      "centres_m": [
+        14.35,
+        17.4
+      ],
+      "sill_navd88_m": 60.35,
+      "width_m": 1.25,
+      "height_m": 1.65
+    },
+    {
+      "side": "south",
+      "at_m": 17.5,
+      "centres_m": [
+        11.4,
+        13.8
+      ],
+      "sill_navd88_m": 60.2,
+      "width_m": 1.2,
+      "height_m": 1.6
+    },
+    {
+      "side": "south",
+      "at_m": 18.84,
+      "centres_m": [
+        12.0,
+        14.0
+      ],
+      "sill_navd88_m": 57.45,
+      "width_m": 1.2,
+      "height_m": 1.55
+    },
+    {
+      "side": "west",
+      "at_m": 2.85,
+      "centres_m": [
+        4.15
+      ],
+      "sill_navd88_m": 57.55,
+      "width_m": 1.3,
+      "height_m": 1.7
+    },
+    {
+      "side": "west",
+      "at_m": 2.85,
+      "centres_m": [
+        4.15
+      ],
+      "sill_navd88_m": 60.35,
+      "width_m": 1.3,
+      "height_m": 1.65
+    }
+  ],
+  "evidence": [
+    {
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=cODrD_pgaOcm6hJCtBNbhQ&heading=90&pitch=0&fov=70",
+      "local": "runtime/research/campus-full-detail-20260905/feroe-bailey-streetview-2019.jpg",
+      "capture_date": "2019-08",
+      "supports": "Partly screened west elevation, cream smooth main walls, two-storey panel bay, paired sashes, pilasters, dentils, oculus and pediment, stone base, white raised deck, gray hip roof and two pale chimneys."
+    },
+    {
+      "url": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+      "supports": "Official campus identity and residence position; no invented repositioning."
+    },
+    {
+      "local": "runtime/research/campus-full-detail-20260905/feroe-headmaster-1698.jpg",
+      "supports": "Interior photo resolves broad multi-light window and glazed-door joinery; does not independently identify a compass elevation."
+    }
+  ],
+  "uncertainties": [
+    "Only the west elevation has an independently usable exterior photograph; trees screen its left bay and entrance. Two clearly visible paired groups per tier are observed; the third group behind trees is interpreted.",
+    "North/east/south opening counts and exact locations, north entrance and deck door are explicit construction interpretations awaiting additional photographs.",
+    "Smooth cream appearance is supported; render, paint, stone species and roof product are not specified. Minecraft block names describe proxies only.",
+    "Chimney count is photographed; exact shaft plan locations/heights are interpreted and not assigned to the rejected high fragments.",
+    "The 56.75m main floor, terrace, raised deck and three entrance steps are photo/terrain interpretations at half-metre voxel resolution; the roof raster also uses quarter-metre stair/slab surface positions.",
+    "Dentils, sash bars and panel relief are quantised at two blocks/metre. Native screenshots must still verify silhouette, glass support, apparent palette and terrain contact."
+  ],
+  "camera_views": [
+    {
+      "name": "feroe-west-reference",
+      "eye_uv_navd88_m": [
+        -24,
+        9.6,
+        58.5
+      ],
+      "target_uv_navd88_m": [
+        2.4,
+        9.9,
+        60.3
+      ],
+      "fov": 67
+    },
+    {
+      "name": "feroe-west-bay-close",
+      "eye_uv_navd88_m": [
+        -12,
+        9.8,
+        60.2
+      ],
+      "target_uv_navd88_m": [
+        -0.2,
+        9.8,
+        60.7
+      ],
+      "fov": 64
+    },
+    {
+      "name": "feroe-south-deck",
+      "eye_uv_navd88_m": [
+        -7,
+        29,
+        59.5
+      ],
+      "target_uv_navd88_m": [
+        7.7,
+        13.0,
+        59.6
+      ],
+      "fov": 70
+    },
+    {
+      "name": "feroe-north-entry",
+      "eye_uv_navd88_m": [
+        5,
+        -18,
+        59.5
+      ],
+      "target_uv_navd88_m": [
+        9,
+        3,
+        59.5
+      ],
+      "fov": 70
+    },
+    {
+      "name": "feroe-east-return",
+      "eye_uv_navd88_m": [
+        34,
+        16,
+        59.5
+      ],
+      "target_uv_navd88_m": [
+        14,
+        10,
+        59.8
+      ],
+      "fov": 65
+    },
+    {
+      "name": "feroe-roof-overview",
+      "eye_uv_navd88_m": [
+        -12,
+        24,
+        77
+      ],
+      "target_uv_navd88_m": [
+        7,
+        9,
+        60
+      ],
+      "fov": 70
+    },
+    {
+      "name": "feroe-west-north-frame-joint",
+      "eye_uv_navd88_m": [
+        -4.4,
+        5.7,
+        59.4
+      ],
+      "target_uv_navd88_m": [
+        0.9,
+        7.2,
+        59.4
+      ],
+      "fov": 65
+    },
+    {
+      "name": "feroe-south-frame-backing",
+      "eye_uv_navd88_m": [
+        12.5,
+        21.8,
+        58.3
+      ],
+      "target_uv_navd88_m": [
+        12.5,
+        17.7,
+        58.1
+      ],
+      "fov": 60
+    }
+  ],
+  "native_revision_notes": [
+    "The v3 west reference and bay close-up passed root review with recorded 2x simplifications. The new pane-joint audit then found four open diagonal pairs on the interpreted south/deck elevations. V4 adds one authorised inward corner pane per pair and reconnects adjacent panes, preserving the accepted materials and all other geometry.",
+    "V4 was rejected: only two joints remained closed and two extra masonry seats were added. V5 applies the four authorised corner returns after all adjoining windows and preserves the two originally empty seating cells. Strict full-state diff against v3 is required.",
+    "V5 closed the four joints, but a concurrent shared reveal change removed twelve earlier connector panes during full rebuilding. V6 derives directly from the hash-checked accepted v3 block archive, preserving every original state before the four returns and neighbour connections.",
+    "V7 preserves exact v6 roof, terrain, bay trim, doors and all4 oculus panes. It removes77 stray/above-roof pane cells (3 become their existing wall backing), adds34 bounded wall/corner panes, removes5 fully isolated caps, and adds9 full concealed quartz cap/jamb cells. Exact original-model wall slices catch and close2 leaks missed by pane counts: the west bay/north junction and a two-cell south jamb backing void."
+  ],
+  "pane_corner_repair": {
+    "basis": "Four diagonal pairs recorded by pane_joint_report in accepted feroe-v3-2x/pane-joint-audit.json. Exact endpoint/corner cells are within the source footprint.",
+    "joints": [
+      {
+        "allowed_xyz": [
+          [
+            -346,
+            72,
+            81
+          ],
+          [
+            -345,
+            72,
+            82
+          ],
+          [
+            -345,
+            72,
+            81
+          ]
+        ],
+        "inward_xz": [
+          0.9844970579211068,
+          0.17540109162911444
+        ]
+      },
+      {
+        "allowed_xyz": [
+          [
+            -346,
+            73,
+            81
+          ],
+          [
+            -345,
+            73,
+            82
+          ],
+          [
+            -345,
+            73,
+            81
+          ]
+        ],
+        "inward_xz": [
+          0.9844970579211068,
+          0.17540109162911444
+        ]
+      },
+      {
+        "allowed_xyz": [
+          [
+            -343,
+            65,
+            84
+          ],
+          [
+            -342,
+            65,
+            83
+          ],
+          [
+            -343,
+            65,
+            83
+          ]
+        ],
+        "inward_xz": [
+          0.17540109162911444,
+          -0.9844970579211068
+        ]
+      },
+      {
+        "allowed_xyz": [
+          [
+            -343,
+            66,
+            84
+          ],
+          [
+            -342,
+            66,
+            83
+          ],
+          [
+            -343,
+            66,
+            83
+          ]
+        ],
+        "inward_xz": [
+          0.17540109162911444,
+          -0.9844970579211068
+        ]
+      }
+    ]
+  },
+  "accepted_baseline": {
+    "archive": "runtime/campus-reconstruction/feroe-v6-2x/sample-blocks.npz",
+    "sha256": "2adb596fa407cff30e3d6ea2ee268c3871a8cc55c449d58e1a2227cfcdb5cdb0",
+    "manifest": "runtime/campus-reconstruction/feroe-v6-2x/manifest.json",
+    "rule": "Restore exact v6 archive before the enumerated, geometry-verified frame repair; preserve reviewed west bay, 2x2 oculus, source footprint and every roof-role block."
+  },
+  "frame_contact_repair": {
+    "baseline_horizontal_candidates": 64,
+    "baseline_vertical_candidates": 12,
+    "classification_ledger": "runtime/campus-reconstruction/feroe-v7-preparation/removed-pane-classification.json",
+    "classification_sha256": "436fa18476c89098b3789a36c39b16942029ed0ba9d1bb27a0067587ee78a164",
+    "occupied_shape_audit": "runtime/campus-reconstruction/feroe-v7-preparation/wall-occupied-shape-audit.json",
+    "rule": "Remove only recorded rear-reveal stubs/above-low-roof leaks, complete actual wall-skin apertures and bounded one-cell returns, and back the verified south jamb void. Original vanilla models verified all22 sash-height half-block slices; oculus shape candidate remains explicitly classified.",
+    "changes": [
+      {
+        "xyz": [
+          -361,
+          65,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -361,
+          66,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -361,
+          67,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -361,
+          71,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -361,
+          72,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -361,
+          73,
+          58
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "one-cell pane-to-masonry return at the west bay/north junction; exact occupied-model flood isolated this open wall route"
+      },
+      {
+        "xyz": [
+          -360,
+          65,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -360,
+          66,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -360,
+          67,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -360,
+          71,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -360,
+          72,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -360,
+          73,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal stub behind the west bay/south return"
+      },
+      {
+        "xyz": [
+          -353,
+          71,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -353,
+          72,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -353,
+          73,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -353,
+          74,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "expected_role": "facade",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "remove a fully isolated cap left by the verified rear reveal stub"
+      },
+      {
+        "xyz": [
+          -347,
+          71,
+          74
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          71,
+          80
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          71,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          71,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "terminal stub joined only to the invalid deck-height glass above; restore the existing wall skin after removing an isolated terminal stub"
+      },
+      {
+        "xyz": [
+          -347,
+          72,
+          74
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          72,
+          80
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          72,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          72,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "terminal stub joined only to the invalid deck-height glass above; restore the existing wall skin after removing an isolated terminal stub"
+      },
+      {
+        "xyz": [
+          -347,
+          73,
+          74
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          73,
+          80
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          73,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the open deck roof patch"
+      },
+      {
+        "xyz": [
+          -347,
+          73,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "terminal stub joined only to the invalid deck-height glass above; restore the existing wall skin after removing an isolated terminal stub"
+      },
+      {
+        "xyz": [
+          -346,
+          70,
+          54
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -346,
+          70,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -346,
+          71,
+          54
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -346,
+          71,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the west/deck jamb"
+      },
+      {
+        "xyz": [
+          -346,
+          72,
+          54
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -346,
+          72,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the west/deck jamb"
+      },
+      {
+        "xyz": [
+          -346,
+          73,
+          54
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -346,
+          74,
+          54
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "expected_role": "facade",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "remove a fully isolated cap left by the verified rear reveal stub"
+      },
+      {
+        "xyz": [
+          -345,
+          64,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -345,
+          65,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          65,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          65,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north corner jamb"
+      },
+      {
+        "xyz": [
+          -345,
+          66,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          66,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          66,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north corner jamb"
+      },
+      {
+        "xyz": [
+          -345,
+          67,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          67,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north corner aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -345,
+          67,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north corner jamb"
+      },
+      {
+        "xyz": [
+          -344,
+          65,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -344,
+          65,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -344,
+          66,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -344,
+          66,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -344,
+          67,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -344,
+          67,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "inward tail replaced by glazing on the actual north corner wall"
+      },
+      {
+        "xyz": [
+          -343,
+          64,
+          83
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -343,
+          67,
+          83
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -342,
+          69,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -342,
+          70,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the south upper jamb"
+      },
+      {
+        "xyz": [
+          -342,
+          71,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the south upper jamb"
+      },
+      {
+        "xyz": [
+          -342,
+          72,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the south upper jamb"
+      },
+      {
+        "xyz": [
+          -342,
+          73,
+          82
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the south upper jamb"
+      },
+      {
+        "xyz": [
+          -341,
+          65,
+          84
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "concealed jamb backing joins the existing inner and outer south-return frame posts below their retained roof substrate; exact occupied-model flood isolated this open route"
+      },
+      {
+        "xyz": [
+          -341,
+          66,
+          84
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "concealed jamb backing joins the existing inner and outer south-return frame posts below their retained roof substrate; exact occupied-model flood isolated this open route"
+      },
+      {
+        "xyz": [
+          -340,
+          70,
+          55
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -340,
+          71,
+          55
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -340,
+          72,
+          55
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -340,
+          73,
+          55
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north wall"
+      },
+      {
+        "xyz": [
+          -340,
+          74,
+          55
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "expected_role": "facade",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "remove a fully isolated cap left by the verified rear reveal stub"
+      },
+      {
+        "xyz": [
+          -338,
+          70,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the south/east corner"
+      },
+      {
+        "xyz": [
+          -338,
+          71,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the south/east corner"
+      },
+      {
+        "xyz": [
+          -338,
+          72,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the south/east corner"
+      },
+      {
+        "xyz": [
+          -338,
+          73,
+          81
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the south/east corner"
+      },
+      {
+        "xyz": [
+          -336,
+          64,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          64,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          65,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          65,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          66,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          66,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          67,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          67,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "interior tail of the north entry reveal"
+      },
+      {
+        "xyz": [
+          -336,
+          69,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -336,
+          70,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north upper jamb"
+      },
+      {
+        "xyz": [
+          -336,
+          71,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north upper jamb"
+      },
+      {
+        "xyz": [
+          -336,
+          72,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north upper jamb"
+      },
+      {
+        "xyz": [
+          -336,
+          73,
+          53
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north upper jamb"
+      },
+      {
+        "xyz": [
+          -335,
+          65,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          66,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          67,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          70,
+          52
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north addition roof"
+      },
+      {
+        "xyz": [
+          -335,
+          70,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "expected_role": "facade",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "remove a fully isolated cap left by the verified rear reveal stub"
+      },
+      {
+        "xyz": [
+          -335,
+          71,
+          52
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north addition roof"
+      },
+      {
+        "xyz": [
+          -335,
+          71,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          72,
+          52
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north addition roof"
+      },
+      {
+        "xyz": [
+          -335,
+          72,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          73,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "isolated rear reveal column behind the north/east corner"
+      },
+      {
+        "xyz": [
+          -335,
+          74,
+          56
+        ],
+        "expected": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "expected_role": "facade",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "remove a fully isolated cap left by the verified rear reveal stub"
+      },
+      {
+        "xyz": [
+          -334,
+          64,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:smooth_quartz"
+        },
+        "role": "facade",
+        "reason": "full concealed head/sill for the bounded retained or added pane return"
+      },
+      {
+        "xyz": [
+          -334,
+          65,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north lower jamb"
+      },
+      {
+        "xyz": [
+          -334,
+          65,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          65,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          66,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north lower jamb"
+      },
+      {
+        "xyz": [
+          -334,
+          66,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          66,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          67,
+          48
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "single inward L-return to the north lower jamb"
+      },
+      {
+        "xyz": [
+          -334,
+          67,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          67,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          71,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          71,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          72,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          72,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          73,
+          68
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -334,
+          73,
+          73
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "true",
+            "north": "false",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind an intact east sash sheet"
+      },
+      {
+        "xyz": [
+          -333,
+          65,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north terrace roof"
+      },
+      {
+        "xyz": [
+          -333,
+          66,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north terrace roof"
+      },
+      {
+        "xyz": [
+          -333,
+          67,
+          47
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "false",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "true"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "above the low north terrace roof"
+      },
+      {
+        "xyz": [
+          -332,
+          65,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -332,
+          65,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -332,
+          66,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -332,
+          66,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -332,
+          67,
+          49
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -332,
+          67,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "false",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "expected_role": "window",
+        "state": {
+          "Name": "minecraft:air"
+        },
+        "role": "air",
+        "reason": "dead inward branch behind the north sash"
+      },
+      {
+        "xyz": [
+          -324,
+          65,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -324,
+          65,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -324,
+          66,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -324,
+          66,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -324,
+          67,
+          50
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      },
+      {
+        "xyz": [
+          -324,
+          67,
+          51
+        ],
+        "expected": {
+          "Name": "minecraft:air"
+        },
+        "expected_role": "air",
+        "state": {
+          "Name": "minecraft:glass_pane",
+          "Properties": {
+            "east": "false",
+            "north": "true",
+            "south": "true",
+            "waterlogged": "false",
+            "west": "false"
+          }
+        },
+        "role": "window",
+        "reason": "north end aperture on its original masonry skin"
+      }
+    ]
+  }
+}

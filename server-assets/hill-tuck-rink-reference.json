@@ -1,0 +1,821 @@
+{
+  "name": "Tuck Hall Arena / Eccleston Rink - photographed north facade",
+  "revision": "2026-09-19-tuck-rink-6-2x-retained-north-site-ownership",
+  "parent_id": "16003036400434C-c86ee564a0",
+  "school_names": [
+    "Edward Tuck Hall Arena and Thomas Eccleston, Jr. Rink"
+  ],
+  "school_map_numbers": [
+    14
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_tuck_rink_details",
+  "study_margin_m": 24,
+  "geometry": {
+    "origin_xz_m": [
+      0,
+      0
+    ],
+    "axis_degrees": 9,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 54.6
+  },
+  "materials": {
+    "facade": "red_terracotta",
+    "foundation": "mud_bricks",
+    "roof_family": "stone_brick"
+  },
+  "reference_packet": {
+    "path": "runtime/research/campus-full-detail-20260905/tuck-rink-reference-packet-20260916.json",
+    "sha256": "fa09dad59fd38215530be804978c385102412c9175cd16164f084ac5c7f65bf9"
+  },
+  "source_roof_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+  "north_slot_centres_u_m": [
+    -8.3,
+    -3.0,
+    2.3,
+    7.6,
+    12.9,
+    18.2,
+    23.5,
+    28.8,
+    34.1
+  ],
+  "source_controls": {
+    "format": "hill-sol-building-reference-packet-v1",
+    "building": "Edward Tuck Hall Arena and Thomas Eccleston, Jr. Rink",
+    "created": "2026-09-16",
+    "status": "builder_ready_north_facade_and_measured_massing",
+    "scope": "Reference and source-registration handoff only; no builder source, profile, world, integration, or native capture was changed.",
+    "coordinate_frame": {
+      "origin_xz_m": [
+        0.0,
+        0.0
+      ],
+      "axis_degrees": 9.0,
+      "axis_u_xz": [
+        0.9876883405951378,
+        0.15643446504023087
+      ],
+      "axis_v_xz": [
+        -0.15643446504023087,
+        0.9876883405951378
+      ],
+      "uv_to_xz": "XZ=U*axis_u+V*axis_v",
+      "mapping": "X=2*east_m; Z=2*south_m; Y=2*(NAVD88_m-25)",
+      "blocks_per_metre": 2,
+      "warning": "Roof-face bounds below are source X/Z metres. Facade planes and site controls are rotated U/V metres. Do not mix the frames."
+    },
+    "identity": {
+      "school_map_number": 14,
+      "county_parent_id": "16003036400434C-c86ee564a0",
+      "cityjson_part_id": "16003036400434C-c86ee564a0-0",
+      "official_map_name": "Edward Tuck Hall Arena and Thomas Eccleston, Jr. Rink",
+      "rule": "This is one detached county parent. Keep the 10.4 m service passage to Mercer and the 7.8 m corridor to Annan open."
+    },
+    "baseline": {
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16003036400434C-c86ee564a0",
+      "sample_blocks_sha256": "928e9af394e8e3fa0720baf5b0886cc0cf2a992ab1b1f5953f2be30280212310",
+      "profile_sha256": "32f9254bfca23bc2a24f853ff518acb3b0245e05c801d5ce8ede1cf65cd6a674",
+      "manifest_sha256": "d4c7fb1b722dad7bae431a30ba324264965d9d60902e90c1eebaf9190e021df7",
+      "visual_review": "pending",
+      "required_method": "Use the measured shell as exact placement and roof authority. Preserve measured roof blocks and all unstudied wall regions unless a patch is explicitly authorized below."
+    },
+    "primary_sources": [
+      {
+        "id": "wohlsen_north_entry_exterior",
+        "owner": "Wohlsen Construction",
+        "page": "https://wohlsenconstruction.com/project/the-hill-school-hockey-arena-and-rink/",
+        "url": "https://wohlsenconstruction.com/wp-content/uploads/2016/03/k-12-schools-construction-the-hill-school-hockey-arena-and-rink-1.jpg",
+        "local": "runtime/research/campus-full-detail-20260905/rink-1.jpg",
+        "sha256": "1c1dad69010e9891c031f3a36c5aca27004027c613bc85ae8b93cd0cec063988",
+        "pixels": [
+          1400,
+          930
+        ],
+        "supports": [
+          "straight north street facade and east-end entrance",
+          "white panel fields with narrow tall dark glazing",
+          "red-brown textured plinth",
+          "brick entrance bay, four glazed door leaves, pale canopy",
+          "red vertically ribbed east-gable cladding and one louver"
+        ],
+        "documented_facts": [
+          "new indoor collegiate arena and rink",
+          "33,000 square feet",
+          "Buck Simpers Architect + Associates"
+        ]
+      },
+      {
+        "id": "official_school_drone_crop",
+        "owner": "The Hill School",
+        "source_url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+        "source_local": "runtime/research/athey-20260905/campus-2026-drone-1080.mp4",
+        "source_sha256": "b4c03c8d5462030ce8e95e5f56b3260da044501144f7390cbfc24e89c3894b21",
+        "local": "runtime/research/campus-full-detail-20260905/sports-east-drone265-detail.png",
+        "sha256": "bbc2af0ef15fc3a5fd71dddc51c7bd483cf0cbe83750b1b90e32e3c721272bf5",
+        "pixels": [
+          1325,
+          850
+        ],
+        "supports": [
+          "detached arena mass",
+          "pale low-gable roof",
+          "north panel rhythm",
+          "open gaps to Mercer and Annan"
+        ],
+        "registration": "Context crop only; it is not calibrated photogrammetry. Measured source governs plan and height."
+      },
+      {
+        "id": "official_school_current_aerial",
+        "owner": "The Hill School",
+        "url": "https://resources.finalsite.net/images/v1781199127/thehillorg/w4u9jqyl7pydvhxczw5z/2026-Aerial-Campus.jpg",
+        "local": "runtime/research/campus-priority-20260905/campus-2026-aerial-original.jpg",
+        "sha256": "fcf609c9cdac99ea54cc59ad143b04aa2d66f1963bac7f704973a9dfda85fcbe",
+        "supports": [
+          "current roof massing",
+          "arena orientation",
+          "separation from neighboring athletics buildings"
+        ]
+      },
+      {
+        "id": "official_school_interior",
+        "owner": "The Hill School",
+        "page": "https://www.thehill.org/athletics/facilities",
+        "url": "https://resources.finalsite.net/images/f_auto,q_auto,t_image_size_6/v1553616190/thehillorg/r3ankmjzh19joj5fzmcr/Hall-Eccleston-Arena.jpg",
+        "local": "runtime/research/campus-full-detail-20260905/Hall-Eccleston-Arena.jpg",
+        "sha256": "bfe34674534af9b034c6beb471b0504c50a9bd4830c63aa61cf9b04121fba204",
+        "pixels": [
+          2200,
+          1468
+        ],
+        "supports": [
+          "identity",
+          "large clear-span gabled interior",
+          "north gallery/daylight opening family"
+        ],
+        "limitation": "Interior view does not authorize exterior opening positions beyond the photographed north face."
+      }
+    ],
+    "measured_sources": {
+      "cityjson": {
+        "path": "runtime/campus-reconstruction/roofer-chapel-trial/campus-model/hill-campus-roofer.city.json",
+        "sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+        "parent_id": "16003036400434C-c86ee564a0",
+        "source_part_id": "16003036400434C-c86ee564a0-0",
+        "source_base_navd88_m": 54.4199,
+        "source_max_navd88_m": 65.2749,
+        "roof_face_count": 5
+      },
+      "roof_analysis": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-roof-geometries.json",
+        "sha256": "da641ab5d136c99ce2d6b4ec7139d30d64fd5d1f651b050bbaaeb44dd2aca6c3"
+      },
+      "facade_registration": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-facades.json",
+        "sha256": "46d88480940568c0da0cbcc72cee0592c97de11daca416d2bada791a129d1532",
+        "status": "scaled photo/aerial reconstruction; use tolerances and count labels below"
+      },
+      "material_register": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-materials.json",
+        "sha256": "215debfaad35368eff622e70995303ff8e2a3b00fd3d3045f4847fe4ae41fa9a"
+      }
+    },
+    "source_roof_faces": [
+      {
+        "face_id": 0,
+        "bounds_xz_m": [
+          8.3337,
+          -132.4967,
+          14.2386,
+          -129.6682
+        ],
+        "height_navd88_m": [
+          59.9951,
+          60.2534
+        ],
+        "area_m2": 11.2122,
+        "role": "small southwest projection roof; preserve"
+      },
+      {
+        "face_id": 1,
+        "bounds_xz_m": [
+          7.5261,
+          -132.6204,
+          8.6491,
+          -130.5618
+        ],
+        "height_navd88_m": [
+          54.4823,
+          54.4955
+        ],
+        "area_m2": 1.6066,
+        "role": "small low southwest source face; preserve"
+      },
+      {
+        "face_id": 2,
+        "bounds_xz_m": [
+          8.6491,
+          -150.7102,
+          76.3775,
+          -122.4508
+        ],
+        "height_navd88_m": [
+          62.2992,
+          65.2749
+        ],
+        "area_m2": 1187.0102,
+        "role": "main south roof plane"
+      },
+      {
+        "face_id": 3,
+        "bounds_xz_m": [
+          63.7464,
+          -160.6388,
+          78.9388,
+          -158.246
+        ],
+        "height_navd88_m": [
+          58.3287,
+          58.8433
+        ],
+        "area_m2": 11.3766,
+        "role": "north entry/canopy-related source face; preserve"
+      },
+      {
+        "face_id": 4,
+        "bounds_xz_m": [
+          11.6179,
+          -167.415,
+          79.2437,
+          -140.057
+        ],
+        "height_navd88_m": [
+          61.9144,
+          64.962
+        ],
+        "area_m2": 1125.6608,
+        "role": "main north roof plane"
+      }
+    ],
+    "measured_massing": {
+      "main_wall_bounds_uv_m": [
+        -12.0,
+        -167.6,
+        53.52,
+        -132.4
+      ],
+      "main_ridge_v_m": -150.0,
+      "main_ridge_navd88_m": 65.27,
+      "north_eave_navd88_m": 61.95,
+      "south_eave_navd88_m": 62.3,
+      "ice_floor_navd88_m": 54.6,
+      "north_gallery_entry_floor_navd88_m": 58.6,
+      "north_entry_projection_uv_bounds_m": [
+        37.83,
+        -168.65,
+        53.52,
+        -167.55
+      ],
+      "southwest_projection_uv_bounds_m": [
+        -13.0,
+        -132.4,
+        -6.53,
+        -130.25
+      ],
+      "height_rule": "The 54.42 m source base is low southwest ground, not the north door threshold. Keep the north entrance near H=58.6 and the arena floor/lower service grade near H=54.6."
+    },
+    "authorized_patches": [
+      {
+        "id": "north_street_facade",
+        "maximum_bounds_uvh_m": [
+          -12.0,
+          -168.25,
+          37.83,
+          -167.2,
+          57.4,
+          62.05
+        ],
+        "plane_v_m": -167.6,
+        "authorization": "Replace only the street-facing shell skin needed for the photographed plinth, pale panel fields, glazing strips, fascia and their backing. Keep the wall straight on one plane."
+      },
+      {
+        "id": "east_end_entry",
+        "maximum_bounds_uvh_m": [
+          37.83,
+          -170.1,
+          53.52,
+          -164.0,
+          58.2,
+          62.1
+        ],
+        "authorization": "Author the photographed brick entrance projection, four-leaf glazed door set, shallow pale canopy and the near-north part of the red ribbed east gable. Do not extrapolate an opening grid down the hidden east wall."
+      },
+      {
+        "id": "southwest_source_projection",
+        "maximum_bounds_uv_m": [
+          -13.0,
+          -132.4,
+          -6.53,
+          -130.25
+        ],
+        "authorization": "Retain the measured low projection and source faces 0/1. Its detailed openings remain unresolved; do not replace it with a copied north entrance."
+      }
+    ],
+    "north_facade_schedule": {
+      "main_plane": {
+        "axis": "v",
+        "at_m": -167.6,
+        "u_range_m": [
+          -12.0,
+          37.83
+        ],
+        "outward_sign": -1,
+        "rule": "One straight wall plane. Do not stagger individual panel bays."
+      },
+      "plinth": {
+        "bottom_navd88_m": "follow local grade, about 57.8 west to 58.6 east",
+        "top_navd88_m": 59.05,
+        "appearance": "red-brown textured masonry units",
+        "certainty": "directly visible"
+      },
+      "pale_panel_band": {
+        "bottom_navd88_m": 59.05,
+        "top_navd88_m": 61.8,
+        "appearance": "broad pale smooth panel fields with thin joints",
+        "certainty": "directly visible; exact joint pitch not measured",
+        "rule": "Use connected broad fields. Fine horizontal/vertical seams should read as texture or sparse shallow relief, not a thick block grid."
+      },
+      "tall_glazed_strips": {
+        "proposed_centres_u_m": [
+          -8.3,
+          -3.0,
+          2.3,
+          7.6,
+          12.9,
+          18.2,
+          23.5,
+          28.8,
+          34.1
+        ],
+        "width_m": 0.85,
+        "bottom_navd88_m": 59.05,
+        "top_navd88_m": 61.7,
+        "source_count": "at least seven individually visible in the contractor photograph",
+        "authoring_count": 9,
+        "count_status": "nine is a length-scaled reconstruction; far-west bays are foreshortened/obscured",
+        "registration_tolerance_m": 0.75,
+        "rule": "Keep a regular rhythm and adjust only the end bays. At 2 blocks/m use one-pane-wide dark vertical slots with occupied pale heads/sills. Do not claim nine as an exact photo count."
+      },
+      "entry": {
+        "centre_u_m": 45.5,
+        "entry_plane_v_m": -168.65,
+        "brick_bay_width_m": 8.0,
+        "four_glass_leaves_total_width_m": 4.2,
+        "door_bottom_navd88_m": 58.6,
+        "door_top_navd88_m": 61.1,
+        "canopy_uv_bounds_m": [
+          40.7,
+          -170.0,
+          50.3,
+          -167.2
+        ],
+        "canopy_bottom_navd88_m": 61.3,
+        "canopy_top_navd88_m": 61.7,
+        "certainty": "composition and four leaves directly visible; dimensions registered/interpreted",
+        "rule": "Keep the canopy thin, pale, backed and physically joined to the entry. Do not add a monumental stair; the sidewalk is near threshold level."
+      }
+    },
+    "other_facades": {
+      "east_gable": {
+        "plane_u_m": 53.52,
+        "v_range_m": [
+          -167.6,
+          -132.4
+        ],
+        "observed": "Red vertically ribbed wall beside the brick entry with pale eave/fascia and one small louver near the north corner.",
+        "near_entry_louver": {
+          "centre_v_m": -164.7,
+          "width_m": 1.15,
+          "bottom_navd88_m": 59.45,
+          "height_m": 1.2
+        },
+        "rule": "Apply red ribbed cladding as a coherent plane. Author only the near-entry louver; other opening totals are unresolved."
+      },
+      "south_service": {
+        "plane_v_m": -132.4,
+        "u_range_m": [
+          -12.0,
+          53.52
+        ],
+        "observed": "Taller wall above low ground with a measured southwest projection and service character.",
+        "rule": "Preserve shell geometry and grade exposure. Do not continue the north glazing rhythm or invent a symmetric entrance."
+      },
+      "west_gable": {
+        "plane_u_m": -12.0,
+        "v_range_m": [
+          -167.6,
+          -132.4
+        ],
+        "rule": "Largely hidden. Preserve shell and roof silhouette; no repeated windows are authorized."
+      }
+    },
+    "site_controls": {
+      "north_sidewalk": {
+        "bounds_uv_m": [
+          -13.0,
+          -170.8,
+          55.0,
+          -168.65
+        ],
+        "east_navd88_m": 58.6,
+        "west_navd88_m": 57.8,
+        "rule": "Continuous pale sidewalk and curb, gently sloping west. Keep the east entrance nearly level with the path."
+      },
+      "rink_mercer_gap": {
+        "bounds_uv_m": [
+          -12.0,
+          -132.4,
+          53.5,
+          -122.0
+        ],
+        "rule": "Preserve the roughly 10.4 m open service passage; do not merge arena and Mercer."
+      },
+      "rink_annan_gap": {
+        "bounds_uv_m": [
+          53.52,
+          -167.6,
+          61.3,
+          -133.99
+        ],
+        "rule": "Preserve the roughly 7.8 m corridor, sloping from about H=59 north to H=57 south."
+      }
+    },
+    "palette": [
+      {
+        "role": "north pale smooth panels",
+        "actual": "pale smooth panel system; product unresolved",
+        "minecraft_primary": [
+          "white_concrete"
+        ],
+        "minecraft_alternative": [
+          "light_gray_concrete"
+        ],
+        "trim": [
+          "smooth_quartz",
+          "smooth_quartz_slab"
+        ],
+        "decision": "Use white or very light gray broad fields. Reserve quartz for thin fascia, corners, heads and canopy."
+      },
+      {
+        "role": "north tall glazing and entry doors",
+        "actual": "dark reflective exterior glazing",
+        "minecraft_primary": [
+          "gray_stained_glass_pane"
+        ],
+        "minecraft_darker_option": [
+          "black_stained_glass_pane"
+        ],
+        "decision": "Pane color may change after native comparison. Start gray for the thin daylight slots; use black only if gray reads too bright. Keep occupied heads and sills."
+      },
+      {
+        "role": "north low plinth",
+        "actual": "red-brown textured masonry unit",
+        "minecraft_primary": [
+          "mud_bricks",
+          "mud_brick_slab"
+        ],
+        "minecraft_alternative": [
+          "terracotta"
+        ],
+        "decision": "Use a continuous coarse base distinct from the small ordinary brick entry."
+      },
+      {
+        "role": "east entrance masonry",
+        "actual": "ordinary red brick",
+        "minecraft": [
+          "bricks",
+          "brick_stairs",
+          "brick_slab"
+        ],
+        "decision": "Limit ordinary brick to the photographed entry bay and local interior-looking returns."
+      },
+      {
+        "role": "east and service-side ribbed cladding",
+        "actual": "red vertically ribbed sheet cladding; alloy/product unresolved",
+        "minecraft_primary": [
+          "red_terracotta"
+        ],
+        "minecraft_detail": [
+          "polished_granite_wall"
+        ],
+        "decision": "Use a coherent red terracotta plane. If rib relief is needed, use sparse shallow vertical accents; do not alternate every 0.5 m into noise."
+      },
+      {
+        "role": "pale low-gable roof",
+        "actual": "pale sheet roof appearance; product unresolved",
+        "minecraft_primary": [
+          "smooth_stone",
+          "smooth_stone_slab"
+        ],
+        "minecraft_alternative": [
+          "light_gray_concrete",
+          "light_gray_concrete_powder"
+        ],
+        "decision": "Preserve exact measured faces and ridge. Keep the roof pale and continuous; material chemistry is not claimed."
+      },
+      {
+        "role": "sidewalk",
+        "actual": "pale concrete",
+        "minecraft": [
+          "smooth_stone",
+          "smooth_stone_slab"
+        ],
+        "decision": "Follow the gentle measured/DEM grade instead of flattening to the low source base."
+      }
+    ],
+    "construction_rules": [
+      "Keep the photographed north facade and all other straight wall segments on consistent planes.",
+      "Preserve all five source roof faces and exact campus placement; no roof-shape exception is authorized.",
+      "Do not use the 54.42 m low source base as a common facade floor; north entry is near 58.60 m.",
+      "Keep the brick entry, ribbed red gable, pale panel band and textured plinth visually distinct.",
+      "At two blocks per metre, represent fine panel joints with texture or sparse shallow relief, not full-block mullions.",
+      "Back stairs/slabs and fascia, connect every pane cardinally, and give panes occupied heads and sills.",
+      "Do not copy the north glazing rhythm to the south, west or concealed east wall.",
+      "Keep the gaps to Mercer and Annan open and retain the measured southwest projection."
+    ],
+    "visible_vs_inferred": {
+      "directly_visible_or_measured": [
+        "five measured roof faces and main gabled mass",
+        "north facade material hierarchy",
+        "at least seven tall north glazing strips",
+        "four-leaf east entrance, brick bay and shallow pale canopy",
+        "red ribbed east-gable field and one near-entry louver",
+        "detached gaps to Mercer and Annan"
+      ],
+      "interpreted_with_tolerance": [
+        "nine-slot full north authoring rhythm",
+        "scaled glazing centers \u00b10.75 m",
+        "entry dimensions and exact U registration",
+        "plinth/panel elevation levels derived from measured eave and photo proportions",
+        "ice-floor H=54.6 m"
+      ],
+      "unresolved": [
+        "south service-side door and window count",
+        "west gable openings",
+        "most east-gable openings beyond the photographed louver",
+        "exact panel and roof products",
+        "full north bay count at the foreshortened west end"
+      ]
+    },
+    "acceptance_gate": [
+      "fresh immutable Tuck/Rink study and exact archive/sample hash",
+      "source roof parity for all five faces and unchanged campus registration",
+      "one straight north plane with broad pale panels, continuous red-brown plinth, dark narrow glazing and thin pale fascia",
+      "east-end ordinary-brick entrance with four glazed leaves, shallow connected canopy, red ribbed gable and single supported louver",
+      "north threshold near H=58.6 rather than the H=54.42 low source base",
+      "open service gaps to Mercer and Annan and retained southwest projection",
+      "native north overview, entry close, east-gable oblique, roof/ridge oblique, south limitation and both neighbor-gap views",
+      "native-review.json bound to the exact hash with inspected images, findings, limitations and explicit status"
+    ]
+  },
+  "uncertainties": [
+    "Bounded north facade and visible east entrance/gable study, not all-sides completion.",
+    "Nine north slots are length-scaled interpretation; at least seven visible, exact western count unresolved.",
+    "All five canonical faces and raster controls remain exact; exactly three named low face3 caps receive authorized +0.25m support fill. The photographed shallow canopy is separately attached.",
+    "Ice/service floor H54.6 and north street/entry H58.6 differ; local sidewalk follows source grade.",
+    "Four scaled entrance leaves are fixed glazing representations; interiors and operable scaled doors unresolved.",
+    "Fine panel joints, metal ribs, leaf hardware and louver blades are below half-metre resolution.",
+    "South/west and concealed east door/window counts are unresolved; no copied opening grid.",
+    "Ordinary palette materials are visual proxies; original panel and roof products unresolved.",
+    "Mercer and Annan gaps retain original placement; full neighboring context requires campus native integration views.",
+    "The 262\u2013279.5s drone sequence was reviewed across three full-frame contact sheets and 264\u2013272s crops; later frames are crest-obscured. It adds no defensible east/back opening counts.",
+    "Canopy top quantizes from source H61.7 to H61.75, with a half-block slab occupying H61.5..61.75; no main roof geometry change.",
+    "V3 substitutes same-shape smooth quartz stairs for 1456 stone-brick roof stairs and retints only exposed east-gable substrate red beneath the pale cap. Quartz is a brighter bounded sheet-roof proxy; every occupied coordinate and source cap remains identical to v2.",
+    "V4 adds only inward red-terracotta cells at diagonal south/west wall turns. The unchanged exposed faces retain unavoidable one-cell steps every six to seven blocks at the exact measured bearing; this is not a visually smooth fractional plane."
+  ],
+  "camera_views": [
+    {
+      "name": "tuck-north-overview",
+      "eye_uv_navd88_m": [
+        22,
+        -200,
+        65
+      ],
+      "target_uv_navd88_m": [
+        21,
+        -165,
+        60
+      ],
+      "fov": 72
+    },
+    {
+      "name": "tuck-north-street",
+      "eye_uv_navd88_m": [
+        12,
+        -184,
+        60
+      ],
+      "target_uv_navd88_m": [
+        12,
+        -167.6,
+        60
+      ],
+      "fov": 76
+    },
+    {
+      "name": "tuck-entry-close",
+      "eye_uv_navd88_m": [
+        51,
+        -181,
+        60.4
+      ],
+      "target_uv_navd88_m": [
+        45.5,
+        -168.2,
+        60
+      ],
+      "fov": 72
+    },
+    {
+      "name": "tuck-east-gable",
+      "eye_uv_navd88_m": [
+        73,
+        -178,
+        62
+      ],
+      "target_uv_navd88_m": [
+        52,
+        -151,
+        61
+      ],
+      "fov": 72
+    },
+    {
+      "name": "tuck-roof-ridge",
+      "eye_uv_navd88_m": [
+        78,
+        -199,
+        91
+      ],
+      "target_uv_navd88_m": [
+        20,
+        -150,
+        62
+      ],
+      "fov": 74
+    },
+    {
+      "name": "tuck-south-service",
+      "eye_uv_navd88_m": [
+        22,
+        -113,
+        61
+      ],
+      "target_uv_navd88_m": [
+        22,
+        -133,
+        59
+      ],
+      "fov": 78
+    },
+    {
+      "name": "tuck-west-limited",
+      "eye_uv_navd88_m": [
+        -30,
+        -150,
+        60
+      ],
+      "target_uv_navd88_m": [
+        -12,
+        -150,
+        60
+      ],
+      "fov": 74
+    },
+    {
+      "name": "tuck-annan-gap",
+      "eye_uv_navd88_m": [
+        60,
+        -174,
+        60.5
+      ],
+      "target_uv_navd88_m": [
+        58,
+        -137,
+        59
+      ],
+      "fov": 70
+    }
+  ],
+  "reference_addenda": [
+    {
+      "path": "runtime/research/campus-full-detail-20260905/tuck-rink-drone-entry-addendum-20260916.json",
+      "sha256": "81917c9517302635b6bb00fb211c8f5dbd1045bb25f3ce019e30c9ac108eb583"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/tuck-rink-roof-material-addendum-20260919.json",
+      "sha256": "5958cc82af4c26bf34af67ea371f20084274841daeccff6a3e3accc0b2662427"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/tuck-rink-straight-wall-addendum-20260919.json",
+      "sha256": "e551d23a106caf3d9d339ebd582f29501d90b9cd8a67f8b71d3595a3c9e0debb"
+    }
+  ],
+  "source_surface_exceptions": [
+    {
+      "id": "face3_supported_entry_cells",
+      "authority": {
+        "path": "runtime/research/campus-full-detail-20260905/tuck-rink-drone-entry-addendum-20260916.json",
+        "sha256": "81917c9517302635b6bb00fb211c8f5dbd1045bb25f3ce019e30c9ac108eb583"
+      },
+      "world_xyz_cells": [
+        [
+          148,
+          67,
+          -318
+        ],
+        [
+          149,
+          67,
+          -318
+        ],
+        [
+          150,
+          67,
+          -318
+        ]
+      ],
+      "cell_centres_uv_m": [
+        [
+          48.5019,
+          -168.4108
+        ],
+        [
+          48.9957,
+          -168.489
+        ],
+        [
+          49.4896,
+          -168.5672
+        ]
+      ],
+      "before_state": "stone_brick_slab with physical top H58.75 m, representing quantized face-3 cap",
+      "after_state": "full ordinary brick support/threshold cell with physical top H59.00 m",
+      "authorization": "At these three cells only, fill the upper half of the retained source slab volume so the face is buried within the supported entrance threshold. The original slab volume remains occupied as a subset of the full block. Record the source-top delta as +0.25 m and do not apply it to any other face-3 column.",
+      "reason": "The door/entry registration is interpreted near H58.6, the photographed walk is nearly level, and a locally quantized H59.0 supported threshold avoids cutting through measured caps while staying within the entrance-height tolerance."
+    }
+  ],
+  "drone_sequence": {
+    "video": "runtime/research/athey-20260905/campus-2026-drone-1080.mp4",
+    "video_sha256": "b4c03c8d5462030ce8e95e5f56b3260da044501144f7390cbfc24e89c3894b21",
+    "video_url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+    "pixels": [
+      1920,
+      1080
+    ],
+    "timestamp_range_seconds": [
+      262.0,
+      279.5
+    ],
+    "interval_seconds": 0.5,
+    "best_unobscured_subject_range_seconds": [
+      264.0,
+      272.0
+    ],
+    "manifest": "runtime/research/campus-full-detail-20260905/tuck-rink-drone-sequence-20260916/manifest.json",
+    "manifest_sha256": "ea71a11923ff9832314791b82e10a9aa0d71303d822748cbf3cbbcf4d0a0dccc",
+    "method": "Thirty-six full-resolution PNGs decoded with ffmpeg at 0.5-second intervals. Derived crops use source rectangle [560,250,1920,1080]. No generative alteration.",
+    "overlay_limitation": "A school crest overlay expands across the central image after about 272.5 seconds. Those later frames are retained in the manifest but are weaker evidence."
+  },
+  "refinement_baseline": {
+    "path": "runtime/campus-reconstruction/tuck-rink-v2-2x/sample-blocks.npz",
+    "sha256": "f987f7c5b15905b5acb947e28c6c8278797016b0a733519a35d2d89d388630b2"
+  },
+  "connect_service_wall_corners": true,
+  "corner_bridge_baseline": {
+    "path": "runtime/campus-reconstruction/tuck-rink-v3-2x/sample-blocks.npz",
+    "sha256": "5acd89cbd62ca75c6687cea6bf1ddaee4a0c74d4081316b7c4309dd7168232c8"
+  },
+  "assembly_site_bounds_uv_m": [
+    [
+      -13,
+      -170.8,
+      55,
+      -168.65
+    ],
+    [
+      40.7,
+      -169.0,
+      50.3,
+      -165.8
+    ]
+  ],
+  "ownership_metadata_revision": {
+    "unchanged_geometry_source": "runtime/campus-reconstruction/tuck-rink-v5-2x",
+    "archive_sha256": "685523e1913ebe9eb82b4914db8161308264eb6af33800f44354619bd2598f3d",
+    "reason": "V11 campus native view clipped the accepted north sidewalk outside the default architecture margin.",
+    "basis": "Exact existing sidewalk and entry-landing masks in the immutable v5 generator and detail register; no new blocks or site design."
+  }
+}

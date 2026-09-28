@@ -1,0 +1,172 @@
+{
+  "name": "The Hill School \u2014 campus study at 2 blocks per metre",
+  "revision": "2026-09-05-context-4-2x-vanilla-quad",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "tile_size_blocks": 256,
+  "terrain": "runtime/campus-reconstruction/campus-context-preparation/terrain.npz",
+  "components": [
+    {
+      "name": "Class of 1960 Alumni House",
+      "study": "runtime/campus-reconstruction/alumni-house-v6-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "Alumni Chapel",
+      "study": "runtime/campus-reconstruction/chapel-context-2x-v5",
+      "margin_m": 2
+    },
+    {
+      "name": "Athey Academic Center and Dining Hall envelope",
+      "study": "runtime/campus-reconstruction/athey-v8-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "John P. Ryan Library",
+      "study": "runtime/campus-reconstruction/ryan-library-v6-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "Hunt Upper School",
+      "study": "runtime/campus-reconstruction/hunt-hall-v6-2x",
+      "margin_m": 2
+    }
+  ],
+  "camera_views": [
+    {
+      "name": "quad-drone-overview",
+      "eye_xz_navd88_m": [
+        95,
+        -95,
+        153
+      ],
+      "target_xz_navd88_m": [
+        66,
+        9,
+        67
+      ],
+      "fov": 78
+    },
+    {
+      "name": "quad-player-height",
+      "eye_xz_navd88_m": [
+        60,
+        9,
+        68.6
+      ],
+      "player_eye_height_blocks": 1.62,
+      "target_xz_navd88_m": [
+        61,
+        43,
+        72.5
+      ],
+      "fov": 76
+    },
+    {
+      "name": "quad-library-and-athey",
+      "eye_xz_navd88_m": [
+        23,
+        -18,
+        75
+      ],
+      "target_xz_navd88_m": [
+        88,
+        32,
+        73
+      ],
+      "fov": 88
+    },
+    {
+      "name": "quad-chapel-and-athey",
+      "eye_xz_navd88_m": [
+        99,
+        -15,
+        80
+      ],
+      "target_xz_navd88_m": [
+        29,
+        27,
+        70
+      ],
+      "fov": 84
+    },
+    {
+      "name": "alumni-house-in-context",
+      "eye_xz_navd88_m": [
+        -153,
+        129,
+        55
+      ],
+      "target_xz_navd88_m": [
+        -158,
+        103,
+        56
+      ],
+      "fov": 66
+    },
+    {
+      "name": "ryan-arcade-in-context",
+      "eye_xz_navd88_m": [
+        106,
+        10,
+        69.8
+      ],
+      "target_xz_navd88_m": [
+        122,
+        24,
+        72
+      ],
+      "fov": 84
+    },
+    {
+      "name": "quad-hunt-and-ryan",
+      "eye_xz_navd88_m": [
+        32,
+        21,
+        72
+      ],
+      "target_xz_navd88_m": [
+        90,
+        -14,
+        74
+      ],
+      "fov": 88
+    },
+    {
+      "name": "hunt-quad-player-height",
+      "eye_xz_navd88_m": [
+        75,
+        5,
+        68
+      ],
+      "player_eye_height_blocks": 1.62,
+      "target_xz_navd88_m": [
+        79,
+        -29,
+        74
+      ],
+      "fov": 82
+    },
+    {
+      "name": "athey-window-frame-close",
+      "eye_xz_navd88_m": [
+        47.5,
+        34.5,
+        73.6
+      ],
+      "target_xz_navd88_m": [
+        47,
+        42.5,
+        73.1
+      ],
+      "fov": 64
+    }
+  ],
+  "uncertainties": [
+    "Five developed buildings; remaining campus buildings will be added from exact measured footprints.",
+    "Quad paths are interpreted from 2026 drone footage with roughly 1.5\u20134 m horizontal uncertainty. Tree crowns and planting are estimated, not classified LiDAR.",
+    "No texture pack is selected. Original Minecraft construction materials only.",
+    "The player-relative scale is 2 blocks per metre, with one shared NAVD88 height offset of -25 m."
+  ],
+  "landscape": "server-assets/hill-quad-landscape.json"
+}

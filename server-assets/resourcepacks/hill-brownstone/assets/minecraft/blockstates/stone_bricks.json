@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "minecraft:block/stone_bricks"
+      },
+      {
+        "model": "hill-brownstone:block/brownstone_reversed"
+      }
+    ]
+  }
+}

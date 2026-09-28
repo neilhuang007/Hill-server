@@ -1,0 +1,1279 @@
+{
+  "name": "Sherrill Guest House \u2014 measured steep roof and five bounded dormers",
+  "revision": "2026-09-15-sherrill-v11-2x",
+  "parent_id": "16001511600619C-b4c5171aed",
+  "source_index_0based": 67,
+  "school_names": [
+    "The Sherrill Guest House"
+  ],
+  "school_map_numbers": [
+    46
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_sherrill_details",
+  "study_margin_m": 12,
+  "geometry": {
+    "origin_xz_m": [
+      276.4041570561944,
+      -56.84240301599059
+    ],
+    "axis_degrees": -14.145152715429706,
+    "entrance_floor_navd88_m": 65.95,
+    "upper_floor_plates_navd88_m": [
+      68.8,
+      71.65
+    ],
+    "main_roof_threshold_navd88_m": 68.0,
+    "source_roof_max_navd88_m": 76.683
+  },
+  "materials": {
+    "facade": "bricks",
+    "foundation": "bricks",
+    "roof_family": "deepslate_tile",
+    "trim": "quartz_block"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.18,
+    "trim_family": "quartz",
+    "glass_block": "gray_stained_glass_pane"
+  },
+  "window_rows": [
+    {
+      "side": "north",
+      "at_m": 0.05,
+      "centres_m": [
+        4.7,
+        8.4,
+        12.1,
+        15.8
+      ],
+      "sill_navd88_m": 66.60000000000001,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "south",
+      "at_m": 8.654,
+      "centres_m": [
+        4.5,
+        7.7,
+        11.1,
+        14.9
+      ],
+      "sill_navd88_m": 66.60000000000001,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "east",
+      "at_m": 18.6845,
+      "centres_m": [
+        2.25,
+        6.35
+      ],
+      "sill_navd88_m": 66.60000000000001,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "west",
+      "at_m": 2.65,
+      "centres_m": [
+        2.2,
+        5.5
+      ],
+      "sill_navd88_m": 66.60000000000001,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "north",
+      "at_m": 0.05,
+      "centres_m": [
+        4.7,
+        8.4,
+        12.1,
+        15.8
+      ],
+      "sill_navd88_m": 69.45,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "south",
+      "at_m": 8.654,
+      "centres_m": [
+        4.5,
+        7.7,
+        11.1,
+        14.9
+      ],
+      "sill_navd88_m": 69.45,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "east",
+      "at_m": 18.6845,
+      "centres_m": [
+        2.25,
+        6.35
+      ],
+      "sill_navd88_m": 69.45,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    },
+    {
+      "side": "west",
+      "at_m": 2.65,
+      "centres_m": [
+        2.2,
+        5.5
+      ],
+      "sill_navd88_m": 69.45,
+      "width_m": 0.85,
+      "height_m": 1.3,
+      "evidence_status": "unobserved_typological_proposal_for_native_audit"
+    }
+  ],
+  "doors": [
+    {
+      "side": "west",
+      "at_m": 2.65,
+      "centre_m": 3.9,
+      "floor_navd88_m": 65.95,
+      "width_m": 1.05,
+      "height_m": 2.15
+    },
+    {
+      "side": "south",
+      "at_m": 8.654,
+      "centre_m": 9.4,
+      "floor_navd88_m": 65.95,
+      "width_m": 1.05,
+      "height_m": 2.15
+    }
+  ],
+  "dormers": [
+    {
+      "side": "north",
+      "bounds_uv_m": [
+        5.475,
+        2.4,
+        7.225,
+        4.4
+      ],
+      "ridge_navd88_m": 75.5,
+      "eave_navd88_m": 74.55,
+      "window_sill_navd88_m": 73.25,
+      "window_width_m": 0.75,
+      "window_height_m": 1.0,
+      "evidence": "front observed; metric placement and height interpreted",
+      "source_packet_window_proposal_m": {
+        "width": 0.75,
+        "height": 1.2
+      },
+      "native_raster_refinement": "Single pale front plane around narrow inset gray sash, with one occupied centre apex and lower inward-rising quartz stair shoulders. Pale cladding ends at front row; cheeks behind remain deepslate. Sol 2026-09-15 north control addendum.",
+      "v10_superseded_controls": {
+        "bounds_uv_m": [
+          5.65,
+          1.15,
+          7.05,
+          4.4
+        ],
+        "ridge_navd88_m": 75.5,
+        "eave_navd88_m": 74.55,
+        "window_sill_navd88_m": 72.7,
+        "window_width_m": 1.4,
+        "window_height_m": 1.5
+      },
+      "single_front_apex": true
+    },
+    {
+      "side": "north",
+      "bounds_uv_m": [
+        13.275,
+        2.4,
+        15.025,
+        4.4
+      ],
+      "ridge_navd88_m": 75.5,
+      "eave_navd88_m": 74.55,
+      "window_sill_navd88_m": 73.25,
+      "window_width_m": 0.75,
+      "window_height_m": 1.0,
+      "evidence": "front observed; metric placement and height interpreted",
+      "source_packet_window_proposal_m": {
+        "width": 0.75,
+        "height": 1.2
+      },
+      "native_raster_refinement": "Single pale front plane around narrow inset gray sash, with one occupied centre apex and lower inward-rising quartz stair shoulders. Pale cladding ends at front row; cheeks behind remain deepslate. Sol 2026-09-15 north control addendum.",
+      "v10_superseded_controls": {
+        "bounds_uv_m": [
+          13.45,
+          1.15,
+          14.85,
+          4.4
+        ],
+        "ridge_navd88_m": 75.5,
+        "eave_navd88_m": 74.55,
+        "window_sill_navd88_m": 72.7,
+        "window_width_m": 1.4,
+        "window_height_m": 1.5
+      },
+      "single_front_apex": true
+    },
+    {
+      "side": "south",
+      "bounds_uv_m": [
+        5.3,
+        6.1,
+        6.7,
+        8.1
+      ],
+      "ridge_navd88_m": 76.3,
+      "eave_navd88_m": 75.4,
+      "window_sill_navd88_m": 73.9,
+      "window_width_m": 1.05,
+      "window_height_m": 1.2,
+      "evidence": "peak only observed; front/window are provisional",
+      "source_packet_window_proposal_m": {
+        "width": 0.75,
+        "height": 1.2
+      },
+      "native_raster_refinement": "Dark pane front with a compact source-profile pale gable/rake and dark cheeks, bounded to the existing envelope. South fronts remain proposals."
+    },
+    {
+      "side": "south",
+      "bounds_uv_m": [
+        9.8,
+        6.1,
+        11.2,
+        8.1
+      ],
+      "ridge_navd88_m": 76.3,
+      "eave_navd88_m": 75.4,
+      "window_sill_navd88_m": 73.9,
+      "window_width_m": 1.05,
+      "window_height_m": 1.2,
+      "evidence": "peak only observed; front/window are provisional",
+      "source_packet_window_proposal_m": {
+        "width": 0.75,
+        "height": 1.2
+      },
+      "native_raster_refinement": "Dark pane front with a compact source-profile pale gable/rake and dark cheeks, bounded to the existing envelope. South fronts remain proposals."
+    },
+    {
+      "side": "south",
+      "bounds_uv_m": [
+        14.3,
+        6.1,
+        15.7,
+        8.1
+      ],
+      "ridge_navd88_m": 76.3,
+      "eave_navd88_m": 75.4,
+      "window_sill_navd88_m": 73.9,
+      "window_width_m": 1.05,
+      "window_height_m": 1.2,
+      "evidence": "peak only observed; front/window are provisional",
+      "source_packet_window_proposal_m": {
+        "width": 0.75,
+        "height": 1.2
+      },
+      "native_raster_refinement": "Dark pane front with a compact source-profile pale gable/rake and dark cheeks, bounded to the existing envelope. South fronts remain proposals."
+    }
+  ],
+  "roof_interpretation": {
+    "major_faces": [
+      0,
+      3
+    ],
+    "all_retained_faces": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "face_fingerprints": [
+      {
+        "id": 0,
+        "fingerprint": "6d95a76e7ad34032",
+        "area_m2": 46.884,
+        "navd88_min_max_m": [
+          72.882,
+          76.683
+        ],
+        "slope_degrees": 49.92,
+        "uv_bounds_m": [
+          2.5712,
+          5.4891,
+          18.062,
+          8.684
+        ],
+        "class": "major south slope"
+      },
+      {
+        "id": 1,
+        "fingerprint": "d9453852ea9e0eae",
+        "area_m2": 4.866,
+        "navd88_min_max_m": [
+          68.149,
+          69.38
+        ],
+        "slope_degrees": 23.534,
+        "uv_bounds_m": [
+          0.0,
+          1.0475,
+          2.8298,
+          3.2422
+        ],
+        "class": "secondary west low roof/detail"
+      },
+      {
+        "id": 2,
+        "fingerprint": "4e69c5677117d6c1",
+        "area_m2": 1.337,
+        "navd88_min_max_m": [
+          71.936,
+          74.33
+        ],
+        "slope_degrees": 50.157,
+        "uv_bounds_m": [
+          17.5642,
+          3.5761,
+          18.5075,
+          5.5776
+        ],
+        "class": "secondary east end roof/detail"
+      },
+      {
+        "id": 3,
+        "fingerprint": "df2ed4f1a4eae7d1",
+        "area_m2": 77.982,
+        "navd88_min_max_m": [
+          70.166,
+          76.683
+        ],
+        "slope_degrees": 49.726,
+        "uv_bounds_m": [
+          2.612,
+          0.0,
+          18.7045,
+          5.5747
+        ],
+        "class": "major north slope"
+      }
+    ],
+    "appendage_rule": "Five exact packet rectangles, max combination only; original measured surface values outside their raised cells remain identical."
+  },
+  "assembly_ownership": {
+    "source_footprint_buffer_m": 0.45,
+    "site_polygon_uv_m": [],
+    "basis": "Measured footprint with narrow 0.45 m detail margin; no inferred exterior porch or path; study terrain margin not owned"
+  },
+  "material_review": {
+    "status": "individual source packet chosen materials; no campus-wide recolor",
+    "packet_path": "runtime\\research\\sol-reference-20260908\\sherrill-guest-house.json",
+    "packet_sha256": "c67776872f1ec410db7ab36d2931e19e3c329d9219ce5a7da3c50e645e751c52",
+    "decisions": {
+      "method_note": "Actual material/profile evidence controls selection. Photo illumination and white balance are unknown; small aerial ROIs have compression and shadow. Colour metrics describe these pixels only.",
+      "zones": [
+        {
+          "zone": "exterior wall field",
+          "actual_evidence": "Red brick-looking masonry with visible coursed wall character; no written product specification.",
+          "chosen_vanilla_proxy": "minecraft:bricks",
+          "texture_sha256": "3242cb8e441c940156633b0d867e08c887ddaeaa32343b212d4b1e5ca3dae123",
+          "reason": "Brick bond and mortar are directly consistent with the observed construction character. A tiny lit gable ROI ranks polished granite slightly closer in colour, but it lacks brick bond; semantic evidence therefore controls. Use one coherent brick field with native lighting, not red/brown patchwork.",
+          "alternatives": [
+            {
+              "block": "minecraft:mud_bricks",
+              "reason": "Warm coursed alternative, but the broad brown bond is less consistent with the visible red brick wall and existing correction already rejects the generic mud-brick envelope."
+            },
+            {
+              "block": "minecraft:polished_granite",
+              "reason": "Lit-ROI colour is marginally closer (DeltaE00 14.347 versus bricks 15.233), but its stone speckle contradicts the observed brick courses."
+            }
+          ]
+        },
+        {
+          "zone": "steep main roof and dormer roof skins",
+          "actual_evidence": "Dark blue-gray overlapping small-unit roof; exact product unresolved.",
+          "chosen_vanilla_proxy": "minecraft:deepslate_tiles with deepslate_tile_slab/stairs",
+          "texture_sha256": "4e0ff4aa76d467697383c776f94d855d3fc2a49a40363d3fa846e441003ebc57",
+          "reason": "The original texture has an overlapping tiled reading and full construction shape family. Against the 18x14-pixel roof ROI it scores DeltaE00 raw/equal-L 9.701/9.444. Gray concrete scores 7.491/7.132 but is flat, lacks the observed unit pattern and supplies no stair/slab family.",
+          "alternative": "minecraft:gray_concrete only if used for an unavoidable flat hidden backing surface, not the visible pitched skin."
+        },
+        {
+          "zone": "pale dormer fronts, cheeks, eaves and small sash framing",
+          "actual_evidence": "Pale painted-looking trim is directly visible at the two north dormers; substrate and lower-wall trim colour are unresolved.",
+          "chosen_vanilla_proxy": "minecraft:quartz_block/quartz_slab/quartz_stairs with minecraft:white_stained_glass_pane",
+          "texture_sha256": "63d3d5c7184b3f83b269933b306ea587bc28792c9c5118227b218cd4e3a6bd8c",
+          "reason": "Coherent pale construction family with thin shapes. Apply confidently to dormers/eaves and provisionally to lower apertures; do not transfer it into a broad white wall field."
+        }
+      ],
+      "roi_controls": [
+        {
+          "id": "sherrill_roof",
+          "source_xyxy_px": [
+            499,
+            817,
+            517,
+            831
+          ],
+          "pixels": 252,
+          "srgb_linear_mean": [
+            40.66,
+            50.58,
+            68.09
+          ],
+          "lab_d65_linear_mean": [
+            20.8818,
+            0.9883,
+            -12.2537
+          ]
+        },
+        {
+          "id": "sherrill_gable_lit",
+          "source_xyxy_px": [
+            626,
+            831,
+            632,
+            850
+          ],
+          "pixels": 114,
+          "srgb_linear_mean": [
+            146.78,
+            129.15,
+            135.28
+          ],
+          "lab_d65_linear_mean": [
+            55.7677,
+            7.8058,
+            -0.8359
+          ],
+          "status": "new tiny manual appearance check; compression and bright aerial lighting limit colour weight"
+        },
+        {
+          "id": "sherrill_long_wall_shade",
+          "source_xyxy_px": [
+            559,
+            899,
+            583,
+            913
+          ],
+          "pixels": 336,
+          "srgb_linear_mean": [
+            33.88,
+            30.92,
+            43.87
+          ],
+          "lab_d65_linear_mean": [
+            12.5755,
+            4.8614,
+            -8.1308
+          ],
+          "status": "new deep-shadow manual appearance check; never use its raw darkness as wall albedo"
+        }
+      ]
+    },
+    "foundation_rule": "Continue the packet's coherent brick field through the exposed base. No photograph or written source supports an added gray stone plinth.",
+    "exposed_floor_edge_rule": "Native v3 traced the remaining gray band to100 smooth_stone floor-role cells at world Y81, not foundation. V6 faces those100 exterior floor-edge cells in brick; interior plate remains unchanged."
+  },
+  "reference_packet": {
+    "schema_version": 1,
+    "packet_date": "2026-09-08",
+    "status": "build_ready_source_bounded",
+    "building": {
+      "name": "The Sherrill Guest House",
+      "parent_id": "16001511600619C-b4c5171aed",
+      "county_structure_id": "16001511600619C",
+      "source_index_0based": 67,
+      "current_school_map_number": 46,
+      "identity_confidence": "high: current school map identity matches the small measured house immediately west of Dell Village and northeast of the pitch"
+    },
+    "coordinate_contract": {
+      "blocks_per_metre": 2,
+      "x_axis": "2 * east_m",
+      "z_axis": "2 * south_m",
+      "y_axis": "2 * (NAVD88_m - 25)",
+      "placement_rule": "Keep the measured footprint, long-axis bearing, grade and campus gaps. Do not rotate, flatten or replace it with a generic rectangle."
+    },
+    "sources": [
+      {
+        "id": "drone_238",
+        "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+        "time_seconds": 238,
+        "file": "runtime/research/campus-full-detail-20260905/drone-238s.png",
+        "sha256": "04aa164635b5a695da9f66982df526862c838f96c6c6f0ac6434dff19e369852",
+        "crop": "runtime/research/campus-full-detail-20260905/dell-sherrill-238s-crop.png",
+        "crop_sha256": "17cea9a3e741b6518194b0751bb5c3d07ea60cb2eb22e6ca362fbb7655db72c4",
+        "role": "first-party high oblique from northeast; current upload, capture date unspecified; strongest massing, wall, roof and dormer evidence"
+      },
+      {
+        "id": "drone_240",
+        "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+        "time_seconds": 240,
+        "file": "runtime/research/campus-full-detail-20260905/drone-240s.png",
+        "sha256": "262483dba9d98610e40964ed322adcb37266c1c79c1370c5d41eb15d41d59d73",
+        "role": "nearby first-party aerial frame corroborating the roof and opposite-slope peak rhythm"
+      },
+      {
+        "id": "school_map_2026",
+        "url": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+        "file": "runtime/research/hill-reference-20260904/campus-map-2026.pdf",
+        "sha256": "a815cf8e058df9bdbb2997fba3a272249508e7175c536b907f984e9966477e59",
+        "role": "first-party current identity and map number; illustrated geometry is not survey"
+      },
+      {
+        "id": "facilities_2021",
+        "url": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+        "file": "runtime/research/campus-priority-20260905/campus-map-2021-address.pdf",
+        "sha256": "119a7cbf22863d593c47a32af7eb6a0604b5e6c6b8668d421ae8ec32c37355a5",
+        "role": "first-party Guest House location crosswalk"
+      },
+      {
+        "id": "measured_housing_record",
+        "url": "https://services1.arcgis.com/kOChldNuKsox8qZD/arcgis/rest/services/Montgomery_County_Building_Outlines/FeatureServer/6",
+        "file": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+        "sha256": "23138b4c0c4d4d7945d2e215477195825e5b77aa6d851eabd01c7eb29f4d3dda",
+        "record_locator": "building_records[parent_id=16001511600619C-b4c5171aed]",
+        "roof_source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+        "role": "exact transformed county footprint, unmodified Roofer CityJSON roof faces, local frame and existing source-bounded construction proposal"
+      },
+      {
+        "id": "major_roof_masks",
+        "file": "runtime/research/campus-full-detail-20260905/housing-major-roof-face-masks.json",
+        "sha256": "dd5fd45ce1938e3c2ca05f553fa3e3fda70608aafb2f43f5cf970c3db7baf658",
+        "record_locator": "records[parent_id=16001511600619C-b4c5171aed]"
+      },
+      {
+        "id": "material_comparison",
+        "file": "runtime/research/campus-material-audit-20260905/photo-texture-comparison.json",
+        "sha256": "26c534bd49ad1ecb93594db9ff7813ae729ccdbeeba1e13e361ae69cfb0c6036",
+        "record_locator": "samples[id=sherrill_roof]"
+      },
+      {
+        "id": "vanilla_26_1_2_catalogue",
+        "file": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+        "sha256": "3567cfef8042cda27bc5f76627d7fe3cfb5a4f28daca25b9e914661af1e6dec1",
+        "client_jar": "C:/Users/neil_/AppData/Roaming/.minecraft/versions/26.1.2/26.1.2.jar",
+        "client_jar_sha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0"
+      }
+    ],
+    "geometry": {
+      "centre_xz_m": [
+        287.21591587994857,
+        -55.2999170613841
+      ],
+      "bounds_xz_m": [
+        276.9414604375148,
+        -61.361962014963986,
+        295.37047330359417,
+        -49.028837992874855
+      ],
+      "local_frame": {
+        "origin_xz_m": [
+          276.4041570561944,
+          -56.84240301599059
+        ],
+        "u_xz": [
+          0.9696797300268244,
+          -0.24437925684293488
+        ],
+        "v_xz": [
+          0.24437925684293488,
+          0.9696797300268244
+        ],
+        "rectangle_size_uv_m": [
+          18.704543109283975,
+          8.684038617482406
+        ],
+        "transform": "XZ = origin + u*U + v*V",
+        "side_rule": "north/south are -V/+V; west/east are -U/+U"
+      },
+      "footprint_exterior_uv_m": [
+        [
+          2.62336,
+          3.24225
+        ],
+        [
+          0.0,
+          2.66593
+        ],
+        [
+          0.33657,
+          1.04746
+        ],
+        [
+          2.61195,
+          1.11609
+        ],
+        [
+          2.94734,
+          1.12629
+        ],
+        [
+          3.11975,
+          0.0
+        ],
+        [
+          12.74196,
+          0.02672
+        ],
+        [
+          12.70376,
+          0.93721
+        ],
+        [
+          18.68173,
+          1.14402
+        ],
+        [
+          18.70454,
+          2.6905
+        ],
+        [
+          18.50746,
+          3.57606
+        ],
+        [
+          18.06202,
+          5.57758
+        ],
+        [
+          17.37072,
+          8.68404
+        ],
+        [
+          2.57726,
+          8.68404
+        ],
+        [
+          2.67447,
+          8.29474
+        ],
+        [
+          2.57119,
+          8.2867
+        ],
+        [
+          3.18165,
+          5.4891
+        ],
+        [
+          3.62387,
+          3.46197
+        ],
+        [
+          2.62336,
+          3.24225
+        ]
+      ],
+      "ground_and_roof": {
+        "register_ground_navd88_m": 64.0899,
+        "perimeter_dem_navd88_m": {
+          "north": 64.22450256347656,
+          "south": 65.76905822753906,
+          "west": 65.61805725097656,
+          "east": 65.76310729980469
+        },
+        "entrance_floor_proposal_navd88_m": 65.95,
+        "floor_plate_proposals_navd88_m": [
+          65.95,
+          68.8,
+          71.65
+        ],
+        "register_main_ridge_navd88_m": 76.682884,
+        "measured_major_roof_peak_navd88_m": 76.683,
+        "roof_rmse_m": 0.918129,
+        "roof_surface_count": 4,
+        "grade_rule": "Use local measured terrain. North-to-south perimeter grade rises about 1.54 m; do not flatten the site or infer one exposed wall-storey count everywhere."
+      },
+      "roof_faces": [
+        {
+          "id": 0,
+          "fingerprint": "6d95a76e7ad34032",
+          "area_m2": 46.884,
+          "navd88_min_max_m": [
+            72.882,
+            76.683
+          ],
+          "slope_degrees": 49.92,
+          "uv_bounds_m": [
+            2.5712,
+            5.4891,
+            18.062,
+            8.684
+          ],
+          "class": "major south slope"
+        },
+        {
+          "id": 1,
+          "fingerprint": "d9453852ea9e0eae",
+          "area_m2": 4.866,
+          "navd88_min_max_m": [
+            68.149,
+            69.38
+          ],
+          "slope_degrees": 23.534,
+          "uv_bounds_m": [
+            0.0,
+            1.0475,
+            2.8298,
+            3.2422
+          ],
+          "class": "secondary west low roof/detail"
+        },
+        {
+          "id": 2,
+          "fingerprint": "4e69c5677117d6c1",
+          "area_m2": 1.337,
+          "navd88_min_max_m": [
+            71.936,
+            74.33
+          ],
+          "slope_degrees": 50.157,
+          "uv_bounds_m": [
+            17.5642,
+            3.5761,
+            18.5075,
+            5.5776
+          ],
+          "class": "secondary east end roof/detail"
+        },
+        {
+          "id": 3,
+          "fingerprint": "df2ed4f1a4eae7d1",
+          "area_m2": 77.982,
+          "navd88_min_max_m": [
+            70.166,
+            76.683
+          ],
+          "slope_degrees": 49.726,
+          "uv_bounds_m": [
+            2.612,
+            0.0,
+            18.7045,
+            5.5747
+          ],
+          "class": "major north slope"
+        }
+      ],
+      "roof_instruction": "Retain all four measured faces. There are no low-patch or high-fragment deletion candidates. Add dormers as source-evidenced appendages over faces 3 and 0; do not flatten or replace the steep measured roof."
+    },
+    "facade_and_roof_observations": {
+      "north": {
+        "label": "Dell-court/drive-facing long side, -V",
+        "direction_confidence": "medium: campus position, local frame and northeast drone bearing agree; no captioned elevation",
+        "observed": [
+          "Two pale-front/cheek gabled dormers on the near roof slope at roughly 0.29 and 0.67 of the long axis.",
+          "Red brick-looking wall is visible, but trees and deep shadow obscure lower openings and the entry.",
+          "At least three dark rectangular upper-wall openings are partly readable; the image does not support a complete count."
+        ],
+        "door_count": null
+      },
+      "south": {
+        "label": "pitch-facing long side, +V",
+        "direction_confidence": "medium",
+        "observed": [
+          "Three pale dormer peak tips are visible beyond the ridge at roughly 0.2, 0.5 and 0.8 of the long axis.",
+          "The full south dormer fronts and wall opening rows are hidden from the source cameras."
+        ],
+        "door_count": null
+      },
+      "west": {
+        "visibility": "partly roof/wall silhouette only; apertures unresolved",
+        "direction_confidence": "high compass assignment from local frame"
+      },
+      "east": {
+        "visibility": "red gable wall partly visible; openings screened",
+        "direction_confidence": "high compass assignment from local frame",
+        "provisional_appendage": "One pale stack-like end silhouette is visible, but attribution and plan position are not strong enough to assert a chimney."
+      }
+    },
+    "dormer_build_controls": [
+      {
+        "side": "north",
+        "bounds_uv_m": [
+          5.65,
+          1.15,
+          7.05,
+          4.4
+        ],
+        "ridge_navd88_m": 75.5,
+        "eave_navd88_m": 74.55,
+        "window_sill_navd88_m": 72.7,
+        "window_width_m": 0.75,
+        "window_height_m": 1.2,
+        "evidence": "front observed; metric placement and height interpreted"
+      },
+      {
+        "side": "north",
+        "bounds_uv_m": [
+          13.45,
+          1.15,
+          14.85,
+          4.4
+        ],
+        "ridge_navd88_m": 75.5,
+        "eave_navd88_m": 74.55,
+        "window_sill_navd88_m": 72.7,
+        "window_width_m": 0.75,
+        "window_height_m": 1.2,
+        "evidence": "front observed; metric placement and height interpreted"
+      },
+      {
+        "side": "south",
+        "bounds_uv_m": [
+          5.3,
+          6.1,
+          6.7,
+          8.1
+        ],
+        "ridge_navd88_m": 76.3,
+        "eave_navd88_m": 75.4,
+        "window_sill_navd88_m": 73.9,
+        "window_width_m": 0.75,
+        "window_height_m": 1.2,
+        "evidence": "peak only observed; front/window are provisional"
+      },
+      {
+        "side": "south",
+        "bounds_uv_m": [
+          9.8,
+          6.1,
+          11.2,
+          8.1
+        ],
+        "ridge_navd88_m": 76.3,
+        "eave_navd88_m": 75.4,
+        "window_sill_navd88_m": 73.9,
+        "window_width_m": 0.75,
+        "window_height_m": 1.2,
+        "evidence": "peak only observed; front/window are provisional"
+      },
+      {
+        "side": "south",
+        "bounds_uv_m": [
+          14.3,
+          6.1,
+          15.7,
+          8.1
+        ],
+        "ridge_navd88_m": 76.3,
+        "eave_navd88_m": 75.4,
+        "window_sill_navd88_m": 73.9,
+        "window_width_m": 0.75,
+        "window_height_m": 1.2,
+        "evidence": "peak only observed; front/window are provisional"
+      }
+    ],
+    "aperture_proposal": {
+      "status": "typological placement for native audit; source does not provide complete wall rows",
+      "window_rows_each_of_two_main_levels": [
+        {
+          "side": "north",
+          "at_m": 0.05,
+          "centres_m": [
+            4.7,
+            8.4,
+            12.1,
+            15.8
+          ],
+          "sill_offsets_above_floor_m": 0.65,
+          "width_m": 0.85,
+          "height_m": 1.3
+        },
+        {
+          "side": "south",
+          "at_m": 8.654,
+          "centres_m": [
+            4.5,
+            7.7,
+            11.1,
+            14.9
+          ],
+          "sill_offsets_above_floor_m": 0.65,
+          "width_m": 0.85,
+          "height_m": 1.3
+        },
+        {
+          "side": "east",
+          "at_m": 18.6845,
+          "centres_m": [
+            2.25,
+            6.35
+          ],
+          "sill_offsets_above_floor_m": 0.65,
+          "width_m": 0.85,
+          "height_m": 1.3
+        },
+        {
+          "side": "west",
+          "at_m": 2.65,
+          "centres_m": [
+            2.2,
+            5.5
+          ],
+          "sill_offsets_above_floor_m": 0.65,
+          "width_m": 0.85,
+          "height_m": 1.3
+        }
+      ],
+      "levels_navd88_m": [
+        65.95,
+        68.8
+      ],
+      "door_proposals": [
+        {
+          "side": "west",
+          "at_m": 2.65,
+          "centre_m": 3.9,
+          "floor_navd88_m": 65.95,
+          "width_m": 1.05,
+          "height_m": 2.15
+        },
+        {
+          "side": "south",
+          "at_m": 8.654,
+          "centre_m": 9.4,
+          "floor_navd88_m": 65.95,
+          "width_m": 1.05,
+          "height_m": 2.15
+        }
+      ],
+      "rule": "Do not report these rows or doors as observed. Clip against the exact footprint and local terrain, then judge from the requested native views."
+    },
+    "material_decisions": {
+      "method_note": "Actual material/profile evidence controls selection. Photo illumination and white balance are unknown; small aerial ROIs have compression and shadow. Colour metrics describe these pixels only.",
+      "zones": [
+        {
+          "zone": "exterior wall field",
+          "actual_evidence": "Red brick-looking masonry with visible coursed wall character; no written product specification.",
+          "chosen_vanilla_proxy": "minecraft:bricks",
+          "texture_sha256": "3242cb8e441c940156633b0d867e08c887ddaeaa32343b212d4b1e5ca3dae123",
+          "reason": "Brick bond and mortar are directly consistent with the observed construction character. A tiny lit gable ROI ranks polished granite slightly closer in colour, but it lacks brick bond; semantic evidence therefore controls. Use one coherent brick field with native lighting, not red/brown patchwork.",
+          "alternatives": [
+            {
+              "block": "minecraft:mud_bricks",
+              "reason": "Warm coursed alternative, but the broad brown bond is less consistent with the visible red brick wall and existing correction already rejects the generic mud-brick envelope."
+            },
+            {
+              "block": "minecraft:polished_granite",
+              "reason": "Lit-ROI colour is marginally closer (DeltaE00 14.347 versus bricks 15.233), but its stone speckle contradicts the observed brick courses."
+            }
+          ]
+        },
+        {
+          "zone": "steep main roof and dormer roof skins",
+          "actual_evidence": "Dark blue-gray overlapping small-unit roof; exact product unresolved.",
+          "chosen_vanilla_proxy": "minecraft:deepslate_tiles with deepslate_tile_slab/stairs",
+          "texture_sha256": "4e0ff4aa76d467697383c776f94d855d3fc2a49a40363d3fa846e441003ebc57",
+          "reason": "The original texture has an overlapping tiled reading and full construction shape family. Against the 18x14-pixel roof ROI it scores DeltaE00 raw/equal-L 9.701/9.444. Gray concrete scores 7.491/7.132 but is flat, lacks the observed unit pattern and supplies no stair/slab family.",
+          "alternative": "minecraft:gray_concrete only if used for an unavoidable flat hidden backing surface, not the visible pitched skin."
+        },
+        {
+          "zone": "pale dormer fronts, cheeks, eaves and small sash framing",
+          "actual_evidence": "Pale painted-looking trim is directly visible at the two north dormers; substrate and lower-wall trim colour are unresolved.",
+          "chosen_vanilla_proxy": "minecraft:quartz_block/quartz_slab/quartz_stairs with minecraft:white_stained_glass_pane",
+          "texture_sha256": "63d3d5c7184b3f83b269933b306ea587bc28792c9c5118227b218cd4e3a6bd8c",
+          "reason": "Coherent pale construction family with thin shapes. Apply confidently to dormers/eaves and provisionally to lower apertures; do not transfer it into a broad white wall field."
+        }
+      ],
+      "roi_controls": [
+        {
+          "id": "sherrill_roof",
+          "source_xyxy_px": [
+            499,
+            817,
+            517,
+            831
+          ],
+          "pixels": 252,
+          "srgb_linear_mean": [
+            40.66,
+            50.58,
+            68.09
+          ],
+          "lab_d65_linear_mean": [
+            20.8818,
+            0.9883,
+            -12.2537
+          ]
+        },
+        {
+          "id": "sherrill_gable_lit",
+          "source_xyxy_px": [
+            626,
+            831,
+            632,
+            850
+          ],
+          "pixels": 114,
+          "srgb_linear_mean": [
+            146.78,
+            129.15,
+            135.28
+          ],
+          "lab_d65_linear_mean": [
+            55.7677,
+            7.8058,
+            -0.8359
+          ],
+          "status": "new tiny manual appearance check; compression and bright aerial lighting limit colour weight"
+        },
+        {
+          "id": "sherrill_long_wall_shade",
+          "source_xyxy_px": [
+            559,
+            899,
+            583,
+            913
+          ],
+          "pixels": 336,
+          "srgb_linear_mean": [
+            33.88,
+            30.92,
+            43.87
+          ],
+          "lab_d65_linear_mean": [
+            12.5755,
+            4.8614,
+            -8.1308
+          ],
+          "status": "new deep-shadow manual appearance check; never use its raw darkness as wall albedo"
+        }
+      ]
+    },
+    "hidden_or_provisional": [
+      "Complete north and south wall-window counts; tree/shadow or roof hides the lower walls.",
+      "Both doors, entrance stairs and any porch.",
+      "East and west gable aperture layouts.",
+      "Full fronts and windows of the three south dormers; only their peaks are visible.",
+      "Exact dormer sizes/positions and all three floor plates are interpreted from plan/roof proportions.",
+      "Roof product, brick product, trim substrate and pale end-stack ownership/position."
+    ],
+    "comparison_views": [
+      {
+        "view": "primary northeast drone match",
+        "camera": "high oblique from northeast",
+        "must_show": [
+          "red brick long house west of Dell complex",
+          "two pale north dormers",
+          "three south peak tips beyond ridge",
+          "dark steep roof",
+          "unaltered campus gaps"
+        ]
+      },
+      {
+        "view": "north eye-level audit",
+        "camera": "north side looking +V at about 1.8 m eye height",
+        "must_show": [
+          "two dormers at different long-axis positions",
+          "brick wall hierarchy",
+          "provisional lower rows without overclaiming source fidelity"
+        ]
+      },
+      {
+        "view": "south high oblique",
+        "camera": "south-southeast above pitch looking northwest",
+        "must_show": [
+          "three separate south dormers",
+          "preserved face0 slope and ridge",
+          "terrain rise toward south"
+        ]
+      },
+      {
+        "view": "roof plan audit",
+        "camera": "near vertical",
+        "must_show": [
+          "all four measured source faces retained",
+          "five dormers added only at packet bounds",
+          "no generic rectangular roof replacement"
+        ]
+      }
+    ]
+  },
+  "uncertainties": [
+    "Complete north and south wall-window counts; tree/shadow or roof hides the lower walls.",
+    "Both doors, entrance stairs and any porch.",
+    "East and west gable aperture layouts.",
+    "Full fronts and windows of the three south dormers; only their peaks are visible.",
+    "Exact dormer sizes/positions and all three floor plates are interpreted from plan/roof proportions.",
+    "Roof product, brick product, trim substrate and pale end-stack ownership/position."
+  ],
+  "camera_views": [
+    {
+      "name": "sherrill-northeast-drone-match",
+      "eye_uv_navd88_m": [
+        28,
+        -16,
+        85
+      ],
+      "target_uv_navd88_m": [
+        10,
+        4,
+        71.7
+      ],
+      "fov": 60
+    },
+    {
+      "name": "sherrill-north-eye-level",
+      "eye_uv_navd88_m": [
+        10,
+        -17,
+        67.8
+      ],
+      "target_uv_navd88_m": [
+        10,
+        3,
+        71.2
+      ],
+      "fov": 68
+    },
+    {
+      "name": "sherrill-south-high-oblique",
+      "eye_uv_navd88_m": [
+        24,
+        25,
+        82
+      ],
+      "target_uv_navd88_m": [
+        10,
+        4.5,
+        72
+      ],
+      "fov": 64
+    },
+    {
+      "name": "sherrill-roof-plan",
+      "eye_uv_navd88_m": [
+        10,
+        5,
+        97
+      ],
+      "target_uv_navd88_m": [
+        10,
+        4.8,
+        71.5
+      ],
+      "fov": 53
+    },
+    {
+      "name": "sherrill-west-entry-and-low-roof",
+      "eye_uv_navd88_m": [
+        -11,
+        2,
+        68.0
+      ],
+      "target_uv_navd88_m": [
+        4,
+        4,
+        69.0
+      ],
+      "fov": 68
+    }
+  ],
+  "dormer_raster_refinement": {
+    "omit_single_neighbor_front_spurs": true,
+    "scope": "Only authored dormer pixels with one cardinal neighbor in the front 0.55 m; restore the unchanged measured source face underneath. This removes a raster finger, not a measured building portion.",
+    "reason": "The v6 native northeast view showed a half-metre quartz finger obscuring one complete glazed front. Preserve the packet rectangles, eaves, ridges, placement and measured source roof.",
+    "pointed_front_caps": true,
+    "pointed_front_cap_rule": "Only the narrow front raster receives paired inward-rising quartz stairs. Their common physical top is the largest whole-block height at or below the unchanged packet ridge: 75.50 m north and 76.00 m south. Full quartz heads below the stair base close the glass. Quantified per-column top deltas and the two omitted spurs are mandatory in the study audit.",
+    "compact_pale_rake": "Use original quantized gable profile, dark deepslate cheeks and only source-shaped front roof caps in quartz. Preserve bounds, centroids, eaves and ridges.",
+    "compact_gable_heads": true
+  },
+  "facade_plane_refinement": {
+    "purpose": "Use the measured footprint segments as straight facade planes and treat block-by-block zigzags along each segment as voxelization, not pilasters or bays.",
+    "quantization_tolerance_m": 0.25,
+    "segments_uv_m": [
+      {
+        "id": "north_main",
+        "from": [
+          3.11975,
+          0.0
+        ],
+        "to": [
+          12.74196,
+          0.02672
+        ],
+        "plane_equation": "V = 0.002776 * (U - 3.11975)",
+        "treatment": "One continuous flat brick facade. Remove the native baseline's repeated full-height raster teeth with inward-backed brick stair/slab shaping."
+      },
+      {
+        "id": "north_east_setback_plane",
+        "from": [
+          12.70376,
+          0.93721
+        ],
+        "to": [
+          18.68173,
+          1.14402
+        ],
+        "plane_equation": "V = 0.93721 + 0.034596 * (U - 12.70376)",
+        "treatment": "One continuous straight segment after the intentional approximately 0.91 m setback at U about 12.72 m. Smooth its voxel steps independently; preserve the setback return."
+      },
+      {
+        "id": "north_west_low_appendage",
+        "from": [
+          0.33657,
+          1.04746
+        ],
+        "to": [
+          2.61195,
+          1.11609
+        ],
+        "plane_equation": "V = 1.04746 + 0.030162 * (U - 0.33657)",
+        "treatment": "Straight short facade belonging to the measured low western appendage. Smooth only along this segment and preserve its bounding returns."
+      },
+      {
+        "id": "south_main",
+        "from": [
+          2.57726,
+          8.68404
+        ],
+        "to": [
+          17.37072,
+          8.68404
+        ],
+        "plane_equation": "V = 8.68404",
+        "treatment": "One continuous flat brick facade. Remove repeated raster teeth while preserving endpoints and the west/east measured returns."
+      }
+    ],
+    "intentional_geometry_to_preserve": [
+      "The approximately 0.91 m north setback/return between the north_main and north_east_setback_plane segments near U=12.72 m.",
+      "The measured western low appendage and its short returns around U=0.0-3.12 m.",
+      "The irregular east end and all source-footprint corners.",
+      "Dormer, roof and trim silhouettes; they do not define wall-plane projections."
+    ],
+    "bounded_method": "Keep every facade cell inside the measured footprint. Shape only the outward half of voxel-step cells with brick stairs/slabs, with solid brick backing on the interior side. Do not fill to a replacement rectangle, move the centerline, or repeat a return vertically as an architectural projection.",
+    "chamfer_convex_tips": false
+  },
+  "reference_refinement_packet": {
+    "path": "runtime/research/sherrill-reference-20260915/sherrill-reference-refinement-packet.json",
+    "sha256": "e28fb954a8efeec966a1fc0beb9e4bd1f0af29cfa02b5cd88d1f85d42ff7cb21"
+  },
+  "refinement_notes": [
+    "Use the minimal regular solid nearest-cell grid raster of each measured straight plane; v9 stair combing was rejected in native views. No change to measured orientation, footprint or real north setback.",
+    "Gray panes are tonal proxies for dark source apertures; all hidden openings retain existing proposed positions.",
+    "Continuous dark roof edge replaces exaggerated alternating white caps; source fine fascia is sub-voxel.",
+    "North windows shorten to three pane rows inside unchanged dormer bounds/eaves/ridges. South fronts remain compact consistency proposals.",
+    "Two-row pale gable triangles above gray north panes restore the observed tonal hierarchy. Pale material is confined to the most outward front row at each world X, while sloped cheeks remain dark.",
+    "V11 applies the Sol north-dormer control addendum: width1.75m, front V2.40, depth2m, sill73.25m and sash.75x1m. U centres, ridge75.5 and eave74.55 retained. This explicitly supersedes interpreted V10 north bounds/sill/sash, not measured main roof geometry."
+  ],
+  "north_dormer_control_addendum": {
+    "path": "runtime\\research\\sherrill-reference-20260915\\sherrill-north-dormer-control-addendum-20260915.json",
+    "sha256": "70fb30301cf1ce758b5b728b3150eb3dbca3a612a798f1a039c1f185d71d9b8e",
+    "status": "interpreted bounded correction after v10 native rejection"
+  }
+}

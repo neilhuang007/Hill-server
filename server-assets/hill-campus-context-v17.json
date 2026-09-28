@@ -1,0 +1,2122 @@
+{
+  "name": "The Hill School - campus reconstruction at 2 blocks per metre",
+  "revision": "core-demo-20260927-environment",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "tile_size_blocks": 256,
+  "terrain": "runtime/campus-reconstruction/campus-full-detail-terrain-v2/terrain.npz",
+  "components": [
+    {
+      "name": "Class of 1960 Alumni House",
+      "study": "runtime/campus-reconstruction/campus-developed-ground-v6-2x/alumni-house",
+      "margin_m": 2,
+      "material_status": "material_correction_pending_native",
+      "ground_status": "regenerated_native_half_metre_grid_pending_native"
+    },
+    {
+      "name": "Hill \u2014 Alumni Chapel at campus scale",
+      "study": "runtime/campus-reconstruction/chapel-entry-v1-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/native-review.json",
+        "sha256": "bd6ab7836d702c4f00d466649983d8dffdf5ca89f9190e36c3c3af8507cb84e7",
+        "archive_sha256": "e47a92b94ef03b8bf6b76a7a42e69bf556f74e2e04e323ce689aeaf7eb0c6a1d",
+        "verdict": {
+          "format": "hill-building-native-review-v1",
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-27T19:19:59.782816+00:00",
+          "reviewer": "Root coordinator; four actual native PNGs inspected individually",
+          "archive_sha256": "e47a92b94ef03b8bf6b76a7a42e69bf556f74e2e04e323ce689aeaf7eb0c6a1d",
+          "native_reports": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-chapel-entry-v1-20260927-1520/chapel-native-qa-report.json",
+              "sha256": "4542bc2f4273405b4db0ec9d1963e52fc72bb4175160d7cee7462feb5d178102"
+            }
+          ],
+          "views_inspected": [
+            {
+              "name": "chapel-south-threshold",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-chapel-entry-v1-20260927-1520/screenshots/chapel-south-threshold.png",
+              "sha256": "996d5b866bb8839f341ba893178fd610c307bbcdb1ed42407a7be927f579888a",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "name": "chapel-east-walk-join",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-chapel-entry-v1-20260927-1520/screenshots/chapel-east-walk-join.png",
+              "sha256": "2f488e103a917ad74a8d32454e5b226a541d647ab9af7266846da631716ae994",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "name": "chapel-east-arcade",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-chapel-entry-v1-20260927-1520/screenshots/chapel-east-arcade.png",
+              "sha256": "2555a32c0693aff35e6c681ac689224e6973da2e3916b87fdc9c3348bc4cebe5",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "name": "chapel-east-whole",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-chapel-entry-v1-20260927-1520/screenshots/chapel-east-whole.png",
+              "sha256": "a769c241e17b7cb93f2a9cba4230627fcad673aabc07747db59999f177b23614",
+              "inspected": true,
+              "usable": true
+            }
+          ],
+          "verification_inputs": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/artifact-audit.json",
+              "sha256": "cf6445961a4b5e96cd9fc504b3e06344686d51bcaa6ade339272b37e7dccfc65"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/entry-route-audit.json",
+              "sha256": "6dfb693a4de0398836cb9f1a167d443544724d4a02604c3de0d423b481a2c9ba"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/entry-physical-audit.json",
+              "sha256": "f38b787800d9468edd181f57e60b3c5fa77a1cd07b6b4e7467562a4ccc7559e6"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/bounded-mutation-parity.json",
+              "sha256": "7c6f932dd524f3f53492e7722f1481066d4b9e907c62c4398dc11378212326f2"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-entry-v1-2x/source-evidence.json",
+              "sha256": "764af270f1f6b38e678da0cc2e0cea21c71559e923392c9a375f808dcdadd6f1"
+            }
+          ],
+          "findings": [
+            "East arcade approach visibly joins the pale path through the formerly grass-covered gap; supported half-block transitions lead to the open arch.",
+            "Covered east arcade has continuous flooring, attached columns/roof, clear circulation and retained recessed glazing.",
+            "South entrance remains attached to its stepped approach; outside-jamb door hinge correction passes occupied-shape access checks with doors opened.",
+            "Original building placement, body extents and all 3,318 roof cells remain exact. No change to nave, tower or addition scale."
+          ],
+          "remaining_limitations": [
+            "Southern addition remains the inherited approximately 19.6 by 7.7 metre SP-1 interpretation with approximately 1 metre uncertainty, not a new survey.",
+            "This accepts the bounded entry amendment; combined-campus landscape joins require fresh verification. Fine stonework, unseen detail and unfinished interiors are not certified by these four views."
+          ]
+        }
+      },
+      "source_archive_sha256": "e47a92b94ef03b8bf6b76a7a42e69bf556f74e2e04e323ce689aeaf7eb0c6a1d"
+    },
+    {
+      "name": "Athey Academic Center and Dining Hall exterior refinement",
+      "study": "runtime/campus-reconstruction/athey-dining-v19-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/athey-dining-v19-2x/native-review.json",
+        "sha256": "3c2e45d9cf3fa16f4b6084c161b7a50837a7d8e1f8a1ef6e417aba5138607508",
+        "archive_sha256": "9ee4726dca3a9334c77c939755faa7c9655ee2a1cd51546e0af808857eb2e002",
+        "verdict": {
+          "format": "hill-building-native-review-v1",
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-27T20:35:23.268933+00:00",
+          "reviewer": "Root coordinator; all eight useful native PNGs inspected individually against official 88/92/96/100 frames and the 2026 aerial",
+          "archive_sha256": "9ee4726dca3a9334c77c939755faa7c9655ee2a1cd51546e0af808857eb2e002",
+          "native_reports": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/chapel-native-qa-report.json",
+              "sha256": "3d84e534a3902cb21563e99ebe74113b2380a8b10e88c9d5cb2851a08c85cda0"
+            }
+          ],
+          "views_inspected": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/athey-court-source88-matched.png",
+              "sha256": "3def36fb0b56e891b34defe508737b1aea34a9b49a62515c9b58829d823d3aa7",
+              "name": "athey-court-source88-matched",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/athey-north-working-entry.png",
+              "sha256": "2a6e745eb809a7001216ad0a33ec508664c9ad6eeaa840b6aabfdd7b4150b525",
+              "name": "athey-north-working-entry",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/athey-recessed-vault-walk.png",
+              "sha256": "c5fb500955de406ec7c0319babc6bd0674205511edf9671f80b411a7b1a0de32",
+              "name": "athey-recessed-vault-walk",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/dining-court-overview.png",
+              "sha256": "9491a2f36690bcafdd38cea0aa27819e500fc800b36d150b54a133a4f9b4f2da",
+              "name": "dining-court-overview",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/dining-east-passage-walk.png",
+              "sha256": "0782574d7836ccbb7b7317afb88e412584f219d38c4020937dc58456a39fcdbc",
+              "name": "dining-east-passage-walk",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/dining-east-roof-close.png",
+              "sha256": "0ca75a5f61f79dba6343dbb6103057f743fbc1f199066bdbfe159f453e6d1652",
+              "name": "dining-east-roof-close",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/dining-west-passage-walk.png",
+              "sha256": "58f38b8cc596a8289ced2d8a14608384e6a616357ad86dcc0d8a04bf32ec169f",
+              "name": "dining-west-passage-walk",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/athey-v19-pale-gallery-review-20260927-2030/screenshots/south-court.png",
+              "sha256": "f17490ce43276f731f738c1cb183adf42befd46a657bfd32729fb88e9cf1bc49",
+              "name": "south-court",
+              "inspected": true,
+              "usable": true
+            }
+          ],
+          "verification_inputs": [
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/artifact-audit.json",
+              "sha256": "98b96adc16bf179d20218e02e3e7ef2d0e8dd21f911dbcffbdbf7d10052c0c2e"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/physical-source-audit.json",
+              "sha256": "54effd539b69d034160287ce442e800026681ef26566ef5cdcb7c2078b57bb77"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/upper-junction-enclosure-audit.json",
+              "sha256": "7e4132a80a920b8cdbdb99db7750264749ee7a2946dd89577ee01f6cc3340f9e"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/extended-route-audit.json",
+              "sha256": "96af0472a067ba85b5854e2ed51554914ba83a85b7763a17abf2b673f00b0d55"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/court-terrain-audit.json",
+              "sha256": "e0d2071f6c4c5595e80d613238479e65d6a591e143f034f53e491074e7d9baf7"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/site-ownership-audit.json",
+              "sha256": "ca00676f03bf9911ead5ac22eb15e6d027579cc3c22372e896727d50b7dc03e8"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/measured-placement-audit.json",
+              "sha256": "5b4afd51e610721a2e763087621533c0c1ce8b0678600cb97baaacf0ae70e0f0"
+            },
+            {
+              "path": "runtime/campus-reconstruction/athey-dining-v19-2x/bounded-mutation-parity.json",
+              "sha256": "99eef18a103169140107430c9558476976f3a4a39f1aac7b57d806f8cfdaa75f"
+            }
+          ],
+          "source_inputs": [
+            {
+              "path": "runtime/research/core-demo-20260927/court-correction/court-correction-controls.json",
+              "sha256": "7206b3b20f8df2ac343644ac96e86521d1a11254bf6ba791a8919d807c60cd96"
+            },
+            {
+              "path": "runtime/research/core-demo-20260927/court-correction/court-correction-addendum-v2.json",
+              "sha256": "2e158be006fd37308aef02fe48ca8f91f242c1f1b97a5e5ecd2fb33aba63a66b"
+            },
+            {
+              "path": "runtime/research/core-demo-20260927/court-correction/athey-east-gallery-garden-connection-v1.json",
+              "sha256": "43abb6c166970c7a7d0f48fa9c8c1aa4685ca53f778535535f5dff905217ed80"
+            },
+            {
+              "path": "runtime/research/core-demo-20260927/court-correction/evidence-addendum-v2.json",
+              "sha256": "973ef32d5b7393385ac785c425ff52fbd12956229092f553ba0e5b4e6fc781fe"
+            }
+          ],
+          "findings": [
+            "Continuous recessed paved walkway with source-based pointed/curved covering is visible behind nine broad/narrow opening bays; one compact central stair has connected side and middle rails.",
+            "Both side galleries retain attached roofs, piers and continuous open floors. The east roof now uses a pale coherent proxy matching the current source, with exactly 751 material substitutions and identical occupied shape.",
+            "No exposed grass or unsupported paving remains in the five court/gallery/arcade regions. Low coping, mulch, clipped shrubs and an ornamental tree remain outside walking routes.",
+            "Upper flank walls use regular source-based planes. Explicit brick returns close the previously visible interior seam at all four junctions.",
+            "North paired door has clear glazing/hinges and a supported Y85 landing that meets the planned Quad boundary at [118,79].",
+            "Exact export/native parity passes for 4880911 occupied blocks. All 35 gallery/apron/arcade/north-entry routes and 6633 samples pass; 3487 panes and 534 trim components have occupied-shape contacts.",
+            "World origin [22,37] m, bearing18.25 degrees and scale2 remain fixed. Main weather roofs remain exact. Apart from the 751 east-gallery material cells, the 130 low source roof-role corrections and 68 floor finish/edge corrections are explicitly enumerated, with no undeclared source exception."
+          ],
+          "remaining_limitations": [
+            "This accepts the detailed photographed exterior amendment; hidden elevations and unfinished interiors remain bounded by earlier source limitations.",
+            "The raised arcade joins the lower galleries through the evidenced central stair and courtyard; no unobserved end stairs or ramps are invented.",
+            "The standalone north platform surrounds use lower isolated-study terrain. Its interface with the accepted combined campus grade must pass fresh route and native review before final selection.",
+            "Block-scale curves and measured rotated walls retain regular voxel steps. Small planting positions and uncertain source counts are interpreted within the registered extents."
+          ]
+        }
+      },
+      "source_archive_sha256": "9ee4726dca3a9334c77c939755faa7c9655ee2a1cd51546e0af808857eb2e002"
+    },
+    {
+      "name": "Hill \u2014 John P. Ryan Library",
+      "study": "runtime/campus-reconstruction/ryan-library-entry-v3-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/native-review.json",
+        "sha256": "68b0b6f67c5c34b23e7f2869ff3e6ddaf1bdefd5e27f0ffb6dbae3be632b4122",
+        "archive_sha256": "ca375b55ffa00ef5b1277e98076685bb21606412a75f593ee23264ce8a3c46c9",
+        "verdict": {
+          "format": "hill-building-native-review-v1",
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-27T19:34:31.176619+00:00",
+          "reviewer": "Root coordinator; five actual native PNGs inspected individually and compared with the Wohlsen west-front photograph",
+          "archive_sha256": "ca375b55ffa00ef5b1277e98076685bb21606412a75f593ee23264ce8a3c46c9",
+          "native_reports": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/chapel-native-qa-report.json",
+              "sha256": "6aad528222795abdb5474341a3968aeecf7b51e592cb48cdf3e547d0e99a2c19"
+            }
+          ],
+          "views_inspected": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/screenshots/ryan-west-front.png",
+              "sha256": "039d5638c8a01fda882a7385282ef67dad58f7d603111bdc069d1aefc480ab3a",
+              "name": "ryan-west-front",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/screenshots/ryan-central-entry.png",
+              "sha256": "07b492b6e103b978a311de710441f10d243f0a32bfb83db95a665064b299f4e8",
+              "name": "ryan-central-entry",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/screenshots/ryan-south-west-steps.png",
+              "sha256": "0e25869444398a68b30f64d4060ead6e4d4cb3bd3809df93c81042ff3b84df09",
+              "name": "ryan-south-west-steps",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/screenshots/ryan-arcade-oblique.png",
+              "sha256": "4e63609a9609ae7b5dcd57cc7286bf5d4f10fc07e1e5fb4d874ff1580b57c4ec",
+              "name": "ryan-arcade-oblique",
+              "inspected": true,
+              "usable": true
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/core-ryan-entry-v3-20260927-1600/screenshots/ryan-roof-preservation.png",
+              "sha256": "9d9892b88a12ae683b9a90303413606a518c9502b1a234f31647ceae3e4d74c1",
+              "name": "ryan-roof-preservation",
+              "inspected": true,
+              "usable": true
+            }
+          ],
+          "verification_inputs": [
+            {
+              "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/artifact-audit.json",
+              "sha256": "21c212129296c769b320774b572c0b9cc09dfbf59389459088885ea8030475ae"
+            },
+            {
+              "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/entry-route-audit.json",
+              "sha256": "146faa274960aa64e91de427b1cff70446a4fa2311a2aa5713b9648fe789054b"
+            },
+            {
+              "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/entry-physical-audit.json",
+              "sha256": "e2af55d75e180d01da3722986309859c84e6f4b29fac574fa33ecd6df1bfb27d"
+            },
+            {
+              "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/bounded-mutation-parity.json",
+              "sha256": "2d034e063a47ac0da23b15d7a3a72ee6e16a4741498bb322ac32bd73b8f599d0"
+            },
+            {
+              "path": "runtime/campus-reconstruction/ryan-library-entry-v3-2x/source-evidence.json",
+              "sha256": "97450a5928169c8212cebf4cb9a297c4abffd1748717e741b4bc85db03a6daad"
+            }
+          ],
+          "findings": [
+            "Both new stair cheeks are visibly continuous masonry with pale coping; isolated tall terrain columns between the flights are removed.",
+            "South entry flight connects to the clear arcade landing; central threshold is supported and open-door access passes occupied-shape checks.",
+            "Matching pale gable coping removes the isolated orange trim without moving its shape.",
+            "Original measured building bounds and bearing remain fixed; all 8680 roof states remain exact. Exact Anvil export passes 784442 occupied blocks."
+          ],
+          "remaining_limitations": [
+            "Accepts this exterior entry amendment and its photographed silhouette, not a new survey or unseen/interior completion.",
+            "Measured rotated walls retain unavoidable regular voxel steps. Source-supported surrounding garden is a separate environment revision; combined-campus routes and joins require verification."
+          ]
+        }
+      },
+      "source_archive_sha256": "ca375b55ffa00ef5b1277e98076685bb21606412a75f593ee23264ce8a3c46c9"
+    },
+    {
+      "name": "Hunt Upper School",
+      "study": "runtime/campus-reconstruction/campus-developed-ground-v6-2x/hunt-hall",
+      "margin_m": 2,
+      "material_status": "material_correction_pending_native",
+      "ground_status": "regenerated_native_half_metre_grid_pending_native"
+    },
+    {
+      "name": "Meigs House \u2014 current 1925 Admission Office",
+      "study": "runtime/campus-reconstruction/meigs-v4-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/meigs-v4-2x/native-review.json",
+        "sha256": "884191a3720552e5a1b931a86f3d1c536ca70984be4b691d2eadbc8e2dbfb3a4",
+        "archive_sha256": "0317f8ade5f6dc3d313d5c7f9440718b6f6a6465b7047a18d4548414721a31a2",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "date": "2026-09-08",
+          "study_revision": "v4",
+          "sample_blocks_sha256": "0317f8ade5f6dc3d313d5c7f9440718b6f6a6465b7047a18d4548414721a31a2",
+          "native_report": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\chapel-native-qa-report.json",
+          "native_report_sha256": "8e3b2e49a7dc4ffb815c490c406c006ae6bcfe4f10b53f67fad216c67fb72096",
+          "views_inspected": [
+            {
+              "name": "meigs-campaign-north-west",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-campaign-north-west.png",
+              "sha256": "bac69d22f9d87831b79f4f466c2d0dd3c7e8f4b6ff3cbcbc2c59a3e8c9ea508a"
+            },
+            {
+              "name": "meigs-north-full",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-north-full.png",
+              "sha256": "8b5c083ec2b05cb0ec3148e6500d4322845a9ff1c3bc6c5b6ed712fc7736481e"
+            },
+            {
+              "name": "meigs-northwest-porch",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-northwest-porch.png",
+              "sha256": "4af93903539f947bbbd146b473b892a80863d7412aabd7d47f8914d45b3afff6"
+            },
+            {
+              "name": "meigs-entry-close",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-entry-close.png",
+              "sha256": "68e815270cd46cad11a03f0cce9fb06a865f468abd0e93b1dd2c7652413f69f5"
+            },
+            {
+              "name": "meigs-roof-audit",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-roof-audit.png",
+              "sha256": "03b6a030b62edebf2a9a54a97b6c8a114f6ecaa2b36e724645ea64082bdd51ab"
+            },
+            {
+              "name": "meigs-unseen-east-south",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\meigs-v4-2x-20260908\\screenshots\\meigs-unseen-east-south.png",
+              "sha256": "0148a52bbd9146ebf72ac714bb2c5e61ec928bc86a231276f237fdf07fefc054"
+            }
+          ],
+          "accepted_findings": [
+            "All six supplied native views inspected against the campaign photograph and supplied source qualifications.",
+            "Campaign, northwest porch and entry views show a continuous shallow brown cover and level cream exterior fascia; the earlier disconnected white ribbons are resolved. Root independently confirms this finding.",
+            "Roof view confirms the retained measured main roof, larger central dormer and separately authored smaller western dormer; the main cornice is reduced without exposing the final wall backing.",
+            "White-pane sash sheets remain connected and closed at their authorised perimeter; original-model roof occupancy checks independently establish contact across all 376 adjacent porch-cover pairs."
+          ],
+          "acceptance_scope": "Integrate the individual measured-footprint Meigs v4 study with its qualified northern campaign interpretation and documented bounded porch/small-dormer corrections. This accepts the reviewed construction and visual proxy; unseen elevations and exact photographic registration remain unresolved.",
+          "material_decision": {
+            "verifier": "Sol xhigh /root/reference_research",
+            "decision": "Retain verified spruce roof appearance proxy, white terracotta stucco field, quartz trim, narrow pale-oak posts/rails and white stained panes.",
+            "actual_roof_product": "Unresolved: campaign brown overlapping units do not establish wood, asphalt or synthetic composition; the supplied drone shows a grayer appearance."
+          },
+          "remaining_limits": [
+            "The campaign north/west orientation is moderate-confidence positional interpretation, not calibrated registration.",
+            "Spruce is warmer and more visibly wood-grained than some supplied aerial roof views; roof product, aging and exposure differences are unresolved.",
+            "White terracotta underrepresents stippled buff stucco and retains a modest pink bias.",
+            "Quarter-grid roof coping and three necessary full backing positions beside dormer panes remain heavier than the narrow photographed cornice.",
+            "Pane mesh has its intrinsic quarter-metre depth at two blocks per metre; original white borders approximate individual sash rails without establishing exact pane counts.",
+            "Smaller dormer bounds, post spacing, chimney portions, partial window edges, west doorway and entrance risers are estimates from incomplete imagery and grade.",
+            "Pale-oak fence post shafts are narrower than the photographed posts and retain timber-joint texture.",
+            "East/south and most west elevations remain unresolved with no mirrored invented window rows; retained low eastern source fragments are not claimed as photographically verified occupied roofs."
+          ],
+          "geometry_validation": "geometric-validation.json",
+          "perimeter_validation": "pane-perimeter-validation.json"
+        }
+      },
+      "source_archive_sha256": "0317f8ade5f6dc3d313d5c7f9440718b6f6a6465b7047a18d4548414721a31a2"
+    },
+    {
+      "name": "Warner Center for Spiritual Life and Equity",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006389O-f1989780fb",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Davy Hall \u2014 pond terrace and gabled facades",
+      "study": "runtime/campus-reconstruction/davy-v11-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/davy-v11-2x/native-review.json",
+        "sha256": "f6b8b75603882c7675e3e74994d8b27da2dcffeffa3e4acec4d4b00e7f7a56e4",
+        "archive_sha256": "c76722beea1f28ec28349752cc767b4811e859d6614300f8d3f5d1e8ef2fc2b1",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-16T02:36:46.363052+00:00",
+          "archive_sha256": "c76722beea1f28ec28349752cc767b4811e859d6614300f8d3f5d1e8ef2fc2b1",
+          "sample_blocks_sha256": "c76722beea1f28ec28349752cc767b4811e859d6614300f8d3f5d1e8ef2fc2b1",
+          "study_directory": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x",
+          "inspected_native_run": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th",
+          "native_report": {
+            "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\chapel-native-qa-report.json",
+            "sha256": "38d956e189db1a07454012fc11488fa3d01f5d9c08213b55a126b608a4fd6c5a"
+          },
+          "screenshots": [
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-north-porch.png",
+              "sha256": "de6a69280d8454aae06d1dac9ae77b603c1dbc6b808883eb4ba77fe54d183aad"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-open-porch-close.png",
+              "sha256": "b5ad303b75af70504d19f10319b0a2c0dc1a160bf196c5d7eb105e810aecb01d"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-pond-front.png",
+              "sha256": "c51101bb8e2aa944b13a0598b93158a463ae1f3fc9e74e7717a7c3654d9c8d2d"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-pond-window-close.png",
+              "sha256": "962e519c0476d36a86a469f8f5974999330409beee97a798fc118b216b0eed38"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-roof-source-planes.png",
+              "sha256": "fe30634c8ff9f57306df721f446bc4cfb9f016e02ca9df161bbfd50762b2c2ba"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\davy-v11-review-20260915-175th\\screenshots\\davy-sports-west.png",
+              "sha256": "1e52b00c29c3d618b46bbb7da8cda3ddc281a8c51a76e273d62e036dac27a3a8"
+            }
+          ],
+          "source_images": [
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\research\\davy-reference-20260915\\official-drone-270s-davy-source-crop.png",
+              "sha256": "0d7946108c9c51a4e7116cd5faa5b750996ff21cbef433cbf9a72c5d37dbccb0"
+            },
+            {
+              "path": "E:\\projects\\Hill-server\\runtime\\research\\davy-reference-20260915\\official-drone-272s-davy-source-crop.png",
+              "sha256": "a9d080d2c01a893bf5e79f9454688530b8535609bec727bbfd63a5fbea779299"
+            }
+          ],
+          "reviewers": [
+            "Astra xhigh builder",
+            "root independent native review"
+          ],
+          "findings": [
+            "All six fresh native screenshots inspected against official source crops 270 and 272.",
+            "Seven distinct masonry gables with thin pale sloped caps replace the full-height white teeth seen in rejected v9.",
+            "Pond glazing reads taller; pale front-only jambs and masonry returns expose more glass in oblique views.",
+            "Both long walls now follow regular single-plane grid steps without inherited raster buttresses; measured rotation and county placement remain unchanged.",
+            "Measured long roof, projecting cross-gable, two-stage open porch, attached posts and four connected pale rails read coherently.",
+            "Central door is restored to its v8 X264 reveal; transparent transoms and backed head close the detected contact gap. No visible new daylight slit at the inspected door, pane or roof contacts.",
+            "Native report provenance and exact archive-to-Anvil parity pass for all 644,247 occupied blocks."
+          ],
+          "acceptance_boundary": "Bounded visible exterior improvement over v8/v9, including below-eave west wall regularization. This does not certify photographic completeness, unseen west/south apertures, or the whole campus.",
+          "remaining_limitations": [
+            "Half-metre blocks still make gable and arch profiles chunky and locally asymmetric.",
+            "Rotated corners make apparent trim widths uneven in oblique views despite connected planar construction.",
+            "West and south opening schedules remain unverified; no west windows are invented.",
+            "The east 62 m gable ridges, opening registration, door divisions, post registration, deck grade and rail substrate remain documented interpretations.",
+            "Source roof slopes and raster outline retain measured irregularity; no whole-roof smoothing was applied.",
+            "Window positions are scaled from drone imagery, with about 1m uncertainty; 1.15m source width quantizes to 1m clear glazing at 2 blocks/m.",
+            "Seven east gables and four plain windows are directly observed. West roof projections remain provisional symmetry; west apertures are unresolved and are not mirrored.",
+            "56.25m entrance and deck level is a DEM/photo interpretation, not a building survey.",
+            "Four pale porch posts are interpreted support locations fitted to the actual retained source canopy and authored outer hood; exact post dimensions and registration remain unmeasured.",
+            "Ordinary quartz stairs approximate the round arches and thin fascia; original block shapes impose visible quarter/half-metre steps.",
+            "The rail substrate is unresolved; pale oak is Sol's painted-white appearance proxy, not an assertion of real wood species."
+          ],
+          "audits": {
+            "geometry": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\geometric-validation.json",
+              "sha256": "81526394e15619b2a791367b98bd04564ba9d45dd8a3fdc63e7df736137f63be"
+            },
+            "export_parity": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\export-parity.json",
+              "sha256": "d74e6ed02a9dd0279a9b3a2c9ae5c0810b5bbef325d837b16ac010f1f80b25c7"
+            },
+            "v8_exact_delta": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\v8-to-revision-delta.json",
+              "sha256": "2fa19250619569ec9f036823c2807bdbd7d2cb037166edc57098e74492f87d8f"
+            },
+            "preceding_exact_delta": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\preceding-to-revision-delta.json",
+              "sha256": "07f79f714a7fba266ea9ed7f0958b7e3ddef50ae638aa058dc62818637aea268"
+            },
+            "baseline_exact_delta": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\baseline-to-revision-delta.json",
+              "sha256": "720d7b6a13067606827a126fa51a40ed7f6d706b10ff66462d0ed57ed570d2fe"
+            },
+            "native_artifact_provenance": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\artifact-audit.json",
+              "sha256": "2fcf3d71cb8e5f15fa9023dd45ecd618d25472cc59e4bcf831f76492e517f0be"
+            },
+            "wall_ground_support": {
+              "path": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\davy-v11-2x\\wall-ground-support.json",
+              "sha256": "46179bd99e73f0889e60abc7ade67c60b35a24fc438547042e8895bd00b0cce0"
+            }
+          }
+        }
+      },
+      "source_archive_sha256": "c76722beea1f28ec28349752cc767b4811e859d6614300f8d3f5d1e8ef2fc2b1"
+    },
+    {
+      "name": "Center For The Arts - pond screen, lobby and measured auditorium",
+      "study": "runtime/campus-reconstruction/cfta-v5-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/cfta-v5-2x/native-review.json",
+        "sha256": "c7b6650fc43e1835b2919855007891afeb0eb6aa4c71458797776abddc5f65ff",
+        "archive_sha256": "bcac4c7958c985c8bd4508345a3fc69c8cd53bcc2070cf7e93746474522a61aa",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "archive_sha256": "bcac4c7958c985c8bd4508345a3fc69c8cd53bcc2070cf7e93746474522a61aa",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/chapel-native-qa-report.json",
+          "native_report_sha256": "659abe613458be4e9e5aaa22e3543cf494ed39f8dc803a270e8a00a29d9a2da1",
+          "inspected_images": [
+            {
+              "name": "cfta-pond-overview",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-pond-overview.png",
+              "sha256": "d599b284128cfba82d561ea0da2e69b6995253a48f0f005fc27451319b402874"
+            },
+            {
+              "name": "cfta-west-five-pairs",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-west-five-pairs.png",
+              "sha256": "cd92a7bf55342a35be252e0b78f7df823571661b5729cbf53b4db1a881c3746c"
+            },
+            {
+              "name": "cfta-curtain-doors",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-curtain-doors.png",
+              "sha256": "1948a4c4a148be2ea89c44b98bfc259eb764a239d9620f0fe71e7d7e79bb79f7"
+            },
+            {
+              "name": "cfta-southeast-curve",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-southeast-curve.png",
+              "sha256": "94d3ecf22e7f7ecb3dda93f8b8fb4765f8f966f7882f4aa6bb9ab3b5e45f16fe"
+            },
+            {
+              "name": "cfta-stair-grade",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-stair-grade.png",
+              "sha256": "d681899a1dc5fabc25f059b40ecc90d772badfa469aa3272286827a35bb5b3b4"
+            },
+            {
+              "name": "cfta-roof-source",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-roof-source.png",
+              "sha256": "d2771398e80cd9aa3aa2521ece42036c147886416eef92873d1d5313c3e058af"
+            },
+            {
+              "name": "cfta-west-back-limited",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-west-back-limited.png",
+              "sha256": "9fe828aa1f50d518d711e99d48db7f41316a5a7e51cfde4368371aafeb060ece"
+            },
+            {
+              "name": "cfta-county-like-pond-oblique",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/cfta-v5-review-20260916-175th/screenshots/cfta-county-like-pond-oblique.png",
+              "sha256": "7acb69c72a4a50f0d7fe9608146d54ed6d33629d3ecb359b1d8d7afe8f2043a8"
+            }
+          ],
+          "source_packet": {
+            "path": "runtime/research/campus-full-detail-20260905/cfta-reference-packet-20260916.json",
+            "sha256": "386a6ca8fa41bcf75d5b30cb2e8ec10094b702cd22dba46906542a9763a7e49b"
+          },
+          "source_addenda": [
+            {
+              "path": "runtime/research/campus-full-detail-20260905/cfta-drone-native-addendum-20260916.json",
+              "sha256": "96841d69838ee8ad09f54f7b418ba474094df82d78d627868403f1d968371cf4"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/cfta-current-roof-material-addendum-20260916.json",
+              "sha256": "cc2da37ce2fa537535f3ff913992e23b28521cdd894568cade5cfa90882738a9"
+            }
+          ],
+          "findings": [
+            "All eight native PNGs independently inspected against two county photographs, the contractor oblique and the 258-264s drone sequence.",
+            "The five upper and five lower west bay groups, separate screen, recessed main glazing, three entrance sets, compact drum and descending stair/landing rhythm are readable.",
+            "Gray curtain fields with sparse white-pane framing retain the source grid without opaque half-metre mullions. Red terracotta now reads as the source red/maroon lower field.",
+            "The southeast and county-like obliques confirm curved enclosure behind the freestanding east aperture. The sky/terrain visible through the screen from straight ahead is parallax, not an absent flat glazing sheet.",
+            "Pale cool-gray source roof faces3/4/7 match the current drone roof-family distinction. Six compact roof boxes remain interpreted; all rest on retained roof caps.",
+            "The bounded face7 east-wall correction remains enclosed and uses regular grid steps. All source roof shapes and heights remain unchanged.",
+            "The stair, rails, glazing caps and lower terrace remain connected. Wide-context terrain edges are study cutout limits, requiring campus integration views."
+          ],
+          "remaining_limits": [
+            "Bounded pond-facade and massing study; side/back opening counts, service entrances and interiors remain unresolved.",
+            "All ten source roof faces remain exact. One additive apron fills only the documented front lobby notch; the separate screen is a second authorized outside-roof structure.",
+            "Screen and west opening counts/centres are LiDAR supported; widths, doors, curve subdivision, drum and railing extent retain source tolerances.",
+            "No east flat glass sheet at superseded V-174.6 control; glazing follows measured curved enclosure behind outer screen aperture.",
+            "Fine 1.11m mullions use ordinary pane texture at two-block scale; six gap ties are photo-informed interpreted supports, not an exact count.",
+            "Panes stop at H68.0 beneath a backed cap at measured H68.5 roof; no pane pushes through roof.",
+            "Three lower double-door sets are fixed scaled glazing. Interior rooms, working scaled door leaves and external east stair remain unfinished.",
+            "Original quartz-brick/mud-brick/terracotta textures are material appearance proxies, not claims of actual species.",
+            "Existing source base/datum/terrain retained; only pond terrace, west stairs and door apron locally authored from source controls.",
+            "The 258-264s drone sequence informs upper wall/roof relationships. Trees still conceal lower parking-side doors/stairs; no hidden counts invented.",
+            "The six rooftop boxes are interpreted 2x1.5x0.5m white objects on existing face3 caps; neither equipment type nor exact surveyed location is claimed.",
+            "Main and curved curtain fields use six/four sparse principal pane groups, an interpreted block-scale rhythm rather than exact fine source counts.",
+            "Grey source faces3/4/7 and red/pale roof perimeter recoloring preserve occupied block shapes and heights; lower face8/9 fields stay under the base packet."
+          ],
+          "acceptance_scope": "Pond facade, visible southeast curve, measured massing/roof and bounded drone details. No all-sides/interior completion or campus integration acceptance.",
+          "integration_status": "ready_for_parent_integration"
+        }
+      },
+      "source_archive_sha256": "bcac4c7958c985c8bd4508345a3fc69c8cd53bcc2070cf7e93746474522a61aa"
+    },
+    {
+      "name": "Mercer Field House / Day / Sweeney Gymnasium",
+      "study": "runtime/campus-reconstruction/mercer-sweeney-v6-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/mercer-sweeney-v6-2x/native-review.json",
+        "sha256": "97f1dc083f455f75f6ed8dbaf9c9bca7693f0ee389bd6542a4c8cce25dd472db",
+        "archive_sha256": "7be5cab0fc799b14e2627700d8b069273d2571e380fa89a67c5dd83200d4f811",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "date": "2026-09-19",
+          "archive_sha256": "7be5cab0fc799b14e2627700d8b069273d2571e380fa89a67c5dd83200d4f811",
+          "profile_sha256": "97468ba0c5b54eace3e636d27c757fa91cfc91722094a7527451a92d273da0c6",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/chapel-native-qa-report.json",
+          "native_report_sha256": "c4bb0c4aec43fa7b6bca9782ad274a26ffeb1f7691e7df8b8eb022c1082e7256",
+          "renderer": "Minecraft 26.1.2 with vanilla resources",
+          "review_scope": "Mercer/Day/Sweeney source-bound exterior study and v6 material correction. This does not certify complete campus or unseen-facade fidelity.",
+          "reviewers": [
+            "GPT-6 Astra builder /root/sherrill_wall_astra",
+            "Coordinator /root: all eight actual PNGs inspected and bounded acceptance agreed"
+          ],
+          "views_inspected": [
+            {
+              "name": "sweeney-east-eye",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/sweeney-east-eye.png",
+              "sha256": "8c2d43fae952be4205edc308fb24288fd3bfba370294ed2c91e6a66baf88849f",
+              "inspected": true,
+              "finding": "Ten east tall openings and two registered gabled bays retained, with raised stepped crowns and a medium-gray pitched field; pale trim remains coarse at the rotated half-metre grid."
+            },
+            {
+              "name": "sweeney-north-gable",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/sweeney-north-gable.png",
+              "sha256": "727ce8503d7975e17d27957acac70c068b1bc1abd0553819c8b3c70b36431a6b",
+              "inspected": true,
+              "finding": "Measured north gable, central stepped arch and quartz coping retained; low flat shoulders are dark again."
+            },
+            {
+              "name": "sweeney-east-oblique",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/sweeney-east-oblique.png",
+              "sha256": "8f51d244e83c6788a882065209e8fa275a3e15bf281cf8eab30ce33f242842b7",
+              "inspected": true,
+              "finding": "Connected measured pitched roof and east gabled bays remain medium gray; the low shoulder roof is dark, with no new detached architectural detail visible."
+            },
+            {
+              "name": "mercer-north-eye",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/mercer-north-eye.png",
+              "sha256": "fedc0cc878047c0cd17015388e42a38f19a743239faba70c4ec49932d337dc00",
+              "inspected": true,
+              "finding": "Pale opaque panels, narrow light-gray panes and brick plinth remain unchanged."
+            },
+            {
+              "name": "mercer-south-oblique",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/mercer-south-oblique.png",
+              "sha256": "244828335eeb731f9b97c5722adc71174250ebb0ce6f26dc49064279c8b19909",
+              "inspected": true,
+              "finding": "Pale roof, upper-panel rhythm and the interpreted south entry groups remain unchanged; terrain is retained."
+            },
+            {
+              "name": "middle-north",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/middle-north.png",
+              "sha256": "ea532af2d9b9690e425c399cc6d40257bea75af6dbbea42651970f546dc01dd7",
+              "inspected": true,
+              "finding": "Eight interpreted north arches remain below the retained roof; Day and the middle roof/cornice surfaces return to dark deepslate."
+            },
+            {
+              "name": "sweeney-arch-close",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/sweeney-arch-close.png",
+              "sha256": "c5e4c003a803dceed59faeefea27812a7f471c9d5f8a3c440b70811474ee00ff",
+              "inspected": true,
+              "finding": "Dark pane openings preserve v5 stepped head rises and eave separation. Stair/slab shoulders and sill joins remain visibly coarse and locally asymmetric at this scale."
+            },
+            {
+              "name": "day-arch-close",
+              "screenshot": "runtime/campus-reconstruction/chapel-native-qa/runs/mercer-sweeney-v6-review-20260919/screenshots/day-arch-close.png",
+              "sha256": "7817880694c494e728f90196a9731cd0611ed501f213261520d986ddef739977",
+              "inspected": true,
+              "finding": "The eight-opening rhythm and v5 stepped heads are preserved; the formerly over-tinted roof band is dark again. Fine semicircular masonry shape is only approximated."
+            }
+          ],
+          "findings": [
+            "Gray roof mapping is restricted to the eleven source-approved Sweeney pitched faces and their immediate roof-role substrate; Day, other roof faces and the face8 seam retain v4 dark states.",
+            "All 4,104,536 occupied coordinates and their roles, every scheduled opening and all 43 quartz coping states are unchanged from reviewed v5 geometry.",
+            "Exactly 15,567 material states are restored to v4, with 8,827 approved gray roof cells and the separately authorized one-slab underside bridge retained.",
+            "Source roof caps, measured 9-degree placement, graded terrain, minimal cardinal wall traces, connected panes/partials and protected neighboring gaps pass the geometry audit.",
+            "Export parity and source/pre-upgrade-backup provenance pass; all eight native image hashes match the complete report."
+          ],
+          "source_authorities": [
+            {
+              "path": "runtime/research/campus-full-detail-20260905/mercer-sweeney-reference-packet-20260919.json",
+              "sha256": "7fd67dbd08c28e842c028ed8aa14a1980b902ed732530d947c82ad574c2ea3f7"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/mercer-sweeney-gable-opening-registration-addendum-20260919.json",
+              "sha256": "7c7b2d74077678d1ec90326c60b88db8fe3d993b05f9065880afbded324cb20e"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/mercer-sweeney-measured-wall-opening-plane-addendum-20260919.json",
+              "sha256": "a6b45b10e50327fca7170b6b9e463900b244f7c716faff144c4f1c957056d7a2"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/mercer-sweeney-v4-arch-roof-spur-addendum-20260919.json",
+              "sha256": "f2f5a0cbc56f6de25f03e629103fca48c8dfd6d6235045024b49836c66473e6f"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/mercer-sweeney-v5-roof-retint-mask-correction-20260919.json",
+              "sha256": "65207a98dbeba2cde1a3c3a0b777ae5e22f7c29be515908645758769f8d704be"
+            }
+          ],
+          "source_image_anchors": [
+            {
+              "path": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/drone-270p0s-mercer-north-crop.png",
+              "sha256": "3f3b5a647c2e8b1dcce3996ad34a71b5ffb7557448d1d33f1a3dfd5d14cf5597"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/drone-272p0s-sweeney-east-crop.png",
+              "sha256": "7bee05bc785e6cfdbb7695bb786601a5271c48d62e690d41782d8e0f3ff9c0f8"
+            }
+          ],
+          "checks": {
+            "geometric-validation.json": {
+              "sha256": "cc484cea0f0b04099cce724ce8388287fc853248c90f9a930d416b2d2f664158",
+              "passed": true
+            },
+            "material-only-revision-audit.json": {
+              "sha256": "2da453fda16b1f61da0224ff4d462c2490c9ddcbfcf00b9fa58c7557ac008f63",
+              "passed": true
+            },
+            "artifact-audit.json": {
+              "sha256": "a449f6570831911f1bc1a3d3f2aee0927f67dd982c60f3421c56efcf2061aa23",
+              "passed": true
+            },
+            "ownership-preflight.json": {
+              "sha256": "3c13136a50195229f4fc5b430b5d12fdd4e120629f3f792054ec897e30805f33",
+              "passed": true
+            },
+            "ownership-with-annan-v2-preflight.json": {
+              "sha256": "e1e9c41e2665d2fe4338941da499478e794679330b8c360ebc9d84ddbce085c4",
+              "passed": true
+            },
+            "integration-camera-preflight.json": {
+              "sha256": "f1a64b9768644e93d6e37b72f6886e2aadcba625e30646590bdd623e19fd0e26",
+              "passed": true
+            }
+          },
+          "independent_verification": {
+            "reviewer": "/root/tuck_finish_astra",
+            "method": "Read-only independent expected full-array result from frozen Sol mask, v5 geometry and exact v4 states.",
+            "expected_state_mismatches": 0,
+            "changed_nonroof_cells": 0,
+            "changed_state_properties": 0,
+            "unchanged_coping_cells": 43,
+            "gray_cap_cells": 4392,
+            "gray_substrate_cells": 4435,
+            "gray_bridge_cells": 1
+          },
+          "remaining_limitations": [
+            "Half-metre rotated stair/slab arch heads, pale surrounds and sill returns show coarse, locally asymmetric aliasing; exact thin semicircular masonry is not reproduced.",
+            "Non-gabled opening centres, sill/crown heights and most lower-window dimensions are interpreted rather than surveyed.",
+            "Unseen or obscured elevations and fine sash, service, roof-interruption and site details remain limited by source coverage.",
+            "Regional floor surfaces are included, but complete structural fit-out, interior circulation and operable doors are not established.",
+            "No new exterior paving, terraces or steps are authored; inherited measured terrain remains coarse.",
+            "Campus integration, camera occlusion and playable-save selection remain coordinator work."
+          ]
+        }
+      },
+      "source_archive_sha256": "7be5cab0fc799b14e2627700d8b069273d2571e380fa89a67c5dd83200d4f811"
+    },
+    {
+      "name": "Tuck Hall Arena / Eccleston Rink - photographed north facade",
+      "study": "runtime/campus-reconstruction/tuck-rink-v6-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/tuck-rink-v6-2x/native-review.json",
+        "sha256": "af11a3eac9b5c6e40e44abf157b36c304a5aef6cb2844fa124d3cfaf58f8f6dd",
+        "archive_sha256": "685523e1913ebe9eb82b4914db8161308264eb6af33800f44354619bd2598f3d",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-19",
+          "archive_sha256": "685523e1913ebe9eb82b4914db8161308264eb6af33800f44354619bd2598f3d",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v5-review-20260919/chapel-native-qa-report.json",
+          "native_report_sha256": "86eeea76ba46e52e451078f4f263b50d01d70f5de9c63987af96681b9da6c84f",
+          "inspected_images": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v5-review-20260919/screenshots/tuck-south-service.png",
+              "sha256": "54622163feddece04979cd053eba7d77a9c4e3f60e10f6cfb81d425060cb91dd"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v5-review-20260919/screenshots/tuck-south-oblique.png",
+              "sha256": "26c1a18a36a9bc1a6dbbc7b17405c5e3f123ecd422fc9a354942270de0255c99"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v5-review-20260919/screenshots/tuck-west-limited.png",
+              "sha256": "ebaf931e4048389c7a2acee760112fade63c1ad7c8ce928473a57d6871aaac2e"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v5-review-20260919/screenshots/tuck-west-oblique.png",
+              "sha256": "de958a60834d4d83236b0d108e404213ba14590f36731005d8beb032f9afbfeb"
+            }
+          ],
+          "previous_unchanged_envelope_comparison": {
+            "study": "runtime/campus-reconstruction/tuck-rink-v3-2x",
+            "archive_sha256": "5acd89cbd62ca75c6687cea6bf1ddaee4a0c74d4081316b7c4309dd7168232c8",
+            "status_note": "Eight v3 PNGs previously inspected; these are not fresh v5 images. V5 preserves every original v3 block coordinate, state and role.",
+            "images": [
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-north-overview.png",
+                "sha256": "73c8ac7edd8bf673d2904d64b7c28d51b01b58040782b8ca154a4057934f154c"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-north-street.png",
+                "sha256": "c2a1eeb3090470750e73f799e1cd0c5148e0a77d9a2505d29080320ba3ef6a3a"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-entry-close.png",
+                "sha256": "f20a778ae0f14e40d05841138824b2db693ea5c964a110d381682559ef59e127"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-east-gable.png",
+                "sha256": "74cc4d373d1d524415bd929a44042c9e2b5a7e716e06670d0640a8416c68d1cd"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-roof-ridge.png",
+                "sha256": "10ece14735ff730507564cc671c5636e1b7c10748d8663bea005b79bae2c2326"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-south-service.png",
+                "sha256": "54622163feddece04979cd053eba7d77a9c4e3f60e10f6cfb81d425060cb91dd"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-west-limited.png",
+                "sha256": "e9dfa48bada24e5ef7ad46bb75d8b450671b3d87ebc6d66b08353a694f96ebaf"
+              },
+              {
+                "path": "runtime/campus-reconstruction/chapel-native-qa/runs/tuck-rink-v3-review-20260919/screenshots/tuck-annan-gap.png",
+                "sha256": "6d7bd2fcb7b0f500f2d80928403a388df9a99bee951eadf9ce70d37c37fa1f8f"
+              }
+            ]
+          },
+          "findings": [
+            "Builder and coordinator inspected all four actual v5 south/west orthogonal and oblique PNGs. No new exterior ledges or projections appear; the measured roof, southwest projection and north corner remain intact.",
+            "Exactly 436 inward red-terracotta bridge cells complete positive-area cardinal wall contacts; all 1516918 original v3 occupied cells retain their coordinates, states and roles.",
+            "The independent exact-county-perimeter audit checks 53 height slices. The south and west walls have no reverse steps, steps larger than one cell, missing original wall cells, projecting extras or unfilled inward bridges.",
+            "The remaining six-to-seven-block cadence is the minimal full-block representation of the measured approximately nine-degree wall angle. Exposed cube envelopes lie within approximately -0.207 to +0.287 metres of their exact measured segments.",
+            "V3 source comparison establishes the unchanged broad north panels, nine interpreted narrow gray-pane slots, four fixed glazed entrance leaves, shallow attached canopy, nearly level threshold, red gable and single supported louver.",
+            "All five canonical roof faces, source masks, gradients and cap shapes remain unchanged except the prior three explicitly authorized face-3 threshold fills. V3 roof stair and east-gable backing material corrections are preserved.",
+            "Exact archive-to-Anvil parity, ordinary construction palette, pane/partial-block contacts, 18 occupied wall floods, entry approach headroom and protected neighbor-gap cores pass.",
+            "Metadata-only v6 preserves every v5 block and world byte while adding bounded assembly ownership for the already reviewed north sidewalk and entrance. All authored ground mutation columns are now owned; no ownership overlap with any other campus component."
+          ],
+          "remaining_limits": [
+            "This is bounded exterior integration, not complete photographic reconstruction of hidden elevations or interiors.",
+            "Full-block walls at nine degrees and measured roof sampling remain visibly stepped. Smooth-quartz stairs are brighter than the photographed roof, and the north-facing red entry-side coping remains coarse and broad.",
+            "Nine north slots are length-scaled interpretation; at least seven are visible in the contractor source. South/west and concealed east opening counts remain unresolved.",
+            "Door leaves are fixed scaled glazing; operable scaled doors, fine hardware, panel seams, metal ribs and louver blades remain unresolved.",
+            "Fresh four-view v5 captures establish the repaired south/west contacts. The unchanged north/entry/east details use prior eight-view v3 comparison plus exact state preservation, not fresh v5 north/east PNGs.",
+            "Study cutouts do not establish full campus neighbor context. Integration must inspect actual Mercer/Annan separation and terrain with adjacent components present.",
+            "V6 site-ownership correction is analytically checked; the next combined-campus capture must verify the restored north sidewalk. V11 campus is not accepted evidence of the correction."
+          ],
+          "audit_files": [
+            "geometric-validation.json",
+            "wall-plane-classification.json",
+            "artifact-audit.json",
+            "site-ownership-proof.json"
+          ],
+          "source_disposition": {
+            "path": "runtime/research/campus-full-detail-20260905/tuck-rink-straight-wall-addendum-20260919.json",
+            "sha256": "e551d23a106caf3d9d339ebd582f29501d90b9cd8a67f8b71d3595a3c9e0debb"
+          },
+          "base_shape_family_note": "The profile stone_brick roof family seeds the retained cap shapes. Actual exported pale roof materials are smooth_stone, smooth_stone_slab and smooth_quartz_stairs.",
+          "revision": "v6 metadata-only site-ownership correction",
+          "native_evidence_note": "All listed fresh four-view images were captured from v5, not v6. The v6 archive and complete world files are byte-identical to v5; site-ownership-proof.json proves this. No new standalone native geometry claim is made.",
+          "profile_sha256": "26b42f0c8b407dc871a3e17dccde5a4ee5dd4dfabc9aa28a40bddd5564c6d480",
+          "site_ownership_proof_sha256": "e8ace927187521fc5731513e835a37d72584ced6e0f4805034390cd3e62361b3",
+          "integration_defect": {
+            "path": "runtime/campus-reconstruction/chapel-native-qa/runs/campus-v11-integration-20260919/screenshots/tuck-north-overview.png",
+            "sha256": "032bd9b78a617c21df8936efbaaa32af30ca7232030a26b78a07ad90d48d307b",
+            "finding": "V11 context loses most pale north sidewalk to grass because default architecture-derived ownership excludes pavement-only columns.",
+            "disposition": "V6 explicitly owns the existing bounded sidewalk/landing masks. Fresh combined native correction verification remains required."
+          }
+        }
+      },
+      "source_archive_sha256": "685523e1913ebe9eb82b4914db8161308264eb6af33800f44354619bd2598f3d"
+    },
+    {
+      "name": "Annan Building - bounded west facade and measured roof",
+      "study": "runtime/campus-reconstruction/annan-v2-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/annan-v2-2x/native-review.json",
+        "sha256": "20fd325c6b72f8d8fa03e28bee010d8c8eec54ce37109306e87e2b750dd5d1d4",
+        "archive_sha256": "82dd942b86df71358a82131d62b6ad0dcb168050748d9750137963e9a713c3fd",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-19",
+          "reviewer": "Building builder and coordinator; all six actual native PNGs inspected against official aerial, supplied consecutive-drone evidence and rejected baseline/v1 views.",
+          "archive_sha256": "82dd942b86df71358a82131d62b6ad0dcb168050748d9750137963e9a713c3fd",
+          "profile_sha256": "5b81c2494f308b6c227460b94f01d523ce78c87d4398967c641eddfdcb5fa29b",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/chapel-native-qa-report.json",
+          "native_report_sha256": "bf4bf2983ea0bc5ed3d769f3dd705cdf7387b7ecfbb81dab94c8a522a81b590f",
+          "inspected_images": [
+            {
+              "name": "annan-west-whole-overview",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-west-whole-overview.png",
+              "sha256": "aa7e5ba92b3a750b54ddd5b63d2cab48e64781fe97cb6c7fd5ce2c6a1dd4022b"
+            },
+            {
+              "name": "annan-west-gap-overview",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-west-gap-overview.png",
+              "sha256": "072339d3b448551753aff15d91fa2c4e6885c453e9f959bfa1972931fa4e2448"
+            },
+            {
+              "name": "annan-west-south-oblique",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-west-south-oblique.png",
+              "sha256": "8dd4e26270ce24ae36b109ecc9961fade7f59347945ab7d1126eba7b00c046d9"
+            },
+            {
+              "name": "annan-north-recess",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-north-recess.png",
+              "sha256": "7d3df0e96a044f8bc7b20ee1e2215a81afe80abb66930ed516ae1c18bd40fced"
+            },
+            {
+              "name": "annan-east-annex",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-east-annex.png",
+              "sha256": "be6b825ba1287ea712f3e606ef6127ddc9806c58406c3d021bc3cc631171683a"
+            },
+            {
+              "name": "annan-roof-and-high-cluster",
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/annan-v2-review-20260919/screenshots/annan-roof-and-high-cluster.png",
+              "sha256": "e76ba508361a35e78bd4c57a7914fc3630853e6e3511e27416b8c6832c860035"
+            }
+          ],
+          "source_bindings": [
+            {
+              "path": "runtime/research/campus-full-detail-20260905/annan-reference-packet-20260919.json",
+              "sha256": "59beeb1a36f1b94c87c37bf24fcad3959102e8662c9f61230a82a333805a421f"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/annan-high-cluster-disposition-addendum-20260919.json",
+              "sha256": "48639c800766fd88ee8d441cb4c5461ee97e0efd00ff065c3fd68f4f81afae7f"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/annan-exposed-roof-backing-material-addendum-20260919.json",
+              "sha256": "0f633278dfa23a8f81ade2452a423a809ce912d54cd78307a30ba42f7d718ed4"
+            },
+            {
+              "path": "runtime/research/campus-full-detail-20260905/annan-south-wall-plane-disposition-addendum-20260919.json",
+              "sha256": "12ef6a7d4b2b1fcb03a44aaed49ceb885e6211a6d97bd98bac306c6a98237e87"
+            }
+          ],
+          "findings": [
+            "The vegetation-contaminated north-east high cluster is gone. The connected ordinary gray roof follows the exact authorized face 20 continuation over 146 half-metre columns in the 35.789274 m2 union; nine other source faces and all footprint controls remain intact.",
+            "The observed four high west windows read as narrow dark glazing below the eave. Five larger lower openings remain explicitly interpreted from the partly hidden source row; north/east opening grids are not invented.",
+            "Fresh west/south views show brick reaching a thinner gray main eave. Exactly 284 already occupied full substrate cells changed material; all cap coordinates, states and shapes remain unchanged.",
+            "Exactly 133 new brick cells complete the source-authorized south outer wall trace above the localized low caps. All 18 Y64\u201381 traces have zero reverse steps, oversized steps, recesses or projecting extras. The same minimum rotated trace persists; eight localized partial source caps remain intact.",
+            "All 908055 original v1 coordinates remain occupied. Other than the 284 authorized material changes, their states and roles remain unchanged. The low annex and north recess remain attached; the original measured terrain and three gap cores are preserved.",
+            "All 29045 architectural cells form one connected component through 74177 positive-area contacts derived from vanilla occupied block faces. No detached roof spur, pillar or canopy remains. Pane support, partial-block contact, 44 wall-subheight floods and exact Anvil export checks pass.",
+            "All 2786 ground-mutation columns are inside the measured footprint and assembly ownership. Ownership after the new wall additions has zero overlap against the other 43 v12 campus components."
+          ],
+          "remaining_limits": [
+            "This is bounded exterior acceptance, not complete photographic reconstruction. North/east openings, interiors and operable scaled doors remain unresolved.",
+            "The source tree hides the north-east roof treatment; the bounded face 20 continuation is interpreted from adjacent measured geometry, not directly observed beneath the tree.",
+            "Full-block walls at nine degrees, sampled roof steps and pale quarter-metre division slabs remain visibly coarse. The source-preserved low caps 5/6 remain visible interruptions, and the low-annex gray edge remains broad. These are documented retained controls, not decorative pilasters or claimed fine trim.",
+            "Only the upper west count of four is directly observed. Lower count/centres, precise window dimensions, the south fixed glazed entry and local floor levels are interpretations within packet tolerances.",
+            "Standalone cutouts do not establish real neighbor context. Final combined native views must verify Tuck 7.78 m, Sweeney 3.7 m and Davy 10.44 m separation with actual neighboring studies."
+          ],
+          "audit_files": [
+            "artifact-audit.json",
+            "geometric-validation.json",
+            "south-plane-classification.json",
+            "architectural-connectivity.json",
+            "backing-material-proof.json",
+            "neighbor-ownership-proof.json"
+          ],
+          "base_shape_family_note": "The profile stone_brick family seeds cap shapes only. Actual main roof uses polished_andesite/full/slab/stairs and the low annex uses smooth_stone/full/slabs; exact products remain unknown.",
+          "previous_rejected_study": "runtime/campus-reconstruction/annan-v1-2x"
+        }
+      },
+      "source_archive_sha256": "82dd942b86df71358a82131d62b6ad0dcb168050748d9750137963e9a713c3fd"
+    },
+    {
+      "name": "Wendell Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600617C-403d7b1a51",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Ferenbach Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600641C-fab9d4a2e4",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Senter Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600641C-d333862570",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lowndes Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600641C-6607e4a8a8",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Scheerer Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600641C-7e1d6bacf8",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Foster Dormitory - pitch portals and measured T roof",
+      "study": "runtime/campus-reconstruction/foster-v14-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/foster-v14-2x/native-review.json",
+        "sha256": "188408c3ed96dcd191e26258d49a12362c167f8a4b8cba9810f779c3f15aae4a",
+        "archive_sha256": "6ff53b5413d4f4a2d8e2befbcab013730f3a3f8b2bc129b5fee3a8ba08ad5875",
+        "verdict": {
+          "revision": "2026-09-08-foster-v14-2x",
+          "status": "accepted_for_bounded_integration",
+          "archive_sha256": "6ff53b5413d4f4a2d8e2befbcab013730f3a3f8b2bc129b5fee3a8ba08ad5875",
+          "sample_blocks_sha256": "6ff53b5413d4f4a2d8e2befbcab013730f3a3f8b2bc129b5fee3a8ba08ad5875",
+          "generator_snapshot_sha256": "586cb90682b4751d31c89076132fe6be9034abb0a89e902256799be831490d2b",
+          "inspection": "All six matching original-client native views inspected against the supplied pitch photo and rejected v13 images. The bounded cap-position/perimeter correction is accepted.",
+          "screenshots": [
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-east-return-grade.png",
+              "sha256": "8aa1ad651d6bb8a4afe9f8c91b28fd4888e115f2fe7539ae363b46c824e045c7",
+              "finding": "The corrected end corner sits within the measured wall. Connected narrow end glazing, lower storeys and the real grade are retained."
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-pitch-full.png",
+              "sha256": "13796e1f7dc32b88073d51679c28672a865d2114b18fc7f7b2c00a0e74d54343",
+              "finding": "Wing/centre aperture counts and original brick/gray-roof silhouette remain. The broad v13 white cap bands are removed; glazing reads continuously within the original wall."
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-pitch-rounded-portal-close.png",
+              "sha256": "bdeff7e1afbf8d0acf476a94786593ce73962470053f405ece7abba3d7f3c462",
+              "finding": "The sash centres stay transparent from top to bottom and attach to the masonry frame. Some slender sill pieces remain visible. Rounded portal shoulders and the attic vent remain coarse."
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-rear-daylight-basement.png",
+              "sha256": "421feaf97023415c5b139686ab5e13d1b5ec89589d950de0fd076c70312e2582",
+              "finding": "Clear sash centres continue on the rear; the low basement and terraced grade remain. The rear opening schedule is unobserved and remains a proposal."
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-roof-valleys-and-stacks.png",
+              "sha256": "97fb1a8f160fd8ba8db16d58f980324611571f6bd6287a1e09db0e4cfe18031f",
+              "finding": "Main roof intersections, eave backing and the two interpreted stacks are retained. Roof courses and diagonal edges remain strongly stepped at this resolution."
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\foster-v14-2x-20260908\\screenshots\\foster-west-end-and-pitch.png",
+              "sha256": "ef8860f55c59b4bc0b726775ca962f69d0321511de8fd79c3e5b33e1b12e6e27",
+              "finding": "The white-pane rim is visible without former broad opaque inner caps. End opening counts and hidden portions of the front remain source-limited."
+            }
+          ],
+          "validated_scope": "All 793 previous pane cells stay fixed; 249 inner panes replace former opaque caps/backing within the same glazing height. 1,042 panes have zero horizontal/vertical/diagonal-jamb candidates; 4,365 outer/recessed wall cells are nonempty. Source roof values and physical tops remain exact.",
+          "remaining_approximations": [
+            "Half-metre horizontal and quarter-metre vertical grid steps are pronounced at the 34-degree source axis; the footprint and roof are not rotated to hide them.",
+            "The rounded portal heads and diamond attic vent are coarser than the photograph.",
+            "Some inner sill segments remain visible, and the thin pane texture rim is less uniform than the real painted surrounds.",
+            "Rear/end rows, partly hidden pitch counts and chimney geometry remain proposals; native views do not establish unseen source details."
+          ],
+          "rejected_baseline": "Foster v13; native-review.json records the obstructive white-cap bands that this version removes."
+        }
+      },
+      "source_archive_sha256": "6ff53b5413d4f4a2d8e2befbcab013730f3a3f8b2bc129b5fee3a8ba08ad5875"
+    },
+    {
+      "name": "Rolfe Dormitory - separate triangular portals and stepped rear roof",
+      "study": "runtime/campus-reconstruction/rolfe-v7-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/rolfe-v7-2x/native-review.json",
+        "sha256": "9253e85e3a4f295377214bfdc45213321fbd0119126985550355ab2713d6da94",
+        "archive_sha256": "45853e030ab2c1d1a75a52bc6cfc3491c7b6df208234266eedb26fd2994f9c20",
+        "verdict": {
+          "revision": "2026-09-08-rolfe-v7-2x",
+          "inspection": "All six original-client native images inspected against existing supplied current drone and historical west-gable reference images.",
+          "bounded_repair_status": "Suitable for integration with recorded visual and source uncertainties; not a claim of measured unobserved facades.",
+          "screenshots": [
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-east-return-grade.png",
+              "sha256": "7d7499ee3f0c987a80716094c487cdddb2f958383ce280ef07d7118422e3a37b"
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-pitch-full.png",
+              "sha256": "8f72ca3f0003c5ca715023dec15d7413add0c9806f21960ce969b538f1ef1893"
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-rear-lower-hip-and-basements.png",
+              "sha256": "107874399a50d522ff325471fc5eaf4b5bffe14f3ea892f26655b2875446156a"
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-roof-level-change.png",
+              "sha256": "a8e21ea17ab5c56c9a2254e95cfdbdc7c65cda49382b98281f542b2f87571b61"
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-triangular-portal-close.png",
+              "sha256": "11f65497ce6cf02a6a2e6ccea1290fa1a36be2505d9f9414d3a65fd849caeea3"
+            },
+            {
+              "path": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\rolfe-v7-2x-20260908\\screenshots\\rolfe-west-gable-historical-match.png",
+              "sha256": "cd2c4e585ea8eaa602d5f1a7d118adc1d125bdeadc031c190ffd9c24275abfb6"
+            }
+          ],
+          "observed_improvements": [
+            "Glass reaches its existing masonry/frame after the bounded inner returns; no new projecting cages or full-height opaque jamb panels.",
+            "Distinct closed lower front block, recessed central gable, lower rear hip and steep grade remain intact."
+          ],
+          "remaining_discrepancies": [
+            "Some inner white cap blocks remain visible at different raster phases; the photographed white surrounds are more uniform and thinner.",
+            "Triangular entrance heads are coarse and shallow at the half-metre horizontal grid.",
+            "Small diamond vents read as stepped narrow slots.",
+            "Quarter-metre fascia/course steps remain more pronounced than the smooth photographed trim.",
+            "Weathered gray roof appearance is approximated by stone-brick textures; lighting differs from the source."
+          ],
+          "source_limits": [
+            "Rear, end and basement proposals are not verified by native screenshots.",
+            "The six west-gable sashes are historically evidenced; their current state remains uncertain.",
+            "Aperture sizes/positions and chimney/flue details are photo estimates."
+          ],
+          "structure": "See physical-pane-perimeter-audit.json and v5-to-v7-bounded-change-and-backing-audit.json; pair support alone was not used as evidence of closure.",
+          "archive_sha256": "45853e030ab2c1d1a75a52bc6cfc3491c7b6df208234266eedb26fd2994f9c20",
+          "generator_snapshot_sha256": "aac4663abfb02d1d6404ace3deb27cd4a30f6e53d479ebd08f82f4f5851de709",
+          "status": "accepted_for_bounded_integration",
+          "sample_blocks_sha256": "45853e030ab2c1d1a75a52bc6cfc3491c7b6df208234266eedb26fd2994f9c20"
+        }
+      },
+      "source_archive_sha256": "45853e030ab2c1d1a75a52bc6cfc3491c7b6df208234266eedb26fd2994f9c20"
+    },
+    {
+      "name": "Sherrerd Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-07f1d5b7e0",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Johnson Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-36b81aa17d",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Markle Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-53c8a9efca",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Robins Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-451a0df37b",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Hillrest Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-c7b546273e",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Sherrill Guest House \u2014 measured steep roof and five bounded dormers",
+      "study": "runtime/campus-reconstruction/sherrill-v11-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/sherrill-v11-2x/native-review.json",
+        "sha256": "c5172888b1cf6b68ddf4aba7ac78793bba7d51fdc435f8452eb30325ab6325ec",
+        "archive_sha256": "9c34ff93270075f106792c61a0c419ac46097dcf2d74b1c6493e14238f8546fd",
+        "verdict": {
+          "format": "hill-native-building-review-v1",
+          "status": "accepted_for_bounded_integration",
+          "revision": "2026-09-15-sherrill-v11-2x",
+          "review_date": "2026-09-16",
+          "archive_sha256": "9c34ff93270075f106792c61a0c419ac46097dcf2d74b1c6493e14238f8546fd",
+          "world_zip_sha256": "69c55d334c0df83b522bb92d7bca9c8fd4198b6eba4e4f5533bebda18d63b5a3",
+          "reviewer": "Astra Sherrill builder; independent root coordinator concurrence after inspection of all five native views",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/chapel-native-qa-report.json",
+          "native_report_sha256": "904b088f51acae8ce1bdbc815467055eb214a6787ed0b85d489975209be6d9fd",
+          "inspected_images": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/screenshots/sherrill-northeast-drone-match.png",
+              "sha256": "5e6d95016cc342813fc04305c2e32cecec9d7500d1fa535b0f6e7f84b0ec0850",
+              "finding": "Both north dormers now read as compact pale stepped gables around small dark openings, with dark cheeks merging directly into the steep roof. The former tall dark pier and small square cap are absent. Fine peak/profile fidelity remains limited by the half-metre block grid."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/screenshots/sherrill-north-eye-level.png",
+              "sha256": "9188b95e0d6404f139d9bc85688bd14beea511d85f64793061bc9986202fbd56",
+              "finding": "The two pale fronts and inset gray glazing remain readable from ground level. Brick runs show the regular grid steps of the measured bearing and real north setback; no stair-comb treatment remains."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/screenshots/sherrill-south-high-oblique.png",
+              "sha256": "7a98320f43a48b7a60bc832635f8a8953a390fbe599a7bbd6b776c29e8bc883a",
+              "finding": "The three south fronts retain chunky pale caps and dark front fields. Only their distant peak tips are source-observed; complete fronts and openings remain provisional, outside this observed-north acceptance."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/screenshots/sherrill-roof-plan.png",
+              "sha256": "d24789c0b07bb75271dfc32127bf8bf8e5971b18327b6212804f82f90a338c15",
+              "finding": "Plan view shows pale material confined to front regions, dark roof cheeks and the retained main roof arrangement. It does not establish exact sub-block fascia or source-unseen south cladding."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/sherrill-v11-review-20260916-175th/screenshots/sherrill-west-entry-and-low-roof.png",
+              "sha256": "caa8ea007ed62dfb3a1a062fc50c7a04e98803461c023d8e04d7580ba326cd28",
+              "finding": "The measured low west appendage remains physically attached and wall/roof surfaces meet. West doorway, lower window schedule and unseen path/entry details remain proposals rather than source-confirmed reconstruction."
+            }
+          ],
+          "source_comparison": {
+            "path": "runtime/research/sherrill-reference-20260915/sherrill-drone-239.0s-crop.png",
+            "sha256": "194c748d246715e4edaa91bb868317b419f94adf2757b71de3b8eb625156e307",
+            "role": "Primary first-party drone 239.0 s crop; north front shapes and tonal hierarchy only"
+          },
+          "reference_bindings": [
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/source-packet.json",
+              "sha256": "c67776872f1ec410db7ab36d2931e19e3c329d9219ce5a7da3c50e645e751c52"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/source-refinement-packet.json",
+              "sha256": "e28fb954a8efeec966a1fc0beb9e4bd1f0af29cfa02b5cd88d1f85d42ff7cb21"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/north-dormer-control-addendum.json",
+              "sha256": "70fb30301cf1ce758b5b728b3150eb3dbca3a612a798f1a039c1f185d71d9b8e"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/profile.json",
+              "sha256": "0757ae03adc61f097a66a8f2b3a124a0a851092e8d06c9959d562808c09175a7"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/detail-generator.py",
+              "sha256": "f1d2df68c3ee5d125190ee18d6f57f1affadceedee07eb89287c198bc5cb97e1"
+            }
+          ],
+          "accepted_scope": "Measured footprint, placement, terrain and four main roof planes; continuous ordinary brick/deepslate construction; the revised source-bounded compact pale north dormer fronts with gray recessed panes. This permits replacement of the measured shell in a new campus assembly, subject to separate native campus context review.",
+          "findings": [
+            "The two observed north fronts satisfy the revised addendum at this scale: compact pale peaked planes, small dark openings and dark attached cheeks. The rejected tall dark-pier silhouette is resolved.",
+            "Exact native provenance and export parity pass for all 289063 occupied blocks. Original vanilla Minecraft 26.1.2 resources were active.",
+            "All 135 panes have backed heads/sills and declared cardinal joins in the exact 1/16 vanilla-model audit; all 377 partial architectural blocks contact an occupied neighbour with positive area. All 329 partial roof caps have full direct backing. These independent checks do not certify arbitrary 3D watertightness.",
+            "Measured facade primary-face midpoints remain within 0.25 m of the four straight planes, maximum 0.243474 m. The real 0.91049 m north setback and fixed bearing remain.",
+            "Against v10, 314 architectural cells change and no terrain/paving cells change. All 23 changed roof-column tops lie inside the union of old and revised north dormer rectangles. Two adjacent full-tile-to-stair state changes restore the measured-shell representation with identical column tops; they are explicitly recorded in v10-to-v11-bounded-delta.json.",
+            "Four source roof faces remain unchanged outside bounded max-patches. Source footprint, datum, grade, lower opening/door proposals, and the southern dormer controls remain fixed. Ferenbach source gap remains 5.1883313279 m, with zero ownership overlap."
+          ],
+          "limitations": [
+            "The three south dormer fronts remain chunky consistency proposals; only their peak tips are directly visible in the source. Their full elevations and glazing are not photographically accepted.",
+            "Lower wall windows, both doors, unseen elevations, hidden walk/entry connections and interiors are unverified or proposed. No new path or entrance is invented from the hidden north walk endpoint.",
+            "Dormer width/front depth/sill are bounded interpretations from low-resolution oblique footage; pale substrate and exact roof/trim products remain unresolved.",
+            "Half-metre voxels leave visible regular rotation steps and stepped apexes. Gray panes are a tonal proxy for dark source apertures, not calibrated glass reflectance.",
+            "Individual bounded acceptance does not imply full photographic completion, acceptance of a combined campus, a launcher change or server deployment."
+          ],
+          "audit_files": [
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/artifact-audit.json",
+              "sha256": "5e3869be2e2f8d78add17fae804b5c8c6c258cd493bb058192282943ca77104e"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/structural-validation.json",
+              "sha256": "c71491a564f4f8f725ee3c4efe5792cc984ee10db07278dd18ae7bc2d255d87a"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/physical-pane-perimeter-audit.json",
+              "sha256": "de2affab9255147768a476981ed7a707fb1b8b3a6c213fb19e1665d581687008"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/occupied-dormer-shape-audit.json",
+              "sha256": "d540805d57934d52d759ba86630a75c3905725766e9b3e865c1b1612edcca4f5"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/partial-shape-contact-audit.json",
+              "sha256": "66e7d00ecba6c96fda5b427dc2ee6f0ea635848fd60fa36c568c69de76ec9911"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/facade-plane-audit.json",
+              "sha256": "f116ee893dd5ae8371f28cc9627ebc54ead8b6ee9dc6000f138f0aa9b35bb813"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/assembly-gap-check.json",
+              "sha256": "6cac00172bfa56cdbb5b18b612632a134127907d910da9924390af788cb5ddb4"
+            },
+            {
+              "path": "runtime/campus-reconstruction/sherrill-v11-2x/v10-to-v11-bounded-delta.json",
+              "sha256": "da7d17fcb659d0655d78e52c557f378f549daf45fc86c060cd1f6101e3ef0fc2"
+            }
+          ]
+        }
+      },
+      "source_archive_sha256": "9c34ff93270075f106792c61a0c419ac46097dcf2d74b1c6493e14238f8546fd"
+    },
+    {
+      "name": "Music House",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600622C-57b5b354dc",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Shirley Quadrivium \u2014 historic halls and glazed link",
+      "study": "runtime/campus-reconstruction/quadrivium-v8-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/quadrivium-v8-2x/native-review.json",
+        "sha256": "5959ce0ac60151ae68a765fb46425cd42ff5fb44660783b439c20a744ca6db01",
+        "archive_sha256": "ac00e48f24aa52ce3a349398a7a710ab09cb3d94578df09a4d49d381978a83da",
+        "verdict": {
+          "format": "hill-native-building-review-v1",
+          "status": "accepted_for_bounded_integration",
+          "reviewed_at": "2026-09-16T14:12:40.423517+00:00",
+          "archive_sha256": "ac00e48f24aa52ce3a349398a7a710ab09cb3d94578df09a4d49d381978a83da",
+          "sample_blocks_sha256": "ac00e48f24aa52ce3a349398a7a710ab09cb3d94578df09a4d49d381978a83da",
+          "study_directory": "runtime/campus-reconstruction/quadrivium-v8-2x",
+          "inspected_native_run": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th",
+          "native_report": {
+            "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/chapel-native-qa-report.json",
+            "sha256": "9520b9e16c8c155a19428f0e3c9cdc4c48324bd8086b88f1eec0ce55c58706aa"
+          },
+          "inspected_images": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-historic-west.png",
+              "sha256": "c190fa1966507e6ae4828bc77f49052b92b082d05009dbda1c0823885c56eb4a",
+              "view": "quadrivium-historic-west"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-new-glazed-link.png",
+              "sha256": "3f35890bd9e0130b73999f483c52c49f91789ba6afd5b5c32ebd0097bd140012",
+              "view": "quadrivium-new-glazed-link"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-east-historic.png",
+              "sha256": "9330109e18469ab13dedb6499746b0296adb9a8106a334ad25204ed6ec677ecd",
+              "view": "quadrivium-east-historic"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-east-end.png",
+              "sha256": "9e74ae04754b19d835d9f295cb9101beb6ff5a0d267f79c9823af51fb4e4234b",
+              "view": "quadrivium-east-end"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-rear-grade.png",
+              "sha256": "1f9b203699505d13363dea361ddbeb6f9b26458290941e309daa2e5912033ab9",
+              "view": "quadrivium-rear-grade"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-bay-west-corner.png",
+              "sha256": "f8f5177a2864a0fcf1b3e289efafe4470aafdbe8e4e53746b075100f4179b6d5",
+              "view": "quadrivium-bay-west-corner"
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/quadrivium-v8-review-20260916-175th/screenshots/quadrivium-link-pane-corner.png",
+              "sha256": "d306f88eedd25b9b1115c34ca4c08f1b516b8ff14a457ae194f1a0adbe6380df",
+              "view": "quadrivium-link-pane-corner"
+            }
+          ],
+          "source_packet": {
+            "path": "runtime/research/quadrivium-reference-20260915/quadrivium-reference-packet-20260915.json",
+            "sha256": "7abc84d6531ec7dd559040d4c0027640efb0778eafed496f658d69820c8c28e0"
+          },
+          "appearance_addendum": {
+            "path": "runtime/research/quadrivium-reference-20260915/quadrivium-v6-appearance-addendum-20260915.json",
+            "sha256": "e36916f67faf4161e0758549598a8b61202664ccee90e871f6cd1df1e569af24"
+          },
+          "source_images": [
+            {
+              "path": "runtime/research/quadrivium-reference-20260915/quadrivium-smp-historic-front-original-20260915.jpg",
+              "sha256": "315ba351bc80fb6745b8619b4dea3cb4241869418ef1ecb5cf4e82b760969a27"
+            },
+            {
+              "path": "runtime/research/quadrivium-reference-20260915/quadrivium-smp-new-link-original-20260915.jpg",
+              "sha256": "8c96a10af012ce93a1d9aa1f3431d65ff845703b8fa97f71ed4955f72eadce6e"
+            },
+            {
+              "path": "runtime/research/quadrivium-reference-20260915/quadrivium-smp-east-end-original-20260915.jpg",
+              "sha256": "6996f6cd29e99ff6387ec2e2a7142a3443b458874d55f0943d33ec208fd660c7"
+            },
+            {
+              "path": "runtime/research/quadrivium-reference-20260915/quadrivium-wohlsen-exterior-original-20260915.jpg",
+              "sha256": "d4d40db4653c6a2abc3c08f7a86dc41b59a26c3701583063da8a08e4edfec855"
+            }
+          ],
+          "frozen_inputs": {
+            "profile": {
+              "path": "runtime/campus-reconstruction/quadrivium-v8-2x/profile.json",
+              "sha256": "93d8a8c89b612bec424b8fb17464eecdc34130a81182499969b60bd3ea55c013"
+            },
+            "detail_generator": {
+              "path": "runtime/campus-reconstruction/quadrivium-v8-2x/detail-generator.py",
+              "sha256": "e295298e97816a2ff565b35b2bd4b9a95cbf39bd26f6f1846509ab0458680070"
+            }
+          },
+          "reviewers": [
+            "Astra xhigh builder continuation: all seven actual PNGs and all four source originals inspected",
+            "root independent native review: all seven actual PNGs inspected; bounded verdict agreed"
+          ],
+          "findings": [
+            "One continuous glazed gable is registered to the measured link crown; the former rectangular pale perimeter beam and duplicate roof are absent.",
+            "Gray panes and sparse black pane divisions replace the bright iron lattice. The front and side-return corner are visibly connected, with occupied heads and sills; no new daylight slit is visible in the inspected close views.",
+            "Both modern flank panels have continuous pale quartz-brick spandrels instead of brown belts. The source panel hierarchy is restored although the top/sill profiles remain coarse.",
+            "The three historic doors now have connected stepped pointed surrounds around visibly peaked dark apertures. Their carving, finials and inscriptions remain simplified.",
+            "The three west dormer windows sit lower within the retained roof bounds, leaving readable brick triangles. Five authored historic cross gables remain distinct; no measured roof ridge was raised for this correction.",
+            "Both historic bays are shallow deliberate curved approximations, joined to their straight host planes. Their pane corners and sill/head returns are occupied in the close bay view.",
+            "The east-end 6/6/2 light schedule is centered under its measured ridge. The measured rear inset is retained, and the exposed foundation follows the falling grade.",
+            "Long facade runs remain consistent planes with regular orientation steps and the real west-wing bend. The rear grade view retains an exposed lower storey and conservative repeated openings.",
+            "Exact archive-to-Anvil parity and native provenance pass for all 2487049 occupied states; zero missing, extra or mismatched states and no forbidden materials. Physical audits pass for 2691 panes, 967 partial backing records and eight operable door leaves."
+          ],
+          "acceptance_boundary": "Bounded visible exterior improvement over rejected v6, suitable to replace the measured Quadrivium shell in a fresh campus assembly. This does not certify complete photographic likeness, unseen elevations, interiors, site completion or the combined campus; campus context requires its own review.",
+          "remaining_limitations": [
+            "At two blocks per metre the limestone surrounds, stepped arches and bay curves remain thick and angular; exact carving, sash subdivision, inscriptions and finials are unresolved.",
+            "The pale modern side-panel spandrels read as stacked rails in close views because occupied sill/head backing and half-metre courses compress the field; material continuity is corrected but the source flatness is only approximate.",
+            "Dormer triangles are improved within fixed roof limits but retain asymmetric grid steps and exaggerated pale trim at some corners.",
+            "Historic slate and the pale metal crown use vanilla stone-brick and smooth-quartz appearance proxies. Retained measured roof samples create local ridge/eave irregularities, including the east-end top; no unsupported whole-roof smoothing is claimed.",
+            "Rear opening rows remain inferred and the large modern rear wall remains a conservative measured mass, not a verified photographed facade.",
+            "The east lower-grade black railing is not yet modeled; local landscape, planting, approach finish and pavement raster detail are incomplete.",
+            "Pane tint denotes a source-matched appearance proxy, not evidence that the real building uses literally gray or black glass. Interior floor edges are visible through the glazing.",
+            "Photo opening registration and authored dormer/portal controls remain interpreted. Source exceptions retain the photographed upper frontage over the anomalously low source face and the tall modern flank over its low slate return."
+          ],
+          "audits": {
+            "native_artifact_provenance": {
+              "path": "runtime/campus-reconstruction/quadrivium-v8-2x/artifact-audit.json",
+              "sha256": "a72db8834109ae27390270a4e894a691188ba8d95a8d58dc02baae692a0ba582"
+            },
+            "pane_joints": {
+              "path": "runtime/campus-reconstruction/quadrivium-v8-2x/pane-audit.json",
+              "sha256": "2a9b5a5bb999891d660849cc7a384e3b64e74e7649c2bad6d7e86080af180d52"
+            },
+            "physical_contacts": {
+              "path": "runtime/campus-reconstruction/quadrivium-v8-2x/physical-contact-audit.json",
+              "sha256": "7c96fc63c13216d8013f8cb005ae3aa6113f070c4e9a456bb4816312761e0056"
+            }
+          }
+        }
+      },
+      "source_archive_sha256": "ac00e48f24aa52ce3a349398a7a710ab09cb3d94578df09a4d49d381978a83da"
+    },
+    {
+      "name": "Thomas House \u2014 shuttered brick residence",
+      "study": "runtime/campus-reconstruction/thomas-v5-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_integration_with_recorded_limitations",
+        "path": "runtime/campus-reconstruction/thomas-v5-2x/native-review.json",
+        "sha256": "e731443b3f96c364e860df3fc77f481124a8386a5adf4185978f5959e0324985",
+        "archive_sha256": "55b4d90f9f57446e79384458e7de414baa814ff25063a15407a28da0567d6ccf",
+        "verdict": {
+          "format": "hill-native-study-review-v1",
+          "study": "runtime/campus-reconstruction/thomas-v5-2x",
+          "archive_sha256": "55b4d90f9f57446e79384458e7de414baa814ff25063a15407a28da0567d6ccf",
+          "status": "accepted_for_integration_with_recorded_limitations",
+          "inspected_native_run": "runtime/campus-reconstruction/chapel-native-qa/runs/thomas-v5-2x-20260908",
+          "inspected_screenshots": [
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/thomas-v5-2x-20260908/screenshots/thomas-west-clear.png",
+              "finding": "The shuttered brick facade, low end coping, entry hoods and broad dormer retain the reviewed silhouette. No new projecting glass or masonry appears."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/thomas-v5-2x-20260908/screenshots/thomas-west-pane-jamb.png",
+              "finding": "Both inspected storeys meet the brick jamb and sill; the added return stays behind the outer pane and shutter face."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/thomas-v5-2x-20260908/screenshots/thomas-east-pane-jamb.png",
+              "finding": "The diagonal return is continuous at the top and bottom; panes contact the existing brick frame without a free edge or visible daylight seam. This elevation remains an unobserved interpretation."
+            },
+            {
+              "path": "runtime/campus-reconstruction/chapel-native-qa/runs/thomas-v5-2x-20260908/screenshots/thomas-dormer-backing.png",
+              "finding": "The broad three-column sash meets its pale frame. Its three head slabs join the same lower-half roof layer; the upper half is external sky above that roof. The sill recess shows solid backing, with no through-hole."
+            }
+          ],
+          "bounded_verdict": "Accepted for the inspected pane-to-frame contacts, concealed caps, original-texture appearance and retained silhouette. Exact archive checks establish zero roof-role or architectural physical-top changes; this is not a claim of exact photographic completion.",
+          "remaining_approximations": [
+            "Only the west facade is independently photographed; north, east and south sash layouts remain provisional.",
+            "The dormer curve, pediment triangle, shutter panel divisions and sash grid are coarse at 2 blocks/metre.",
+            "Floor/threshold height, hidden west openings, chimney position, foliage and material products retain their recorded uncertainty.",
+            "Thomas retains the nearly planar 9.021-degree source facade, whose oblique raster produces half-metre steps."
+          ]
+        }
+      },
+      "source_archive_sha256": "55b4d90f9f57446e79384458e7de414baa814ff25063a15407a28da0567d6ccf"
+    },
+    {
+      "name": "Pine Court Faculty Village - western joined pair",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600611C-a5bb4f8f72",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Pine Court Faculty Village - eastern joined pair",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/16001511600611C-50fbc7ea98",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Gatehouse",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-143655d070",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Feroe House \u2014 Head of School Residence",
+      "study": "runtime/campus-reconstruction/feroe-v7-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/feroe-v7-2x/native-review.json",
+        "sha256": "5a1487096267b8ba2d138041f3a0b85716bc1c72406a9dfe80ab1db357020fc1",
+        "archive_sha256": "2068e58976d52ac27ec50b60eb4fbd8eefd006d529b22ceefa2dfda9cd9709fa",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "archive_sha256": "2068e58976d52ac27ec50b60eb4fbd8eefd006d529b22ceefa2dfda9cd9709fa",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/feroe-v7-2x-20260908/chapel-native-qa-report.json",
+          "native_report_sha256": "a5c1cbff54298497f36d1167db60043060731dbc25e65de9420485d1e2ac07d4",
+          "reviewer": "root, independent native inspection after Astra modeled and audited the repair",
+          "views_inspected": [
+            {
+              "name": "feroe-west-bay-close",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\feroe-v7-2x-20260908\\screenshots\\feroe-west-bay-close.png",
+              "sha256": "90d52c737a2c76234247d2169723096b770c6588e357383f555e72045ad64687"
+            },
+            {
+              "name": "feroe-north-entry",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\feroe-v7-2x-20260908\\screenshots\\feroe-north-entry.png",
+              "sha256": "d65eca6223ed757ebd9bc797db46bbfc45897fe36fb2b79865ff91d5f152fe7b"
+            },
+            {
+              "name": "feroe-west-north-frame-joint",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\feroe-v7-2x-20260908\\screenshots\\feroe-west-north-frame-joint.png",
+              "sha256": "4c755bd4f04bea64fcc8dba048408c6ef25972fea72d4f22b9032848802459bf"
+            },
+            {
+              "name": "feroe-south-frame-backing",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\feroe-v7-2x-20260908\\screenshots\\feroe-south-frame-backing.png",
+              "sha256": "30d910a5b218912eed54a0addb29912b186797956efc78df776207fdd8cacf53"
+            }
+          ],
+          "findings": [
+            "West bay and north entry retain the existing reviewed silhouette and pane locations visible on those facades.",
+            "West/north close view shows connected inner pane returns seated against the pale jamb, sill and head with no visible daylight seam.",
+            "South sash close view shows the repaired perimeter contacting its backing without the former stray interior glass branches.",
+            "The native views agree with the bounded occupied-shape audit; no new roof geometry was introduced."
+          ],
+          "acceptance_scope": "Accept the v6-to-v7 frame closure repair for integration with the existing source and material limits. This is not a claim of exact photographic completion.",
+          "remaining_limits": [
+            "Unseen rear and side window schedules and entrance levels remain interpretations recorded in the profile.",
+            "Vanilla glass borders, coarse ornamental posts, pane recess and quarter-grid cornice steps remain visible approximations.",
+            "The round oculus has a coarse beveled silhouette; its unchanged occupied shape was checked separately by the builder.",
+            "Bare-earth exterior grade does not establish concealed finished thresholds or retaining-wall details."
+          ]
+        }
+      },
+      "source_archive_sha256": "2068e58976d52ac27ec50b60eb4fbd8eefd006d529b22ceefa2dfda9cd9709fa"
+    },
+    {
+      "name": "East Campus Faculty Village - southwest duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-ddefd3570f",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - west south-middle duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-b790426980",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - west north-middle duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-c0e2b642d9",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - northwest duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-8e22af513e",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village \u2014 Unit 3 south single house",
+      "study": "runtime/campus-reconstruction/east-faculty3-v8-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/east-faculty3-v8-2x/native-review.json",
+        "sha256": "06265f93e6ad3c19979e4a1f510a8035cf698ad95fc1a6ddb99bf7bb0a5504f4",
+        "archive_sha256": "c5684ae8cb872239def883b0f0e2c3c00040fe47223416b6cf4f95ef3141fbc8",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "date": "2026-09-08",
+          "study_revision": "v8",
+          "sample_blocks_sha256": "c5684ae8cb872239def883b0f0e2c3c00040fe47223416b6cf4f95ef3141fbc8",
+          "native_report": "runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\chapel-native-qa-report.json",
+          "native_report_sha256": "c004e0c3d7fbb4fd2b852305e6a3de884b2d97b01024e8b375f0aeddc0a728c8",
+          "views_inspected": [
+            {
+              "name": "east3-photo-southwest",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-photo-southwest.png",
+              "sha256": "bfa6fa7d9213b18526dad2d2644818524be25f6c7182f18f9dce3f8fd2075c95"
+            },
+            {
+              "name": "east3-south-two-gables",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-south-two-gables.png",
+              "sha256": "b3acceb9b2d7eca491a7f110913b8cdaa9fcebdfbb7ba7fb799e5698824e66a7"
+            },
+            {
+              "name": "east3-west-porch-chimney",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-west-porch-chimney.png",
+              "sha256": "ae297ff2b079ebe354e37b0813051f1d13f5fd537fd051f06e70352ec2d819c6"
+            },
+            {
+              "name": "east3-entrance-close",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-entrance-close.png",
+              "sha256": "a86cfa79be9104d10212dc2b254ee3e258037c006e26bda4b0f29f81a1728b76"
+            },
+            {
+              "name": "east3-roof-audit",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-roof-audit.png",
+              "sha256": "08d6d5e947a5ad78637877508f40d4827dccd060d607ca31ec7a7c15e094ce4b"
+            },
+            {
+              "name": "east3-unseen-east-north-audit",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\east-faculty3-v8-2x-20260908\\screenshots\\east3-unseen-east-north-audit.png",
+              "sha256": "41789ea3a5ed6f09612cf032078b1ad7fcdaf87e382a4abc07d6dba649d53065"
+            }
+          ],
+          "accepted_findings": [
+            "Entrance view confirms the right-bay sky slit is closed. Root independently confirmed this finding.",
+            "Southwest and entrance views show the seven bevelled gable caps with retained roof contact.",
+            "Connected outer white pane sheets and concealed cap backing are retained; exported perimeter and joint reports have zero defects."
+          ],
+          "material_decision": {
+            "verifier": "Sol xhigh /root/reference_research",
+            "packet": "runtime\\research\\sol-reference-20260908\\east-faculty-unit3-material-review.json",
+            "sha256": "47a28ee602e94c56923ebeb87e5d707b0a0e9f081d2eb414e8225a42f8012dd0",
+            "decision": "Retain white_terracotta facade and oak_planks only in the two observed gable-tip regions. No audited original vanilla alternative improves the combined native colour/texture compromise."
+          },
+          "acceptance_scope": "Integrate the individual measured-footprint Unit3 study with its documented photo-interpreted south/west geometry. This is bounded acceptance of the closed construction and native-reviewed proxy, not a claim of exact photographic replication.",
+          "remaining_limits": [
+            "Smooth warm pink-taupe facade loses the photographed fine beige horizontal lap lines.",
+            "Oak gable-tip infill retains a mustard cast and lacks the actual shingle/fishscale profile.",
+            "Vanilla pane mesh remains0.25m inside the full-block facade face at2blocks/m; there is no additional full-cell setback.",
+            "Quarter-grid rake and stone-brick roof grain do not reproduce all fine gray-brown weathering.",
+            "Porch posts remain0.5m wide; exact camera registration, sash dimensions and authored two-gable placement are photo estimates.",
+            "North/east elevations remain unresolved and receive no invented mirrored window rows."
+          ],
+          "geometry_validation": "geometric-validation.json",
+          "perimeter_validation": "pane-perimeter-validation.json"
+        }
+      },
+      "source_archive_sha256": "c5684ae8cb872239def883b0f0e2c3c00040fe47223416b6cf4f95ef3141fbc8"
+    },
+    {
+      "name": "East Campus Faculty Village - north middle single house",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-e070cb1680",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - northeast single house",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160006438008-5e66af9ae7",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lehrman '56 Pavilion - south round viewing pavilion",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-081aa7dcac",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lehrman '56 Pavilion - north service bar",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/160015116006-f7611d45c7",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Hillhouse & Moore Business Office \u2014 individually observed west elevation",
+      "study": "runtime/campus-reconstruction/business-office-v4-2x",
+      "margin_m": 0.5,
+      "detail_status": "individual_photo_study",
+      "native_review": {
+        "status": "accepted_for_bounded_integration",
+        "path": "runtime/campus-reconstruction/business-office-v4-2x/native-review.json",
+        "sha256": "7c2a71f7992caee6dc6416c0777dd7bec1f7961bbe2c2b69d6d54a995ca23fab",
+        "archive_sha256": "bf87cc2451ad924924a0fc437479307819730afd3fb3ba55935fa0cff6308a4a",
+        "verdict": {
+          "status": "accepted_for_bounded_integration",
+          "date": "2026-09-08",
+          "study_revision": "v4",
+          "sample_blocks_sha256": "bf87cc2451ad924924a0fc437479307819730afd3fb3ba55935fa0cff6308a4a",
+          "previous_native_verdict": "runtime/campus-reconstruction/business-office-v2-2x/native-review.json",
+          "previous_native_verdict_sha256": "925c23802c7eef75fec6718966744088323bf9e2783baaf11c2a9461db22f0ac",
+          "material_addendum": "runtime\\research\\sol-reference-20260908\\hillhouse-moore-office-native-material-addendum.json",
+          "material_addendum_sha256": "f513d3bfcf2051bb1a85dbf1094228bf2d1f0fddc89ef1f2fdd2880614725325",
+          "material_decision": "Sol verified ordinary andesite as the continuous rough-render proxy; exact real substrate remains unresolved.",
+          "exported_changes": [
+            "V3: terrace corner forms one reciprocal connected eight-column L, with six bounded dark local post feet.",
+            "V4: exactly 4990 facade-role states changed from polished_andesite to andesite; every coordinate, role and all other states match v3."
+          ],
+          "required_native_comparisons": [
+            "office-primary-west and office-west-sash-close: verify removal of explicit square borders and compare fine rough render, trim contrast and remaining shade limitations.",
+            "office-north-terrace: verify continuous corner and removal of the heavy white pedestal.",
+            "Retain source qualifications for bay sash edge width, estimated cap and unseen elevations."
+          ],
+          "geometry_validation": "geometric-validation.json",
+          "perimeter_validation": "pane-perimeter-validation.json",
+          "exact_state_delta_validation": "material-delta-validation.json",
+          "archive_sha256": "bf87cc2451ad924924a0fc437479307819730afd3fb3ba55935fa0cff6308a4a",
+          "reviewer": "root, independent native inspection after Astra modeled and geometrically audited the revision",
+          "native_report": "runtime/campus-reconstruction/chapel-native-qa/runs/business-office-v4-2x-20260908/chapel-native-qa-report.json",
+          "native_report_sha256": "5c7b98b59b7942d0881a7963617f8655619bf7c9b5dbc32eb4aebd871239fea7",
+          "views_inspected": [
+            {
+              "name": "office-primary-west",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-primary-west.png",
+              "sha256": "1864ac4d719f3b024327d1cbf8823caa1e4e8ee8ebd0d4308d7db4b71f613f26"
+            },
+            {
+              "name": "office-west-sash-close",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-west-sash-close.png",
+              "sha256": "f023ccc61aa09c9322b40e1c346d3a6bcef0703a73a1a36aca2f99f403aa86cd"
+            },
+            {
+              "name": "office-polygonal-bay",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-polygonal-bay.png",
+              "sha256": "c2d27409d43f3246d4f25fb466478b9b021ef9850dfa5e7e7f815f2c27d645f4"
+            },
+            {
+              "name": "office-north-terrace",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-north-terrace.png",
+              "sha256": "54da2023e7053aff2c6808cd297c3f2f08b6e2b804b52c541a0b57445db2a762"
+            },
+            {
+              "name": "office-roof-audit",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-roof-audit.png",
+              "sha256": "99c4c2ea386c86e5dfb61653c4362b7e257abb71b85176651a1ec6d5c5698d29"
+            },
+            {
+              "name": "office-unseen-east-south",
+              "screenshot": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\chapel-native-qa\\runs\\business-office-v4-2x-20260908\\screenshots\\office-unseen-east-south.png",
+              "sha256": "84f3545f1407b9670712b851e5c99dc38f9bbd169cee6e8a26386c45b9c94b9f"
+            }
+          ],
+          "findings": [
+            "All six native views inspected. Ordinary andesite removes the previous explicit polished-block borders; its continuous rough texture follows the Sol material addendum.",
+            "The west facade retains the three upper singles, lower single and wide three-sash aperture region, green hoods and two-storey polygonal bay without visible daylight seams at the pane perimeter.",
+            "North terrace rail now has a reciprocal connected corner with supported dark post feet; the large white pedestal is removed.",
+            "Roof audit shows the retained source roof mass and bounded photographed bay overlay. No material-swap geometry change is visible."
+          ],
+          "acceptance_scope": "Accept the sourced west/bay study, repaired terrace and bounded v4 material change as a detailed replacement for the measured envelope. This is not photographic completion of the building.",
+          "remaining_limits": [
+            "The original andesite texture remains darker/coarser in native shade than the photographed warm fine render; the actual render substrate is unresolved.",
+            "Thin white sash jambs, internal triple-window divisions and curved green hood profiles are simplified at the half-metre grid. Native glass border repetition and thick diagonal pane returns remain visible.",
+            "The bay cap is a bounded photo-authored interpretation replacing fourteen ground-level source-face columns; other 1262 source-height controls remain unchanged.",
+            "East and south elevations are source-unresolved and remain blank rather than carrying a verified opening schedule. Concealed foundation/threshold levels and planting remain incomplete."
+          ]
+        }
+      },
+      "source_archive_sha256": "bf87cc2451ad924924a0fc437479307819730afd3fb3ba55935fa0cff6308a4a"
+    },
+    {
+      "name": "Kipp '46 Pavilion - Reese '75 Tennis Center",
+      "study": "runtime/campus-reconstruction/campus-developed-ground-v6-2x/pavilions/kipp_46_pavilion",
+      "margin_m": 0.5,
+      "detail_status": "interpreted_structure"
+    },
+    {
+      "name": "Frank Puccio '66 Press Box and filming platform - Madden Stadium",
+      "study": "runtime/campus-reconstruction/campus-developed-ground-v6-2x/pavilions/madden_puccio_66_press_box",
+      "margin_m": 0.5,
+      "detail_status": "interpreted_structure"
+    }
+  ],
+  "camera_views": [
+    {
+      "name": "quad-reference",
+      "eye_xz_navd88_m": [
+        111.4828046019539,
+        33.865086832376775,
+        71.4
+      ],
+      "target_xz_navd88_m": [
+        51.127509105774436,
+        47.657777127198116,
+        76.7
+      ],
+      "fov": 65
+    },
+    {
+      "name": "quad-straight",
+      "eye_xz_navd88_m": [
+        73.42338560662442,
+        -0.797293722598873,
+        69.1
+      ],
+      "target_xz_navd88_m": [
+        56.8257038629857,
+        49.53675996610061,
+        76.8
+      ],
+      "fov": 70
+    },
+    {
+      "name": "ryan-west-front",
+      "eye_xz_navd88_m": [
+        101.12953249694922,
+        13.197215662911127,
+        72.0
+      ],
+      "target_xz_navd88_m": [
+        124.89084186094158,
+        23.75184390405013,
+        75.0
+      ],
+      "fov": 72
+    },
+    {
+      "name": "ryan-central-entry",
+      "eye_xz_navd88_m": [
+        118.95051451994348,
+        21.113186843765376,
+        71.0
+      ],
+      "target_xz_navd88_m": [
+        125.80473837494128,
+        24.157791144093938,
+        72.0
+      ],
+      "fov": 80
+    },
+    {
+      "name": "chapel-south-threshold",
+      "eye_xz_navd88_m": [
+        -13.233265707561317,
+        34.42209579199212,
+        69.0
+      ],
+      "target_xz_navd88_m": [
+        -4.1386635116290975,
+        27.69244417413367,
+        68.0
+      ],
+      "fov": 76
+    },
+    {
+      "name": "chapel-east-walk-join",
+      "eye_xz_navd88_m": [
+        15.246489919178714,
+        12.996328140839697,
+        68.0
+      ],
+      "target_xz_navd88_m": [
+        3.378299558835712,
+        11.22261520728437,
+        67.0
+      ],
+      "fov": 76
+    },
+    {
+      "name": "campus-context-warmup",
+      "eye_xz_navd88_m": [
+        135.15373571603476,
+        -79.84026378964585,
+        78.0
+      ],
+      "target_xz_navd88_m": [
+        102.67854307726664,
+        -84.98382900016864,
+        63.0
+      ],
+      "fov": 68
+    },
+    {
+      "name": "sweeney-east-campus",
+      "eye_xz_navd88_m": [
+        135.15373571603476,
+        -79.84026378964585,
+        78.0
+      ],
+      "target_xz_navd88_m": [
+        102.67854307726664,
+        -84.98382900016864,
+        63.0
+      ],
+      "fov": 68
+    },
+    {
+      "name": "sweeney-northeast-campus",
+      "eye_xz_navd88_m": [
+        122.95790477641683,
+        -124.29542893040602,
+        77.0
+      ],
+      "target_xz_navd88_m": [
+        92.74140843477656,
+        -99.71976314419302,
+        65.0
+      ],
+      "fov": 64
+    },
+    {
+      "name": "mercer-south-campus",
+      "eye_xz_navd88_m": [
+        -17.339788657987594,
+        -50.33221363397725,
+        76.0
+      ],
+      "target_xz_navd88_m": [
+        -1.3619611154672118,
+        -87.28771426678531,
+        62.0
+      ],
+      "fov": 70
+    },
+    {
+      "name": "mercer-north-campus",
+      "eye_xz_navd88_m": [
+        6.9290655316650245,
+        -139.63519631832762,
+        72.0
+      ],
+      "target_xz_navd88_m": [
+        8.425949003755633,
+        -117.12388050003342,
+        63.0
+      ],
+      "fov": 70
+    },
+    {
+      "name": "day-north-campus",
+      "eye_xz_navd88_m": [
+        65.35911209181839,
+        -131.39325122154912,
+        75.0
+      ],
+      "target_xz_navd88_m": [
+        62.3242834700379,
+        -112.23209741400345,
+        61.8
+      ],
+      "fov": 65
+    },
+    {
+      "name": "tuck-mercer-passage",
+      "eye_xz_navd88_m": [
+        49.49782727796345,
+        -120.74338530437556,
+        55.31
+      ],
+      "target_xz_navd88_m": [
+        27.768683784870422,
+        -124.18494353526064,
+        57.0
+      ],
+      "fov": 74
+    },
+    {
+      "name": "sweeney-davy-approach",
+      "eye_xz_navd88_m": [
+        108.32173770765085,
+        -88.13989528014481,
+        56.81
+      ],
+      "target_xz_navd88_m": [
+        103.02426324500554,
+        -87.16662023288387,
+        62.2
+      ],
+      "fov": 74
+    },
+    {
+      "name": "annan-campus-roof-context",
+      "eye_xz_navd88_m": [
+        71.34351349972194,
+        -143.607461789125,
+        76.0
+      ],
+      "target_xz_navd88_m": [
+        95.72285308451991,
+        -137.72122348192894,
+        64.0
+      ],
+      "fov": 72
+    },
+    {
+      "name": "annan-campus-west-close",
+      "eye_xz_navd88_m": [
+        79.42599546470015,
+        -140.30239215509275,
+        63.0
+      ],
+      "target_xz_navd88_m": [
+        84.1668994995568,
+        -139.55150672289963,
+        61.0
+      ],
+      "fov": 78
+    },
+    {
+      "name": "annan-campus-south-oblique",
+      "eye_xz_navd88_m": [
+        74.8403144281797,
+        -117.74199478644482,
+        67.0
+      ],
+      "target_xz_navd88_m": [
+        86.93182111987117,
+        -126.96400465006892,
+        61.0
+      ],
+      "fov": 74
+    },
+    {
+      "name": "annan-campus-tuck-gap",
+      "eye_xz_navd88_m": [
+        83.13073534195992,
+        -157.93999126726905,
+        61.0
+      ],
+      "target_xz_navd88_m": [
+        78.90700478587368,
+        -131.27240607120032,
+        59.3
+      ],
+      "fov": 76
+    }
+  ],
+  "uncertainties": [
+    "Working reconstruction: 23 measured envelopes still require individual facade development; their presence is not a photographic completion claim.",
+    "Athey frame v4 improves native-visible glazing and sill closure, but retains 179 open/mixed conservative ray candidates and unresolved Dining Hall/hidden-elevation detail. This is bounded context acceptance.",
+    "Individually authored study cameras and observed material zones are retained. Concealed elevations remain unresolved where their profiles say so.",
+    "Original Minecraft textures and ordinary construction blocks only; thin glazing, stair/slab trim and measured physical coordinates share one 2 blocks/metre scale.",
+    "Ground uses a native 0.5m DEM grid with block tops at NAVD88. Dell pond is levelled to measured 55.0m; surrounding slopes are retained.",
+    "Field paths, planting and sports structures retain the uncertainty documented in their source profiles. Campus-wide visual acceptance is pending."
+  ],
+  "landscape": "server-assets/hill-quad-landscape.json",
+  "reconstruction_status": {
+    "components": 44,
+    "individual_photo_studies": 17,
+    "individual_studies_replaced_this_revision": 3,
+    "major_building_frame_refinements": 0,
+    "remaining_measured_envelopes": 23,
+    "visual_review": "pending"
+  },
+  "environment": {
+    "plan": "runtime\\campus-reconstruction\\core-demo-20260927\\environment\\plan-v16-base\\environment-plan.json",
+    "sha256": "c8e6943a9fe5d36d651caa1a55fdf4f7139fdc282a654cd76ec074c8063cc981",
+    "base_manifest_sha256": "bcf724257ea3c012556f28fd0a1fe41046815c4bd04695cd3b59f80197fe429d"
+  },
+  "building_amendment": {
+    "source": "E:\\projects\\Hill-server\\runtime\\campus-reconstruction\\campus-context-v14-2x",
+    "manifest_sha256": "d4b8b02734b98e77ef0e0e1defccc41eaa1167d27d4e2c60162c96ccf4dd893e",
+    "method": "exact_reviewed_study_delta"
+  }
+}

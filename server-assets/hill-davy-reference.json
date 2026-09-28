@@ -1,0 +1,191 @@
+{
+  "name": "Davy Hall — pond terrace and gabled facades",
+  "revision": "2026-09-15-davy-11-2x-straight-east-west-walls-backed-door-thin-gable-caps",
+  "parent_id": "16001511600633C-c14400ca75",
+  "school_names": [
+    "Davy Hall"
+  ],
+  "school_map_numbers": [
+    8
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_davy_details",
+  "geometry": {
+    "origin_xz_m": [
+      0,
+      0
+    ],
+    "axis_degrees": 9,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 56.25
+  },
+  "materials": {
+    "facade": "stone_bricks",
+    "foundation": "stone_bricks",
+    "roof_family": "deepslate_tile",
+    "trim": "quartz_block"
+  },
+  "material_review": {
+    "status": "supplied Sol xhigh decisions applied",
+    "facade": "stone_bricks",
+    "roof": "deepslate_tile",
+    "trim": "pale quartz",
+    "existing_rail_runs": "pale_oak_fence",
+    "materials_are_visual_proxies": true
+  },
+  "roof_railing_reference_packet": {
+    "path": "runtime/research/sol-reference-20260908/davy-roof-railings-handoff.json",
+    "sha256": "3fc2ae3b556d518d8b0405c36e1ce4ad1fa2130765f32b291eb3a066da2e9905",
+    "research_model": "gpt-5.6-sol",
+    "reasoning_effort": "xhigh"
+  },
+  "source_face_fingerprint_packet": {
+    "path": "runtime/research/davy-reference-20260915/verified-provenance/davy-source-face-fingerprint-provenance.json",
+    "sha256": "d8736a40b231e1322847321785cec2cf819d8a23c3e75f1add6fbc6d6328bc73",
+    "decision": "Byte-exact frozen copy of root-reconciled packet, validating all exterior and interior rings; stale prior hash retained only in historical studies."
+  },
+  "native_refinement": {
+    "basis": "Root and Astra inspected all six native v8 views against supplied drone272; v8 remains rejected.",
+    "east_ridges_navd88_m": 62.0,
+    "previous_east_ridges_navd88_m": 61.4,
+    "east_ridge_status": "Root-authorized bounded photo interpretation; seven existing patch footprints unchanged. Source heights and gradients outside patches stay exact. West ridge interpretation remains61.4m.",
+    "glazed_height_m": 2.0,
+    "glazed_width_m": 1.0,
+    "glazing_status": "Native-driven interpretation of tall narrow sashes and supplied arch rise; no width increase. Full-block horns beyond the head and sill removed.",
+    "door_transoms": "Five transparent white stained glass blocks within existing reveals physically join thin door tops to upper panes; no opaque interior cap band.",
+    "v9_correction": "Replace full-height white gable risers by top-only sloped caps over masonry; retain exact central door leaf plane X264; use pale front-only jambs and masonry deep returns."
+  },
+  "material_reference_packet": {
+    "path": "runtime/research/sol-reference-20260908/davy-material-correction.json",
+    "sha256": "39352d2aa80b3dc8f3f745c96a53a1f8e9568d6b2a7d657d971736d44cd6f5d4",
+    "research_model": "gpt-5.6-sol",
+    "reasoning_effort": "xhigh",
+    "decision": "One coherent stone-brick field approximates observed coarse horizontal masonry courses; real product unresolved. Original deepslate-tile roof and pale quartz trim retained."
+  },
+  "window_reveal": {
+    "glass_recess_m": 0.5,
+    "trim_width_m": 0.2,
+    "trim_family": "smooth_quartz",
+    "trim_block": "smooth_quartz",
+    "glass_block": "white_stained_glass_pane",
+    "status": "Individually bounded one-cell inset behind contacting front arch bevel; source opening dimensions quantized without widening."
+  },
+  "evidence": [
+    {
+      "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+      "frames_seconds": [
+        270,
+        272
+      ],
+      "local": "runtime/research/campus-full-detail-20260905/davy-pond-drone272-detail.png",
+      "supports": "Seven white gables, four plain windows, gray walls, raised pond terrace and central open porch"
+    }
+  ],
+  "uncertainties": [
+    "Window positions are scaled from drone imagery, with about 1m uncertainty; 1.15m source width quantizes to 1m clear glazing at 2 blocks/m.",
+    "Seven east gables and four plain windows are directly observed. West roof projections remain provisional symmetry; west apertures are unresolved and are not mirrored.",
+    "56.25m entrance and deck level is a DEM/photo interpretation, not a building survey.",
+    "Four pale porch posts are interpreted support locations fitted to the actual retained source canopy and authored outer hood; exact post dimensions and registration remain unmeasured.",
+    "Ordinary quartz stairs approximate the round arches and thin fascia; original block shapes impose visible quarter/half-metre steps.",
+    "The rail substrate is unresolved; pale oak is Sol's painted-white appearance proxy, not an assertion of real wood species."
+  ],
+  "camera_views": [
+    {
+      "name": "davy-pond-front",
+      "eye_uv_navd88_m": [
+        146,
+        -116,
+        60
+      ],
+      "target_uv_navd88_m": [
+        116,
+        -116,
+        59
+      ],
+      "fov": 80
+    },
+    {
+      "name": "davy-north-porch",
+      "eye_uv_navd88_m": [
+        130,
+        -156,
+        59
+      ],
+      "target_uv_navd88_m": [
+        112,
+        -134,
+        59
+      ],
+      "fov": 65
+    },
+    {
+      "name": "davy-pond-window-close",
+      "eye_uv_navd88_m": [
+        126,
+        -129,
+        57.5
+      ],
+      "target_uv_navd88_m": [
+        116.6,
+        -129,
+        58.3
+      ],
+      "fov": 65
+    },
+    {
+      "name": "davy-sports-west",
+      "eye_uv_navd88_m": [
+        87,
+        -116,
+        59
+      ],
+      "target_uv_navd88_m": [
+        103,
+        -116,
+        59
+      ],
+      "fov": 80
+    },
+    {
+      "name": "davy-roof-source-planes",
+      "eye_uv_navd88_m": [
+        137,
+        -127,
+        77
+      ],
+      "target_uv_navd88_m": [
+        111,
+        -116,
+        61
+      ],
+      "fov": 72
+    },
+    {
+      "name": "davy-open-porch-close",
+      "eye_uv_navd88_m": [
+        128,
+        -120,
+        58
+      ],
+      "target_uv_navd88_m": [
+        117,
+        -115.6,
+        58.8
+      ],
+      "fov": 70
+    }
+  ],
+  "facade_refinement_packet": {
+    "path": "runtime/research/davy-reference-20260915/davy-facade-refinement-handoff.json",
+    "sha256": "436a58b349288faff817a2a3d2c8a1734369f836212920f3aac8c8d78dab04b0"
+  },
+  "straight_wall_control": {
+    "east_constant_u_m": 116.6,
+    "axis_degrees": 9,
+    "target_cell_center_error_m": 0.3,
+    "rule": "Nearest row cell with one inward step return; wall-only regularization below unchanged retained roof caps; central canopy preserved.",
+    "west_constant_u_m": 103.35,
+    "west_basis": "Median U103.3416 of ordinary measured west contour rows; root authorized below-eave regularization after native v9, without windows or roof alteration."
+  }
+}

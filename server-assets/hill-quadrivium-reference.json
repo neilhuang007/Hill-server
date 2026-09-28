@@ -1,0 +1,226 @@
+{
+  "name": "Shirley Quadrivium \u2014 historic halls and glazed link",
+  "revision": "2026-09-15-quadrivium-v8-tinted-glazing-and-connected-arches",
+  "parent_id": "16001511600615C-ee30229dd5",
+  "school_names": [
+    "Shirley Quadrivium"
+  ],
+  "school_map_numbers": [
+    5
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_quadrivium_details",
+  "study_margin_m": 24,
+  "geometry": {
+    "origin_xz_m": [
+      117.53806453253866,
+      103.76844899678831
+    ],
+    "axis_degrees": -2.9518969078678134,
+    "main_roof_threshold_navd88_m": 71,
+    "entrance_floor_navd88_m": 63.0
+  },
+  "materials": {
+    "facade": "mud_bricks",
+    "foundation": "mud_bricks",
+    "roof_family": "stone_brick",
+    "trim": "smooth_quartz"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "trim_width_m": 0.23,
+    "trim_family": "smooth_quartz",
+    "trim_block": "smooth_quartz",
+    "glass_block": "gray_stained_glass_pane"
+  },
+  "material_decisions": [
+    {
+      "zone": "historic and modern brick walls",
+      "actual": "dark reddish brown brick",
+      "minecraft": "mud_bricks",
+      "evidence": "Three labelled facade samples in institutional-labelled-samples.json have raw CIEDE2000 3.589, 4.796 and 6.38 for mud bricks versus 6.737, 11.205 and 10.834 for red bricks. Minecraft mud bricks are an appearance proxy; the real walls are fired brick."
+    },
+    {
+      "zone": "historic limestone surrounds",
+      "actual": "limestone",
+      "minecraft": "smooth_quartz, smooth_quartz_stairs, smooth_quartz_slab",
+      "evidence": "Architect and contractor specify limestone. Native pale-surround coupons favour restrained smooth quartz over coarse calcite or diorite. No exact vanilla limestone exists; no sandstone is asserted or used."
+    },
+    {
+      "zone": "new link pale wall panels",
+      "actual": "pale small-unit coursed masonry, exact composition unresolved",
+      "minecraft": "quartz_bricks",
+      "evidence": "SMP new-link photograph visibly separates these small pale units from carved historic limestone."
+    },
+    {
+      "zone": "historic roof",
+      "actual": "weathered gray slate",
+      "minecraft": "stone_brick family",
+      "evidence": "Three photographed roof regions vary strongly with lighting; keep the light gray family instead of uniformly dark deepslate."
+    },
+    {
+      "zone": "central link glazing grid",
+      "actual": "thin dark metal framing",
+      "minecraft": "iron_bars with connected glass panes",
+      "evidence": "Native full-cube mullions were too heavy. Thin bars preserve connected window geometry; their metal colour remains an imperfect vanilla substitute."
+    },
+    {
+      "zone": "all dark glazed openings and fine divisions",
+      "actual": "clear/reflective glass with dark frames and sash",
+      "minecraft": "gray_stained_glass_pane fields; sparse black_stained_glass_pane divisions",
+      "evidence": "User explicit tinted-pane instruction and Sol appearance addendum e36916f6; reduce bright vanilla glass/iron lattice while preserving connected geometry."
+    }
+  ],
+  "evidence": [
+    {
+      "url": "https://smparchitects.com/project/the-shirley-quadrivium/",
+      "local": "runtime/research/hill-reference-20260904/quadrivium-new-link.jpg",
+      "supports": "Three-storey central glazed gable, pale side panels and matched brick"
+    },
+    {
+      "local": "runtime/research/hill-reference-20260904/quadrivium-historic.jpg",
+      "supports": "Paired curved bays, three gabled dormers, central pointed limestone portal"
+    },
+    {
+      "local": "runtime/research/hill-reference-20260904/quadrivium-end.jpg",
+      "supports": "East six-light groups, two pointed portals and stacked end-gable windows"
+    },
+    {
+      "local": "runtime/research/campus-full-detail-20260905/terrain-priority-building-approach-controls.json",
+      "supports": "North approach67.61\u201368.43m; south approach62.74\u201366.52m"
+    }
+  ],
+  "uncertainties": [
+    "Opening registration is interpreted; measured west wing has a genuine bend near U=-33.5 which is retained as two constant planes.",
+    "Roofer low frontage face 36 conflicts with photographed two-storey walls; straight wall paths continue above it while historic main roof faces remain preserved.",
+    "Rear opening rows are conservative interpretations, not verified photographic schedules.",
+    "Subvoxel limestone carving and historic sash mullions use a restrained quartz/iron-bar appearance proxy at two blocks per metre.",
+    "No native acceptance before inspection of this exact revision.",
+    "Glazed link and east-end windows re-registered to measured source ridge; older packet average-U positions are superseded by specific source geometry evidence."
+  ],
+  "camera_views": [
+    {
+      "name": "quadrivium-historic-west",
+      "eye_uv_navd88_m": [
+        -28,
+        -31,
+        70.5
+      ],
+      "target_uv_navd88_m": [
+        -28,
+        -6.8,
+        74.0
+      ],
+      "fov": 68
+    },
+    {
+      "name": "quadrivium-new-glazed-link",
+      "eye_uv_navd88_m": [
+        -2,
+        -27,
+        70.5
+      ],
+      "target_uv_navd88_m": [
+        -6.25,
+        -8.3,
+        75.5
+      ],
+      "fov": 65
+    },
+    {
+      "name": "quadrivium-east-historic",
+      "eye_uv_navd88_m": [
+        47,
+        -29,
+        70.5
+      ],
+      "target_uv_navd88_m": [
+        23,
+        -6,
+        74
+      ],
+      "fov": 70
+    },
+    {
+      "name": "quadrivium-east-end",
+      "eye_uv_navd88_m": [
+        62,
+        -3.1,
+        71.5
+      ],
+      "target_uv_navd88_m": [
+        44.2,
+        -3.1,
+        73.8
+      ],
+      "fov": 65
+    },
+    {
+      "name": "quadrivium-rear-grade",
+      "eye_uv_navd88_m": [
+        21,
+        34,
+        68
+      ],
+      "target_uv_navd88_m": [
+        6,
+        7,
+        72
+      ],
+      "fov": 80
+    },
+    {
+      "name": "quadrivium-bay-west-corner",
+      "eye_uv_navd88_m": [
+        -43,
+        -16,
+        71
+      ],
+      "target_uv_navd88_m": [
+        -39.0,
+        -9.0,
+        71.5
+      ],
+      "fov": 60
+    },
+    {
+      "name": "quadrivium-link-pane-corner",
+      "eye_uv_navd88_m": [
+        -11.5,
+        -14.3,
+        73
+      ],
+      "target_uv_navd88_m": [
+        -9.0,
+        -8.3,
+        72.7
+      ],
+      "fov": 60
+    }
+  ],
+  "reference_packet": {
+    "path": "runtime/research/quadrivium-reference-20260915/quadrivium-reference-packet-20260915.json",
+    "sha256": "7abc84d6531ec7dd559040d4c0027640efb0778eafed496f658d69820c8c28e0"
+  },
+  "material_review": {
+    "source": "September 15 source packet",
+    "scope": "Existing coherent ordinary vanilla families; sparse iron bars proxy subvoxel sash fields. No registry substitution."
+  },
+  "registration_corrections": {
+    "link_ridge_u_m": -6.25,
+    "link_front_v_m": -8.3,
+    "link_roof_source_faces": [
+      1,
+      21
+    ],
+    "link_roof_geometry_changed": false,
+    "east_end_window_v_m": -3.1,
+    "evidence": "Independent CityJSON extraction by Sol confirms source faces1/21 and their slanted front ridge U=-6.277,V=-8.318. Front glazing uses U=-6.25,V=-8.3, aligned within 0.04 m.",
+    "source_handoff_sha256": "263c45501a440734db4ebf915d114390c88c469b5e81e3b88319ca16f998d8a3"
+  },
+  "appearance_addendum": {
+    "path": "runtime/research/quadrivium-reference-20260915/quadrivium-v6-appearance-addendum-20260915.json",
+    "sha256": "e36916f67faf4161e0758549598a8b61202664ccee90e871f6cd1df1e569af24"
+  }
+}

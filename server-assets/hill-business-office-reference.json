@@ -1,0 +1,1765 @@
+{
+  "name": "Hillhouse & Moore Business Office \u2014 individually observed west elevation",
+  "revision": "2026-09-08-business-office-v4-2x",
+  "parent_id": "1600151000041C-510dc616b8",
+  "school_names": [
+    "Hillhouse & Moore Business Office"
+  ],
+  "school_map_numbers": [
+    49
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_business_office_details",
+  "study_margin_m": 18,
+  "roof_backing_metres": 0.3,
+  "geometry": {
+    "origin_xz_m": [
+      -202.97506878786803,
+      77.52887282145714
+    ],
+    "axis_degrees": 8.975271921128607,
+    "entrance_floor_navd88_m": 50.75,
+    "upper_floor_navd88_m": 53.75,
+    "attic_floor_navd88_m": 56.75,
+    "main_roof_threshold_navd88_m": 55.5,
+    "source_main_ridge_navd88_m": 61.246059,
+    "source_roof_rmse_m": 0.431629,
+    "main_west_wall_u_m": 1.8,
+    "main_west_wall_v_limits_m": [
+      3.8,
+      11.7
+    ],
+    "floor_status": "Functional interior level estimated from local terrain and two storeys; no photographed threshold is claimed."
+  },
+  "materials": {
+    "facade": "andesite",
+    "foundation": "andesite",
+    "roof_family": "deepslate_tile",
+    "trim": "quartz_block",
+    "glass": "white_stained_glass_pane",
+    "green_driphood": "waxed_weathered_cut_copper_slab",
+    "terrace_rail": "pale_oak_fence",
+    "terrace_foot": "deepslate_tile_slab"
+  },
+  "window_reveal": {
+    "glass_recess_m": 0,
+    "glass_block": "white_stained_glass_pane",
+    "trim_family": "quartz",
+    "trim_width_m": 0.12,
+    "status": "Original white pane edges approximate fine sash; no duplicate projecting opaque frame."
+  },
+  "material_review": {
+    "status": "appearance_proxy_verified_native_review_pending",
+    "verifier": "Sol xhigh /root/reference_research",
+    "packet": "runtime\\research\\sol-reference-20260908\\hillhouse-moore-business-office.json",
+    "packet_sha256": "089e33a46ec564e52a4064eef93183ca6e0566a4f42f3a341fae9f0a355a0ada",
+    "actual_vs_proxy": {
+      "method_note": "Photo illumination and white balance are unknown. CIEDE2000 values compare observed image appearance to original vanilla 26.1.2 texture averages; they do not identify substrate or paint.",
+      "zones": [
+        {
+          "zone": "rendered walls, all volumes unless later source contradicts",
+          "actual_evidence": "Direct west-elevation observation: rough/stippled warm gray stucco-like render; exact render system and substrate unresolved.",
+          "chosen_vanilla_proxy": "minecraft:andesite",
+          "texture_sha256": "7c7960dd3dd2084233907c1529dcbea0b8a2195fadaa608027f395b6f430fbd7",
+          "reason": "Andesite removes the explicit square border that dominates polished andesite at native 2x scale while retaining a fine irregular neutral-gray surface. It also improves the lit source ROI color result from raw/equal-L deltaE00 5.437/3.342 to 4.576/2.464. Its shaded result 3.305/3.292 is only slightly worse than polished andesite 2.747/2.744 and remains close. Pattern evidence controls the tie: a continuous rough render is more important than optimizing one shaded mean.",
+          "alternatives": [
+            {
+              "block": "minecraft:light_gray_concrete",
+              "reason": "Correct jointless finish family and quieter texture, but darker: 10.084/5.067 lit and 5.180/2.431 shaded."
+            },
+            {
+              "block": "minecraft:smooth_stone",
+              "reason": "Closest lit colour at 4.226/2.311, but its smooth profile and repeated side-edge treatment can contradict the visibly coarse render."
+            }
+          ],
+          "do_not_use": [
+            "brick as blanket wall",
+            "random gray patchwork",
+            "sandstone"
+          ],
+          "superseded_choice": "Polished andesite rejected after native v2: repeated bordered square units contradict the fine continuous rendered field."
+        },
+        {
+          "zone": "white sash, window surrounds, fascia and terrace rails",
+          "actual_evidence": "Directly observed white painted trim; shaded ROI appears blue gray and is not paint reflectance.",
+          "chosen_vanilla_proxy": "minecraft:quartz_block with quartz slabs/stairs; minecraft:white_stained_glass_pane for sash",
+          "texture_sha256": "63d3d5c7184b3f83b269933b306ea587bc28792c9c5118227b218cd4e3a6bd8c",
+          "reason": "Quartz supplies coherent warm-white construction shapes. The shaded ROI colour ranks smoother gray blocks better only because it is in shadow; semantic white-paint evidence controls this choice."
+        },
+        {
+          "zone": "thin dark green window caps/driphoods",
+          "actual_evidence": "Direct 6-pixel-high observation of a dark green metal-like profile; alloy and paint-versus-patina unresolved.",
+          "chosen_vanilla_proxy": "minecraft:waxed_weathered_cut_copper_slab/stairs",
+          "texture_sha256": "7fe4ff5274baa27d40c0170a81d4ae5612e97f71e01a4a9d5d78ad96a5e2ea0c",
+          "reason": "This is the catalogue's green metal construction family with thin shape variants. Its photograph DeltaE is poor under the deep local shadow, so use it sparingly as a profile rather than a broad field.",
+          "alternative": "minecraft:deepslate_tile_slab if native render makes weathered copper conspicuously bright/cyan; this keeps the observed darkness but loses the green cue."
+        },
+        {
+          "zone": "major pitched roofs",
+          "actual_evidence": "Only a clipped dark gray roof edge is visible; exact roofing product is unresolved.",
+          "chosen_vanilla_proxy": "minecraft:deepslate_tiles with slabs/stairs",
+          "texture_sha256": "4e0ff4aa76d467697383c776f94d855d3fc2a49a40363d3fa846e441003ebc57",
+          "reason": "Provisional dark overlapping-unit visual proxy with construction shapes. Do not infer it from the green driphood colour.",
+          "alternative": "minecraft:stone_bricks with slabs/stairs if native comparison shows deepslate excessively dark; actual product remains unclassified."
+        }
+      ],
+      "roi_controls": [
+        {
+          "id": "office_lit_rough_render",
+          "xyxy_px": [
+            2161,
+            270,
+            2335,
+            338
+          ],
+          "srgb_linear_mean": [
+            152.16,
+            148.12,
+            145.41
+          ],
+          "lab_d65_linear_mean": [
+            61.6233,
+            0.9697,
+            1.9581
+          ]
+        },
+        {
+          "id": "office_shaded_rough_render",
+          "xyxy_px": [
+            1060,
+            255,
+            1138,
+            328
+          ],
+          "srgb_linear_mean": [
+            137.73,
+            136.83,
+            131.22
+          ],
+          "lab_d65_linear_mean": [
+            56.9459,
+            -0.7411,
+            3.1261
+          ]
+        },
+        {
+          "id": "office_white_sash_trim",
+          "xyxy_px": [
+            1324,
+            550,
+            1337,
+            650
+          ],
+          "srgb_linear_mean": [
+            155.3,
+            163.34,
+            174.12
+          ],
+          "lab_d65_linear_mean": [
+            66.8057,
+            -0.6587,
+            -6.5398
+          ]
+        },
+        {
+          "id": "office_green_driphood",
+          "xyxy_px": [
+            1880,
+            390,
+            1945,
+            396
+          ],
+          "srgb_linear_mean": [
+            52.4,
+            61.47,
+            52.38
+          ],
+          "lab_d65_linear_mean": [
+            24.8893,
+            -5.8951,
+            4.3481
+          ]
+        }
+      ]
+    },
+    "modelling_shape_addendum": "Pale oak fence supplies narrow terrace balusters as in previously native-tested white-painted railing proxies; texture joints and off-white tone remain visible simplifications.",
+    "native_review": "runtime/campus-reconstruction/business-office-v2-2x/native-review.json",
+    "native_material_addendum": {
+      "path": "runtime\\research\\sol-reference-20260908\\hillhouse-moore-office-native-material-addendum.json",
+      "sha256": "f513d3bfcf2051bb1a85dbf1094228bf2d1f0fddc89ef1f2fdd2880614725325",
+      "decision": {
+        "zone": "facade and foundation wall field on every volume unless a later elevation source contradicts it",
+        "chosen_vanilla_proxy": "minecraft:andesite",
+        "texture": "assets/minecraft/textures/block/andesite.png",
+        "texture_sha256": "7c7960dd3dd2084233907c1529dcbea0b8a2195fadaa608027f395b6f430fbd7",
+        "shape_family": [
+          "andesite",
+          "andesite_stairs",
+          "andesite_slab",
+          "andesite_wall"
+        ],
+        "instruction": "Replace polished_andesite coherently in facade/foundation roles with andesite. Do not mix both textures and do not alter quartz trim, glass, green hood, or roof roles.",
+        "reason": "Andesite removes the explicit square border that dominates polished andesite at native 2x scale while retaining a fine irregular neutral-gray surface. It also improves the lit source ROI color result from raw/equal-L deltaE00 5.437/3.342 to 4.576/2.464. Its shaded result 3.305/3.292 is only slightly worse than polished andesite 2.747/2.744 and remains close. Pattern evidence controls the tie: a continuous rough render is more important than optimizing one shaded mean.",
+        "material_semantics": "Minecraft andesite is a visual rough-render proxy, not evidence that the real facade is stone."
+      },
+      "roi_comparison": [
+        {
+          "sample_id": "office_lit_rough_render",
+          "roi_xyxy_px": [
+            2161,
+            270,
+            2335,
+            338
+          ],
+          "mean_lab_d65": [
+            61.6233,
+            0.9697,
+            1.9581
+          ],
+          "candidates": [
+            {
+              "block": "andesite",
+              "delta_e_2000_raw": 4.576,
+              "delta_e_2000_equal_lightness": 2.464,
+              "delta_l_star": -4.35,
+              "pattern": "irregular rough field without unit border"
+            },
+            {
+              "block": "smooth_stone",
+              "delta_e_2000_raw": 4.226,
+              "delta_e_2000_equal_lightness": 2.311,
+              "delta_l_star": 4.231,
+              "pattern": "dark edge repeats at every texture tile; reject after native-pattern review"
+            },
+            {
+              "block": "polished_andesite",
+              "delta_e_2000_raw": 5.437,
+              "delta_e_2000_equal_lightness": 3.342,
+              "delta_l_star": -4.822,
+              "pattern": "explicit square bordered unit; reject"
+            },
+            {
+              "block": "light_gray_concrete",
+              "delta_e_2000_raw": 10.084,
+              "delta_e_2000_equal_lightness": 5.067,
+              "delta_l_star": -9.474,
+              "pattern": "jointless but too dark and olive"
+            },
+            {
+              "block": "white_concrete",
+              "delta_e_2000_raw": 18.03,
+              "delta_e_2000_equal_lightness": 5.002,
+              "delta_l_star": 23.255,
+              "pattern": "quiet finish but too bright/cool and collapses white-trim contrast"
+            }
+          ]
+        },
+        {
+          "sample_id": "office_shaded_rough_render",
+          "roi_xyxy_px": [
+            1060,
+            255,
+            1138,
+            328
+          ],
+          "mean_lab_d65": [
+            56.9459,
+            -0.7411,
+            3.1261
+          ],
+          "candidates": [
+            {
+              "block": "polished_andesite",
+              "delta_e_2000_raw": 2.747,
+              "delta_e_2000_equal_lightness": 2.744,
+              "delta_l_star": -0.145,
+              "pattern": "color-close but wrong square bordered construction pattern"
+            },
+            {
+              "block": "andesite",
+              "delta_e_2000_raw": 3.305,
+              "delta_e_2000_equal_lightness": 3.292,
+              "delta_l_star": 0.328,
+              "pattern": "selected coherent rough field"
+            },
+            {
+              "block": "stone",
+              "delta_e_2000_raw": 4.959,
+              "delta_e_2000_equal_lightness": 3.084,
+              "delta_l_star": -4.095,
+              "pattern": "fine but too dark and reads generic stone"
+            },
+            {
+              "block": "light_gray_concrete",
+              "delta_e_2000_raw": 5.18,
+              "delta_e_2000_equal_lightness": 2.431,
+              "delta_l_star": -4.797,
+              "pattern": "too dark/olive despite quiet surface"
+            },
+            {
+              "block": "smooth_stone",
+              "delta_e_2000_raw": 8.281,
+              "delta_e_2000_equal_lightness": 3.083,
+              "delta_l_star": 8.909,
+              "pattern": "too bright in shade and repeats a dark tile edge"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": "office_streetview_2019",
+      "url": "https://www.google.com/maps/@?api=1&map_action=pano&pano=MaglwSohOgIjzpPSF6LNTA&heading=90&pitch=0&fov=70",
+      "file": "runtime/research/campus-full-detail-20260905/business-office-bailey-streetview-2019.jpg",
+      "sha256": "e8d47bd0d7a15cc14c3440265153151999ad8adfe3bd742aa5dd7746897010ba",
+      "capture": "Google Street View, 2019-08; pano MaglwSohOgIjzpPSF6LNTA; camera 40.244382,-75.6376416; heading 90 degrees, pitch 0, FOV 70",
+      "role": "direct current-building observation of the Bailey-facing west elevation; capture date is not evidence of 2026 paint condition"
+    },
+    {
+      "id": "school_map_2026",
+      "url": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+      "file": "runtime/research/hill-reference-20260904/campus-map-2026.pdf",
+      "sha256": "a815cf8e058df9bdbb2997fba3a272249508e7175c536b907f984e9966477e59",
+      "role": "first-party current identity and map number; illustrated geometry is not survey geometry"
+    },
+    {
+      "id": "facilities_2021",
+      "url": "https://resources.finalsite.net/images/v1633097238/thehillorg/ewtimjvxagjkgblsqf5q/fy22campusmapgraphic.pdf",
+      "file": "runtime/research/campus-priority-20260905/campus-map-2021-address.pdf",
+      "sha256": "119a7cbf22863d593c47a32af7eb6a0604b5e6c6b8668d421ae8ec32c37355a5",
+      "role": "first-party address/use crosswalk"
+    },
+    {
+      "id": "measured_housing_record",
+      "url": "https://services1.arcgis.com/kOChldNuKsox8qZD/arcgis/rest/services/Montgomery_County_Building_Outlines/FeatureServer/6",
+      "file": "runtime/research/campus-full-detail-20260905/housing-facades.json",
+      "sha256": "23138b4c0c4d4d7945d2e215477195825e5b77aa6d851eabd01c7eb29f4d3dda",
+      "record_locator": "building_records[parent_id=1600151000041C-510dc616b8]",
+      "roof_source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+      "role": "exact transformed county footprint, unmodified Roofer CityJSON roof planes, and measured local frame"
+    },
+    {
+      "id": "major_roof_masks",
+      "file": "runtime/research/campus-full-detail-20260905/housing-major-roof-face-masks.json",
+      "sha256": "dd5fd45ce1938e3c2ca05f553fa3e3fda70608aafb2f43f5cf970c3db7baf658",
+      "record_locator": "records[parent_id=1600151000041C-510dc616b8]"
+    },
+    {
+      "id": "entrance_ground_profile",
+      "file": "runtime/research/campus-full-detail-20260905/housing-entrance-ground-profiles.json",
+      "sha256": "309e11f6da2f9101b0a145a8b2e4df90b9bd5b50ceef5cc80cfa954c7aa68178",
+      "record_locator": "records[parent_id=1600151000041C-510dc616b8]"
+    },
+    {
+      "id": "material_roi_register",
+      "file": "runtime/research/campus-full-detail-20260905/housing-material-appearance.json",
+      "sha256": "65c09968ec5d7618191ff0c46337a7bfe82715ff1ffad7e98f64e9825f989071",
+      "role": "original-photo ROI coordinates and image-only colour statistics"
+    },
+    {
+      "id": "vanilla_26_1_2_catalogue",
+      "file": "runtime/research/campus-material-audit-20260905/vanilla-construction-candidates.json",
+      "sha256": "3567cfef8042cda27bc5f76627d7fe3cfb5a4f28daca25b9e914661af1e6dec1",
+      "client_jar": "C:/Users/neil_/AppData/Roaming/.minecraft/versions/26.1.2/26.1.2.jar",
+      "client_jar_sha256": "b1b3158572666445eff01e82fad8c7de2e4953db6d354f311730d77a8359d0b0"
+    }
+  ],
+  "roof_evidence": {
+    "source_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+    "all_original_faces": [
+      {
+        "face_id_0based": 0,
+        "fingerprint": "4b78be33d01f3b04",
+        "uv_polygon_m": [
+          [
+            5.9092,
+            12.22326
+          ],
+          [
+            7.8636,
+            12.33022
+          ],
+          [
+            8.2784,
+            12.2284
+          ],
+          [
+            8.25067,
+            12.12196
+          ],
+          [
+            6.80936,
+            9.48731
+          ],
+          [
+            5.9092,
+            12.22326
+          ]
+        ],
+        "navd88_min_m": 57.6567,
+        "navd88_max_m": 60.2794,
+        "area_m2": 3.405189169774129,
+        "slope_degrees": 44.29576955751237,
+        "height_plane_xz": [
+          0.7409000189198662,
+          0.6348912499111177,
+          148.30774319903813
+        ]
+      },
+      {
+        "face_id_0based": 1,
+        "fingerprint": "ca91580ef290f496",
+        "uv_polygon_m": [
+          [
+            5.09239,
+            22.11853
+          ],
+          [
+            3.48817,
+            21.64088
+          ],
+          [
+            3.26507,
+            21.75168
+          ],
+          [
+            2.47535,
+            23.64433
+          ],
+          [
+            5.09916,
+            23.64095
+          ],
+          [
+            5.09239,
+            22.11853
+          ]
+        ],
+        "navd88_min_m": 56.346700000000006,
+        "navd88_max_m": 57.893,
+        "area_m2": 4.01354097701781,
+        "slope_degrees": 37.57696312821862,
+        "height_plane_xz": [
+          0.12467249870251229,
+          -0.7592961315813841,
+          158.7009820755217
+        ]
+      },
+      {
+        "face_id_0based": 2,
+        "fingerprint": "dc326f68d7f7b8ef",
+        "uv_polygon_m": [
+          [
+            3.48817,
+            21.64088
+          ],
+          [
+            5.09239,
+            22.11853
+          ],
+          [
+            5.07806,
+            18.88806
+          ],
+          [
+            3.5074,
+            21.17079
+          ],
+          [
+            3.23574,
+            21.5657
+          ],
+          [
+            0.8126,
+            20.8441
+          ],
+          [
+            0.80921,
+            23.64658
+          ],
+          [
+            2.47535,
+            23.64433
+          ],
+          [
+            3.26507,
+            21.75168
+          ],
+          [
+            3.48817,
+            21.64088
+          ]
+        ],
+        "navd88_min_m": 53.4103,
+        "navd88_max_m": 61.1052,
+        "area_m2": 8.246017773494584,
+        "slope_degrees": 60.43257576119532,
+        "height_plane_xz": [
+          1.7463398042724099,
+          0.23924031250019073,
+          388.7541016958884
+        ]
+      },
+      {
+        "face_id_0based": 3,
+        "fingerprint": "168721e1a8cc5883",
+        "uv_polygon_m": [
+          [
+            10.98685,
+            11.56354
+          ],
+          [
+            10.64374,
+            10.37047
+          ],
+          [
+            9.90773,
+            8.8241
+          ],
+          [
+            8.91069,
+            12.07319
+          ],
+          [
+            10.98685,
+            11.56354
+          ]
+        ],
+        "navd88_min_m": 57.807900000000004,
+        "navd88_max_m": 60.1681,
+        "area_m2": 3.292504147996642,
+        "slope_degrees": 44.866368433657534,
+        "height_plane_xz": [
+          -0.9455073087971524,
+          0.3110145247427276,
+          -153.45914787632773
+        ]
+      },
+      {
+        "face_id_0based": 4,
+        "fingerprint": "4cd31a189ef13f94",
+        "uv_polygon_m": [
+          [
+            0.82238,
+            10.5419
+          ],
+          [
+            0.82522,
+            11.67612
+          ],
+          [
+            0.01833,
+            11.68843
+          ],
+          [
+            -0.0,
+            12.6694
+          ],
+          [
+            0.01391,
+            14.22086
+          ],
+          [
+            0.82066,
+            14.20837
+          ],
+          [
+            0.81702,
+            17.23568
+          ],
+          [
+            1.50055,
+            17.24143
+          ],
+          [
+            1.78336,
+            12.18695
+          ],
+          [
+            1.45963,
+            12.00239
+          ],
+          [
+            1.47433,
+            11.23991
+          ],
+          [
+            0.82238,
+            10.5419
+          ]
+        ],
+        "navd88_min_m": 49.5857,
+        "navd88_max_m": 50.0534,
+        "area_m2": 7.078940384941994,
+        "slope_degrees": 11.505670070456675,
+        "height_plane_xz": [
+          0.1940311418880103,
+          0.0615361701180176,
+          83.83798823646067
+        ]
+      },
+      {
+        "face_id_0based": 5,
+        "fingerprint": "873613f34f229651",
+        "uv_polygon_m": [
+          [
+            5.9092,
+            12.22326
+          ],
+          [
+            5.85232,
+            13.24528
+          ],
+          [
+            7.76969,
+            15.78796
+          ],
+          [
+            8.61951,
+            15.52937
+          ],
+          [
+            8.53633,
+            12.16509
+          ],
+          [
+            8.2784,
+            12.2284
+          ],
+          [
+            7.8636,
+            12.33022
+          ],
+          [
+            5.9092,
+            12.22326
+          ]
+        ],
+        "navd88_min_m": 58.3083,
+        "navd88_max_m": 60.8733,
+        "area_m2": 7.0316105296760165,
+        "slope_degrees": 40.632340835132986,
+        "height_plane_xz": [
+          0.8326133945157227,
+          0.20751338011363218,
+          205.2509275309264
+        ]
+      },
+      {
+        "face_id_0based": 6,
+        "fingerprint": "80cc52e3d57b1cb9",
+        "uv_polygon_m": [
+          [
+            5.45191,
+            18.34465
+          ],
+          [
+            5.07806,
+            18.88806
+          ],
+          [
+            5.09239,
+            22.11853
+          ],
+          [
+            7.27506,
+            22.76855
+          ],
+          [
+            5.45191,
+            18.34465
+          ]
+        ],
+        "navd88_min_m": 57.0431,
+        "navd88_max_m": 61.1052,
+        "area_m2": 4.843169410076749,
+        "slope_degrees": 61.122852091461375,
+        "height_plane_xz": [
+          -1.787724423778048,
+          -0.3029134330435528,
+          -268.6831850820099
+        ]
+      },
+      {
+        "face_id_0based": 7,
+        "fingerprint": "cf8bb949c0631d37",
+        "uv_polygon_m": [
+          [
+            12.08492,
+            23.14178
+          ],
+          [
+            12.07426,
+            22.48844
+          ],
+          [
+            10.05065,
+            22.24802
+          ],
+          [
+            9.5523,
+            23.44664
+          ],
+          [
+            7.27506,
+            22.76855
+          ],
+          [
+            5.09239,
+            22.11853
+          ],
+          [
+            5.09916,
+            23.64095
+          ],
+          [
+            14.03429,
+            23.6293
+          ],
+          [
+            14.04252,
+            22.72219
+          ],
+          [
+            13.13984,
+            22.61497
+          ],
+          [
+            12.08492,
+            23.14178
+          ]
+        ],
+        "navd88_min_m": 53.9829,
+        "navd88_max_m": 54.2738,
+        "area_m2": 8.429097650726467,
+        "slope_degrees": 10.045335410542593,
+        "height_plane_xz": [
+          0.03648136268517405,
+          -0.1733457070785946,
+          78.96358142825868
+        ]
+      },
+      {
+        "face_id_0based": 8,
+        "fingerprint": "688a56e056886528",
+        "uv_polygon_m": [
+          [
+            8.53633,
+            12.16509
+          ],
+          [
+            8.91069,
+            12.07319
+          ],
+          [
+            9.90773,
+            8.8241
+          ],
+          [
+            10.05803,
+            8.33416
+          ],
+          [
+            9.99538,
+            8.11648
+          ],
+          [
+            9.85106,
+            8.12178
+          ],
+          [
+            9.27357,
+            7.52887
+          ],
+          [
+            8.32234,
+            8.17756
+          ],
+          [
+            8.14727,
+            8.18389
+          ],
+          [
+            7.22709,
+            8.21745
+          ],
+          [
+            6.80936,
+            9.48731
+          ],
+          [
+            8.25067,
+            12.12196
+          ],
+          [
+            8.2784,
+            12.2284
+          ],
+          [
+            8.53633,
+            12.16509
+          ]
+        ],
+        "navd88_min_m": 56.8645,
+        "navd88_max_m": 60.2794,
+        "area_m2": 8.947916822917389,
+        "slope_degrees": 36.02402494603309,
+        "height_plane_xz": [
+          -0.11097955108669039,
+          0.7186648770347808,
+          -26.876854958196404
+        ]
+      },
+      {
+        "face_id_0based": 9,
+        "fingerprint": "35c387d736ffa4b0",
+        "uv_polygon_m": [
+          [
+            11.39131,
+            13.35168
+          ],
+          [
+            12.11592,
+            14.10714
+          ],
+          [
+            12.59589,
+            13.8677
+          ],
+          [
+            12.60722,
+            8.01612
+          ],
+          [
+            10.32018,
+            7.47998
+          ],
+          [
+            10.12631,
+            8.11177
+          ],
+          [
+            9.99538,
+            8.11648
+          ],
+          [
+            10.05803,
+            8.33416
+          ],
+          [
+            9.90773,
+            8.8241
+          ],
+          [
+            10.64374,
+            10.37047
+          ],
+          [
+            10.98685,
+            11.56354
+          ],
+          [
+            11.21568,
+            12.35907
+          ],
+          [
+            11.29136,
+            13.24754
+          ],
+          [
+            11.39131,
+            13.35168
+          ]
+        ],
+        "navd88_min_m": 57.3254,
+        "navd88_max_m": 59.4253,
+        "area_m2": 11.579930602128885,
+        "slope_degrees": 37.655619640228146,
+        "height_plane_xz": [
+          0.7653015819865118,
+          0.09878864077914695,
+          197.55384798908847
+        ]
+      },
+      {
+        "face_id_0based": 10,
+        "fingerprint": "673253744aa4b2eb",
+        "uv_polygon_m": [
+          [
+            12.59589,
+            13.8677
+          ],
+          [
+            13.99464,
+            13.16979
+          ],
+          [
+            15.14759,
+            12.59442
+          ],
+          [
+            15.14759,
+            7.92869
+          ],
+          [
+            12.60722,
+            8.01612
+          ],
+          [
+            12.59589,
+            13.8677
+          ]
+        ],
+        "navd88_min_m": 57.3371,
+        "navd88_max_m": 59.4253,
+        "area_m2": 13.384943848621925,
+        "slope_degrees": 37.871962475772236,
+        "height_plane_xz": [
+          -0.7639097551860797,
+          -0.14576874590433697,
+          -74.32964685656631
+        ]
+      },
+      {
+        "face_id_0based": 11,
+        "fingerprint": "f699c4cadc22ab23",
+        "uv_polygon_m": [
+          [
+            1.61974,
+            3.72247
+          ],
+          [
+            1.47433,
+            11.23991
+          ],
+          [
+            1.45963,
+            12.00239
+          ],
+          [
+            1.78336,
+            12.18695
+          ],
+          [
+            3.01544,
+            12.88956
+          ],
+          [
+            4.58423,
+            13.78411
+          ],
+          [
+            4.69301,
+            3.61094
+          ],
+          [
+            1.61974,
+            3.72247
+          ]
+        ],
+        "navd88_min_m": 56.904700000000005,
+        "navd88_max_m": 59.3783,
+        "area_m2": 28.704871387686616,
+        "slope_degrees": 37.514867131403676,
+        "height_plane_xz": [
+          0.7581746631253131,
+          0.12080918514939443,
+          200.29588601713257
+        ]
+      },
+      {
+        "face_id_0based": 12,
+        "fingerprint": "d8ee60052f13208c",
+        "uv_polygon_m": [
+          [
+            12.01299,
+            18.75004
+          ],
+          [
+            12.07426,
+            22.48844
+          ],
+          [
+            12.08492,
+            23.14178
+          ],
+          [
+            13.13984,
+            22.61497
+          ],
+          [
+            14.04252,
+            22.72219
+          ],
+          [
+            14.04768,
+            22.16144
+          ],
+          [
+            13.92264,
+            22.22388
+          ],
+          [
+            12.44068,
+            18.65197
+          ],
+          [
+            12.01299,
+            18.75004
+          ]
+        ],
+        "navd88_min_m": 57.2528,
+        "navd88_max_m": 61.0546,
+        "area_m2": 5.158288991370496,
+        "slope_degrees": 62.38284387495194,
+        "height_plane_xz": [
+          -1.8918344865100585,
+          -0.27299170394284955,
+          -279.29387399150886
+        ]
+      },
+      {
+        "face_id_0based": 13,
+        "fingerprint": "a9579861d634a7ce",
+        "uv_polygon_m": [
+          [
+            1.50055,
+            17.24143
+          ],
+          [
+            15.14747,
+            17.35448
+          ],
+          [
+            15.14759,
+            12.59442
+          ],
+          [
+            13.99464,
+            13.16979
+          ],
+          [
+            12.59589,
+            13.8677
+          ],
+          [
+            12.11592,
+            14.10714
+          ],
+          [
+            11.39131,
+            13.35168
+          ],
+          [
+            10.93798,
+            13.7455
+          ],
+          [
+            9.96167,
+            15.12086
+          ],
+          [
+            8.61951,
+            15.52937
+          ],
+          [
+            7.76969,
+            15.78796
+          ],
+          [
+            5.85232,
+            13.24528
+          ],
+          [
+            5.06371,
+            14.0576
+          ],
+          [
+            4.58423,
+            13.78411
+          ],
+          [
+            3.01544,
+            12.88956
+          ],
+          [
+            1.78336,
+            12.18695
+          ],
+          [
+            1.50055,
+            17.24143
+          ]
+        ],
+        "navd88_min_m": 57.599900000000005,
+        "navd88_max_m": 61.268800000000006,
+        "area_m2": 45.72645041549309,
+        "slope_degrees": 35.960124388664795,
+        "height_plane_xz": [
+          -0.120765184174991,
+          0.7153576809334109,
+          -31.200486321624684
+        ]
+      },
+      {
+        "face_id_0based": 14,
+        "fingerprint": "a4b571dc8657442f",
+        "uv_polygon_m": [
+          [
+            12.07426,
+            22.48844
+          ],
+          [
+            12.01299,
+            18.75004
+          ],
+          [
+            11.45165,
+            18.87872
+          ],
+          [
+            10.05065,
+            22.24802
+          ],
+          [
+            12.07426,
+            22.48844
+          ]
+        ],
+        "navd88_min_m": 57.4566,
+        "navd88_max_m": 61.0546,
+        "area_m2": 4.630685277497864,
+        "slope_degrees": 60.559358812289446,
+        "height_plane_xz": [
+          1.7551761372731707,
+          0.24195287577188118,
+          377.9261417792005
+        ]
+      },
+      {
+        "face_id_0based": 15,
+        "fingerprint": "04cddf499a1c60fe",
+        "uv_polygon_m": [
+          [
+            4.69301,
+            3.61094
+          ],
+          [
+            4.58423,
+            13.78411
+          ],
+          [
+            5.06371,
+            14.0576
+          ],
+          [
+            5.85232,
+            13.24528
+          ],
+          [
+            5.9092,
+            12.22326
+          ],
+          [
+            6.80936,
+            9.48731
+          ],
+          [
+            7.22709,
+            8.21745
+          ],
+          [
+            8.14727,
+            8.18389
+          ],
+          [
+            7.24922,
+            3.51815
+          ],
+          [
+            4.69301,
+            3.61094
+          ]
+        ],
+        "navd88_min_m": 56.6454,
+        "navd88_max_m": 59.3783,
+        "area_m2": 23.867886673723156,
+        "slope_degrees": 37.62942237614043,
+        "height_plane_xz": [
+          -0.7589285458862779,
+          -0.13545583979692433,
+          -80.49069973361134
+        ]
+      },
+      {
+        "face_id_0based": 16,
+        "fingerprint": "9998cefd6560fedc",
+        "uv_polygon_m": [
+          [
+            1.61974,
+            3.72247
+          ],
+          [
+            4.69301,
+            3.61094
+          ],
+          [
+            7.24922,
+            3.51815
+          ],
+          [
+            8.14727,
+            8.18389
+          ],
+          [
+            8.32234,
+            8.17756
+          ],
+          [
+            9.27357,
+            7.52887
+          ],
+          [
+            9.85106,
+            8.12178
+          ],
+          [
+            9.99538,
+            8.11648
+          ],
+          [
+            10.12631,
+            8.11177
+          ],
+          [
+            10.32018,
+            7.47998
+          ],
+          [
+            12.60722,
+            8.01612
+          ],
+          [
+            15.14759,
+            7.92869
+          ],
+          [
+            15.14759,
+            6.53747
+          ],
+          [
+            14.05022,
+            6.53817
+          ],
+          [
+            14.05317,
+            1.45106
+          ],
+          [
+            6.20879,
+            0.0
+          ],
+          [
+            4.4119,
+            0.005
+          ],
+          [
+            4.44035,
+            2.01428
+          ],
+          [
+            1.65285,
+            2.01379
+          ],
+          [
+            1.61974,
+            3.72247
+          ]
+        ],
+        "navd88_min_m": 53.266400000000004,
+        "navd88_max_m": 54.5719,
+        "area_m2": 62.23616229892524,
+        "slope_degrees": 9.509039894614958,
+        "height_plane_xz": [
+          -0.05099033067734425,
+          0.15955515265426856,
+          30.704671872291332
+        ]
+      },
+      {
+        "face_id_0based": 17,
+        "fingerprint": "c642817e16bef080",
+        "uv_polygon_m": [
+          [
+            1.47433,
+            11.23991
+          ],
+          [
+            1.61974,
+            3.72247
+          ],
+          [
+            1.65285,
+            2.01379
+          ],
+          [
+            0.801,
+            2.01355
+          ],
+          [
+            0.82238,
+            10.5419
+          ],
+          [
+            1.47433,
+            11.23991
+          ]
+        ],
+        "navd88_min_m": 50.0629,
+        "navd88_max_m": 50.217000000000006,
+        "area_m2": 6.702011676178708,
+        "slope_degrees": 8.970783675975055,
+        "height_plane_xz": [
+          0.15632683326969196,
+          0.021960408667303533,
+          79.98939559264169
+        ]
+      },
+      {
+        "face_id_0based": 18,
+        "fingerprint": "0b84a518273eb86d",
+        "uv_polygon_m": [
+          [
+            8.61951,
+            15.52937
+          ],
+          [
+            9.96167,
+            15.12086
+          ],
+          [
+            10.93798,
+            13.7455
+          ],
+          [
+            11.39131,
+            13.35168
+          ],
+          [
+            11.29136,
+            13.24754
+          ],
+          [
+            11.21568,
+            12.35907
+          ],
+          [
+            10.98685,
+            11.56354
+          ],
+          [
+            8.91069,
+            12.07319
+          ],
+          [
+            8.53633,
+            12.16509
+          ],
+          [
+            8.61951,
+            15.52937
+          ]
+        ],
+        "navd88_min_m": 58.2222,
+        "navd88_max_m": 60.8733,
+        "area_m2": 7.844702907537973,
+        "slope_degrees": 41.09057075329166,
+        "height_plane_xz": [
+          -0.8718655530603607,
+          -0.018688811850259057,
+          -109.02222009311451
+        ]
+      },
+      {
+        "face_id_0based": 19,
+        "fingerprint": "4a35903dc8d7f672",
+        "uv_polygon_m": [
+          [
+            15.14747,
+            17.35448
+          ],
+          [
+            1.50055,
+            17.24143
+          ],
+          [
+            0.81702,
+            17.23568
+          ],
+          [
+            0.8126,
+            20.8441
+          ],
+          [
+            3.23574,
+            21.5657
+          ],
+          [
+            3.5074,
+            21.17079
+          ],
+          [
+            5.07806,
+            18.88806
+          ],
+          [
+            5.45191,
+            18.34465
+          ],
+          [
+            7.27506,
+            22.76855
+          ],
+          [
+            9.5523,
+            23.44664
+          ],
+          [
+            10.05065,
+            22.24802
+          ],
+          [
+            11.45165,
+            18.87872
+          ],
+          [
+            12.01299,
+            18.75004
+          ],
+          [
+            12.44068,
+            18.65197
+          ],
+          [
+            13.92264,
+            22.22388
+          ],
+          [
+            14.04768,
+            22.16144
+          ],
+          [
+            14.05012,
+            21.90076
+          ],
+          [
+            15.14749,
+            21.90006
+          ],
+          [
+            15.14747,
+            17.35448
+          ]
+        ],
+        "navd88_min_m": 56.5321,
+        "navd88_max_m": 61.2699,
+        "area_m2": 53.67888987783717,
+        "slope_degrees": 37.57664807685463,
+        "height_plane_xz": [
+          0.12467667702659493,
+          -0.7592865740051266,
+          158.70087165770806
+        ]
+      }
+    ],
+    "unaltered_source_face_ids": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "low_source_faces_preserved": [
+      7,
+      16,
+      17
+    ],
+    "bay_correction_authorization": "Root verified the supplied photograph contradicts the ground-level face4 inside the two-storey bay. Preserve its raw provenance and explicitly overlay only the bounded bay subset; do not claim those affected heights unchanged or exposed."
+  },
+  "bay": {
+    "polygon_uv_m": [
+      [
+        1.8,
+        11.7
+      ],
+      [
+        0.86,
+        11.7
+      ],
+      [
+        0.12,
+        12.28
+      ],
+      [
+        0.12,
+        13.62
+      ],
+      [
+        0.86,
+        14.2
+      ],
+      [
+        1.8,
+        14.2
+      ]
+    ],
+    "cap_eave_navd88_m": 57.0,
+    "cap_inner_navd88_m": 57.35,
+    "source_face_id": 4,
+    "geometry_status": "Two-storey polygonal projection is directly observed. Exact depth, cheeks and unseen cap shape/height are photo estimates, clipped inside the measured protruding footprint.",
+    "sash_levels": [
+      {
+        "id": "lower",
+        "sill_navd88_m": 51.0,
+        "height_m": 2.2
+      },
+      {
+        "id": "upper",
+        "sill_navd88_m": 54.15,
+        "height_m": 2.35
+      }
+    ],
+    "sash_status": "Tall sash proportions estimated from the supplied photo. Separate head/sill half-courses remain vertically contacting after the two-blocks-per-metre quantization; exact dimensions are not surveyed.",
+    "corner_status": "A full inboard stucco corner column is retained between the separate front and southern cheek sashes where rasterised reveals otherwise remove the same wall cell. It is not a projecting white jamb.",
+    "upper_cap_status": "Photograph clips the highest bay cap. Where an upper sash head meets the estimated bay roof, the original full cornice block is retained; a green half-slab hood must not remove roof backing."
+  },
+  "terrace": {
+    "rail_segments_uv_m": [
+      [
+        [
+          1.7,
+          2.15
+        ],
+        [
+          1.7,
+          3.55
+        ]
+      ],
+      [
+        [
+          1.7,
+          2.15
+        ],
+        [
+          4.3,
+          2.15
+        ]
+      ]
+    ],
+    "rail_top_navd88_m": 55.15,
+    "status": "Observed white railing on the north low appendage; extent/top are estimated, and sourceface16 surface is retained.",
+    "footing_status": "Native v2 rejected the bulky white pedestal. Local quarter-metre post support uses the existing dark roof family; original face16 sample heights remain unchanged and only bounded post feet overlay the visible surface.",
+    "corner_status": "Intended rail samples outside low face16 snap to its nearest support within 0.65 m; exactly necessary orthogonal corner returns remain on retained face16. No gap is silently skipped."
+  },
+  "openings": [
+    {
+      "id": "west-main-upper-three-singles",
+      "centres_m": [
+        5.15,
+        8.1,
+        10.45
+      ],
+      "side": "west",
+      "at_m": 1.8,
+      "sill_navd88_m": 54.25,
+      "width_m": 1.0,
+      "height_m": 1.85,
+      "green_cap": true,
+      "evidence_status": "observed; dimensions estimated",
+      "source_ref": "office_streetview_2019"
+    },
+    {
+      "id": "west-main-lower-single",
+      "centres_m": [
+        5.15
+      ],
+      "side": "west",
+      "at_m": 1.8,
+      "sill_navd88_m": 51.65,
+      "width_m": 1.05,
+      "height_m": 1.35,
+      "green_cap": false,
+      "evidence_status": "observed; dimensions estimated",
+      "source_ref": "office_streetview_2019"
+    },
+    {
+      "id": "west-main-lower-triple",
+      "centres_m": [
+        9.15
+      ],
+      "side": "west",
+      "at_m": 1.8,
+      "sill_navd88_m": 51.55,
+      "width_m": 2.9,
+      "height_m": 1.65,
+      "green_cap": false,
+      "evidence_status": "observed; dimensions estimated",
+      "source_ref": "office_streetview_2019"
+    },
+    {
+      "id": "north-appendage-obscured-lower",
+      "centres_m": [
+        2.8
+      ],
+      "side": "west",
+      "at_m": 1.8,
+      "sill_navd88_m": 51.65,
+      "width_m": 1.0,
+      "height_m": 1.1,
+      "green_cap": false,
+      "evidence_status": "Partly obscured small opening visible beneath north terrace; dimensions and exposed extent estimated.",
+      "source_ref": "office_streetview_2019"
+    },
+    {
+      "id": "south-west-edge-lower",
+      "centres_m": [
+        18.6
+      ],
+      "side": "west",
+      "at_m": 1.0,
+      "sill_navd88_m": 51.05,
+      "width_m": 1.0,
+      "height_m": 2.2,
+      "green_cap": true,
+      "evidence_status": "One tall lower sash is visible at the photograph right edge; its local centre is approximate.",
+      "source_ref": "office_streetview_2019"
+    },
+    {
+      "id": "south-west-edge-upper-partial",
+      "centres_m": [
+        18.6
+      ],
+      "side": "west",
+      "at_m": 1.0,
+      "sill_navd88_m": 54.2,
+      "width_m": 1.0,
+      "height_m": 2.3,
+      "green_cap": true,
+      "evidence_status": "Only a clipped upper sash is visible at the photograph right/top edge; its full extent is an estimate.",
+      "source_ref": "office_streetview_2019"
+    }
+  ],
+  "uncertainties": [
+    "North, south and east elevation aperture layouts.",
+    "All door positions and thresholds; shrubs obscure the west base.",
+    "Upper roof covering and any chimney position/material.",
+    "Exact window centres, sill heights and bay projection depth.",
+    "Whether green caps are painted metal or patinated metal.",
+    "Current 2026 repaint/weathering state beyond the 2019 photograph.",
+    "Interior floor levels and all unphotographed thresholds remain estimates; no door is invented on an unseen face.",
+    "Baluster spacing, off-white fence texture, pane grid and quarter-metre metal cap thickness are voxel approximations."
+  ],
+  "camera_views": [
+    {
+      "name": "office-primary-west",
+      "eye_uv_navd88_m": [
+        -14,
+        10.5,
+        51.1
+      ],
+      "target_uv_navd88_m": [
+        1.8,
+        10.5,
+        53.3
+      ],
+      "fov": 58
+    },
+    {
+      "name": "office-west-sash-close",
+      "eye_uv_navd88_m": [
+        -9,
+        7.7,
+        52.1
+      ],
+      "target_uv_navd88_m": [
+        1.8,
+        7.7,
+        53.8
+      ],
+      "fov": 58
+    },
+    {
+      "name": "office-polygonal-bay",
+      "eye_uv_navd88_m": [
+        -8,
+        10.0,
+        52.2
+      ],
+      "target_uv_navd88_m": [
+        0.7,
+        12.9,
+        53.8
+      ],
+      "fov": 63
+    },
+    {
+      "name": "office-north-terrace",
+      "eye_uv_navd88_m": [
+        -7,
+        -6,
+        56
+      ],
+      "target_uv_navd88_m": [
+        3.4,
+        2.5,
+        53.8
+      ],
+      "fov": 60
+    },
+    {
+      "name": "office-roof-audit",
+      "eye_uv_navd88_m": [
+        -15,
+        27,
+        66
+      ],
+      "target_uv_navd88_m": [
+        7.5,
+        12,
+        56.5
+      ],
+      "fov": 60
+    },
+    {
+      "name": "office-unseen-east-south",
+      "eye_uv_navd88_m": [
+        27,
+        30,
+        54.5
+      ],
+      "target_uv_navd88_m": [
+        9,
+        16,
+        54.5
+      ],
+      "fov": 62
+    }
+  ]
+}

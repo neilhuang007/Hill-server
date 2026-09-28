@@ -1,0 +1,863 @@
+{
+  "name": "Annan Building - bounded west facade and measured roof",
+  "revision": "2026-09-19-annan-2-2x-south-plane-and-brick-backing",
+  "parent_id": "1600303920031C-4b7d18d798",
+  "school_names": [
+    "Annan Building"
+  ],
+  "school_map_numbers": [
+    15
+  ],
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "detail_module": "hill_annan_details",
+  "study_margin_m": 18,
+  "geometry": {
+    "origin_xz_m": [
+      0,
+      0
+    ],
+    "axis_degrees": 9,
+    "main_roof_threshold_navd88_m": 0,
+    "entrance_floor_navd88_m": 55.6699,
+    "source_base_note": "Substructure datum preserves low source faces; local visible program floors are authored at H57, H60.3 and north H59."
+  },
+  "materials": {
+    "facade": "bricks",
+    "foundation": "mud_bricks",
+    "roof_family": "stone_brick"
+  },
+  "material_review": {
+    "status": "Sol packet selected appearance proxies",
+    "base_roof_family_note": "Stone brick seeds cap states only; all actual main-roof cells retint to polished andesite and low annex fields to smooth stone."
+  },
+  "reference_packet": {
+    "path": "runtime/research/campus-full-detail-20260905/annan-reference-packet-20260919.json",
+    "sha256": "59beeb1a36f1b94c87c37bf24fcad3959102e8662c9f61230a82a333805a421f"
+  },
+  "reference_addenda": [
+    {
+      "path": "runtime/research/campus-full-detail-20260905/annan-high-cluster-disposition-addendum-20260919.json",
+      "sha256": "48639c800766fd88ee8d441cb4c5461ee97e0efd00ff065c3fd68f4f81afae7f"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/annan-exposed-roof-backing-material-addendum-20260919.json",
+      "sha256": "0f633278dfa23a8f81ade2452a423a809ce912d54cd78307a30ba42f7d718ed4"
+    },
+    {
+      "path": "runtime/research/campus-full-detail-20260905/annan-south-wall-plane-disposition-addendum-20260919.json",
+      "sha256": "12ef6a7d4b2b1fcb03a44aaed49ceb885e6211a6d97bd98bac306c6a98237e87"
+    }
+  ],
+  "source_roof_sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+  "west_upper_centres_v_m": [
+    -161.5,
+    -154,
+    -146.5,
+    -139
+  ],
+  "west_lower_centres_v_m": [
+    -161.5,
+    -156.3,
+    -151.1,
+    -145.9,
+    -140.7
+  ],
+  "source_controls": {
+    "schema_version": 1,
+    "date": "2026-09-19",
+    "status": "builder_ready_bounded_exterior_reference",
+    "scope": "Annan Building exterior massing and the photographically supported west face, with conservative south, north and east limitations",
+    "parent_id": "1600303920031C-4b7d18d798",
+    "school_map_number": 15,
+    "identity": {
+      "official_map_name": "Annan Building",
+      "status": "verified_whole_outline",
+      "centroid_lonlat": [
+        -75.634039539,
+        40.246384769
+      ],
+      "source_feature_index": 100,
+      "source": "server-assets/hill-campus-building-identities.json",
+      "source_sha256": "1689e7b469b964a87ac2fec97a67792ed1ec07d7f943933545cd217b33de9baf",
+      "match_note": "The official map, 2021 facilities plan and county outline identify the stepped building between Tuck Arena and Davy, immediately north of the main gym aggregate."
+    },
+    "baseline": {
+      "study": "runtime/campus-reconstruction/campus-envelopes-v2-ground/1600303920031C-4b7d18d798",
+      "profile_sha256": "a6cff9d20f4456036388c5a6229b0a21fe984cfd8edb893143229b7ee9128779",
+      "sample_blocks_sha256": "870abd66629fb5e910f7a15555e8649d6b44ef4fb253647e25872b55f67a7db5",
+      "manifest_sha256": "274d45134deb006fd2874ab72c190c047ef72066cdacf67d8294f6af4e109350",
+      "detail_status": "measured envelope only; no accepted native facade review",
+      "builder_rule": "Create a fresh immutable individual study. Do not edit this baseline, completed building studies, shared geometry modules, current campus worlds or the current manifest."
+    },
+    "coordinate_frame": {
+      "horizontal": "Physical campus metres X east and Z south. Local U is rotated 9 degrees from east; local V points approximately south.",
+      "origin_xz_m": [
+        0.0,
+        0.0
+      ],
+      "axis_degrees": 9.0,
+      "axis_u_xz": [
+        0.9876883405951378,
+        0.15643446504023087
+      ],
+      "axis_v_xz": [
+        -0.15643446504023087,
+        0.9876883405951378
+      ],
+      "uv_to_xz": "X=U*0.9876883405951378+V*(-0.15643446504023087); Z=U*0.15643446504023087+V*0.9876883405951378",
+      "blocks_per_metre": 2,
+      "vertical_offset_m": -25.0,
+      "minecraft_transform": "Xblock=2*Xmetres; Zblock=2*Zmetres; Yblock=2*(NAVD88metres-25). Keep physical values authoritative and quantize once in the builder.",
+      "baseline_world_bounds_blocks": [
+        144,
+        -336,
+        240,
+        -224
+      ],
+      "baseline_built_bounds_blocks": [
+        163,
+        -317,
+        227,
+        -236
+      ]
+    },
+    "sources": [
+      {
+        "id": "official_fy26_map",
+        "owner": "The Hill School",
+        "url": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+        "local": "runtime/research/hill-reference-20260904/campus-map-2026.pdf",
+        "sha256": "a815cf8e058df9bdbb2997fba3a272249508e7175c536b907f984e9966477e59",
+        "supports": [
+          "map number 15",
+          "Annan Building identity",
+          "campus relationship"
+        ]
+      },
+      {
+        "id": "hill_2026_aerial",
+        "owner": "The Hill School",
+        "url": "https://resources.finalsite.net/images/v1781199127/thehillorg/w4u9jqyl7pydvhxczw5z/2026-Aerial-Campus.jpg",
+        "local": "runtime/research/campus-priority-20260905/campus-2026-aerial-original.jpg",
+        "sha256": "fcf609c9cdac99ea54cc59ad143b04aa2d66f1963bac7f704973a9dfda85fcbe",
+        "pixels": [
+          1500,
+          843
+        ],
+        "supports": [
+          "current gray main gable",
+          "red-brown west wall",
+          "four small upper west windows",
+          "lower west openings with occlusion",
+          "south gable and low annex relationship",
+          "gaps to Tuck and Davy"
+        ]
+      },
+      {
+        "id": "official_aerial_annan_context_crop",
+        "local": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/official-aerial-annan-context-crop.png",
+        "sha256": "c68f822a0b6d6c04d30dc59869fe86e0c539a808a8f1f01ba1a800e01324f44f",
+        "source_crop_xyxy": [
+          250,
+          285,
+          710,
+          585
+        ],
+        "pixels": [
+          460,
+          300
+        ],
+        "supports": [
+          "Annan between Tuck and Davy",
+          "main gable and low east/south annex",
+          "trees and neighboring roofs that limit facade visibility"
+        ]
+      },
+      {
+        "id": "official_aerial_annan_working_enlargement",
+        "local": "runtime/research/campus-full-detail-20260905/annan-aerial-detail.png",
+        "sha256": "753942371eaaf8fbb9e85c594b6d12a6c728859ee789fde1be12be83915b0131",
+        "pixels": [
+          1110,
+          620
+        ],
+        "supports": [
+          "four upper west openings",
+          "at least four lower west opening patches",
+          "red-brown wall",
+          "gray roof",
+          "partial south canopy/gable"
+        ],
+        "limit": "Earlier non-generative working enlargement of the official aerial; its original crop/scale record was not retained. Use the frozen official original and context crop for registration, and this enlargement only for visual reading."
+      },
+      {
+        "id": "official_bissell_wrestling_room_photo",
+        "owner": "The Hill School",
+        "page": "https://www.thehill.org/athletics/facilities",
+        "url": "https://resources.finalsite.net/images/v1553616194/thehillorg/zhkmjkypbcpn9ei1dtgh/Wrestling-Room.jpg",
+        "local": "runtime/research/campus-full-detail-20260905/Wrestling-Room.jpg",
+        "sha256": "ac36e47f6e1988bc7bb64ae2907ddac64d07efd1cb94c25eb7976e37f12e4d9b",
+        "pixels": [
+          2200,
+          1468
+        ],
+        "supports": [
+          "four high rectangular windows on one long wrestling-room wall",
+          "dark frames",
+          "low interior sill",
+          "upper-room scale"
+        ],
+        "limit": "The school page does not name Annan in this facility section. Assigning the photographed long wall to Annan's west upper exterior is consistent with the exterior four-window row and athletics identity, but remains an inference."
+      },
+      {
+        "id": "school_athletics_facilities",
+        "owner": "The Hill School",
+        "url": "https://www.thehill.org/athletics/facilities",
+        "local": "runtime/research/campus-full-detail-20260905/athletics.html",
+        "sha256": "387ad2429953d78ef8603880d10cbb01b3842a7398185c05b4a9f7ffe125315a",
+        "supports": [
+          "Bissell Wrestling Room above the fitness room",
+          "3,915 square feet",
+          "two mats",
+          "bleachers on two walls"
+        ]
+      },
+      {
+        "id": "school_founders_hall",
+        "owner": "The Hill School",
+        "url": "https://www.thehill.org/athletics/hall-of-fame/founders-hall",
+        "retrieved": "2026-09-19",
+        "supports": [
+          "school historical account separately names construction of the Bissell Wrestling Room and Annan Strength Center during David Mercer's tenure"
+        ],
+        "limit": "Historical identity/use only; it does not provide an elevation, material schedule or exact room-to-footprint plan."
+      },
+      {
+        "id": "hill_2026_drone",
+        "owner": "The Hill School",
+        "url": "https://resources.finalsite.net/videos/t_video_mp4_1080/v1782935559/thehillorg/knkakkud0xzfegdmwlq9/2026-Drone-Fly-Through-Full-Video.mp4",
+        "local": "runtime/research/athey-20260905/campus-2026-drone-1080.mp4",
+        "sha256": "b4c03c8d5462030ce8e95e5f56b3260da044501144f7390cbfc24e89c3894b21",
+        "pixels": [
+          1920,
+          1080
+        ],
+        "duration_seconds": 280.589569,
+        "supports": [
+          "current athletics-complex context",
+          "detached Tuck and main-gym relationships",
+          "overall roof hierarchy"
+        ],
+        "limit": "The 258-272 second approach keeps Annan behind or beyond the larger athletics roofs and never resolves a new Annan facade count."
+      },
+      {
+        "id": "consecutive_1080_sequence",
+        "local": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/manifest.json",
+        "sha256": "2c10a15df580b2ff2b085437feacc9efd3016bc3e5115afee360710ee00b7fa7",
+        "frames_aggregate_sha256": "0c408a80a778a43a0974236a408ac0a70a164d92558dc26432eaece9a78e59fb",
+        "coverage": "45 consecutive lossless 1920x1080 frames at 0.5-second intervals from 258.0 through 280.0 seconds; frames through 272.0 are unobscured, after which the end logo covers central campus.",
+        "annan_finding": "No frame supplies a closer or less-occluded Annan elevation than the official still aerial. This negative result prevents unsupported door/window extrapolation."
+      },
+      {
+        "id": "drone_270_annan_context_crop",
+        "local": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/drone-270p0s-annan-context-crop.png",
+        "sha256": "3629f87e96d8a6d697315911679cec19e1faac5dd83fdf38b34eb74cefdcc31e",
+        "source_frame": "runtime/research/campus-full-detail-20260905/sports-drone-sequence-20260919/frame-024.png",
+        "source_frame_sha256": "cf53a78a5074a41090da122b9bc5af3c6c097f1639d1a7e76459989abcb6a5ab",
+        "timestamp_seconds": 270.0,
+        "source_crop_xyxy": [
+          1120,
+          380,
+          1920,
+          980
+        ],
+        "finding": "The crop resolves Mercer/Sweeney/Tuck context; Annan remains concealed or beyond the right/east edge. It must not be used for Annan opening counts."
+      }
+    ],
+    "measured_sources": {
+      "cityjson": {
+        "path": "runtime/campus-reconstruction/roofer-chapel-trial/campus-model/hill-campus-roofer.city.json",
+        "sha256": "b5dd39b48b012224388a9d1310b22897ebca9ca40c1bcb5a4ef77075602478e8",
+        "parent_id": "1600303920031C-4b7d18d798",
+        "source_base_navd88_m": 55.6699,
+        "source_max_navd88_m": 76.3459,
+        "roof_face_count": 21
+      },
+      "roof_analysis": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-roof-geometries.json",
+        "sha256": "da641ab5d136c99ce2d6b4ec7139d30d64fd5d1f651b050bbaaeb44dd2aca6c3",
+        "rule": "The file retains every source polygon and height plane. Grouped controls below route the builder; they do not replace the exact 21 source faces."
+      },
+      "facade_registration": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-facades.json",
+        "sha256": "46d88480940568c0da0cbcc72cee0592c97de11daca416d2bada791a129d1532"
+      },
+      "material_register": {
+        "path": "runtime/research/campus-full-detail-20260905/institutional-materials.json",
+        "sha256": "215debfaad35368eff622e70995303ff8e2a3b00fd3d3045f4847fe4ae41fa9a"
+      },
+      "terrain": {
+        "path": "runtime/campus-reconstruction/campus-full-detail-terrain-v2/terrain.npz",
+        "sha256": "856bbb182f037ed014e7146c03b7d7909c4b002cb7b3563b52eb5ee6aca46216"
+      }
+    },
+    "measured_massing": {
+      "main_bar": {
+        "walls_uv_bounds_m": [
+          61.3,
+          -170.44,
+          77.18,
+          -133.99
+        ],
+        "ridge_u_m": 69.3,
+        "ridge_navd88_m": 66.96,
+        "eave_navd88_m": 64.35,
+        "lower_floor_navd88_m": 57.0,
+        "upper_floor_navd88_m": 60.3
+      },
+      "low_east_annex": {
+        "uv_bounds_m": [
+          76.88,
+          -144.65,
+          92.36,
+          -133.88
+        ],
+        "roof_navd88_m": 60.6,
+        "rule": "Keep this as a low flat-roof wing. Do not continue the tall main gable over it."
+      },
+      "north_entry_recess": {
+        "approx_uv_bounds_m": [
+          66.5,
+          -170.44,
+          72.1,
+          -163.3
+        ],
+        "terrain_navd88_m": 59.0,
+        "rule": "Treat the notch and low measured faces as attached/recessed Annan geometry, not a detached shed. Entry and door arrangement remain unresolved."
+      },
+      "height_rule": "The 55.6699 m source minimum is low local ground/roof-edge data, not a common floor. Keep the lower program near H=57.0, upper program near H=60.3 and north street/entry ground near H=59.0. The H=76.3459 maximum belongs only to the localized north-east high-face cluster."
+    },
+    "source_face_controls": [
+      {
+        "face_ids_0based": [
+          11
+        ],
+        "bounds_xz_m": [
+          81.503692,
+          -151.63281,
+          93.680228,
+          -121.818422
+        ],
+        "height_min_max_navd88_m": [
+          64.3907,
+          66.9581
+        ],
+        "area_m2": 222.0951,
+        "role": "main west roof slope"
+      },
+      {
+        "face_ids_0based": [
+          20
+        ],
+        "bounds_xz_m": [
+          89.066137,
+          -150.507941,
+          101.723958,
+          -120.223989
+        ],
+        "height_min_max_navd88_m": [
+          64.287,
+          66.9581
+        ],
+        "area_m2": 230.9007,
+        "role": "main east roof slope"
+      },
+      {
+        "face_ids_0based": [
+          4
+        ],
+        "bounds_xz_m": [
+          96.830279,
+          -130.838503,
+          113.791756,
+          -118.941167
+        ],
+        "height_min_max_navd88_m": [
+          60.512,
+          60.6298
+        ],
+        "area_m2": 150.6906,
+        "role": "low east/south annex flat roof"
+      },
+      {
+        "face_ids_0based": [
+          0,
+          3,
+          17
+        ],
+        "union_bounds_xz_m": [
+          86.142136,
+          -158.744059,
+          96.762538,
+          -150.067408
+        ],
+        "height_min_max_navd88_m": [
+          58.3001,
+          63.7564
+        ],
+        "combined_area_m2": 41.7006,
+        "role": "north recess/entry-side low and pitched faces; preserve as attached geometry"
+      },
+      {
+        "face_ids_0based": [
+          1,
+          5,
+          6
+        ],
+        "union_bounds_xz_m": [
+          81.902627,
+          -122.702393,
+          112.330907,
+          -117.783485
+        ],
+        "height_min_max_navd88_m": [
+          56.4951,
+          64.0409
+        ],
+        "combined_area_m2": 17.8227,
+        "role": "south-edge low transition/canopy/gable fragments; preserve exact faces, do not generalize them into a continuous extra wing"
+      },
+      {
+        "face_ids_0based": [
+          2,
+          7,
+          8,
+          9,
+          10,
+          12,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19
+        ],
+        "union_bounds_xz_m": [
+          96.632633,
+          -156.905452,
+          102.894262,
+          -149.570734
+        ],
+        "approx_union_bounds_uv_m": [
+          73.5,
+          -170.43,
+          77.18,
+          -163.17
+        ],
+        "height_min_max_navd88_m": [
+          66.2359,
+          76.3459
+        ],
+        "combined_area_m2": 35.7893,
+        "role": "localized north-east high-face cluster",
+        "rule": "Preserve these exact source faces and their limited footprint in the first study. Do not use H=76.3459 as a whole-building height, extrude the cluster into another storey, enlarge it, or name it a chimney/tower/copper roof. The official aerial has only a few ambiguous pixels at this location; native review must judge the measured localized form."
+      }
+    ],
+    "facade_schedule": {
+      "west_rink_side": {
+        "plane_u_m": 61.3,
+        "v_range_m": [
+          -170.44,
+          -133.99
+        ],
+        "outward_sign": -1,
+        "wall": "One straight two-level red-brown masonry plane with a restrained pale horizontal division near H=60.6.",
+        "upper_windows": {
+          "centres_v_m": [
+            -161.5,
+            -154.0,
+            -146.5,
+            -139.0
+          ],
+          "width_m": 0.9,
+          "bottom_navd88_m": 62.15,
+          "height_m": 1.3,
+          "count": 4,
+          "count_status": "Four small upper openings are directly visible in the official aerial enlargement. The interior photograph independently shows four windows on a long wrestling-room wall; assigning that interior wall to this exterior is inferred.",
+          "registration_tolerance_m": 0.75,
+          "rule": "Use dark narrow panes with occupied masonry heads and sills. Keep the row high below the eave; do not enlarge it into a curtain wall."
+        },
+        "lower_windows": {
+          "proposed_centres_v_m": [
+            -161.5,
+            -156.3,
+            -151.1,
+            -145.9,
+            -140.7
+          ],
+          "width_m": 1.2,
+          "bottom_navd88_m": 57.85,
+          "height_m": 1.8,
+          "count_status": "At least four lower dark patches/frames are visible; five positions are a length-scaled interpretation because Tuck/roof occlusion hides parts of the row.",
+          "registration_tolerance_m": 0.9,
+          "rule": "Five is an inferred bounded authoring schedule, not a photographed exact total. Adjust end positions before adding a sixth; do not mirror the upper row mechanically."
+        }
+      },
+      "south_gable": {
+        "plane_v_m": -133.99,
+        "u_range_m": [
+          61.3,
+          77.18
+        ],
+        "observed": "The red-brown gable is partly visible beyond a foreground roof. A shallow low canopy/entry form occupies the west half and the low annex joins the east half.",
+        "bounded_entry_interpretation": {
+          "centre_u_m": 65.8,
+          "width_m": 1.3,
+          "floor_navd88_m": 57.0,
+          "door_height_m": 2.25,
+          "canopy_top_navd88_m": 59.7,
+          "registration_tolerance_m": 1.0,
+          "rule": "One conservative dark entry beneath a thin connected canopy. Do not add a symmetric pair or repeated window grid."
+        }
+      },
+      "north_street_gable": {
+        "plane_v_m": -170.44,
+        "u_range_m": [
+          61.3,
+          77.18
+        ],
+        "local_ground_navd88_m": 59.0,
+        "rule": "Preserve the measured attached recess and closed straight gable mass. Door, window and stair arrangement are unseen; do not invent a monumental entry or repeated openings."
+      },
+      "east_and_annex": {
+        "main_plane_u_m": 77.18,
+        "annex_east_u_m": 92.36,
+        "rule": "Keep the main east gable distinct from the low annex. Openings are unresolved; use closed ordinary masonry planes except for any source-backed end return needed for enclosure."
+      }
+    },
+    "site_controls": {
+      "tuck_gap": {
+        "bounds_uv_m": [
+          53.52,
+          -167.6,
+          61.3,
+          -133.99
+        ],
+        "minimum_nominal_width_m": 7.78,
+        "grade_navd88_m": "about 59 north, descending toward 57 south",
+        "rule": "Preserve the open walking/service corridor. Do not bridge or merge Tuck and Annan."
+      },
+      "sweeney_gap": {
+        "annan_south_v_m": -133.99,
+        "nearest_sweeney_north_v_m": -130.29,
+        "minimum_nominal_width_m": 3.7,
+        "rule": "Preserve the tight passage and actual grade; do not widen it into an invented lawn or close it with Annan's annex."
+      },
+      "davy_gap": {
+        "annan_annex_east_u_m": 92.36,
+        "davy_west_u_m": 102.8,
+        "minimum_nominal_width_m": 10.44,
+        "rule": "Keep the east service/landscape gap open. Do not extend the low annex toward Davy."
+      },
+      "grade_rule": "Use the measured terrain and expose foundations where grade drops. Do not flatten the building to the H=55.6699 source minimum or lift the south/west lower floor to the north H=59 terrain."
+    },
+    "palette_guidance": [
+      {
+        "role": "main and annex walls",
+        "actual": "red-brown brick-like masonry; exact unit/product undocumented",
+        "evidence_status": "photographically explicit appearance, material species inferred",
+        "minecraft_primary": [
+          "bricks"
+        ],
+        "minecraft_shadow_or_foundation": [
+          "mud_bricks"
+        ],
+        "rule": "Use ordinary coursed masonry texture on straight connected planes. Do not replace the whole facade with smooth terracotta or noisy alternating stripes."
+      },
+      {
+        "role": "main pitched roof and localized high-face cluster",
+        "actual": "medium gray roof; small-unit versus sheet product unresolved",
+        "evidence_status": "image inferred",
+        "minecraft_primary": [
+          "polished_andesite",
+          "polished_andesite_slab",
+          "polished_andesite_stairs"
+        ],
+        "minecraft_fallback": [
+          "stone_bricks",
+          "stone_brick_slab",
+          "stone_brick_stairs"
+        ],
+        "rule": "Use one coherent medium-gray family while preserving every measured cap shape/state. Prefer the less masonry-striped polished-andesite family if native textures remain continuous; do not claim slate, metal or copper."
+      },
+      {
+        "role": "low annex roof",
+        "actual": "low gray flat roof",
+        "evidence_status": "measured and image inferred",
+        "minecraft_primary": [
+          "gray_concrete",
+          "smooth_stone",
+          "smooth_stone_slab"
+        ],
+        "rule": "Keep flat, low and visually subordinate to the main gable."
+      },
+      {
+        "role": "west windows",
+        "actual": "dark-framed reflective glazing",
+        "evidence_status": "directly visible exterior and interior",
+        "minecraft_primary": [
+          "gray_stained_glass_pane"
+        ],
+        "minecraft_darker_option": [
+          "black_stained_glass_pane"
+        ],
+        "frame": [
+          "polished_andesite",
+          "smooth_stone"
+        ],
+        "rule": "Use panes in the wall plane with cardinal backing/joins, occupied heads and sills. Select gray or black after native comparison; avoid bright clear panes."
+      },
+      {
+        "role": "pale west band, canopy and sparse trim",
+        "actual": "pale trim/coping appearance; exact stone or concrete unresolved",
+        "evidence_status": "image interpreted",
+        "minecraft_primary": [
+          "smooth_stone",
+          "smooth_stone_slab"
+        ],
+        "minecraft_brighter_option": [
+          "smooth_quartz",
+          "smooth_quartz_slab"
+        ],
+        "rule": "Keep trim thin and continuous. Do not create full-block white belts or thick decorative frames unsupported by the aerial."
+      }
+    ],
+    "construction_rules": [
+      "Preserve the exact 21 source roof faces, campus placement, main ridge/eaves, low annex and localized high-face cluster.",
+      "Keep all photographed wall runs on straight analytic planes represented by the minimum connected half-metre raster; no decorative pilaster combs or roof-boundary teeth.",
+      "Build the west four-window upper row as observed. Label the five-window lower row interpreted and keep its stated tolerance.",
+      "Do not copy the west openings to the north, east or annex walls.",
+      "Keep main bar, north recess and low annex physically connected, but do not turn the roof notch into a detached pavilion.",
+      "Use the local floors/grades rather than the source minimum as a common datum.",
+      "Back roof stairs/slabs, connect panes cardinally, give every pane an occupied head/sill and keep canopies physically attached.",
+      "Preserve the Tuck, Sweeney and Davy gaps and current terrain."
+    ],
+    "observed_inferred_unseen": {
+      "observed_or_measured": [
+        "Official map identity and whole county outline",
+        "Twenty-one measured source roof faces, main gable, low annex and localized high-face cluster",
+        "Gray main roof and red-brown west/south wall appearance",
+        "Four small upper west windows",
+        "At least four lower west opening patches",
+        "Low south canopy/entry form and annex relationship",
+        "Bissell Wrestling Room above fitness room and its four-window interior long wall",
+        "Open gaps to Tuck, Sweeney and Davy"
+      ],
+      "interpreted_with_tolerance": [
+        "Assignment of the official wrestling-room long wall to Annan's west upper exterior",
+        "Five-position lower west authoring schedule",
+        "Exact west window centres and dimensions",
+        "One south low entry beneath the partial canopy",
+        "Lower H=57.0 and upper H=60.3 floor levels from facade/terrain registration",
+        "Minecraft material proxies"
+      ],
+      "unseen_or_unresolved": [
+        "North entry doors, stairs and windows",
+        "East main-gable and low-annex opening counts",
+        "Exact wall and roof products",
+        "Architectural identity and material of the localized H=76.3459 high-face cluster",
+        "Interiors and operable doors"
+      ]
+    },
+    "camera_views": [
+      {
+        "name": "annan-west-gap-overview",
+        "eye_uv_navd88_m": [
+          56.5,
+          -151.0,
+          63.0
+        ],
+        "target_uv_navd88_m": [
+          61.3,
+          -151.0,
+          61.0
+        ],
+        "fov": 78,
+        "note": "Standalone-safe proposal; campus capture must preflight air and grade in the narrow Tuck corridor."
+      },
+      {
+        "name": "annan-west-south-oblique",
+        "eye_uv_navd88_m": [
+          55.5,
+          -128.0,
+          67.0
+        ],
+        "target_uv_navd88_m": [
+          66.0,
+          -139.0,
+          61.0
+        ],
+        "fov": 74
+      },
+      {
+        "name": "annan-north-recess",
+        "eye_uv_navd88_m": [
+          69.0,
+          -183.0,
+          64.0
+        ],
+        "target_uv_navd88_m": [
+          69.0,
+          -168.0,
+          62.0
+        ],
+        "fov": 72
+      },
+      {
+        "name": "annan-east-annex",
+        "eye_uv_navd88_m": [
+          100.0,
+          -139.0,
+          63.0
+        ],
+        "target_uv_navd88_m": [
+          87.0,
+          -139.0,
+          60.0
+        ],
+        "fov": 72,
+        "note": "Preflight against Davy and terrain in combined context."
+      },
+      {
+        "name": "annan-roof-and-high-cluster",
+        "eye_uv_navd88_m": [
+          104.0,
+          -184.0,
+          84.0
+        ],
+        "target_uv_navd88_m": [
+          72.0,
+          -151.0,
+          66.0
+        ],
+        "fov": 74
+      }
+    ],
+    "acceptance_gate": [
+      "Fresh immutable Annan study, exact archive/sample hash and profile bound to this packet hash",
+      "Exact parity for all 21 measured source roof faces, including the limited high cluster, without whole-building extrusion to H=76.3459",
+      "Straight connected west wall with four high small windows and a separately labeled inferred lower row",
+      "Low connected annex and retained north recess; no detached notch pavilion",
+      "No invented north/east opening grids and no copied Tuck/Sweeney facade language",
+      "Terrain/floor separation and open Tuck, Sweeney and Davy gaps",
+      "Shape/contact, pane support, whole-wall enclosure, source-roof, neighbor-gap and exact Anvil export audits",
+      "Fresh native west overview/close, south oblique, north limitation, east annex, roof/high-cluster and all three neighbor-gap views",
+      "native-review.json bound to exact hashes with inspected PNGs, findings, explicit remaining limits and acceptance/rejection status"
+    ]
+  },
+  "camera_views": [
+    {
+      "name": "annan-west-whole-overview",
+      "eye_uv_navd88_m": [
+        40,
+        -151,
+        68
+      ],
+      "target_uv_navd88_m": [
+        65,
+        -151,
+        61
+      ],
+      "fov": 76
+    },
+    {
+      "name": "annan-west-gap-overview",
+      "eye_uv_navd88_m": [
+        56.5,
+        -151.0,
+        63.0
+      ],
+      "target_uv_navd88_m": [
+        61.3,
+        -151.0,
+        61.0
+      ],
+      "fov": 78,
+      "note": "Standalone-safe proposal; campus capture must preflight air and grade in the narrow Tuck corridor."
+    },
+    {
+      "name": "annan-west-south-oblique",
+      "eye_uv_navd88_m": [
+        55.5,
+        -128.0,
+        67.0
+      ],
+      "target_uv_navd88_m": [
+        66.0,
+        -139.0,
+        61.0
+      ],
+      "fov": 74
+    },
+    {
+      "name": "annan-north-recess",
+      "eye_uv_navd88_m": [
+        69.0,
+        -183.0,
+        64.0
+      ],
+      "target_uv_navd88_m": [
+        69.0,
+        -168.0,
+        62.0
+      ],
+      "fov": 72
+    },
+    {
+      "name": "annan-east-annex",
+      "eye_uv_navd88_m": [
+        100.0,
+        -139.0,
+        63.0
+      ],
+      "target_uv_navd88_m": [
+        87.0,
+        -139.0,
+        60.0
+      ],
+      "fov": 72,
+      "note": "Preflight against Davy and terrain in combined context."
+    },
+    {
+      "name": "annan-roof-and-high-cluster",
+      "eye_uv_navd88_m": [
+        104.0,
+        -184.0,
+        84.0
+      ],
+      "target_uv_navd88_m": [
+        72.0,
+        -151.0,
+        66.0
+      ],
+      "fov": 74
+    }
+  ],
+  "uncertainties": [
+    "North entry doors, stairs and windows",
+    "East main-gable and low-annex opening counts",
+    "Exact wall and roof products",
+    "Architectural identity and material of the localized H=76.3459 high-face cluster",
+    "Interiors and operable doors",
+    "Excluded high faces are vegetation contamination; the face20 continuation over exactly35.789274m2 is interpreted under tree cover.",
+    "Five lower windows and single fixed south entry are bounded interpretations; north/east opening counts remain unresolved.",
+    "Quarter-metre slab trim and half-metre wall/roof steps are coarse vanilla approximations."
+  ],
+  "complete_south_plane": true,
+  "retint_exposed_backing": true,
+  "refinement_baseline": {
+    "path": "runtime/campus-reconstruction/annan-v1-2x/sample-blocks.npz",
+    "sha256": "48ab5b521b863fa210691dfe8622b54412b67c24b5465dfa85f8f681baf9647d"
+  }
+}

@@ -1,0 +1,480 @@
+{
+  "name": "The Hill School - campus reconstruction at 2 blocks per metre",
+  "revision": "2026-09-05-context-5-2x-vanilla",
+  "blocks_per_metre": 2,
+  "vertical_offset_m": -25,
+  "tile_size_blocks": 256,
+  "terrain": "runtime/campus-reconstruction/campus-all-named-preparation/terrain.npz",
+  "components": [
+    {
+      "name": "Class of 1960 Alumni House",
+      "study": "runtime/campus-reconstruction/alumni-house-v6-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "Alumni Chapel",
+      "study": "runtime/campus-reconstruction/chapel-context-2x-v5",
+      "margin_m": 2
+    },
+    {
+      "name": "Athey Academic Center and Dining Hall envelope",
+      "study": "runtime/campus-reconstruction/athey-v8-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "John P. Ryan Library",
+      "study": "runtime/campus-reconstruction/ryan-library-v6-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "Hunt Upper School",
+      "study": "runtime/campus-reconstruction/hunt-hall-v6-2x",
+      "margin_m": 2
+    },
+    {
+      "name": "Meigs House - Admission Office",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600620C-fff89cfae9",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Warner Center for Spiritual Life and Equity",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006389O-f1989780fb",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Davy Hall Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600633C-c14400ca75",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Center For The Arts (CFTA)",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160031040003-894f07a81a",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "David H. Mercer Field House and Jerry Day '37 Squash Center / Sweeney Gymnasium",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-1f19950994",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Edward Tuck Hall Arena and Thomas Eccleston Jr. Rink",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16003036400434C-c86ee564a0",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Annan Building",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/1600303920031C-4b7d18d798",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Wendell Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600617C-403d7b1a51",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Ferenbach Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-fab9d4a2e4",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Senter Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-d333862570",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lowndes Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-6607e4a8a8",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Scheerer Dormitory - Dell Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600641C-7e1d6bacf8",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Foster Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600621C-2c9084ad78",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Rolfe Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600625C-c108a9b9b6",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Sherrerd Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-07f1d5b7e0",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Johnson Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-36b81aa17d",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Markle Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-53c8a9efca",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Robins Dormitory - Dutch Village",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-451a0df37b",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Hillrest Dormitory",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-c7b546273e",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "The Sherrill Guest House",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600619C-b4c5171aed",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Music House",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600622C-57b5b354dc",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Shirley Quadrivium Center",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600615C-ee30229dd5",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Thomas House",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600610C-e7f1a01cbc",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Pine Court Faculty Village - western joined pair",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600611C-a5bb4f8f72",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Pine Court Faculty Village - eastern joined pair",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600611C-50fbc7ea98",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Gatehouse",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-143655d070",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Feroe House - Head of School Residence",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/16001511600623C-ba74e78741",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - southwest duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-ddefd3570f",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - west south-middle duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-b790426980",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - west north-middle duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-c0e2b642d9",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - northwest duplex",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-8e22af513e",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - south single house",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-47b633ec2f",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - north middle single house",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-e070cb1680",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "East Campus Faculty Village - northeast single house",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160006438008-5e66af9ae7",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lehrman '56 Pavilion - south round viewing pavilion",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-081aa7dcac",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Lehrman '56 Pavilion - north service bar",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/160015116006-f7611d45c7",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    },
+    {
+      "name": "Hillhouse & Moore Business Office",
+      "study": "runtime/campus-reconstruction/campus-envelopes-v1-2x/1600151000041C-510dc616b8",
+      "margin_m": 0.5,
+      "detail_status": "measured_envelope"
+    }
+  ],
+  "camera_views": [
+    {
+      "name": "quad-drone-overview",
+      "eye_xz_navd88_m": [
+        95,
+        -95,
+        153
+      ],
+      "target_xz_navd88_m": [
+        66,
+        9,
+        67
+      ],
+      "fov": 78
+    },
+    {
+      "name": "quad-player-height",
+      "eye_xz_navd88_m": [
+        68.3,
+        12,
+        68.6
+      ],
+      "player_eye_height_blocks": 1.62,
+      "target_xz_navd88_m": [
+        58.7,
+        43.7,
+        72.5
+      ],
+      "fov": 76
+    },
+    {
+      "name": "quad-library-and-athey",
+      "eye_xz_navd88_m": [
+        34,
+        -5,
+        78
+      ],
+      "target_xz_navd88_m": [
+        88,
+        32,
+        73
+      ],
+      "fov": 88
+    },
+    {
+      "name": "quad-chapel-and-athey",
+      "eye_xz_navd88_m": [
+        108,
+        -1,
+        77
+      ],
+      "target_xz_navd88_m": [
+        29,
+        27,
+        70
+      ],
+      "fov": 84
+    },
+    {
+      "name": "alumni-house-in-context",
+      "eye_xz_navd88_m": [
+        -153,
+        129,
+        55
+      ],
+      "target_xz_navd88_m": [
+        -158,
+        103,
+        56
+      ],
+      "fov": 66
+    },
+    {
+      "name": "ryan-arcade-in-context",
+      "eye_xz_navd88_m": [
+        106,
+        10,
+        69.8
+      ],
+      "target_xz_navd88_m": [
+        122,
+        24,
+        72
+      ],
+      "fov": 84
+    },
+    {
+      "name": "quad-hunt-and-ryan",
+      "eye_xz_navd88_m": [
+        32,
+        21,
+        72
+      ],
+      "target_xz_navd88_m": [
+        90,
+        -14,
+        74
+      ],
+      "fov": 88
+    },
+    {
+      "name": "hunt-quad-player-height",
+      "eye_xz_navd88_m": [
+        70.2,
+        5,
+        68
+      ],
+      "player_eye_height_blocks": 1.62,
+      "target_xz_navd88_m": [
+        79,
+        -29,
+        74
+      ],
+      "fov": 82
+    },
+    {
+      "name": "athey-window-frame-close",
+      "eye_xz_navd88_m": [
+        47.5,
+        34.5,
+        73.6
+      ],
+      "target_xz_navd88_m": [
+        47,
+        42.5,
+        73.1
+      ],
+      "fov": 64
+    },
+    {
+      "name": "quad-official-aerial-comparison",
+      "eye_xz_navd88_m": [
+        -45,
+        120,
+        125
+      ],
+      "target_xz_navd88_m": [
+        53,
+        12,
+        69
+      ],
+      "fov": 78
+    },
+    {
+      "name": "sports-envelopes",
+      "eye_xz_navd88_m": [
+        83,
+        -215,
+        116
+      ],
+      "target_xz_navd88_m": [
+        46,
+        -103,
+        64
+      ],
+      "fov": 80
+    },
+    {
+      "name": "west-village-envelopes",
+      "eye_xz_navd88_m": [
+        -212,
+        -113,
+        103
+      ],
+      "target_xz_navd88_m": [
+        -125,
+        -25,
+        63
+      ],
+      "fov": 80
+    },
+    {
+      "name": "quadrivium-envelope",
+      "eye_xz_navd88_m": [
+        138,
+        140,
+        96
+      ],
+      "target_xz_navd88_m": [
+        118,
+        95,
+        71
+      ],
+      "fov": 82
+    },
+    {
+      "name": "east-faculty-envelopes",
+      "eye_xz_navd88_m": [
+        400,
+        15,
+        110
+      ],
+      "target_xz_navd88_m": [
+        461,
+        -54,
+        70
+      ],
+      "fov": 80
+    },
+    {
+      "name": "lehrman-envelopes",
+      "eye_xz_navd88_m": [
+        445,
+        -480,
+        110
+      ],
+      "target_xz_navd88_m": [
+        510,
+        -541,
+        67
+      ],
+      "fov": 78
+    }
+  ],
+  "uncertainties": [
+    "Five developed exterior studies are joined by 37new measured roof/footprint envelopes, covering 42county parents and 44official name records. New envelopes have no detailed facade openings yet; this is not all-campus photographic completion.",
+    "Kipp pavilion and Madden press box need newer map/photo geometry because their complete structures are absent from the older county outlines.",
+    "Quad paths are interpreted from 2026 drone footage with roughly 1.5-4 m horizontal uncertainty; tree crowns and planting dimensions are estimated. The Athey approach has been joined to its actual generated threshold.",
+    "All materials use original Minecraft textures and ordinary construction blocks.",
+    "Two blocks represent one physical metre throughout, with NAVD88 to Minecraft Y offset -25 m.",
+    "Lehrman retains two measured source components; its intervening porch/connector awaits newer photo geometry."
+  ],
+  "landscape": "server-assets/hill-quad-landscape.json"
+}

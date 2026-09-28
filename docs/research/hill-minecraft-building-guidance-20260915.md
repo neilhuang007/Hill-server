@@ -1,0 +1,13 @@
+# Minecraft construction guidance for measured Hill buildings — 2026-09-15
+
+These are implementation cues, not architectural evidence. A generic Minecraft tutorial cannot override The Hill School photographs, measured footprint, roof data, grade controls, placement or scale. For Quadrivium, use the measured source and the dedicated [`reference packet`](../../runtime/research/quadrivium-reference-20260915/quadrivium-reference-packet-20260915.json) first.
+
+1. Mojang's [How to Structure your Build](https://www.minecraft.net/en-us/article/how-structure-your-build) treats triangles as roof/gable forms, triangular prisms as roof volumes, and circles as deliberately planned stepped outlines. For Quadrivium, use this vocabulary only to voxelize the photographed pointed arches, gables and two curved bays. Keep straight walls straight and make every step part of a repeatable curve profile.
+
+2. Mojang's [How to do MEGA builds](https://www.minecraft.net/en-us/article/how-do-mega-builds) recommends beginning from real reference images, laying out the outline, building a three-dimensional skeleton and then adding roof trim, windows, chimneys and arches. The useful Hill workflow is silhouette first, opening rhythm second, thin trim last. Do not let decorative stairs or slabs change measured massing.
+
+3. Mojang's [Taking Inventory: Slab](https://www.minecraft.net/en-us/article/slab) confirms slabs can occupy either half of a block and are intended for half-height architectural work. Use top/bottom slabs with stairs to keep roof slopes, arch heads and sills near the two-blocks-per-metre source line. Back each visible partial block with occupied masonry; a visually thin slab must not leave an open wall or roof contact.
+
+4. Mojang's [Taking Inventory: Glass Pane](https://www.minecraft.net/en-us/article/taking-inventory--glass-pane) recommends panes when a window needs depth instead of a full glass block. For Hill windows, recess connected panes within the opening and keep mullions sparse. Minecraft panes must have cardinal connections at stepped corners; diagonal contact alone leaves a gap. Inspect pane-to-frame, head, sill and inward backing in native views.
+
+For the Quadrivium palette, prefer ordinary manmade vanilla construction families that supply the shapes the geometry needs: `mud_bricks`; `stone_bricks`, `stone_brick_stairs`, `stone_brick_slab`; `smooth_quartz`, `smooth_quartz_stairs`, `smooth_quartz_slab`; `quartz_bricks`; `glass_pane`; sparse `iron_bars`; and `dark_oak_door`/`dark_oak_planks`. Do not substitute sculk, ore, coral, plants or other organic/fantasy textures for masonry, slate, metal or glass.
