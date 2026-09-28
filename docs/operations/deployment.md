@@ -200,6 +200,10 @@ protect it with root-only permissions. The script requires `BORG_REPO_PATH` and
 any repository unlock credentials through Borg's supported environment mechanism.
 Read `ops/backup-hill175.sh` for retention/runtime overrides. Initialize the Borg
 repository deliberately and test restore; a scheduled timer alone proves no backup.
+Hill runtime/service/retention settings are resolved from `HILL175_*` after loading
+the credential file. Generic `SRV_DIR` or `SERVICE_NAME` values belonging to another
+Minecraft installation must not select the Hill backup target. Check the archive
+log and stored paths for `/opt/hill175`, not just a successful Borg exit code.
 
 On startup/verification failure, the installer attempts to restore prior config,
 plugin, template and imported worlds. It retains failed replacements when needed

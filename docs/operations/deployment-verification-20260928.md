@@ -1,7 +1,8 @@
 # September 28 deployment verification
 
-The logistics server is running the v19 two-blocks-per-metre People template and
-updated camera controls. **Microsoft SSO and Bedrock linking remain unimplemented.**
+This records the earlier v19 campus/camera deployment, before Microsoft SSO was
+implemented. See the [later SSO review](microsoft-sso-verification-20260928.md) for
+the current application build and remaining IT rollout requirements.
 
 ## Deployed artifacts
 
@@ -14,7 +15,7 @@ updated camera controls. **Microsoft SSO and Bedrock linking remain unimplemente
 | Campus archive | `hill_people_template_campus_v19_2x.tgz` |
 | Archive SHA-256 | `b913315523e35b8231b8a56647179830d5e8c4099e2908d610f1ef2ff320598e` |
 | Template | 25 region files; frozen campus v19; two blocks per metre |
-| Pre-deployment Borg snapshot | `hill175-predeploy-v19-2026-09-28T18-40-24Z` |
+| Earlier reported Borg archive | `hill175-predeploy-v19-2026-09-28T18-40-24Z`; do not rely on this as a Hill snapshot (see correction below) |
 | Previous template backup | `/opt/hill175/assets/people-template-backup.rMouPr` |
 
 The server pulled GitHub source, built and tested it, then installed from that
@@ -23,6 +24,11 @@ and verification-document checkpoint does not change application code.
 
 Existing People entries were preserved. The template applies to new entries and
 owner-confirmed resets. All live reset checks targeted a newly created smoke entry.
+
+Backup correction: the later SSO deployment exposed a shared-environment variable
+collision that could redirect Hill backups to the other Minecraft installation.
+A successful Borg exit did not verify the intended runtime. The backup script was
+corrected; use the verified Hill archive recorded in the later SSO report.
 
 ## Checks performed
 

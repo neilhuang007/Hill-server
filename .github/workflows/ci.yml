@@ -24,6 +24,8 @@ jobs:
           for script in ops/*.mjs; do node --check "$script"; done
           python3 -m compileall -q ops scripts tests
           python3 -m unittest discover -s tests -p test_auth_environment.py
+      - name: Verify backup isolation with mocked system services
+        run: sudo python3 -m unittest discover -s tests -p test_backup_isolation.py
       - name: Validate PowerShell syntax
         shell: pwsh
         run: |

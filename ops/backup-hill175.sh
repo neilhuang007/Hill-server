@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SERVICE_NAME="${HILL175_SERVICE_NAME:-hill175.service}"
-SRV_DIR="${HILL175_RUNTIME_DIR:-/opt/hill175}"
 ENV_FILE="${HILL175_BACKUP_ENV_FILE:-/etc/minecraft-backup.env}"
-LOCK_FILE="${MC_BACKUP_LOCK:-/run/lock/mc-backup.lock}"
-LOCK_WAIT_SECONDS="${HILL175_BACKUP_LOCK_WAIT_SECONDS:-3600}"
-ARCHIVE_PREFIX="${HILL175_BACKUP_ARCHIVE_PREFIX:-hill175-daily}"
-KEEP_DAILY="${HILL175_BACKUP_KEEP_DAILY:-14}"
 
 log() {
   printf '%s %s\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" "$*" >&2
@@ -53,12 +47,7 @@ require_command flock
 require_command stat
 require_command systemctl
 
-[[ "${SRV_DIR}" == /* ]] || fail "runtime directory must be absolute: ${SRV_DIR}"
-[[ -d "${SRV_DIR}" ]] || fail "runtime directory does not exist: ${SRV_DIR}"
 [[ -f "${ENV_FILE}" && -r "${ENV_FILE}" ]] || fail "backup env file missing or unreadable: ${ENV_FILE}"
-[[ "${LOCK_WAIT_SECONDS}" =~ ^[0-9]+$ ]] || fail "lock wait must be numeric: ${LOCK_WAIT_SECONDS}"
-[[ "${KEEP_DAILY}" =~ ^[0-9]+$ && "${KEEP_DAILY}" -gt 0 ]] || fail "daily retention must be a positive number: ${KEEP_DAILY}"
-[[ "${ARCHIVE_PREFIX}" =~ ^[A-Za-z0-9._-]+$ ]] || fail "archive prefix contains unsupported characters: ${ARCHIVE_PREFIX}"
 
 env_uid="$(stat -c '%u' "${ENV_FILE}")"
 env_mode="$(stat -c '%a' "${ENV_FILE}")"
@@ -70,6 +59,22 @@ set -a
 source "${ENV_FILE}"
 set +a
 : "${BORG_REPO_PATH:?BORG_REPO_PATH must be set by ${ENV_FILE}}"
+
+# Shared Borg credentials can also contain another server's SRV_DIR or SERVICE_NAME.
+# Resolve Hill's namespaced settings after sourcing so those generic values cannot
+# redirect a Hill snapshot, stop another service, or change its retention policy.
+SERVICE_NAME="${HILL175_SERVICE_NAME:-hill175.service}"
+SRV_DIR="${HILL175_RUNTIME_DIR:-/opt/hill175}"
+LOCK_FILE="${MC_BACKUP_LOCK:-/run/lock/mc-backup.lock}"
+LOCK_WAIT_SECONDS="${HILL175_BACKUP_LOCK_WAIT_SECONDS:-3600}"
+ARCHIVE_PREFIX="${HILL175_BACKUP_ARCHIVE_PREFIX:-hill175-daily}"
+KEEP_DAILY="${HILL175_BACKUP_KEEP_DAILY:-14}"
+
+[[ "${SRV_DIR}" == /* ]] || fail "runtime directory must be absolute: ${SRV_DIR}"
+[[ -d "${SRV_DIR}" ]] || fail "runtime directory does not exist: ${SRV_DIR}"
+[[ "${LOCK_WAIT_SECONDS}" =~ ^[0-9]+$ ]] || fail "lock wait must be numeric: ${LOCK_WAIT_SECONDS}"
+[[ "${KEEP_DAILY}" =~ ^[0-9]+$ && "${KEEP_DAILY}" -gt 0 ]] || fail "daily retention must be a positive number: ${KEEP_DAILY}"
+[[ "${ARCHIVE_PREFIX}" =~ ^[A-Za-z0-9._-]+$ ]] || fail "archive prefix contains unsupported characters: ${ARCHIVE_PREFIX}"
 
 SRV_DIR="$(cd "${SRV_DIR}" && pwd -P)"
 [[ "${SRV_DIR}" != "/" && "${SRV_DIR}" != "/opt" ]] || fail "refusing to back up broad runtime path: ${SRV_DIR}"
