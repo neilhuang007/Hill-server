@@ -8,7 +8,8 @@ an active event.
 
 | Java package | Responsibility |
 | --- | --- |
-| `auth` | Identity-provider boundary and password verification |
+| `auth` | Game identity, school sessions and development password verification |
+| `auth.sso` | Environment configuration, Microsoft OIDC, browser challenges and atomic identity links |
 | `model` | Competition records and domain data |
 | `data` | Durable competition and survival state |
 | `competition` | Session, entry, team, camera workflows |
@@ -19,10 +20,11 @@ an active event.
 Keep Bukkit mutations on the server thread and network/database work off it.
 Authorize actions in the application layer shared by commands, menus, and listeners.
 Use [CONTEXT.md](CONTEXT.md) for terminology and the
-[SSO design](docs/architecture/microsoft-sso.md) for the planned identity migration.
+[SSO architecture](docs/architecture/microsoft-sso.md) for participant ownership.
 Display names must not replace verified game identities or become authorization keys.
 
-`ops/` contains server lifecycle tools; `ops/systemd/` contains service definitions.
+`ops/` contains server lifecycle tools; `ops/systemd/` contains service definitions
+and `ops/nginx/` contains the authentication proxy example.
 `server-config/` holds deployable defaults. `server-assets/` holds asset provenance,
 checksum pins, and reconstruction inputs. Keep packaging/verification pins synchronized.
 Do not replace participant builds when updating a template.

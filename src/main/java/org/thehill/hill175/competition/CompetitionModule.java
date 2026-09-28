@@ -32,6 +32,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.thehill.hill175.auth.IdentityLinker;
 import org.thehill.hill175.auth.PasswordHasher;
+import org.thehill.hill175.auth.SsoPlayerSessions;
+import org.thehill.hill175.auth.sso.MicrosoftSsoService;
+import org.thehill.hill175.auth.sso.VerifiedSession;
 import org.thehill.hill175.data.CompetitionStore;
 import org.thehill.hill175.data.SurvivalInventoryStore;
 import org.thehill.hill175.model.Account;
@@ -90,6 +93,7 @@ public final class CompetitionModule {
     private final WorldModule worlds;
     private final PasswordHasher passwordHasher;
     private final IdentityLinker identityLinker;
+    private final SsoPlayerSessions schoolSessions;
     private final SurvivalInventoryStore survivalInventories;
     private final ClientCameraBridge cameraBridge;
     private final NamespacedKey itemKey;
@@ -116,17 +120,32 @@ public final class CompetitionModule {
             PasswordHasher passwordHasher,
             IdentityLinker identityLinker
     ) {
+        this(plugin, store, worlds, passwordHasher, identityLinker, null);
+    }
+
+    public CompetitionModule(
+            JavaPlugin plugin,
+            CompetitionStore store,
+            WorldModule worlds,
+            PasswordHasher passwordHasher,
+            IdentityLinker identityLinker,
+            MicrosoftSsoService schoolIdentity
+    ) {
         this.plugin = plugin;
         this.store = store;
         this.worlds = worlds;
         this.passwordHasher = passwordHasher;
         this.identityLinker = identityLinker;
+        this.schoolSessions = schoolIdentity == null ? null : new SsoPlayerSessions(plugin, schoolIdentity, this::authenticateSchool);
         this.survivalInventories = new SurvivalInventoryStore(plugin.getDataFolder(), plugin.getLogger());
         this.cameraBridge = ClientCameraBridge.create(plugin);
         this.itemKey = new NamespacedKey(plugin, "item-id");
     }
 
     public void handleJoin(Player player) {
+        if (schoolSessions != null && !schoolSessions.connect(player)) {
+            return;
+        }
         // Paper initially places every connection in the primary Overworld,
         // which is also our survival world. Only an existing persistent intent
         // proves this player was actually in survival before reconnecting.
@@ -134,7 +153,7 @@ public final class CompetitionModule {
                 && survivalInventories.isActive(player.getUniqueId())) {
             saveSurvivalState(player);
         }
-        store.recordConnection(nicknameKey(player.getName()), connectionAddress(player), "join");
+        store.recordConnection(participantKey(player), connectionAddress(player), "join");
         authenticatedSessions.remove(player.getUniqueId());
         pendingRegistrations.remove(player.getUniqueId());
         currentEntryByPlayer.remove(player.getUniqueId());
@@ -154,6 +173,9 @@ public final class CompetitionModule {
         player.teleport(worlds.authenticationSpawn());
         showAuthenticationTitle(player);
         sendAuthenticationInstructions(player);
+        if (schoolSessions != null) {
+            schoolSessions.requestLink(player);
+        }
     }
 
     public void handleQuit(Player player) {
@@ -161,7 +183,10 @@ public final class CompetitionModule {
             saveSurvivalState(player);
             survivalInventories.markActive(player.getUniqueId());
         }
-        store.recordConnection(nicknameKey(player.getName()), connectionAddress(player), "quit");
+        store.recordConnection(participantKey(player), connectionAddress(player), "quit");
+        if (schoolSessions != null) {
+            schoolSessions.disconnect(player);
+        }
         authenticatedSessions.remove(player.getUniqueId());
         pendingRegistrations.remove(player.getUniqueId());
         currentEntryByPlayer.remove(player.getUniqueId());
@@ -177,24 +202,46 @@ public final class CompetitionModule {
     }
 
     public boolean isAuthenticated(Player player) {
-        return authenticatedSessions.contains(player.getUniqueId());
+        return schoolSessions == null ? authenticatedSessions.contains(player.getUniqueId()) : schoolSessions.session(player).isPresent();
     }
 
-    public Optional<Account> account(Player player) {
-        return store.account(nicknameKey(player.getName()));
+    public boolean usesMicrosoftAuthentication() {
+        return schoolSessions != null;
     }
 
-    public Optional<Account> account(String nicknameKey) {
-        return store.account(nicknameKey);
+    /** A school's immutable participant key owns builds, regardless of the Minecraft account used. */
+    public String participantKey(Player player) {
+        if (schoolSessions != null) {
+            return schoolSessions.session(player).map(VerifiedSession::participantKey)
+                    .orElse("unauthenticated:" + player.getUniqueId());
+        }
+        return nicknameKey(player.getName());
+    }
+
+    public void verify(Player player, String code) {
+        if (schoolSessions == null) {
+            message(player, NamedTextColor.YELLOW, "Microsoft verification is not enabled on this development server.");
+        } else if (code == null) {
+            schoolSessions.requestLink(player);
+        } else {
+            schoolSessions.confirm(player, code);
+        }
     }
 
     public String displayName(String nicknameKey) {
+        if (schoolSessions != null) {
+            return schoolSessions.nameLookup(nicknameKey).orElse("Unverified legacy participant");
+        }
         return store.account(nicknameKey)
                 .map(Account::displayName)
                 .orElse(nicknameKey);
     }
 
     public void register(Player player, String nicknameArgument, String password, String repeatedPassword) {
+        if (schoolSessions != null) {
+            sendAuthenticationInstructions(player);
+            return;
+        }
         if (isAuthenticated(player)) {
             message(player, NamedTextColor.YELLOW, "You are already authenticated.");
             return;
@@ -208,7 +255,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "The registration username must match your current Minecraft nickname: " + player.getName());
             return;
         }
-        String nicknameKey = nicknameKey(player.getName());
+        String nicknameKey = participantKey(player);
         if (isReservedNpcNickname(nicknameKey)) {
             message(player, NamedTextColor.RED, "That nickname is reserved for a Hill 175 category guide.");
             return;
@@ -261,12 +308,17 @@ public final class CompetitionModule {
             );
             store.saveAccount(account);
             if (player.isOnline()) {
-                authenticate(player, account, "Registration complete. School link approved.");
+                authenticatedSessions.add(player.getUniqueId());
+                authenticate(player, account.nicknameKey(), account.displayName(), "Registration complete. Development link approved.");
             }
         }, plugin.getConfig().getLong("authentication.stub-link-delay-ticks", 20L));
     }
 
     public void login(Player player, String password) {
+        if (schoolSessions != null) {
+            sendAuthenticationInstructions(player);
+            return;
+        }
         if (isAuthenticated(player)) {
             message(player, NamedTextColor.YELLOW, "You are already authenticated.");
             return;
@@ -276,7 +328,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "Too many failed attempts. Wait before trying again.");
             return;
         }
-        Optional<Account> existing = store.account(nicknameKey(player.getName()));
+        Optional<Account> existing = store.account(participantKey(player));
         if (existing.isEmpty()) {
             message(player, NamedTextColor.YELLOW, "This nickname is not registered. Use /register "
                     + player.getName() + " <password> <repeatPassword>.");
@@ -301,11 +353,17 @@ public final class CompetitionModule {
             return;
         }
         loginFailures.remove(player.getUniqueId());
-        authenticate(player, account, "Login successful.");
+        authenticatedSessions.add(player.getUniqueId());
+        authenticate(player, account.nicknameKey(), account.displayName(), "Login successful.");
     }
 
     public void sendAuthenticationInstructions(Player player) {
-        if (store.account(nicknameKey(player.getName())).isPresent()) {
+        if (schoolSessions != null) {
+            message(player, NamedTextColor.GOLD, "Use /verify to open Hill Microsoft sign-in, then /verify <browser-code>.");
+            message(player, NamedTextColor.GRAY, "Never enter a code supplied by someone else. School passwords belong only on Microsoft's sign-in page.");
+            return;
+        }
+        if (store.account(participantKey(player)).isPresent()) {
             message(player, NamedTextColor.GOLD, "Please sign in using your Hill competition password.");
             message(player, NamedTextColor.WHITE, "/login <password>");
         } else {
@@ -316,6 +374,14 @@ public final class CompetitionModule {
     }
 
     public void tickSessionLocks() {
+        if (schoolSessions != null) {
+            schoolSessions.expireSessions(player -> {
+                if (worlds.isSurvivalWorld(player.getWorld())) {
+                    saveSurvivalState(player);
+                    survivalInventories.markActive(player.getUniqueId());
+                }
+            });
+        }
         long now = System.nanoTime();
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (!isAuthenticated(online)) {
@@ -370,7 +436,10 @@ public final class CompetitionModule {
     }
 
     private String authenticationHint(Player player) {
-        if (store.account(nicknameKey(player.getName())).isPresent()) {
+        if (schoolSessions != null) {
+            return "Use /verify to sign in with your Hill Microsoft account";
+        }
+        if (store.account(participantKey(player)).isPresent()) {
             return "Use /login <password> to enter Hill 175";
         }
         return "Use /register " + player.getName() + " <password> <repeatPassword>";
@@ -389,8 +458,13 @@ public final class CompetitionModule {
     public void sendHelp(Player player) {
         message(player, NamedTextColor.GOLD, "Hill 175 Commands");
         if (!isAuthenticated(player)) {
-            message(player, NamedTextColor.WHITE, "/register <nickname> <password> <repeatPassword>");
-            message(player, NamedTextColor.WHITE, "/login <password>");
+            if (schoolSessions != null) {
+                message(player, NamedTextColor.WHITE, "/verify - request your Hill Microsoft sign-in link");
+                message(player, NamedTextColor.WHITE, "/verify <browser-code> - confirm this Minecraft connection");
+            } else {
+                message(player, NamedTextColor.WHITE, "/register <nickname> <password> <repeatPassword>");
+                message(player, NamedTextColor.WHITE, "/login <password>");
+            }
             message(player, NamedTextColor.WHITE, "/help and /rules");
             return;
         }
@@ -516,7 +590,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.AQUA,
                     "This People build was spawned from the server's Hill School campus template.");
         }
-        boolean owner = entry.isMember(nicknameKey(player.getName()));
+        boolean owner = entry.isMember(participantKey(player));
         if (owner && !visiting && !entry.submitted() && !worlds.isResetting(entry.id())) {
             setOwnerMode(player);
             giveEntryOwnerItems(player, entry);
@@ -603,9 +677,9 @@ public final class CompetitionModule {
     }
 
     public boolean home(Player player) {
-        List<Entry> ownedEntries = entriesFor(nicknameKey(player.getName()));
+        List<Entry> ownedEntries = entriesFor(participantKey(player));
         Optional<Entry> currentOwned = currentEntry(player)
-                .filter(entry -> entry.isMember(nicknameKey(player.getName())));
+                .filter(entry -> entry.isMember(participantKey(player)));
         if (currentOwned.isPresent()) {
             teleportToEntry(player, currentOwned.get(), false);
             return true;
@@ -640,7 +714,7 @@ public final class CompetitionModule {
         if (worlds.isSurvivalWorld(location)) {
             return true;
         }
-        String key = nicknameKey(player.getName());
+        String key = participantKey(player);
         return entryAt(location)
                 .filter(entry -> entry.isMember(key))
                 .filter(entry -> !entry.submitted())
@@ -670,10 +744,10 @@ public final class CompetitionModule {
             Entry activeEntry = entry.get();
             currentEntryByPlayer.put(player.getUniqueId(), activeEntry.id());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-            boolean ownerMode = activeEntry.isMember(nicknameKey(player.getName()))
+            boolean ownerMode = activeEntry.isMember(participantKey(player))
                     && !activeEntry.submitted()
                     && !worlds.isResetting(activeEntry.id());
-            boolean entryOwner = activeEntry.isMember(nicknameKey(player.getName()));
+            boolean entryOwner = activeEntry.isMember(participantKey(player));
             String desiredKit = ownerMode
                     ? ownerKit(activeEntry)
                     : visitorKit(activeEntry, entryOwner);
@@ -891,7 +965,7 @@ public final class CompetitionModule {
 
     public boolean canEditCameras(Player player, Entry entry) {
         return isAuthenticated(player)
-                && entry.isMember(nicknameKey(player.getName()))
+                && entry.isMember(participantKey(player))
                 && !entry.submitted()
                 && !worlds.isResetting(entry.id());
     }
@@ -1093,6 +1167,9 @@ public final class CompetitionModule {
         previewBossBarsByPlayer.clear();
         lastPreviewExitAtNanosByPlayer.clear();
         lastCameraItemUseAtNanosByPlayer.clear();
+        if (schoolSessions != null) {
+            schoolSessions.close();
+        }
     }
 
     private boolean teleportEndingCameraPreview(Player player, Location target) {
@@ -1117,14 +1194,14 @@ public final class CompetitionModule {
             message(inviter, NamedTextColor.RED, "This entry already has two team members.");
             return;
         }
-        String targetKey = nicknameKey(targetNickname);
-        if (targetKey.equals(nicknameKey(inviter.getName()))) {
-            message(inviter, NamedTextColor.RED, "You cannot invite yourself.");
-            return;
-        }
         Player target = Bukkit.getPlayerExact(targetNickname);
         if (target == null || !isAuthenticated(target)) {
             message(inviter, NamedTextColor.RED, "That authenticated participant is not online.");
+            return;
+        }
+        String targetKey = participantKey(target);
+        if (targetKey.equals(participantKey(inviter))) {
+            message(inviter, NamedTextColor.RED, "You cannot invite yourself or another account linked to your Hill identity.");
             return;
         }
         if (entriesFor(targetKey).size() >= 2) {
@@ -1135,7 +1212,7 @@ public final class CompetitionModule {
             message(inviter, NamedTextColor.RED, "That participant already has an entry in this category.");
             return;
         }
-        invitesByTarget.put(targetKey, new TeamInvite(entry.id(), nicknameKey(inviter.getName()), Instant.now().plus(Duration.ofMinutes(5))));
+        invitesByTarget.put(targetKey, new TeamInvite(entry.id(), participantKey(inviter), Instant.now().plus(Duration.ofMinutes(5))));
         message(inviter, NamedTextColor.GREEN, "Invite sent to " + target.getName() + ".");
         message(target, NamedTextColor.GOLD, inviter.getName() + " invited you to their " + entry.category().displayName()
                 + " entry. Use /team accept " + inviter.getName() + ".");
@@ -1147,8 +1224,11 @@ public final class CompetitionModule {
             return;
         }
         TeamInvite invite = invitesByTarget.get(targetKey);
+        Player inviter = Bukkit.getPlayerExact(inviterNickname);
         if (invite == null || invite.expiresAt().isBefore(Instant.now())
-                || !invite.inviterKey().equals(nicknameKey(inviterNickname))) {
+                || inviter == null || !isAuthenticated(inviter)
+                || !invite.inviterKey().equals(participantKey(inviter))
+                || targetKey.equals(invite.inviterKey())) {
             message(target, NamedTextColor.RED, "No valid invite from that participant.");
             return;
         }
@@ -1159,6 +1239,11 @@ public final class CompetitionModule {
             return;
         }
         Entry entry = entryOptional.get();
+        if (!entry.isMember(invite.inviterKey())) {
+            invitesByTarget.remove(targetKey);
+            message(target, NamedTextColor.RED, "The inviter is no longer a member of that entry.");
+            return;
+        }
         if (entry.submitted()) {
             message(target, NamedTextColor.RED, "That entry is submitted. A member must unlock it before changing the team.");
             return;
@@ -1182,7 +1267,7 @@ public final class CompetitionModule {
             return;
         }
         Entry entry = current.get();
-        String key = nicknameKey(player.getName());
+        String key = participantKey(player);
         if (entry.members().size() == 1) {
             deleteCurrentEntry(player);
             return;
@@ -1236,20 +1321,24 @@ public final class CompetitionModule {
         return nicknameKey.equals(nicknameKey(survivalProfileName));
     }
 
-    private void authenticate(Player player, Account account, String successMessage) {
-        authenticatedSessions.add(player.getUniqueId());
+    private void authenticate(Player player, String participantKey, String displayName, String successMessage) {
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
-        store.recordConnection(account.nicknameKey(), connectionAddress(player), "authenticated");
-        player.displayName(Component.text(account.displayName()));
-        player.playerListName(Component.text(account.displayName(), NamedTextColor.GOLD));
+        store.recordConnection(participantKey, connectionAddress(player), "authenticated");
+        player.displayName(Component.text(displayName));
+        player.playerListName(Component.text(displayName, NamedTextColor.GOLD));
         if (survivalInventories.isActive(player.getUniqueId())) {
             teleportSurvival(player);
         } else {
             teleportHub(player);
         }
-        showWelcomeTitle(player, account.displayName());
+        showWelcomeTitle(player, displayName);
         message(player, NamedTextColor.GREEN, successMessage);
         sendRules(player);
+    }
+
+    private void authenticateSchool(Player player, VerifiedSession session) {
+        authenticate(player, session.participantKey(), session.displayName(),
+                "Hill Microsoft identity verified. Your linked Minecraft accounts share competition entries.");
     }
 
     public void resetEntry(Player player, Entry entry) {
@@ -1432,7 +1521,7 @@ public final class CompetitionModule {
         player.getInventory().setHeldItemSlot(3);
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
-        boolean owner = entry.isMember(nicknameKey(player.getName()));
+        boolean owner = entry.isMember(participantKey(player));
         if (canEditCameras(player, entry)) {
             player.getInventory().setItem(4, competitionItem(Material.RED_DYE, CAMERA_PREVIEW_REMOVE_ITEM_ID,
                     "Remove This Camera", "Right-click to remove this exact camera pose after confirmation."));
@@ -1524,7 +1613,7 @@ public final class CompetitionModule {
             return Optional.empty();
         }
         Optional<Entry> current = currentEntry(player);
-        if (current.isEmpty() || !current.get().isMember(nicknameKey(player.getName()))) {
+        if (current.isEmpty() || !current.get().isMember(participantKey(player))) {
             message(player, NamedTextColor.RED, "Open one of your entries first.");
             return Optional.empty();
         }
@@ -1545,7 +1634,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "Authenticate first.");
             return null;
         }
-        return nicknameKey(player.getName());
+        return participantKey(player);
     }
 
     private boolean ensureOwnedEntryAccess(Player player, Entry entry) {
@@ -1553,7 +1642,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "Authenticate first.");
             return false;
         }
-        if (!entry.isMember(nicknameKey(player.getName()))) {
+        if (!entry.isMember(participantKey(player))) {
             message(player, NamedTextColor.RED, "That is not one of your entries.");
             return false;
         }
@@ -1581,7 +1670,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.RED, "Authenticate first.");
             return false;
         }
-        if (entry.isMember(nicknameKey(player.getName()))) {
+        if (entry.isMember(participantKey(player))) {
             return true;
         }
         Optional<Entry> current = currentEntry(player);
@@ -1834,7 +1923,7 @@ public final class CompetitionModule {
             return;
         }
         Entry restoredEntry = entry.get();
-        boolean owner = restoredEntry.isMember(nicknameKey(player.getName()));
+        boolean owner = restoredEntry.isMember(participantKey(player));
         if (owner && !restoredEntry.submitted() && !worlds.isResetting(restoredEntry.id())) {
             setOwnerMode(player);
             giveEntryOwnerItems(player, restoredEntry);
@@ -1859,7 +1948,7 @@ public final class CompetitionModule {
 
     private void synchronizeEntryModes(Entry entry) {
         for (Player online : Bukkit.getOnlinePlayers()) {
-            String nicknameKey = nicknameKey(online.getName());
+            String nicknameKey = participantKey(online);
             if (isCameraPreviewing(online)) {
                 continue;
             }
@@ -1882,7 +1971,7 @@ public final class CompetitionModule {
 
     private void notifyEntry(Entry entry, String text) {
         for (Player online : Bukkit.getOnlinePlayers()) {
-            if (entry.isMember(nicknameKey(online.getName()))) {
+            if (entry.isMember(participantKey(online))) {
                 message(online, NamedTextColor.AQUA, text);
             }
         }

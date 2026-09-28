@@ -3,9 +3,13 @@ version: '${version}'
 main: org.thehill.hill175.Hill175Plugin
 api-version: '26.2'
 load: POSTWORLD
+softdepend: [floodgate]
 authors: [The Hill School]
 description: Hill School 175th Anniversary Minecraft competition server
 commands:
+  verify:
+    description: Sign in with your Hill Microsoft account and confirm the browser code
+    usage: /verify [browser-code]
   register:
     description: Register a competition nickname and password
     usage: /register <username> <password> <repeatPassword>

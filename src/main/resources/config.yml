@@ -1,8 +1,9 @@
-# Hill 175 development configuration.
-# Microsoft school SSO is designed but not implemented; this is controlled demo access only.
+# Hill 175 defaults. HILL175_AUTH_MODE=microsoft selects school SSO using the
+# protected environment configuration described in docs/operations/microsoft-sso-setup.md.
+# Never place tenant client secrets or student data in this file.
 authentication:
   provider: always-approve-development-stub
-  # Required safety acknowledgement. Replace the identity adapter before a real competition launch.
+  # Required acknowledgement only for the isolated development login provider.
   development-stub-acknowledged: true
   stub-link-base-url: https://example.invalid/hill175/link
   stub-link-delay-ticks: 20

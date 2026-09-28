@@ -4,7 +4,9 @@
 
 - [Build and deployment](operations/deployment.md)
 - [Player workflow and commands](operations/player-guide.md)
-- [Microsoft SSO and Java/Bedrock design](architecture/microsoft-sso.md)
+- [Microsoft SSO setup for Hill IT](operations/microsoft-sso-setup.md)
+- [Microsoft SSO architecture and limits](architecture/microsoft-sso.md)
+- [SSO implementation review](operations/microsoft-sso-verification-20260928.md)
 - [Smoke tests](SMOKE_TEST.md)
 - [Survival world generation](SURVIVAL_WORLDGEN.md)
 - [World credits](credits/world-assets.md)

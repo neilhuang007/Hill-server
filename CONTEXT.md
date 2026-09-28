@@ -3,19 +3,19 @@
 ## Terms
 
 ### School Identity
-The immutable Hill-managed identity representing one eligible person. It is the authority for eligibility, entry limits, team membership, voting, moderation, and password recovery. It is distinct from the Minecraft nickname.
+The immutable Entra tenant/object pair representing one eligible Hill person. In Microsoft mode it controls entry limits, team membership and permissions across linked game accounts. Eligibility also requires the configured app role. Voting and moderation extensions remain separate work.
 
 ### Minecraft Nickname
-The participant-selected Minecraft protocol username entered by the launcher. It is stored locally so the launcher can reuse it. It is linked to exactly one School Identity after registration. It is not proof of identity by itself.
+The game account's current protocol name, used for account labels and command targeting. A name is not proof of identity. Microsoft mode uses verified Java UUIDs or Floodgate XUIDs for durable game links.
 
 ### School Display Name
-The full name supplied by Hill and displayed in the Minecraft server interfaces. It is hidden during anonymous voting. It is distinct from the Minecraft Nickname.
+The approved name from the validated Microsoft `name` claim, displayed as plain text in server interfaces. It is distinct from the Minecraft nickname. Anonymous voting/name suppression is not yet implemented.
 
 ### Competition Password
-A competition-specific secret created during registration and used with `/login` on subsequent joins. It is not a Hill password or Microsoft password. Successful password verification authenticates the current Minecraft session only.
+A development-only secret created with `/register` and used with `/login`. Microsoft mode disables this flow. Students never enter Microsoft passwords into Minecraft.
 
 ### Participant
-An eligible student or staff member represented by one School Identity. A Participant may hold no more than two active Entry memberships across different Categories.
+An eligible person represented by one School Identity. The current Microsoft policy admits the configured student role; staff need explicit eligibility configuration. A Participant may hold no more than two active Entry memberships across different Categories, regardless of linked accounts.
 
 ### Team
 One or two Participants who jointly own one Entry. Both members have equal build and entry-management authority after an invitation is accepted.
@@ -60,16 +60,16 @@ The state in which an Entry owner is in Creative mode, may fly, and may modify t
 The state in which a Participant may fly through or inspect a Build Space but cannot modify blocks, entities, inventories, fluids, redstone, or entry data.
 
 ### Authentication Lobby
-The protected world and restricted session state used before `/login` succeeds or `/register` completes School Identity linking.
+The protected world and restricted session state before school verification succeeds. Development mode instead uses `/login` or `/register`.
 
 ### Exhibition Hub
 The post-authentication ceremonial Hill 175 hall containing the Hill ram centerpiece, category selectors, rules, navigation, help, and archive displays.
 
 ### Pending Registration
-A temporary reservation containing a Minecraft Nickname and Competition Password hash that cannot become an Account Link until School Identity linking succeeds.
+A development-only reservation containing a nickname and password hash. Microsoft mode uses a five-minute browser challenge bound to a fresh game connection nonce, then a browser-only confirmation code entered with `/verify`.
 
 ### Account Link
-The one-to-one association between a Minecraft Nickname and a School Identity.
+The durable association between one verified game identity and one School Identity. Multiple Java/Bedrock identities may link to the same participant; a game identity cannot be automatically reassigned. Only one active game connection per participant is allowed.
 
 ### Camera Item
 The spatial competition item used to create, replace, preview, or remove up to three Camera Poses for an Entry.

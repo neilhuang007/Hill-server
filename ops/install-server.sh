@@ -1,21 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This release has no Microsoft identity service yet. Make development access an
-# explicit operator choice, before downloading anything or stopping the service.
+# Choose a mode explicitly, before downloading anything or stopping the service.
 case "${1:-}" in
   --help|-h)
-    echo "Usage: bash ops/install-server.sh --allow-development-auth"
-    echo "Installs the logistics/demo server. Microsoft SSO is not implemented."
+    echo "Usage: bash ops/install-server.sh --microsoft | --allow-development-auth"
+    echo "Microsoft mode requires /etc/hill175/hill175.env; see .env.example."
     exit 0
     ;;
   --allow-development-auth)
     [[ "$#" -eq 1 ]] || { echo "Unexpected installer arguments." >&2; exit 2; }
+    AUTH_MODE=development
+    ;;
+  --microsoft)
+    [[ "$#" -eq 1 ]] || { echo "Unexpected installer arguments." >&2; exit 2; }
+    AUTH_MODE=microsoft
     ;;
   *)
-    echo "Refusing installation: this release automatically approves development identities." >&2
-    echo "For a controlled logistics/demo deployment, pass --allow-development-auth." >&2
-    echo "For student launch, complete docs/architecture/microsoft-sso.md first." >&2
+    echo "Select --microsoft or --allow-development-auth explicitly." >&2
     exit 2
     ;;
 esac
@@ -26,6 +28,13 @@ if [[ "${EUID}" -ne 0 ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+AUTH_ENV_FILE=/etc/hill175/hill175.env
+command -v python3 >/dev/null || { echo "Install python3 before running this installer." >&2; exit 1; }
+if [[ "${AUTH_MODE}" == development && ! -e "${AUTH_ENV_FILE}" && ! -L "${AUTH_ENV_FILE}" ]]; then
+  install -d -m 0700 -o root -g root /etc/hill175
+  (umask 077; printf 'HILL175_AUTH_MODE=development\n' > "${AUTH_ENV_FILE}")
+fi
+python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --expect-mode "${AUTH_MODE}"
 RUNTIME_DIR="/opt/hill175"
 JAVA_HOME="/opt/java25"
 SERVICE_USER="hill175"
@@ -428,11 +437,16 @@ cleanup() {
     restore_runtime_files
   fi
   if [[ "${status}" -ne 0 && "${service_was_stopped}" == true && "${service_was_active}" == true \
-      && "${startup_rollback_failed}" == false ]]; then
+      && "${startup_rollback_failed}" == false && "${AUTH_MODE}" == development ]]; then
     echo "Installer failed; restarting the previously active ${SERVICE_NAME}." >&2
     if ! systemctl start "${SERVICE_NAME}"; then
       echo "WARNING: ${SERVICE_NAME} could not be restarted automatically." >&2
     fi
+  fi
+  if [[ "${status}" -ne 0 && "${service_was_stopped}" == true && "${AUTH_MODE}" == microsoft ]]; then
+    # A restored JAR may predate SSO and ignore the environment. Never reopen
+    # admission using an unknown authentication implementation after failure.
+    echo "Microsoft-mode deployment failed; leaving Paper stopped for reviewed recovery." >&2
   fi
   exit "${status}"
 }
@@ -573,6 +587,9 @@ install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/server-config/server.properties" \
   "${RUNTIME_DIR}/server.properties"
+if [[ "${AUTH_MODE}" == microsoft ]]; then
+  sed -i 's/^online-mode=false$/online-mode=true/' "${RUNTIME_DIR}/server.properties"
+fi
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/server-config/spigot.yml" \
   "${RUNTIME_DIR}/spigot.yml"

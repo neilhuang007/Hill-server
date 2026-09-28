@@ -46,6 +46,9 @@ world-templates/
 
 # Plugin data and generated worlds
 competition-data.yml
+school-identities.json
+school-identities.json.*
+hill175.env
 *.log
 *.log.*
 *.log.json

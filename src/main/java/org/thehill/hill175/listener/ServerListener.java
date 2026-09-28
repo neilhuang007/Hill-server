@@ -3,6 +3,7 @@ package org.thehill.hill175.listener;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
+import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
@@ -45,6 +46,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -84,9 +86,9 @@ import java.util.UUID;
 
 public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
-    private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "rules", "help");
+    private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "verify", "rules", "help");
     private static final Set<String> COMPETITION_COMMANDS = Set.of(
-            "hill175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "help"
+            "hill175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help"
     );
     private static final Set<Material> TNT_IGNITERS = Set.of(Material.FLINT_AND_STEEL, Material.FIRE_CHARGE);
 
@@ -106,13 +108,39 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(PlayerJoinEvent event) {
-        event.joinMessage(Component.text(event.getPlayer().getName() + " joined the Hill 175 server.", NamedTextColor.GRAY));
+        event.joinMessage(competition.usesMicrosoftAuthentication() ? null
+                : Component.text(event.getPlayer().getName() + " joined the Hill 175 server.", NamedTextColor.GRAY));
         competition.handleJoin(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(PlayerQuitEvent event) {
+        if (competition.usesMicrosoftAuthentication()) {
+            event.quitMessage(null);
+        }
         competition.handleQuit(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onServerListPing(PaperServerListPingEvent event) {
+        if (competition.usesMicrosoftAuthentication()) {
+            event.setHidePlayers(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onDeathAnnouncement(PlayerDeathEvent event) {
+        if (competition.usesMicrosoftAuthentication()) {
+            event.deathMessage(null);
+            event.setShowDeathMessages(false);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onAdvancementAnnouncement(PlayerAdvancementDoneEvent event) {
+        if (competition.usesMicrosoftAuthentication()) {
+            event.message(null);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -120,12 +148,17 @@ public final class ServerListener implements Listener {
         if (!competition.isAuthenticated(event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(Component.text("Authenticate before using public chat.", NamedTextColor.RED));
+            return;
+        }
+        if (competition.usesMicrosoftAuthentication()) {
+            event.viewers().removeIf(viewer -> viewer instanceof Player player && !competition.isAuthenticated(player));
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (competition.isAuthenticated(event.getPlayer()) && worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+        if (!competition.usesMicrosoftAuthentication() && competition.isAuthenticated(event.getPlayer())
+                && worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
             return;
         }
         if (isNamespacedCommand(event.getMessage())) {
@@ -246,7 +279,7 @@ public final class ServerListener implements Listener {
             if (competition.isCompetitionItem(item, CompetitionModule.ENTRY_RESET_ITEM_ID)) {
                 event.setCancelled(true);
                 competition.currentEntry(player).ifPresentOrElse(entry -> {
-                    if (entry.isMember(competition.nicknameKey(player.getName()))) {
+                    if (entry.isMember(competition.participantKey(player))) {
                         menus.openResetConfirmation(player, entry);
                     } else {
                         deny(player, "Open one of your entries first.");
@@ -259,7 +292,7 @@ public final class ServerListener implements Listener {
                 competition.currentEntry(player).ifPresentOrElse(entry -> {
                     if (entry.submitted()) {
                         competition.unlockEntry(player, entry);
-                    } else if (entry.isMember(competition.nicknameKey(player.getName()))) {
+                    } else if (entry.isMember(competition.participantKey(player))) {
                         menus.openSubmitConfirmation(player, entry);
                     } else {
                         deny(player, "Open one of your entries first.");

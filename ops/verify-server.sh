@@ -2,6 +2,8 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+AUTH_ENV_FILE="${HILL175_AUTH_ENV_FILE:-/etc/hill175/hill175.env}"
+AUTH_MODE="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print mode)"
 RUNTIME_DIR="${HILL175_RUNTIME_DIR:-/opt/hill175}"
 MANIFEST="${HILL175_WORLDGEN_MANIFEST:-${REPO_DIR}/server-assets/survival-worldgen-manifest.tsv}"
 DATAPACKS_DIR="${RUNTIME_DIR}/world/datapacks"
@@ -96,8 +98,12 @@ check_latest_log() {
   local pattern='Failed to load datapack|Could not load datapack|Failed to parse|Couldn.t parse|registry.*error|Unknown registry|Missing required feature|watchdog|Exception|ERROR'
 
   [[ -f "${latest_log}" ]] || fail "missing latest log: ${latest_log}"
-  grep -Fq 'Hill 175 competition server enabled with development identity linking.' "${latest_log}" \
-    || fail "Paper started without the expected Hill175 development authentication provider"
+  local provider_message='Hill 175 competition server enabled with development identity linking.'
+  if [[ "${AUTH_MODE}" == microsoft ]]; then
+    provider_message='Hill 175 competition server enabled with Microsoft school verification.'
+  fi
+  grep -Fq "${provider_message}" "${latest_log}" \
+    || fail "Paper started without the configured Hill175 authentication provider"
   if grep -Eiq "${pattern}" "${latest_log}"; then
     grep -Ein "${pattern}" "${latest_log}" >&2
     fail "latest.log contains datapack, registry, watchdog, exception, or ERROR lines"
@@ -281,8 +287,15 @@ verify_chunky_plugin
 verify_people_template
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
-require_line "${PLUGIN_CONFIG}" "  provider: always-approve-development-stub"
-require_line "${PLUGIN_CONFIG}" "  development-stub-acknowledged: true"
+if [[ "${AUTH_MODE}" == microsoft ]]; then
+  require_line "${SERVER_PROPERTIES}" "online-mode=true"
+  auth_port="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print port)"
+  ss -ltn | grep -Eq "127\\.0\\.0\\.1:${auth_port}[[:space:]]" \
+    || fail "Microsoft authentication listener is missing on loopback"
+else
+  require_line "${PLUGIN_CONFIG}" "  provider: always-approve-development-stub"
+  require_line "${PLUGIN_CONFIG}" "  development-stub-acknowledged: true"
+fi
 check_latest_log
 journalctl -u hill175.service -n 160 --no-pager | grep -E 'Hill175|Done \(|datapack|ERROR|WARN' || true
 echo "File/log smoke checks passed. In-game smoke still must run /datapack list and survival chunk/structure checks."

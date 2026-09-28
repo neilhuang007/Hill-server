@@ -4,15 +4,17 @@ Paper plugin and deployment tooling for the anniversary competition: Journey
 outdoor plots, Place interiors, People campus worlds, teams, saved camera views,
 submissions, and a separate survival area.
 
-**Status: logistics and controlled testing.** Authentication currently uses a
-password and automatic development approval. Microsoft school SSO and Java/Bedrock
-account linking are designed, not implemented. The installer requires
-`--allow-development-auth`; this release is not ready for student admission.
+**Status: logistics and controlled testing.** The plugin implements Microsoft
+school verification and shared participant ownership across Java/Floodgate accounts.
+Hill IT configures it through environment variables; the existing deployed demo
+continues to use development authentication until IT setup and a real-client pilot.
 
 ## Start here
 
 - [Build and deploy from source](docs/operations/deployment.md)
-- [Microsoft SSO and Java/Bedrock design](docs/architecture/microsoft-sso.md)
+- [Microsoft SSO setup for Hill IT](docs/operations/microsoft-sso-setup.md)
+- [Authentication architecture and limits](docs/architecture/microsoft-sso.md)
+- [SSO validation and review](docs/operations/microsoft-sso-verification-20260928.md)
 - [Player workflow and commands](docs/operations/player-guide.md)
 - [Smoke tests](docs/SMOKE_TEST.md)
 - [Latest deployment verification](docs/operations/deployment-verification-20260928.md)
@@ -29,6 +31,13 @@ Use JDK 25 and the checked-in Gradle wrapper:
 On Linux/macOS: `bash ./gradlew clean test jar`. Output:
 `build/libs/Hill-server-1.0-SNAPSHOT.jar`. Paper is pinned to **26.2 build 119**.
 Local reconstruction launchers target other Minecraft versions and are separate.
+
+For school sign-in, copy [.env.example](.env.example) to the protected server
+environment file, configure the Entra application and HTTPS proxy, then install
+with `--microsoft`. A student opens the in-game link, signs into their Hill account,
+and enters the browser's code with `/verify`. The same school account links their
+Java and Bedrock identities. The [IT guide](docs/operations/microsoft-sso-setup.md)
+includes the exact configuration, rollout checks and recovery limits.
 
 ## Campus map
 

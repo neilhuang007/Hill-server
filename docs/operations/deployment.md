@@ -1,9 +1,9 @@
 # Build and deploy Hill 175 from source
 
-This guide deploys the **controlled logistics/demo server**. Microsoft SSO,
-student eligibility checks, and Java/Bedrock account linking are not implemented.
-Do not open this release to students as a verified school service. Complete the
-[SSO implementation and acceptance plan](../architecture/microsoft-sso.md) first.
+This guide builds and deploys the plugin with either Microsoft school verification
+or explicitly acknowledged development authentication. The existing demo remains
+in development mode. For school mode, complete the [Hill IT setup](microsoft-sso-setup.md)
+and pilot through the real tenant, proxy and supported game clients.
 
 ## Versions and locations
 
@@ -102,7 +102,7 @@ Inside the SSH session, for a first checkout:
 
 ```bash
 apt-get update
-apt-get install -y git curl ca-certificates tar gzip unzip borgbackup util-linux
+apt-get install -y git curl ca-certificates tar gzip unzip borgbackup util-linux python3
 git clone https://github.com/neilhuang007/Hill-server.git /opt/Hill-server
 cd /opt/Hill-server
 ```
@@ -127,16 +127,26 @@ cold snapshot using `bash ops/backup-hill175.sh` after the Borg configuration be
 is ready. A complete `/opt/hill175` snapshot while Paper is stopped is an alternative.
 The installer's rollback directories do not replace a complete data backup.
 
+For school verification, prepare `/etc/hill175/hill175.env` from
+[.env.example](../../.env.example) and follow the [IT guide](microsoft-sso-setup.md).
 Run the installer as root:
+
+```bash
+cd /opt/Hill-server
+bash ops/install-server.sh --microsoft
+```
+
+For the controlled logistics demo only:
 
 ```bash
 cd /opt/Hill-server
 bash ops/install-server.sh --allow-development-auth
 ```
 
-The flag explicitly acknowledges automatic development identity approval. There
-is no production SSO flag in this release. Unknown identity providers stop Paper
-instead of silently falling back to the stub.
+The demo flag explicitly acknowledges automatic development identity approval.
+It creates a development environment file only if none exists. Neither mode
+overwrites an existing environment file; mode mismatches are rejected. Microsoft
+mode sets `online-mode=true` and missing/invalid SSO configuration stops Paper.
 
 The installer builds and tests the plugin from the pulled source, checks staged
 assets, stops Paper before world/config changes, preserves replaced maps, installs
@@ -146,8 +156,9 @@ It writes `eula=true`; the operator must accept Minecraft's EULA before using it
 Configuration is deployed from `server-config/` and `src/main/resources/config.yml`.
 Local edits to the deployed defaults are overwritten on installation. Persistent
 accounts, entries, inventories, worlds, and the generated survival seed stay under
-the runtime. Do not put future identity secrets in those source defaults; use a
-separate protected service environment/credential file outside Git.
+the runtime. Authentication mode and credentials live in the separate root-owned
+`/etc/hill175/hill175.env` (mode `0600`), loaded by systemd at startup. This file is
+required by the installed unit and must be backed up separately from server data.
 
 The new campus is a template for newly created People worlds. Existing entries
 are preserved; an owner-requested reset recreates an entry using the current template.
@@ -166,7 +177,8 @@ Check for a new Paper ready marker, enabled Hill175 plugin, no startup errors,
 the expected commit and plugin build, and the pinned template checksum/counts.
 Then run the [smoke checklist](../SMOKE_TEST.md), especially:
 
-1. Restricted lobby, development registration, reconnect/password login.
+1. Restricted lobby and authentication for the selected mode: Microsoft link/code
+   and reconnect verification, or demo registration/password login.
 2. Hub navigation, Journey/Place creation, permissions and submission lock.
 3. New People entry with v19 terrain, safe ground spawn, campus chart, reset/reentry.
 4. Owner and visitor camera previews: exit item selected, right/left-click exits,
@@ -193,6 +205,10 @@ On startup/verification failure, the installer attempts to restore prior config,
 plugin, template and imported worlds. It retains failed replacements when needed
 for recovery. Inspect the error and `/opt/hill175/assets/` recovery paths before
 retrying; do not delete the rollback evidence or restart repeatedly into bad data.
+Microsoft-mode failures leave Paper stopped after restoring recoverable files;
+they never automatically restart an older JAR that might lack school verification.
+Confirm the restored plugin supports SSO and the environment/proxy remain valid
+before reopening admission.
 
 For manual recovery: stop `hill175.service`, preserve the failed runtime, restore
 a coherent snapshot (plugin/config/data/worlds together), correct ownership, then
@@ -200,15 +216,16 @@ restart and repeat verification. Rebuild an earlier source revision only with it
 matching asset pins. Never downgrade converted world files without restoring their
 pre-conversion snapshot. Keep the other Minecraft service on port 25565 untouched.
 
-## Network and future SSO
+## Network and Microsoft SSO
 
 Current demo game traffic uses TCP 25566. Bedrock UDP ingress and Geyser/Floodgate
-are **not installed by this guide**; pin a compatible stack in the SSO milestone.
+are **not installed by the installer**; follow the [IT guide](microsoft-sso-setup.md)
+and record a compatible, tested stack.
 Do not put Minecraft ports behind the ordinary Cloudflare HTTP proxy.
 
-Future browser authentication must follow browser → Cloudflare → nginx → loopback
+Browser authentication must follow browser → Cloudflare → nginx → loopback
 identity service. Use Cloudflare Full (strict), a valid Origin CA certificate,
 Authenticated Origin Pulls, and firewall ingress restricted to Cloudflare networks;
 Origin CA by itself does not prevent direct-origin requests. Keep database/internal
-plugin endpoints private. The [SSO design](../architecture/microsoft-sso.md) gives
-the exact Hill IT inputs, claims, account-linking rules, and acceptance gates.
+plugin endpoints private. The [SSO architecture](../architecture/microsoft-sso.md)
+describes claims, account-linking rules and implementation limits.

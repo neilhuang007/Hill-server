@@ -32,6 +32,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         return switch (command.getName().toLowerCase(Locale.ROOT)) {
             case "register" -> register(player, args);
             case "login" -> login(player, args);
+            case "verify" -> verify(player, args);
             case "hill175", "competition" -> competitionMenu(player);
             case "hub", "lobby", "help" -> routedUtility(player, command.getName().toLowerCase(Locale.ROOT), args);
             case "rules" -> rules(player);
@@ -43,6 +44,10 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
     }
 
     private boolean register(Player player, String[] args) {
+        if (competition.usesMicrosoftAuthentication()) {
+            competition.sendAuthenticationInstructions(player);
+            return true;
+        }
         if (args.length != 3) {
             player.sendMessage("Usage: /register <username> <password> <repeatPassword>");
             return true;
@@ -51,7 +56,20 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    private boolean verify(Player player, String[] args) {
+        if (args.length > 1) {
+            player.sendMessage("Usage: /verify [code shown in your browser]");
+            return true;
+        }
+        competition.verify(player, args.length == 0 ? null : args[0]);
+        return true;
+    }
+
     private boolean login(Player player, String[] args) {
+        if (competition.usesMicrosoftAuthentication()) {
+            competition.sendAuthenticationInstructions(player);
+            return true;
+        }
         if (args.length != 1) {
             player.sendMessage("Usage: /login <password>");
             return true;
@@ -115,13 +133,13 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             case "list" -> menus.openMain(player);
             case "visit" -> menus.openVisits(player, 0);
             case "reset" -> competition.currentEntry(player)
-                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .filter(entry -> entry.isMember(competition.participantKey(player)))
                     .ifPresentOrElse(
                             entry -> menus.openResetConfirmation(player, entry),
                             () -> player.sendMessage("Open one of your entries first.")
                     );
             case "delete" -> competition.currentEntry(player)
-                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .filter(entry -> entry.isMember(competition.participantKey(player)))
                     .ifPresentOrElse(
                             entry -> menus.openDeleteConfirmation(player, entry),
                             () -> player.sendMessage("Open one of your entries first.")
@@ -151,7 +169,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                 competition.setDescription(player, joinFrom(args, 1));
             }
             case "submit" -> competition.currentEntry(player)
-                    .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                    .filter(entry -> entry.isMember(competition.participantKey(player)))
                     .ifPresentOrElse(
                             entry -> menus.openSubmitConfirmation(player, entry),
                             () -> player.sendMessage("Open one of your entries first.")

@@ -9,6 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.auth.IdentityLinker;
 import org.thehill.hill175.auth.IdentityLinkerFactory;
 import org.thehill.hill175.auth.PasswordHasher;
+import org.thehill.hill175.auth.sso.MicrosoftSsoService;
+import org.thehill.hill175.auth.sso.SsoConfig;
 import org.thehill.hill175.command.CommandModule;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.data.CompetitionStore;
@@ -20,12 +22,15 @@ import org.thehill.hill175.world.WorldModule;
 
 import java.util.List;
 import java.util.Objects;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 
 public final class Hill175Plugin extends JavaPlugin {
     private CompetitionStore store;
     private CompetitionModule competition;
     private HubNpcModule hubNpcs;
     private WorldModule worlds;
+    private MicrosoftSsoService schoolIdentity;
 
     @Override
     public void onEnable() {
@@ -41,8 +46,19 @@ public final class Hill175Plugin extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
         reloadConfig();
-        IdentityLinker identityLinker = IdentityLinkerFactory.create(getConfig());
-        getLogger().warning("DEVELOPMENT AUTHENTICATION IS ACTIVE: any unregistered offline nickname can be claimed while registration is open.");
+        var microsoftConfig = SsoConfig.fromEnvironment(System.getenv());
+        IdentityLinker identityLinker = null;
+        if (microsoftConfig.isPresent()) {
+            try {
+                schoolIdentity = new MicrosoftSsoService(microsoftConfig.orElseThrow(),
+                        getDataFolder().toPath().resolve("school-identities.json"));
+            } catch (IOException exception) {
+                throw new UncheckedIOException("Cannot start Microsoft school verification safely.", exception);
+            }
+        } else {
+            identityLinker = IdentityLinkerFactory.create(getConfig());
+            getLogger().warning("DEVELOPMENT AUTHENTICATION IS ACTIVE: any unregistered offline nickname can be claimed while registration is open.");
+        }
 
         worlds = new WorldModule(this);
         worlds.initialize();
@@ -53,8 +69,17 @@ public final class Hill175Plugin extends JavaPlugin {
                 store,
                 worlds,
                 new PasswordHasher(),
-                identityLinker
+                identityLinker,
+                schoolIdentity
         );
+        if (schoolIdentity != null) {
+            // Session construction validates online-mode and Floodgate before any browser endpoint opens.
+            try {
+                schoolIdentity.start();
+            } catch (IOException exception) {
+                throw new UncheckedIOException("Cannot open Microsoft school verification safely.", exception);
+            }
+        }
         MenuModule menus = new MenuModule(competition);
         hubNpcs = new HubNpcModule(this, competition, menus, worlds);
         ServerListener serverListener = new ServerListener(this, competition, menus, worlds);
@@ -65,7 +90,7 @@ public final class Hill175Plugin extends JavaPlugin {
         pluginManager.registerEvents(hubNpcs, this);
         pluginManager.registerEvents(serverListener, this);
 
-        for (String commandName : List.of("register", "login", "hill175", "competition", "hub", "lobby", "help", "rules", "entry", "team", "camera")) {
+        for (String commandName : List.of("register", "login", "verify", "hill175", "competition", "hub", "lobby", "help", "rules", "entry", "team", "camera")) {
             var command = Objects.requireNonNull(getCommand(commandName), "Missing command in plugin.yml: " + commandName);
             command.setExecutor(commands);
             command.setTabCompleter(commands);
@@ -86,7 +111,9 @@ public final class Hill175Plugin extends JavaPlugin {
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             competition.handleJoin(onlinePlayer);
         }
-        getLogger().info("Hill 175 competition server enabled with development identity linking.");
+        getLogger().info(schoolIdentity == null
+                ? "Hill 175 competition server enabled with development identity linking."
+                : "Hill 175 competition server enabled with Microsoft school verification.");
     }
 
     private void stopAfterStartupFailure(RuntimeException exception) {
@@ -99,6 +126,10 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (schoolIdentity != null && !getServer().isStopping()) {
+            // Hot-disabling admission protection must not leave an unprotected production server open.
+            getServer().shutdown();
+        }
         if (competition != null) {
             competition.shutdown();
         }
@@ -107,6 +138,9 @@ public final class Hill175Plugin extends JavaPlugin {
         }
         if (store != null) {
             store.flush();
+        }
+        if (schoolIdentity != null) {
+            schoolIdentity.close();
         }
     }
 

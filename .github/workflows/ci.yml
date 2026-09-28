@@ -23,6 +23,7 @@ jobs:
           for script in ops/*.sh; do bash -n "$script"; done
           for script in ops/*.mjs; do node --check "$script"; done
           python3 -m compileall -q ops scripts tests
+          python3 -m unittest discover -s tests -p test_auth_environment.py
       - name: Validate PowerShell syntax
         shell: pwsh
         run: |

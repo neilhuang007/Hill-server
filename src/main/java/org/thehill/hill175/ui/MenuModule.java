@@ -67,7 +67,7 @@ public final class MenuModule implements Listener {
         inventory.setItem(4, item(Material.NETHER_STAR, "Hill 175 Competition",
                 List.of("Your entries are on the left.", "Create or visit on the right."), NamedTextColor.GOLD));
 
-        List<Entry> ownEntries = competition.entriesFor(competition.nicknameKey(player.getName()));
+        List<Entry> ownEntries = competition.entriesFor(competition.participantKey(player));
         for (int index = 0; index < Math.min(2, ownEntries.size()); index++) {
             Entry entry = ownEntries.get(index);
             int slot = index == 0 ? 10 : 11;
@@ -104,11 +104,11 @@ public final class MenuModule implements Listener {
 
     public void openCurrentEntry(Player player) {
         competition.currentEntry(player)
-                .filter(entry -> entry.isMember(competition.nicknameKey(player.getName())))
+                .filter(entry -> entry.isMember(competition.participantKey(player)))
                 .ifPresentOrElse(
                         entry -> openEntryDetails(player, entry),
                         () -> {
-                            List<Entry> entries = competition.entriesFor(competition.nicknameKey(player.getName()));
+                            List<Entry> entries = competition.entriesFor(competition.participantKey(player));
                             if (entries.size() == 1) {
                                 openEntryDetails(player, entries.getFirst());
                             } else {
@@ -210,7 +210,7 @@ public final class MenuModule implements Listener {
     }
 
     public void openCategory(Player player, Category category) {
-        competition.entriesFor(competition.nicknameKey(player.getName())).stream()
+        competition.entriesFor(competition.participantKey(player)).stream()
                 .filter(entry -> entry.category() == category)
                 .findFirst()
                 .ifPresentOrElse(
@@ -246,7 +246,7 @@ public final class MenuModule implements Listener {
 
     private void openCameraControls(Player player, Entry entry) {
         boolean editor = competition.canEditCameras(player, entry);
-        boolean owner = entry.isMember(competition.nicknameKey(player.getName()));
+        boolean owner = entry.isMember(competition.participantKey(player));
         HillMenuHolder holder = new HillMenuHolder();
         Inventory inventory = Bukkit.createInventory(holder, 27,
                 Component.text(editor ? "Camera Controls" : "Camera Views", NamedTextColor.AQUA));
@@ -792,7 +792,7 @@ public final class MenuModule implements Listener {
             title = title == null ? "" : title.trim();
             description = description == null ? "" : description.trim();
             if (!competition.isAuthenticated(player)
-                    || !entry.isMember(competition.nicknameKey(player.getName()))
+                    || !entry.isMember(competition.participantKey(player))
                     || entry.submitted()) {
                 player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
                         .append(Component.text("This entry is no longer available for editing.", NamedTextColor.RED)
