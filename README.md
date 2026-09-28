@@ -9,6 +9,12 @@ school verification and shared participant ownership across Java/Floodgate accou
 Hill IT configures it through environment variables; the existing deployed demo
 continues to use development authentication until IT setup and a real-client pilot.
 
+After the [one-time host and IT setup](docs/operations/microsoft-sso-setup.md), deploy
+a clean, committed `main` checkout with `./ops/deploy.ps1 -Mode Microsoft`.
+It pushes to GitHub, pulls on the host, builds/tests, backs up, installs pinned
+Java/Bedrock components, configures nginx, restarts and verifies the service.
+Use `-Mode Development` for the current demo.
+
 ## Start here
 
 - [Build and deploy from source](docs/operations/deployment.md)

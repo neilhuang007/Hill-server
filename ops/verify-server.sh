@@ -292,6 +292,13 @@ if [[ "${AUTH_MODE}" == microsoft ]]; then
   auth_port="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print port)"
   ss -ltn | grep -Eq "127\\.0\\.0\\.1:${auth_port}[[:space:]]" \
     || fail "Microsoft authentication listener is missing on loopback"
+  if [[ "$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-enabled)" == true ]]; then
+    bedrock_port="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-port)"
+    python3 "${REPO_DIR}/ops/install-bedrock.py" verify --runtime "${RUNTIME_DIR}" --port "${bedrock_port}"
+    require_line "${SERVER_PROPERTIES}" "enforce-secure-profile=false"
+    ss -lun | grep -Eq ":${bedrock_port}[[:space:]]" || fail "Bedrock UDP listener is missing"
+    grep -Fq '[floodgate] Enabling floodgate' "${RUNTIME_DIR}/logs/latest.log" || fail "Floodgate was not enabled"
+  fi
 else
   require_line "${PLUGIN_CONFIG}" "  provider: always-approve-development-stub"
   require_line "${PLUGIN_CONFIG}" "  development-stub-acknowledged: true"

@@ -14,7 +14,7 @@ SCRIPT = Path(__file__).resolve().parents[1] / "ops" / "backup-hill175.sh"
 
 @unittest.skipUnless(os.name == "posix" and os.geteuid() == 0, "Linux root integration test (all service/archive commands are mocked)")
 class BackupIsolationTest(unittest.TestCase):
-    def run_backup(self, fail_create=False):
+    def run_backup(self, fail_create=False, leave_stopped=False, inherit_lock=False):
         with tempfile.TemporaryDirectory(prefix="hill175-backup-test-") as directory:
             root = Path(directory)
             runtime = root / "hill-runtime"
@@ -49,12 +49,17 @@ if name == "borg" and sys.argv[1] == "create" and os.environ.get("TEST_FAIL_CREA
                 "HILL175_BACKUP_ARCHIVE_PREFIX": "hill175-test",
                 "HILL175_BACKUP_KEEP_DAILY": "14",
                 "HILL175_BACKUP_LOCK_WAIT_SECONDS": "1",
+                "HILL175_BACKUP_LEAVE_STOPPED": "true" if leave_stopped else "false",
                 "MC_BACKUP_LOCK": str(root / "backup.lock"),
                 "TEST_COMMAND_LOG": str(log),
                 "TEST_FAIL_CREATE": "1" if fail_create else "0",
             }
-            result = subprocess.run(["bash", str(SCRIPT)], env=environment, capture_output=True, text=True, timeout=15)
-            recorded = [json.loads(line) for line in log.read_text().splitlines()]
+            command = ["bash", str(SCRIPT)]
+            if inherit_lock:
+                command = ["bash", "-c", 'source "$1"; bash "$2"', "test-inherited-lock",
+                           str(SCRIPT.with_name("deployment-lock.sh")), str(SCRIPT)]
+            result = subprocess.run(command, env=environment, capture_output=True, text=True, timeout=15)
+            recorded = [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
             return result, recorded, str(runtime)
 
     def test_shared_credentials_cannot_redirect_runtime_service_or_retention(self):
@@ -77,6 +82,26 @@ if name == "borg" and sys.argv[1] == "create" and os.environ.get("TEST_FAIL_CREA
         self.assertNotEqual(0, result.returncode)
         self.assertIn(["systemctl", "start", "hill175-test.service"], commands)
         self.assertFalse(any(command[:2] == ["borg", "prune"] for command in commands))
+
+    def test_installer_keeps_old_server_stopped_on_success_and_failure(self):
+        for fail in (False, True):
+            with self.subTest(fail=fail):
+                result, commands, _ = self.run_backup(fail_create=fail, leave_stopped=True)
+                self.assertEqual(fail, result.returncode != 0, result.stderr)
+                self.assertIn(["systemctl", "stop", "hill175-test.service"], commands)
+                self.assertNotIn(["systemctl", "start", "hill175-test.service"], commands)
+
+    def test_backup_can_inherit_deployment_lock(self):
+        result, _, _ = self.run_backup(leave_stopped=True, inherit_lock=True)
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_separate_backup_cannot_interrupt_deployment(self):
+        import fcntl
+        with open("/run/lock/hill175-deploy.lock", "a") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            result, commands, _ = self.run_backup()
+            self.assertNotEqual(0, result.returncode)
+            self.assertEqual([], commands)
 
 
 if __name__ == "__main__":

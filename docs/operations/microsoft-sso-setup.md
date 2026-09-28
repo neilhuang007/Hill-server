@@ -6,6 +6,20 @@ demo remains in development mode until those values and the protected hostname
 are configured. A real Hill tenant and actual Java/Bedrock clients must pass the
 pilot below before student admission.
 
+Routine deployment is one local command from a clean, committed `main` checkout:
+
+```powershell
+./ops/deploy.ps1 -Mode Microsoft
+```
+
+The command pushes to GitHub, pulls that exact revision through PuTTY, then builds,
+tests, takes a cold backup, installs Java/Bedrock components, configures nginx and
+verifies startup. No plugin downloads or nginx edits are needed by the operator.
+The one-time work below remains with IT: Entra registration and student assignment,
+the protected environment file, Cloudflare DNS/TLS/AOP, and game firewall rules.
+The existing host already has the map assets and Borg backup repository; a new host
+also needs the [initial host and asset setup](deployment.md).
+
 ## 1. Register the school application
 
 In Hill's Microsoft Entra tenant, create an **App registration** named Hill 175.
@@ -66,6 +80,11 @@ mode `0600`; systemd passes the variables to the `hill175` service account.
 | `HILL175_AUTH_PUBLIC_URL` | Approved HTTPS origin, e.g. `https://auth.example.org`, without a path |
 | `HILL175_AUTH_PORT` | `8087`, bound to `127.0.0.1` only; allowed range 1024–65535 |
 | `HILL175_MAX_LINKED_ACCOUNTS` | `4` game accounts per student; allowed range 2–20 |
+| `HILL175_ORIGIN_CERT` | `/etc/hill175/tls/origin.pem` |
+| `HILL175_ORIGIN_KEY` | `/etc/hill175/tls/origin.key`, root-owned mode `0600` |
+| `HILL175_AOP_CA` | `/etc/hill175/tls/aop-ca.pem`, CA that signed the Cloudflare client certificate |
+| `HILL175_BEDROCK_ENABLED` | `true` in Microsoft mode; development deployment skips Bedrock |
+| `HILL175_BEDROCK_PORT` | `19132` UDP; allowed range 1024–65535 |
 
 The Java process reads environment variables at startup. Editing the file requires
 a service restart. A `.env` file in the checkout is not automatically loaded.
@@ -84,12 +103,18 @@ alone does not restrict who can reach the origin. Keep public port 80 closed and
 perform HTTPS redirects at Cloudflare. [Origin CA](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/),
 [Authenticated Origin Pulls](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/).
 
-Adapt [the nginx example](../../ops/nginx/hill175-auth.conf.example), replacing the
-hostname and certificate paths. If changing the authentication port, change nginx's
-upstream too. Check `nginx -t` before reloading nginx. The example sends the canonical
-Host and HTTPS scheme, requires the client certificate, disables proxy caching,
-and avoids logging authentication query strings. Bypass Cloudflare caching for
-the entire auth hostname and do not add analytics to sign-in pages.
+Place those three certificate files at the paths in the environment file. Install
+`nginx` and `openssl` as part of initial host setup. The installer checks the
+certificate hostname, expiry and key match before stopping Paper. It fetches the
+official Cloudflare IPv4/IPv6 ranges and generates
+`/etc/nginx/conf.d/hill175-auth.conf` with the canonical hostname, loopback port,
+Cloudflare peer restriction and mandatory AOP certificate. It tests and reloads
+nginx automatically; a failed update restores the previous managed site. Existing
+manual files at that path are preserved and must be reviewed before adoption.
+The generated site disables caching and authentication query logging. Bypass
+Cloudflare caching for the entire auth hostname and do not add analytics to pages.
+The nginx rule restricts this hostname even when another site shares port 443;
+keep the host/provider Cloudflare ingress restrictions as well.
 
 Never expose port 8087 publicly. The plugin has no public endpoint that can mark a
 UUID authenticated. No database or separate identity daemon is required: the
@@ -98,7 +123,7 @@ link persistence run away from the game tick thread.
 
 ## 4. Build and enable Microsoft mode
 
-Back up the demo runtime before switching authentication modes. Existing demo
+The installer backs up the demo runtime before switching authentication modes. Existing demo
 records are not proof of school identity and are not automatically reassigned by
 nickname. Preserve them for reviewed recovery; the online UUID may also differ
 from a prior offline UUID. Never rename player-data files by guesswork.
@@ -110,26 +135,31 @@ bash ops/verify-server.sh
 ```
 
 The installer builds and tests from the pulled source, preserves the environment
-file, sets `online-mode=true`, restarts Paper and checks the authentication mode and
-loopback listener. Java players need a verified Minecraft Java account. Do not set
-offline mode to accommodate Bedrock; use Floodgate below. This release targets a
+file, sets `online-mode=true`, installs the pinned Bedrock transport and nginx site,
+then checks the authentication mode and listeners. Java players need a verified
+Minecraft Java account. This release targets a
 direct Paper installation, not a proxy network with offline backend servers.
 
 For the controlled demo, use `HILL175_AUTH_MODE=development` and
 `bash ops/install-server.sh --allow-development-auth`. A mismatch between the flag
 and the existing environment file is rejected before the server is stopped.
 
-## 5. Add Bedrock transport
+## 5. Bedrock transport and game ports
 
-Install compatible Geyser-Spigot and Floodgate-Spigot releases on this same Paper
-server, following the official [Geyser setup](https://geysermc.org/wiki/geyser/setup/)
-and [Floodgate setup](https://geysermc.org/wiki/floodgate/setup/). Record the exact
-download versions and hashes in the deployment record. These third-party JARs are
-not bundled or downloaded by the Hill installer.
+Microsoft deployment automatically installs the exact Geyser/Floodgate versions and
+SHA-256 hashes in [the manifest](../../server-assets/bedrock-manifest.json), with
+Geyser authentication set to Floodgate and Paper online mode enabled. Both plugins
+run in the same server; Floodgate's separate account-linking feature is disabled
+because Hill owns the school identity mapping. The installer preserves generated
+keys and refuses to overwrite manually changed transport files. Set the UDP port
+in the environment file rather than editing plugin configuration. Setting enabled
+to `false` skips initial installation; disabling an existing installation requires
+an explicit maintenance removal/archive of its managed files.
 
-Set Geyser's Java authentication type to `floodgate`; keep Paper online mode enabled.
-Open a separate Bedrock UDP port (normally 19132). Keep Floodgate's private key out
-of Git and restrict access to it. Hill175 reads Floodgate's authenticated XUID; it
+Allow Java TCP `25566` and Bedrock UDP `19132` (or the configured port) in host and
+provider firewalls. Use a separate DNS-only game hostname: ordinary Cloudflare web
+proxying does not carry these game ports. Keep Floodgate's private key out of Git
+and restrict access to it. Hill175 reads Floodgate's authenticated XUID; it
 does not infer Bedrock identity from a username prefix. Java TCP and Bedrock UDP
 are game traffic, separate from the Cloudflare-protected web endpoint.
 

@@ -28,6 +28,7 @@ if [[ "${EUID}" -ne 0 ]]; then
 fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "${REPO_DIR}/ops/deployment-lock.sh"
 AUTH_ENV_FILE=/etc/hill175/hill175.env
 command -v python3 >/dev/null || { echo "Install python3 before running this installer." >&2; exit 1; }
 if [[ "${AUTH_MODE}" == development && ! -e "${AUTH_ENV_FILE}" && ! -L "${AUTH_ENV_FILE}" ]]; then
@@ -52,6 +53,19 @@ hub_replacement_applied=false
 hub_replacement_backup=""
 people_template_replacement_applied=false
 people_template_backup=""
+BEDROCK_ENABLED="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-enabled)"
+BEDROCK_PORT="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-port)"
+bedrock_paths=()
+if [[ "${BEDROCK_ENABLED}" == true ]]; then
+  bedrock_file_list="$(python3 "${REPO_DIR}/ops/install-bedrock.py" files)"
+  mapfile -t bedrock_paths <<< "${bedrock_file_list}"
+elif [[ -f "${RUNTIME_DIR}/assets/bedrock-managed.json" ]]; then
+  echo "Bedrock is already installed. Preserve/review its runtime files before disabling transport." >&2
+  exit 1
+fi
+if [[ "${AUTH_MODE}" == microsoft ]]; then
+  python3 "${REPO_DIR}/ops/configure-auth-proxy.py" prepare --env-file "${AUTH_ENV_FILE}"
+fi
 
 backup_runtime_file() {
   local target="$1"
@@ -75,6 +89,8 @@ restore_runtime_file() {
 }
 
 restore_runtime_files() {
+  local index
+  restore_runtime_file "${RUNTIME_DIR}/paper.jar" paper.jar
   restore_runtime_file "${RUNTIME_DIR}/plugins/Hill175.jar" plugin.jar
   restore_runtime_file "${RUNTIME_DIR}/plugins/Hill175/config.yml" plugin-config.yml
   restore_runtime_file "${RUNTIME_DIR}/server.properties" server.properties
@@ -85,6 +101,9 @@ restore_runtime_files() {
   restore_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
   restore_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
   restore_runtime_file "${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed" hub-install-marker
+  for index in "${!bedrock_paths[@]}"; do
+    restore_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
+  done
 }
 
 wait_for_server_ready() {
@@ -527,7 +546,7 @@ fi
 cd "${REPO_DIR}"
 JAVA_HOME="${JAVA_HOME}" PATH="${JAVA_HOME}/bin:${PATH}" bash ./gradlew clean test jar --no-daemon
 
-paper_target="${RUNTIME_DIR}/paper.jar"
+paper_target="${RUNTIME_DIR}/assets/paper-pinned.jar"
 if [[ ! -f "${paper_target}" ]] || ! verify_sha256 "${paper_target}" "${PAPER_SHA256}"; then
   curl --fail --location --silent --show-error "${PAPER_URL}" --output "${paper_target}.tmp"
   verify_sha256 "${paper_target}.tmp" "${PAPER_SHA256}"
@@ -551,6 +570,20 @@ for existing_chunky in "${RUNTIME_DIR}"/plugins/*[Cc]hunky*.jar; do
 done
 
 preflight_people_template_archive
+if [[ "${BEDROCK_ENABLED}" == true ]]; then
+  python3 "${REPO_DIR}/ops/install-bedrock.py" prepare --runtime "${RUNTIME_DIR}" --port "${BEDROCK_PORT}"
+fi
+
+# A failed cold snapshot blocks upgrades before any active runtime file is changed.
+# Update the timer's entry point before the outage so it also observes our lock.
+install -m 0644 -o root -g root "${REPO_DIR}/ops/deployment-lock.sh" /usr/local/bin/deployment-lock.sh
+install -m 0750 -o root -g root "${REPO_DIR}/ops/backup-hill175.sh" /usr/local/bin/hill175-backup.sh
+if [[ -f "${RUNTIME_DIR}/plugins/Hill175.jar" ]]; then
+  if systemctl is-active --quiet "${SERVICE_NAME}"; then service_was_active=true; fi
+  service_was_stopped=true
+  HILL175_BACKUP_ARCHIVE_PREFIX=hill175-predeploy HILL175_BACKUP_LEAVE_STOPPED=true \
+    bash "${REPO_DIR}/ops/backup-hill175.sh"
+fi
 
 # Runtime files, datapacks, and fresh survival world folders are updated while Paper is stopped.
 if systemctl is-active --quiet "${SERVICE_NAME}"; then
@@ -561,6 +594,7 @@ else
 fi
 service_was_stopped=true
 runtime_rollback_dir="$(mktemp -d "${RUNTIME_DIR}/assets/install-rollback.XXXXXX")"
+backup_runtime_file "${RUNTIME_DIR}/paper.jar" paper.jar
 backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175.jar" plugin.jar
 backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175/config.yml" plugin-config.yml
 backup_runtime_file "${RUNTIME_DIR}/server.properties" server.properties
@@ -571,6 +605,13 @@ backup_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
 backup_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
 backup_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
 backup_runtime_file "${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed" hub-install-marker
+for index in "${!bedrock_paths[@]}"; do
+  backup_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
+done
+install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" "${paper_target}" "${RUNTIME_DIR}/paper.jar"
+if [[ "${BEDROCK_ENABLED}" == true ]]; then
+  python3 "${REPO_DIR}/ops/install-bedrock.py" install --runtime "${RUNTIME_DIR}" --port "${BEDROCK_PORT}"
+fi
 
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/build/libs/Hill-server-1.0-SNAPSHOT.jar" \
@@ -768,7 +809,6 @@ fi
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${RUNTIME_DIR}"
 chmod 0640 "${RUNTIME_DIR}/eula.txt" "${RUNTIME_DIR}/server.properties" "${RUNTIME_DIR}/spigot.yml" "${RUNTIME_DIR}/paper.jar"
 
-install -m 0750 -o root -g root "${REPO_DIR}/ops/backup-hill175.sh" /usr/local/bin/hill175-backup.sh
 install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175.service" /etc/systemd/system/hill175.service
 install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175-backup.service" /etc/systemd/system/hill175-backup.service
 install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175-backup.timer" /etc/systemd/system/hill175-backup.timer
@@ -783,6 +823,9 @@ touch "${startup_probe_marker}"
 systemctl restart "${SERVICE_NAME}"
 wait_for_server_ready "${startup_probe_marker}"
 bash "${REPO_DIR}/ops/verify-server.sh"
+if [[ "${AUTH_MODE}" == microsoft ]]; then
+  python3 "${REPO_DIR}/ops/configure-auth-proxy.py" install --env-file "${AUTH_ENV_FILE}"
+fi
 systemctl --no-pager --full status "${SERVICE_NAME}"
 runtime_files_committed=true
 service_was_stopped=false

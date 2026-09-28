@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "checked_on": "2026-09-28",
+  "java_minecraft": "26.2",
+  "bedrock_minecraft": "26.30-26.51",
+  "sources": [
+    "https://geysermc.org/wiki/geyser/supported-versions/",
+    "https://geysermc.org/wiki/floodgate/setup/"
+  ],
+  "artifacts": [
+    {
+      "project": "geyser",
+      "plugin_name": "Geyser-Spigot",
+      "version": "2.11.3",
+      "build": 1247,
+      "source_commit": "63a4e2b79b12f0d138777d5fd80176a112b4bd72",
+      "filename": "Geyser-Spigot.jar",
+      "url": "https://download.geysermc.org/v2/projects/geyser/versions/2.11.3/builds/1247/downloads/spigot",
+      "sha256": "6fed2d9711e2db3c365508ec10db36d06a0199abd226159d23d57f82662fd7a6"
+    },
+    {
+      "project": "floodgate",
+      "plugin_name": "floodgate",
+      "version": "2.2.5",
+      "build": 141,
+      "source_commit": "81b65ccb766bf8024858ebf3eefa6974056aecc5",
+      "filename": "floodgate-spigot.jar",
+      "url": "https://download.geysermc.org/v2/projects/floodgate/versions/2.2.5/builds/141/downloads/spigot",
+      "sha256": "21570aff9ce17d6983928e8552777760e1ede5050026b04c686b0ae112e6fd7e"
+    }
+  ]
+}

@@ -16,6 +16,8 @@ SUPPORTED = {
     "HILL175_AUTH_MODE", "HILL175_ENTRA_TENANT_ID", "HILL175_ENTRA_CLIENT_ID",
     "HILL175_ENTRA_CLIENT_SECRET", "HILL175_ENTRA_REQUIRED_ROLE",
     "HILL175_AUTH_PUBLIC_URL", "HILL175_AUTH_PORT", "HILL175_MAX_LINKED_ACCOUNTS",
+    "HILL175_ORIGIN_CERT", "HILL175_ORIGIN_KEY", "HILL175_AOP_CA",
+    "HILL175_BEDROCK_ENABLED", "HILL175_BEDROCK_PORT",
 }
 
 
@@ -47,6 +49,10 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
         raise ValueError("HILL175_AUTH_MODE must explicitly be development or microsoft")
     if expected_mode and mode != expected_mode:
         raise ValueError("Installer mode differs from the environment file; no settings were changed")
+    if values.get("HILL175_BEDROCK_ENABLED", "true") not in {"true", "false"}:
+        raise ValueError("HILL175_BEDROCK_ENABLED must be true or false")
+    if not 1024 <= int(values.get("HILL175_BEDROCK_PORT", "19132")) <= 65535:
+        raise ValueError("HILL175_BEDROCK_PORT must be between 1024 and 65535")
     if mode == "development":
         return mode, 8087
     for key in ("HILL175_ENTRA_TENANT_ID", "HILL175_ENTRA_CLIENT_ID"):
@@ -85,15 +91,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--file", type=Path, default=Path("/etc/hill175/hill175.env"))
     parser.add_argument("--expect-mode", choices=["development", "microsoft"])
-    parser.add_argument("--print", dest="field", choices=["mode", "port"])
+    parser.add_argument("--print", dest="field", choices=["mode", "port", "bedrock-enabled", "bedrock-port"])
     args = parser.parse_args()
     try:
-        mode, port = validate(read_environment(args.file), args.expect_mode)
+        values = read_environment(args.file)
+        mode, port = validate(values, args.expect_mode)
     except (OSError, UnicodeError, ValueError):
         # Error values can contain credentials (including malformed URLs); never print them.
         print("Authentication environment invalid. Check required keys, format, mode, and file permissions against .env.example.", file=sys.stderr)
         return 1
-    print({"mode": mode, "port": port}[args.field] if args.field else f"Authentication environment valid ({mode}).")
+    fields = {"mode": mode, "port": port,
+              "bedrock-enabled": values.get("HILL175_BEDROCK_ENABLED", "true") if mode == "microsoft" else "false",
+              "bedrock-port": values.get("HILL175_BEDROCK_PORT", "19132")}
+    print(fields[args.field] if args.field else f"Authentication environment valid ({mode}).")
     return 0
 
 

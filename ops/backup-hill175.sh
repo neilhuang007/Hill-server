@@ -20,6 +20,7 @@ require_command() {
 
 restart_service_if_needed() {
   [[ "${was_running}" == true ]] || return 0
+  [[ "${LEAVE_STOPPED}" == false ]] || return 0
   log "starting ${SERVICE_NAME}"
   if ! systemctl start "${SERVICE_NAME}"; then
     return 1
@@ -46,6 +47,7 @@ require_command borg
 require_command flock
 require_command stat
 require_command systemctl
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/deployment-lock.sh"
 
 [[ -f "${ENV_FILE}" && -r "${ENV_FILE}" ]] || fail "backup env file missing or unreadable: ${ENV_FILE}"
 
@@ -69,6 +71,8 @@ LOCK_FILE="${MC_BACKUP_LOCK:-/run/lock/mc-backup.lock}"
 LOCK_WAIT_SECONDS="${HILL175_BACKUP_LOCK_WAIT_SECONDS:-3600}"
 ARCHIVE_PREFIX="${HILL175_BACKUP_ARCHIVE_PREFIX:-hill175-daily}"
 KEEP_DAILY="${HILL175_BACKUP_KEEP_DAILY:-14}"
+LEAVE_STOPPED="${HILL175_BACKUP_LEAVE_STOPPED:-false}"
+[[ "${LEAVE_STOPPED}" == true || "${LEAVE_STOPPED}" == false ]] || fail "HILL175_BACKUP_LEAVE_STOPPED must be true or false"
 
 [[ "${SRV_DIR}" == /* ]] || fail "runtime directory must be absolute: ${SRV_DIR}"
 [[ -d "${SRV_DIR}" ]] || fail "runtime directory does not exist: ${SRV_DIR}"

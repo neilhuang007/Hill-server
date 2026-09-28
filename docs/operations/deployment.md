@@ -102,7 +102,7 @@ Inside the SSH session, for a first checkout:
 
 ```bash
 apt-get update
-apt-get install -y git curl ca-certificates tar gzip unzip borgbackup util-linux python3
+apt-get install -y git curl ca-certificates tar gzip unzip borgbackup util-linux python3 nginx openssl
 git clone https://github.com/neilhuang007/Hill-server.git /opt/Hill-server
 cd /opt/Hill-server
 ```
@@ -122,10 +122,25 @@ Do not copy edited source or a local plugin JAR over the deployment checkout.
 
 ## 4. Back up, build, install
 
-Schedule the restart around active users. On an existing service, create a verified
-cold snapshot using `bash ops/backup-hill175.sh` after the Borg configuration below
-is ready. A complete `/opt/hill175` snapshot while Paper is stopped is an alternative.
-The installer's rollback directories do not replace a complete data backup.
+After initial host setup, use one command from a clean, committed local `main`:
+
+```powershell
+./ops/deploy.ps1 -Mode Microsoft
+# Current controlled demo instead:
+./ops/deploy.ps1 -Mode Development
+```
+
+This checks the checkout, pushes GitHub, connects through PuTTY, pulls with
+`--ff-only`, requires that exact commit, and runs the installer. An unrecognized
+SSH host key fails in PuTTY batch mode; verify/cache the host fingerprint during
+initial access. Dirty or diverged checkouts are preserved and rejected. Deployment
+output is retained in a root-only `/opt/hill175-deploy-<UTC>.log` on the server.
+
+Schedule the restart around active users. Upgrades automatically take a cold Borg
+snapshot and keep Paper stopped until installation is complete. A failed backup
+blocks the upgrade. Configure and initialize Borg once as described below; the
+rollback directories do not replace the full data backup. Deployment and scheduled
+Hill backups share a lock, preventing overlapping service/world changes.
 
 For school verification, prepare `/etc/hill175/hill175.env` from
 [.env.example](../../.env.example) and follow the [IT guide](microsoft-sso-setup.md).
@@ -151,6 +166,11 @@ mode sets `online-mode=true` and missing/invalid SSO configuration stops Paper.
 The installer builds and tests the plugin from the pulled source, checks staged
 assets, stops Paper before world/config changes, preserves replaced maps, installs
 the template and pinned worldgen inputs, then starts the service and verifies it.
+In Microsoft mode it also downloads checksum-pinned Geyser/Floodgate, generates
+their configuration, verifies the UDP listener, and installs/reloads the protected
+nginx site from the environment. Certificates and Cloudflare ranges are validated
+before the outage. Managed Bedrock files participate in startup rollback. Secret
+rotation needs no source changes; run the same command after updating the host file.
 It writes `eula=true`; the operator must accept Minecraft's EULA before using it.
 
 Configuration is deployed from `server-config/` and `src/main/resources/config.yml`.

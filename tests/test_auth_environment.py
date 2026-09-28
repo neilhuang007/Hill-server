@@ -39,6 +39,8 @@ class AuthEnvironmentTest(unittest.TestCase):
             "HILL175_AUTH_PUBLIC_URL": ["http://auth.example.org", "https://user:secret@auth.example.org", "https://auth.example.org/redirect", "https://auth.example.org?query=1", "https://auth.example.org:8443"],
             "HILL175_AUTH_PORT": ["0", "65536", "bad"],
             "HILL175_MAX_LINKED_ACCOUNTS": ["1", "21"],
+            "HILL175_BEDROCK_ENABLED": ["yes", "1", "TRUE"],
+            "HILL175_BEDROCK_PORT": ["0", "65536", "bad"],
         }
         for key, values in invalid.items():
             for value in values:
