@@ -91,9 +91,11 @@ def validate_certificates(values):
     if key.stat().st_uid != 0 or key.stat().st_mode & 0o077:
         raise ValueError("Origin private key must be root-owned with mode 0600")
     host = urlsplit(values["HILL175_AUTH_PUBLIC_URL"]).hostname
-    match = run("openssl", "x509", "-in", str(cert), "-noout", "-checkhost", host, "-checkend", "86400")
+    # OpenSSL handles -checkend as an early exit; run hostname validation separately.
+    match = run("openssl", "x509", "-in", str(cert), "-noout", "-checkhost", host)
     if b"does match certificate" not in match:
         raise ValueError("Origin certificate does not cover the authentication hostname")
+    run("openssl", "x509", "-in", str(cert), "-noout", "-checkend", "86400")
     run("openssl", "x509", "-in", str(ca), "-noout", "-checkend", "86400")
     public_cert = run("openssl", "x509", "-in", str(cert), "-pubkey", "-noout")
     public_key = run("openssl", "pkey", "-in", str(key), "-passin", "pass:", "-pubout")
