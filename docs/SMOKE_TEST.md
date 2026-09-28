@@ -2,10 +2,14 @@
 
 Run against Minecraft Java Edition 26.2.
 
+This checks the development server. Microsoft SSO and Bedrock are not implemented;
+see the [identity acceptance plan](architecture/microsoft-sso.md) for that milestone.
+Deployment tools are in `ops/`; see the [source guide](operations/deployment.md).
+
 ## Authentication
 
 1. Join `135.181.78.188:25566` with a new offline nickname.
-2. Confirm spawn in the glass authentication lobby.
+2. Confirm spawn in the pinned authentication lobby.
 3. Confirm the title and chat instructions say to sign in.
 4. Run `/register <currentNickname> TestPassword123! TestPassword123!`.
 5. Confirm a temporary browser link appears.
@@ -66,7 +70,7 @@ Run against Minecraft Java Edition 26.2.
 3. Run `/camera list`, then `/camera remove 2` and save a replacement into slot 2.
 4. Preview a saved slot; confirm it begins at the exact saved eye viewpoint, yaw, and pitch without shifting vertically into a block. Confirm it displays `Previewing camera slot …` as a title plus a persistent status bar.
 5. While previewing, try walking, flying, sneaking, swimming, gliding, and rotating the view; confirm both position and angle remain continuously locked and camera markers are hidden.
-6. Use the Exit Camera Preview item with a right-click, preview again, then use it with a left-click; confirm both return to the pre-preview position and restore the owner hotbar.
+6. Confirm Exit Camera Preview is automatically selected. Use it with a right-click, preview again, then use it with a left-click; confirm both return and restore the owner hotbar. Repeat as a visitor and verify `/camera exit` also returns safely.
 7. As the entry owner, preview a camera and confirm the Remove This Camera item appears and requires confirmation. As a visitor, confirm that removal item and all removal actions are absent/denied.
 8. Left-click and right-click each visible camera marker; confirm both enter that marker's exact locked preview and show its camera number.
 9. Run `/entry title <title>`.

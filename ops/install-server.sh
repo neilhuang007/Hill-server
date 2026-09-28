@@ -1,6 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# This release has no Microsoft identity service yet. Make development access an
+# explicit operator choice, before downloading anything or stopping the service.
+case "${1:-}" in
+  --help|-h)
+    echo "Usage: bash ops/install-server.sh --allow-development-auth"
+    echo "Installs the logistics/demo server. Microsoft SSO is not implemented."
+    exit 0
+    ;;
+  --allow-development-auth)
+    [[ "$#" -eq 1 ]] || { echo "Unexpected installer arguments." >&2; exit 2; }
+    ;;
+  *)
+    echo "Refusing installation: this release automatically approves development identities." >&2
+    echo "For a controlled logistics/demo deployment, pass --allow-development-auth." >&2
+    echo "For student launch, complete docs/architecture/microsoft-sso.md first." >&2
+    exit 2
+    ;;
+esac
+
 if [[ "${EUID}" -ne 0 ]]; then
   echo "Run this installer as root." >&2
   exit 1
@@ -186,7 +205,7 @@ remove_people_template_staging() {
   local staging_dir="$1"
 
   case "${staging_dir}" in
-    "${RUNTIME_DIR}/assets/voxelearth/install-staging/"*) ;;
+    "${RUNTIME_DIR}/assets/campus/install-staging/"*) ;;
     *)
       echo "Refused to remove unsafe People template staging path: ${staging_dir}" >&2
       return 1
@@ -216,12 +235,12 @@ validate_people_template_root() {
     echo "${label} has unexpected People template marker: ${marker}" >&2
     return 1
   }
-  [[ -f "${template_root}/voxelearth-hill-manifest.json" ]] || {
-    echo "${label} is missing voxelearth-hill-manifest.json" >&2
+  [[ -f "${template_root}/hill-campus-template.json" ]] || {
+    echo "${label} is missing hill-campus-template.json" >&2
     return 1
   }
-  [[ -f "${template_root}/hill-hybrid-manifest.json" ]] || {
-    echo "${label} is missing hill-hybrid-manifest.json" >&2
+  [[ -f "${template_root}/hill-campus-template.yml" ]] || {
+    echo "${label} is missing hill-campus-template.yml" >&2
     return 1
   }
   [[ -d "${template_root}/region" ]] || {
@@ -441,13 +460,8 @@ HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
 HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
 HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
 
-PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz"
-PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
-PEOPLE_TEMPLATE_SHA256="c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99"
-PEOPLE_TEMPLATE_READY_MARKER="generated"
-PEOPLE_TEMPLATE_REGION_MCA_COUNT="21"
-PEOPLE_TEMPLATE_POI_MCA_COUNT="0"
-PEOPLE_TEMPLATE_ASSET_DIR="${RUNTIME_DIR}/assets/voxelearth"
+source "${REPO_DIR}/server-assets/campus-template.env"
+PEOPLE_TEMPLATE_ASSET_DIR="${RUNTIME_DIR}/assets/campus"
 PEOPLE_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
 
 require_command() {
@@ -579,7 +593,7 @@ install_people_template
 if [[ -f "${RUNTIME_DIR}/assets/survival-worldgen/primary-trio-managed.env" ]]; then
   primary_transition_marker_existed=true
 fi
-bash "${REPO_DIR}/scripts/install-survival-worldgen.sh" \
+bash "${REPO_DIR}/ops/install-survival-worldgen.sh" \
   "${RUNTIME_DIR}" \
   "${REPO_DIR}/server-assets/survival-worldgen-manifest.tsv"
 if [[ "${primary_transition_marker_existed}" == false \
@@ -668,7 +682,7 @@ if [[ "${installed_hub_sha}" != "${HUB_SHA256}" || ! -d "${hub_target}" && ! -d 
   hub_archive="${RUNTIME_DIR}/assets/${HUB_ARCHIVE_NAME}"
   if [[ ! -f "${hub_archive}" ]]; then
     echo "Missing user-provided hub archive: ${hub_archive}" >&2
-    echo "Package it with scripts/package-user-hub.ps1 and stage it before running this installer." >&2
+    echo "Package it with ops/package-user-hub.ps1 and stage it before running this installer." >&2
     exit 1
   fi
   verify_sha256 "${hub_archive}" "${HUB_SHA256}"
@@ -737,10 +751,10 @@ fi
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${RUNTIME_DIR}"
 chmod 0640 "${RUNTIME_DIR}/eula.txt" "${RUNTIME_DIR}/server.properties" "${RUNTIME_DIR}/spigot.yml" "${RUNTIME_DIR}/paper.jar"
 
-install -m 0750 -o root -g root "${REPO_DIR}/scripts/backup-hill175.sh" /usr/local/bin/hill175-backup.sh
-install -m 0644 -o root -g root "${REPO_DIR}/deploy/hill175.service" /etc/systemd/system/hill175.service
-install -m 0644 -o root -g root "${REPO_DIR}/deploy/hill175-backup.service" /etc/systemd/system/hill175-backup.service
-install -m 0644 -o root -g root "${REPO_DIR}/deploy/hill175-backup.timer" /etc/systemd/system/hill175-backup.timer
+install -m 0750 -o root -g root "${REPO_DIR}/ops/backup-hill175.sh" /usr/local/bin/hill175-backup.sh
+install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175.service" /etc/systemd/system/hill175.service
+install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175-backup.service" /etc/systemd/system/hill175-backup.service
+install -m 0644 -o root -g root "${REPO_DIR}/ops/systemd/hill175-backup.timer" /etc/systemd/system/hill175-backup.timer
 systemctl daemon-reload
 systemctl enable hill175.service
 systemctl enable --now hill175-backup.timer
@@ -751,7 +765,7 @@ fi
 touch "${startup_probe_marker}"
 systemctl restart "${SERVICE_NAME}"
 wait_for_server_ready "${startup_probe_marker}"
-bash "${REPO_DIR}/scripts/verify-server.sh"
+bash "${REPO_DIR}/ops/verify-server.sh"
 systemctl --no-pager --full status "${SERVICE_NAME}"
 runtime_files_committed=true
 service_was_stopped=false

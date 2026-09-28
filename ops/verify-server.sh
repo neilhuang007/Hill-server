@@ -15,13 +15,8 @@ EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\t
 CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
 CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
 CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
-PEOPLE_TEMPLATE_ARCHIVE_NAME="hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz"
-PEOPLE_TEMPLATE_ARCHIVE_ROOT="hill_people_template"
-PEOPLE_TEMPLATE_SHA256="c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99"
-PEOPLE_TEMPLATE_READY_MARKER="generated"
-PEOPLE_TEMPLATE_REGION_MCA_COUNT="21"
-PEOPLE_TEMPLATE_POI_MCA_COUNT="0"
-PEOPLE_TEMPLATE_ARCHIVE="${RUNTIME_DIR}/assets/voxelearth/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
+source "${REPO_DIR}/server-assets/campus-template.env"
+PEOPLE_TEMPLATE_ARCHIVE="${RUNTIME_DIR}/assets/campus/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
 PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
 
 fail() {
@@ -101,6 +96,8 @@ check_latest_log() {
   local pattern='Failed to load datapack|Could not load datapack|Failed to parse|Couldn.t parse|registry.*error|Unknown registry|Missing required feature|watchdog|Exception|ERROR'
 
   [[ -f "${latest_log}" ]] || fail "missing latest log: ${latest_log}"
+  grep -Fq 'Hill 175 competition server enabled with development identity linking.' "${latest_log}" \
+    || fail "Paper started without the expected Hill175 development authentication provider"
   if grep -Eiq "${pattern}" "${latest_log}"; then
     grep -Ein "${pattern}" "${latest_log}" >&2
     fail "latest.log contains datapack, registry, watchdog, exception, or ERROR lines"
@@ -140,10 +137,10 @@ verify_people_template() {
     || fail "Hill175 config does not point People entries at world-templates/hill_people_template"
   grep -Eq '^  require-template:[[:space:]]*true[[:space:]]*$' "${PLUGIN_CONFIG}" \
     || fail "Hill175 config must fail closed when the People template is unavailable"
-  grep -Eq '^  template-region-file-count:[[:space:]]*21[[:space:]]*$' "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must require all 21 VoxelEarth region files"
+  grep -Eq "^  template-region-file-count:[[:space:]]*${PEOPLE_TEMPLATE_REGION_MCA_COUNT}[[:space:]]*$" "${PLUGIN_CONFIG}" \
+    || fail "Hill175 config must require all ${PEOPLE_TEMPLATE_REGION_MCA_COUNT} campus region files"
   grep -Eq '^  template-poi-file-count:[[:space:]]*0[[:space:]]*$' "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must require zero VoxelEarth POI files"
+    || fail "Hill175 config must require zero campus POI files"
   grep -Eq "^  structure-file:[[:space:]]*(''|\"\"|)[[:space:]]*$" "${PLUGIN_CONFIG}" \
     || fail "Hill175 config must leave people.structure-file blank for the Anvil template"
 
@@ -153,10 +150,10 @@ verify_people_template() {
   marker="$(tr -d '\r\n' < "${PEOPLE_TEMPLATE_DIR}/.hill175-people-ready")"
   [[ "${marker}" == "${PEOPLE_TEMPLATE_READY_MARKER}" ]] \
     || fail "People template marker was '${marker}', expected '${PEOPLE_TEMPLATE_READY_MARKER}'"
-  [[ -f "${PEOPLE_TEMPLATE_DIR}/voxelearth-hill-manifest.json" ]] \
-    || fail "missing People template voxelearth-hill-manifest.json"
-  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-hybrid-manifest.json" ]] \
-    || fail "missing People template hill-hybrid-manifest.json"
+  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-campus-template.json" ]] \
+    || fail "missing People template hill-campus-template.json"
+  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-campus-template.yml" ]] \
+    || fail "missing People template hill-campus-template.yml"
   [[ -d "${PEOPLE_TEMPLATE_DIR}/region" ]] || fail "missing People template region directory"
   if [[ "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" != "0" ]]; then
     [[ -d "${PEOPLE_TEMPLATE_DIR}/poi" ]] || fail "missing People template POI directory"
@@ -284,6 +281,8 @@ verify_chunky_plugin
 verify_people_template
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
+require_line "${PLUGIN_CONFIG}" "  provider: always-approve-development-stub"
+require_line "${PLUGIN_CONFIG}" "  development-stub-acknowledged: true"
 check_latest_log
 journalctl -u hill175.service -n 160 --no-pager | grep -E 'Hill175|Done \(|datapack|ERROR|WARN' || true
 echo "File/log smoke checks passed. In-game smoke still must run /datapack list and survival chunk/structure checks."

@@ -77,7 +77,7 @@ The installer records this plan in `assets/survival-worldgen/pregen-plan.txt` bu
 
 Before students enter the world:
 
-1. Start Paper 26.2 from a clean runtime after `scripts/install-server.sh` or `scripts/prepare-local-runtime.ps1`.
+1. Start Paper 26.2 from a clean runtime after `ops/install-server.sh` or `ops/prepare-local-runtime.ps1`.
 2. Confirm `/datapack list` shows the seven selected packs and no Tectonic pack.
 3. Enter through the Survival Guide and confirm the destination is the primary `world`.
 4. Confirm mobs, damage, hunger, death drops, explosions, fire behavior, and PvP follow normal survival rules.

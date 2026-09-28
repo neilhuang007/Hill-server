@@ -328,6 +328,14 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
             return;
         }
+        if (competition.isCompetitionItem(event.getPlayer().getInventory().getItemInMainHand(),
+                CompetitionModule.CAMERA_PREVIEW_ITEM_ID)) {
+            event.setCancelled(true);
+            if (competition.acceptsCameraPreviewLeftClick(event.getPlayer())) {
+                competition.exitCameraPreview(event.getPlayer());
+            }
+            return;
+        }
         if (!event.getAttacked().getScoreboardTags().contains(CAMERA_MARKER_TAG)) {
             return;
         }

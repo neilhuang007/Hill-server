@@ -65,4 +65,4 @@ try {
     Pop-Location
 }
 
-Write-Host "Run the player smoke test with: node scripts/smoke-player.mjs"
+Write-Host "Run the player smoke test with: node ops/smoke-player.mjs"

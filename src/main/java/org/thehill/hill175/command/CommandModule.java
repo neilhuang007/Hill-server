@@ -216,6 +216,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "list" -> competition.listCameras(player);
             case "preview" -> competition.previewNextCamera(player);
+            case "exit" -> competition.exitCameraPreview(player);
             case "remove" -> {
                 if (args.length != 2) {
                     player.sendMessage("Usage: /camera remove <1-3>");
@@ -227,7 +228,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                     player.sendMessage("Camera index must be 1, 2, or 3.");
                 }
             }
-            default -> player.sendMessage("Camera commands: save, list, preview, remove <1-3>");
+            default -> player.sendMessage("Camera commands: save, list, preview, exit, remove <1-3>");
         }
         return true;
     }
@@ -246,7 +247,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             return filter(args[0], List.of("invite", "accept", "leave"));
         }
         if (command.getName().equalsIgnoreCase("camera") && args.length == 1) {
-            return filter(args[0], List.of("save", "list", "preview", "remove"));
+            return filter(args[0], List.of("save", "list", "preview", "exit", "remove"));
         }
         return List.of();
     }

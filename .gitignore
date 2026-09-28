@@ -17,16 +17,41 @@ versions/
 tmp/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+node_modules/
 
 # Large generated/source map assets stay outside Git and are deployed separately.
 combined_3d_tiles.glb
 structure.nbt
+structure (*).nbt
 world-templates/
 
 # Plugin data and generated worlds
 competition-data.yml
 *.log
+*.log.*
+*.log.json
 crash-reports/
+
+# Generated BlueMap output and dependency scratch, not a web application.
+/web/
+/io/
+/data/logs/
+
+# Local credentials, server identities, and office working files.
+.env
+.env.*
+!.env.example
+*.ppk
+*.key
+*.pem
+*.p12
+*.pfx
+**/key.pem
+**/~$*
+/docs/*.docx
 
 # OS
 .DS_Store

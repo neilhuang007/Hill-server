@@ -3,7 +3,7 @@ import path from "node:path";
 
 const botRoot = process.argv[2];
 if (!botRoot) {
-  throw new Error("Usage: node scripts/patch-smoke-bot-protocol.mjs <mineflayer-root>");
+  throw new Error("Usage: node ops/patch-smoke-bot-protocol.mjs <mineflayer-root>");
 }
 
 const protocolPath = path.join(

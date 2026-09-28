@@ -49,6 +49,7 @@ public final class WorldModule {
     private final Map<UUID, ResetOperation> resetOperations = new HashMap<>();
     private final Set<String> readyPeopleWorlds = new HashSet<>();
     private final Map<String, List<Runnable>> waitingPeopleWorldCallbacks = new HashMap<>();
+    private final Map<UUID, Optional<CampusTemplateMetadata>> campusMetadata = new HashMap<>();
     private World authenticationWorld;
     private World hubWorld;
     private World journeyWorld;
@@ -403,12 +404,20 @@ public final class WorldModule {
             for (org.bukkit.entity.Player player : world.getPlayers()) {
                 player.teleport(hubSpawn());
             }
-            if (!Bukkit.unloadWorld(world, false)) {
+            if (!unloadPeopleWorld(world)) {
                 plugin.getLogger().severe("Could not unload private world " + entry.worldName());
                 return false;
             }
         }
         return deleteDirectorySafely(worldPath);
+    }
+
+    private boolean unloadPeopleWorld(World world) {
+        if (!Bukkit.unloadWorld(world, false)) {
+            return false;
+        }
+        campusMetadata.remove(world.getUID());
+        return true;
     }
 
     private World loadImportedWorld(String worldName) {
@@ -474,7 +483,7 @@ public final class WorldModule {
                     player.teleport(hubSpawn());
                 }
                 Path existingPath = existing.getWorldFolder().toPath();
-                Bukkit.unloadWorld(existing, false);
+                unloadPeopleWorld(existing);
                 deleteDirectorySafely(existingPath);
                 readyPeopleWorlds.remove(worldName);
                 return createPeopleWorld(worldName);
@@ -504,7 +513,7 @@ public final class WorldModule {
             if (hasMatchingPeopleReadyMarker(migratedWorld.getWorldFolder().toPath(), metadata) || metadata == null) {
                 markPeopleWorldReady(migratedWorld, metadata);
             } else if (templateReady) {
-                Bukkit.unloadWorld(migratedWorld, false);
+                unloadPeopleWorld(migratedWorld);
                 deleteDirectorySafely(migratedWorld.getWorldFolder().toPath());
                 return createPeopleWorld(worldName);
             } else {
@@ -563,7 +572,7 @@ public final class WorldModule {
         }
 
         if (metadata != null) {
-            Bukkit.unloadWorld(world, false);
+            unloadPeopleWorld(world);
             deleteDirectorySafely(world.getWorldFolder().toPath());
             beginPeopleTemplatePreparation();
             throw new IllegalStateException("The People template is still preparing. Try again in about a minute.");
@@ -582,10 +591,19 @@ public final class WorldModule {
         double configuredMinimum = plugin.getConfig().getDouble("people.world-border-size", 0.0);
         world.getWorldBorder().setCenter(borderCenterX, borderCenterZ);
         world.getWorldBorder().setSize(Math.max(computedSize, configuredMinimum));
-        world.setSpawnLocation(region.centerX(), Math.min(world.getMaxHeight() - 2, region.minY() + 2), region.centerZ());
+        Optional<CampusTemplateMetadata> campus = campusMetadata(world);
+        if (campus.isPresent()) {
+            world.setSpawnLocation(campus.get().spawnLocation(world));
+        } else {
+            world.setSpawnLocation(region.centerX(), Math.min(world.getMaxHeight() - 2, region.minY() + 2), region.centerZ());
+        }
     }
 
     private BuildRegion peopleRegion(String worldName, World world) {
+        Optional<CampusTemplateMetadata> campus = campusMetadata(world);
+        if (campus.isPresent()) {
+            return campus.get().region(worldName, world.getMinHeight(), world.getMaxHeight());
+        }
         StructureNbtLoader.Metadata metadata = resolvePeopleStructureMetadata();
         if (metadata != null) {
             int minX = -Math.floorDiv(metadata.sizeX(), 2);
@@ -732,7 +750,10 @@ public final class WorldModule {
         Path marker = templateFolder.resolve(PEOPLE_READY_MARKER);
         Path regionFolder = templateFolder.resolve("region");
         Path poiFolder = templateFolder.resolve("poi");
-        Path manifest = templateFolder.resolve("voxelearth-hill-manifest.json");
+        Path manifest = templateFolder.resolve("hill-campus-template.json");
+        if (!Files.isRegularFile(manifest)) {
+            manifest = templateFolder.resolve("voxelearth-hill-manifest.json");
+        }
         if (!Files.isRegularFile(marker)
                 || !Files.isRegularFile(manifest)
                 || !Files.isDirectory(regionFolder)
@@ -796,7 +817,7 @@ public final class WorldModule {
             deleteStalePeopleWorldIfNecessary(templateFolder, metadata);
             World loadedBuildWorld = Bukkit.getWorld(PEOPLE_TEMPLATE_BUILD_WORLD);
             if (loadedBuildWorld != null) {
-                Bukkit.unloadWorld(loadedBuildWorld, false);
+                unloadPeopleWorld(loadedBuildWorld);
             }
             deleteDirectorySafely(locateWorldFolder(PEOPLE_TEMPLATE_BUILD_WORLD, loadedBuildWorld));
             deleteDirectorySafely(new File(Bukkit.getWorldContainer(), PEOPLE_TEMPLATE_BUILD_WORLD).toPath());
@@ -846,7 +867,7 @@ public final class WorldModule {
             plugin.getLogger().log(Level.SEVERE, "Could not finalize cached People template at " + templateFolder, exception);
         } finally {
             Path buildWorldPath = templateWorld.getWorldFolder().toPath();
-            Bukkit.unloadWorld(templateWorld, false);
+            unloadPeopleWorld(templateWorld);
             deleteDirectorySafely(buildWorldPath);
             peopleTemplatePreparing = false;
             peopleTemplateReady = hasMatchingPeopleReadyMarker(templateFolder, metadata);
@@ -871,11 +892,26 @@ public final class WorldModule {
     }
 
     private void alignPeopleSpawn(World world) {
+        Optional<CampusTemplateMetadata> campus = campusMetadata(world);
+        if (campus.isPresent()) {
+            world.setSpawnLocation(campus.get().spawnLocation(world));
+            return;
+        }
         BuildRegion region = peopleRegion(world.getName(), world);
         int centerX = region.centerX();
         int centerZ = region.centerZ();
         int spawnY = Math.max(region.minY() + 2, world.getHighestBlockYAt(centerX, centerZ) + 2);
         world.setSpawnLocation(centerX, Math.min(world.getMaxHeight() - 2, spawnY), centerZ);
+    }
+
+    private Optional<CampusTemplateMetadata> campusMetadata(World world) {
+        return campusMetadata.computeIfAbsent(world.getUID(), ignored ->
+                CampusTemplateMetadata.read(world.getWorldFolder().toPath()));
+    }
+
+    public Optional<BuildRegion> campusChartRegion(World world) {
+        return campusMetadata(world).map(metadata ->
+                metadata.region(world.getName(), world.getMinHeight(), world.getMaxHeight()));
     }
 
     private void writePeopleReadyMarker(Path worldFolder, StructureNbtLoader.Metadata metadata) {

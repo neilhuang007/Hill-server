@@ -6,8 +6,8 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.thehill.hill175.auth.AlwaysApproveIdentityLinker;
 import org.thehill.hill175.auth.IdentityLinker;
+import org.thehill.hill175.auth.IdentityLinkerFactory;
 import org.thehill.hill175.auth.PasswordHasher;
 import org.thehill.hill175.command.CommandModule;
 import org.thehill.hill175.competition.CompetitionModule;
@@ -29,24 +29,25 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        try {
+            initialize();
+        } catch (RuntimeException exception) {
+            stopAfterStartupFailure(exception);
+        }
+    }
+
+    private void initialize() {
         saveDefaultConfig();
         getConfig().options().copyDefaults(true);
         saveConfig();
         reloadConfig();
-        if (!getConfig().getBoolean("authentication.development-stub-acknowledged", false)) {
-            getLogger().severe("Development identity linking is not acknowledged in config.yml; refusing to start.");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        IdentityLinker identityLinker = IdentityLinkerFactory.create(getConfig());
         getLogger().warning("DEVELOPMENT AUTHENTICATION IS ACTIVE: any unregistered offline nickname can be claimed while registration is open.");
 
         worlds = new WorldModule(this);
         worlds.initialize();
 
         store = new YamlCompetitionStore(getDataFolder(), getLogger());
-        IdentityLinker identityLinker = new AlwaysApproveIdentityLinker(
-                getConfig().getString("authentication.stub-link-base-url", "https://example.invalid/hill175/link")
-        );
         competition = new CompetitionModule(
                 this,
                 store,
@@ -74,10 +75,7 @@ public final class Hill175Plugin extends JavaPlugin {
             try {
                 hubNpcs.spawnCategoryNpcs();
             } catch (RuntimeException exception) {
-                getLogger().log(java.util.logging.Level.SEVERE,
-                        "Player category guides could not start; disabling Hill175 instead of running without navigation.",
-                        exception);
-                getServer().getPluginManager().disablePlugin(this);
+                stopAfterStartupFailure(exception);
             }
         });
         Bukkit.getScheduler().runTask(this, competition::rebuildAllCameraMarkers);
@@ -89,6 +87,14 @@ public final class Hill175Plugin extends JavaPlugin {
             competition.handleJoin(onlinePlayer);
         }
         getLogger().info("Hill 175 competition server enabled with development identity linking.");
+    }
+
+    private void stopAfterStartupFailure(RuntimeException exception) {
+        // Disabling only this plugin would remove admission and world protections
+        // while leaving Paper open to player connections.
+        getLogger().log(java.util.logging.Level.SEVERE,
+                "Stopping Paper because Hill175 could not start safely.", exception);
+        getServer().shutdown();
     }
 
     @Override

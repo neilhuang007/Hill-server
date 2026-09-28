@@ -24,7 +24,7 @@ hub:
   source-size-bytes: 17686682
   sanitized-archive-size-bytes: 1544267
   sanitized-content: source entities, session locks, UIDs, player data, statistics, and advancements are excluded
-  packaging-script: scripts/package-user-hub.ps1
+  packaging-script: ops/package-user-hub.ps1
   spawn: [70.5, 66.1, 42.5, 0.0, 0.0]
   category-personnel:
     journey: [70.5, 67.0, 70.5, 180.0, 0.0]
@@ -37,6 +37,31 @@ generated-worlds:
   people: one private hill_people_<entry> clone per People entry
 
 people-campus:
+  name: Hill School anniversary campus v19
+  revision: campus-v19-2x
+  deployment-pins: server-assets/campus-template.env
+  packaging-script: ops/package-campus-template.py
+  source-artifact-filename: Hill-School-175th-v19-Java-1.21.11.zip
+  source-artifact-sha256: afd71210f650f3e5adea9d4d6859b3c5295b1314b2330788af0bafbce0bd8c0f
+  source-minecraft-version: 1.21.11
+  source-data-version: 4671
+  template-artifact-filename: hill_people_template_campus_v19_2x.tgz
+  template-artifact-sha256: b913315523e35b8231b8a56647179830d5e8c4099e2908d610f1ef2ff320598e
+  template-archive-root: hill_people_template
+  install-template: world-templates/hill_people_template
+  runtime-minecraft-version: 26.2
+  paper-build: 119
+  blocks-per-metre: 2
+  block-bounds: [-576, 18, -1600, 1407, 319, 415]
+  preferred-spawn: [228, 91, 154]
+  region-files: 25
+  poi-files: 0
+  source-chunks: 15624
+  scope: frozen reviewed core and retained 44 campus components; construction remains unfinished
+  permission: School-authorized project asset; world archive staged separately from Git
+  existing-entries: preserved; new entries and owner-confirmed resets use this template
+
+historical-people-campus-v15:
   name: Hill School strict hybrid VoxelEarth ground and Roofer/VoxCity buildings v15
   address: 860 Beech Street, Pottstown, PA 19464
   engine: VoxelEarth Java 3D Tiles voxelizer for terrain/context plus Roofer LoD2 geometry voxelized by VoxCity

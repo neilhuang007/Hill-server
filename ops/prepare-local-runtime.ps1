@@ -18,7 +18,9 @@ $HubSha256 = 'd6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de'
 
 Push-Location $Root
 try {
+    & (Join-Path $Root 'ops\prepare-local-campus-template.ps1') -Runtime $Runtime
     & .\gradlew.bat clean test jar
+    if ($LASTEXITCODE -ne 0) { throw 'Plugin build or tests failed.' }
     New-Item -ItemType Directory -Force -Path $Runtime, $Assets, (Join-Path $Runtime 'plugins') | Out-Null
 
     $PaperJar = Join-Path $Runtime 'paper.jar'
@@ -61,7 +63,7 @@ try {
     }
     Set-Content -LiteralPath (Join-Path $Runtime 'eula.txt') -Value 'eula=true'
 
-    & (Join-Path $Root 'scripts\prepare-local-survival-worldgen.ps1') `
+    & (Join-Path $Root 'ops\prepare-local-survival-worldgen.ps1') `
         -Runtime $Runtime `
         -Manifest (Join-Path $Root 'server-assets\survival-worldgen-manifest.tsv')
 
@@ -98,7 +100,7 @@ try {
 
     $HubArchive = Join-Path $Assets $HubArchiveName
     if (-not (Test-Path $HubArchive)) {
-        & (Join-Path $Root 'scripts\package-user-hub.ps1')
+        & (Join-Path $Root 'ops\package-user-hub.ps1')
     }
     if ((Get-FileHash $HubArchive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $HubSha256) {
         throw 'Hub world SHA-256 checksum mismatch.'

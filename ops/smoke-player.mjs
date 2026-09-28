@@ -753,8 +753,9 @@ async function verifyVisitorCannotRemoveCamera(entryTitle) {
     if (exitSlot < 0) {
       throw new Error("Visitor camera preview had no exit item");
     }
-    visitor.setQuickBarSlot(exitSlot);
-    visitor._client.write("held_item_slot", { slotId: exitSlot });
+    if (visitor.heldItem?.name !== "barrier") {
+      throw new Error("Visitor camera preview did not select the exit item");
+    }
     const exitStart = visitorTranscript.length;
     visitor.activateItem();
     await waitFor(
@@ -762,6 +763,39 @@ async function verifyVisitorCannotRemoveCamera(entryTitle) {
       "visitor camera exit",
     );
     visitor.deactivateItem();
+    const secondPreviewStart = visitorTranscript.length;
+    visitor.chat("/camera preview");
+    await waitFor(() => visitorTranscript.slice(secondPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
+      "second visitor preview");
+    await waitFor(() => visitor.heldItem?.name === "barrier" && visitor.game.gameMode === "adventure",
+      "visitor exit item selected in Adventure mode");
+    await delay(500);
+    const leftExitStart = visitorTranscript.length;
+    const visitorGround = visitor.blockAt(visitor.entity.position.offset(0, -1, 0).floored());
+    if (!visitorGround) throw new Error("Visitor preview ground chunk was not loaded");
+    visitor._client.write("block_dig", { status: 0, location: visitorGround.position, face: 1 });
+    visitor.swingArm();
+    await waitFor(() => visitorTranscript.slice(leftExitStart).some((line) => line.includes("Camera preview closed")),
+      "visitor left-click exit");
+    const attackPreviewStart = visitorTranscript.length;
+    visitor.chat("/camera preview");
+    await waitFor(() => visitorTranscript.slice(attackPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
+      "visitor preview before entity exit");
+    await delay(500);
+    const attackExitStart = visitorTranscript.length;
+    // Camera markers are hidden during preview, so Paper discards packets for
+    // them before Bukkit events. Click the visible owner at the same viewpoint.
+    visitor._client.write("attack", { entityId: bot.entity.id });
+    await waitFor(() => visitorTranscript.slice(attackExitStart).some((line) => line.includes("Camera preview closed")),
+      "visitor exit while clicking an entity");
+    const fallbackPreviewStart = visitorTranscript.length;
+    visitor.chat("/camera preview");
+    await waitFor(() => visitorTranscript.slice(fallbackPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
+      "visitor preview before command exit");
+    const fallbackExitStart = visitorTranscript.length;
+    visitor.chat("/camera exit");
+    await waitFor(() => visitorTranscript.slice(fallbackExitStart).some((line) => line.includes("Camera preview closed")),
+      "visitor command exit fallback");
   } finally {
     visitor.quit("Visitor camera smoke complete");
     await delay(250);
@@ -844,7 +878,9 @@ async function cameraViewScenario() {
   }
 
   let closeTranscriptStart = transcript.length;
-  await holdHotbarItem("barrier");
+  if (bot.heldItem?.name !== "barrier") {
+    throw new Error("Camera preview did not put the Exit Camera Preview item directly in hand");
+  }
   bot.activateItem();
   await waitFor(
     () => transcript.slice(closeTranscriptStart).some((line) => line.includes("Camera preview closed")),
@@ -892,6 +928,15 @@ async function cameraViewScenario() {
   );
 
   await verifyVisitorCannotRemoveCamera(cameraEntryTitle);
+
+  closeTranscriptStart = transcript.length;
+  bot.chat("/camera exit");
+  await waitFor(() => transcript.slice(closeTranscriptStart).some((line) => line.includes("Camera preview closed")),
+    "camera exit command fallback");
+  const commandPreviewStart = transcript.length;
+  bot.chat("/camera preview");
+  await waitFor(() => transcript.slice(commandPreviewStart).some((line) => line.includes("Previewing camera slot 1")),
+    "preview after command exit");
 
   const removeTranscriptStart = transcript.length;
   await holdHotbarItem("red_dye");
@@ -1282,6 +1327,45 @@ function currentWorldFolder() {
   return candidates.find((candidate) => existsSync(candidate));
 }
 
+async function peopleCampusTemplateScenario() {
+  bot.chat("/entry create people");
+  await waitFor(() => transcript.some((line) => line.includes("People entry created.")), "People creation", 120_000);
+  await waitFor(() => currentDimension(bot).includes("hill_people_"), "private campus arrival", 120_000);
+  await waitFor(() => bot.game.gameMode === "creative" && hasHotbarItem("filled_map", "People Campus Chart"),
+    "campus owner mode and chart", 30_000);
+  await delay(2_000);
+  const arrival = bot.entity.position.clone();
+  if (Math.abs(arrival.x - 228.5) > 4 || Math.abs(arrival.z - 154.5) > 4 || Math.abs(arrival.y - 86) > 1) {
+    throw new Error(`Campus arrival ${arrival} is not the verified core spawn [228,91,154]`);
+  }
+  const below = bot.blockAt(arrival.offset(0, -1, 0).floored(), false);
+  if (!below || ["air", "void_air"].includes(below.name)) {
+    throw new Error(`Campus spawn lacks solid ground: ${below?.name ?? "unloaded"}`);
+  }
+  if (!skipLocalWorldFiles) {
+    const folder = currentWorldFolder();
+    if (!folder) throw new Error("Cannot resolve the private campus folder");
+    const manifest = JSON.parse(readFileSync(path.join(folder, "hill-campus-template.json"), "utf8"));
+    if (manifest.revision !== "campus-v19-2x" || manifest.blocks_per_metre !== 2 || manifest.source_chunks !== 15624) {
+      throw new Error("Private world has incorrect campus provenance");
+    }
+    const regions = readdirSync(path.join(folder, "region")).filter((name) => /^r\.-?\d+\.-?\d+\.mca$/.test(name));
+    if (regions.length !== 25) throw new Error(`Expected 25 campus regions, got ${regions.length}`);
+  }
+  await holdHotbarItem("nether_star");
+  await waitForWindow(() => bot.activateItem(), "campus controls before reset");
+  await waitForWindow(() => bot.clickWindow(22, 0, 0), "campus reset confirmation");
+  const resetStart = transcript.length;
+  bot.clickWindow(4, 0, 0);
+  await waitFor(() => transcript.slice(resetStart).some((line) => line.includes("Entry reset complete")), "campus reset", 120_000);
+  bot.chat("/entry home");
+  await waitFor(() => currentDimension(bot).includes("hill_people_") && bot.game.gameMode === "creative", "campus reentry", 30_000);
+  await delay(1_000);
+  if (bot.entity.position.distanceTo(arrival) > 2) throw new Error("Campus reset changed the core spawn");
+  if (!hasHotbarItem("filled_map", "People Campus Chart")) throw new Error("Campus chart missing after reset");
+  console.log(`PASS: campus v19 at two blocks/metre cloned 25 regions, spawned safely on ${below.name}, supplied its chart, and reset/rejoined at ${bot.entity.position}`);
+}
+
 async function peopleVoxelEarthTemplateScenario() {
   bot.chat("/entry create people");
   await waitFor(
@@ -1457,6 +1541,9 @@ try {
       break;
     case "people-voxelearth-template":
       await peopleVoxelEarthTemplateScenario();
+      break;
+    case "people-campus-template":
+      await peopleCampusTemplateScenario();
       break;
     case "navigation":
       await helpScenario();

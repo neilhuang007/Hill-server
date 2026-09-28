@@ -1427,6 +1427,9 @@ public final class CompetitionModule {
         givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.BARRIER, CAMERA_PREVIEW_ITEM_ID, "Exit Camera Preview",
                 "Left-click or right-click to return to your previous position."));
+        // Marker/menu entry can start from any held slot. Put the exit control
+        // directly in the player's hand on every entry and recovery path.
+        player.getInventory().setHeldItemSlot(3);
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
         boolean owner = entry.isMember(nicknameKey(player.getName()));
@@ -1463,7 +1466,7 @@ public final class CompetitionModule {
         if (world == null) {
             return null;
         }
-        BuildRegion chartRegion = campusChartBounds(entry);
+        BuildRegion chartRegion = worlds.campusChartRegion(world).orElseGet(() -> campusChartBounds(entry));
         CampusChartMap cached = campusChartMapsByEntry.get(entry.id());
         if (cached != null
                 && cached.world() == world

@@ -1,115 +1,58 @@
-# Hill 175 Minecraft Competition Server
+# Hill School 175th Anniversary Server
 
-Paper 26.2 server plugin implementing the testable competition workflow only. School identity linking is intentionally unconfigured and uses an always-approve development adapter.
+Paper plugin and deployment tooling for the anniversary competition: Journey
+outdoor plots, Place interiors, People campus worlds, teams, saved camera views,
+submissions, and a separate survival area.
 
-## Player workflow
+**Status: logistics and controlled testing.** Authentication currently uses a
+password and automatic development approval. Microsoft school SSO and Java/Bedrock
+account linking are designed, not implemented. The installer requires
+`--allow-development-auth`; this release is not ready for student admission.
 
-```text
-join with an offline nickname
--> spawn in the authentication lobby
--> first join: /register <username> <password> <repeatPassword>
--> receive a temporary school-link URL
--> development adapter approves the link automatically
--> teleport to the exhibition hub
--> use the Competition Compass or the titled player category guides
--> create The Journey, The Place, or The People entry
--> build in a protected plot/private world
--> invite one teammate with /team invite <nickname>
--> save up to three camera poses
--> set title + description
--> submit and lock the entry
-```
+## Start here
 
-Returning players use `/login <password>` on every connection. `/login` and `/register` are plugin commands and are not sent to public chat.
-Production copies `server-config/spigot.yml` with `commands.log: false` so Paper does not write sensitive command arguments to console or `latest.log`. Passwords still appear in the player's own local command history, so competition passwords must be unique to this event.
+- [Build and deploy from source](docs/operations/deployment.md)
+- [Microsoft SSO and Java/Bedrock design](docs/architecture/microsoft-sso.md)
+- [Player workflow and commands](docs/operations/player-guide.md)
+- [Smoke tests](docs/SMOKE_TEST.md)
+- [Repository conventions](CONTRIBUTING.md) and [documentation index](docs/README.md)
 
-## Included server behavior
+## Build
 
-- Offline-mode nickname protection with salted PBKDF2 password hashes.
-- Always-approve School Identity adapter for development testing.
-- Authentication lobby title, popup instructions, and private command workflow.
-- Owner-provided exhibition hub plus three skinned category guides and a fourth Survival Guide Player NPC; left- and right-click both open the relevant GUI.
-- Journey 64x64 outdoor plots.
-- Place 32x32 interior shells.
-- People private worlds cloned from the prepared high-resolution VoxelEarth campus template; production fails closed if that template is missing or malformed.
-- Maximum two category entries per participant and maximum two team members per entry.
-- Compass entry/visitor GUI with player heads and an Entry Controls GUI for reset, submission lock, delete, and category change instead of separate hotbar items.
-- Owner Creative Mode inside an owned entry; Spectator Mode outside it and while visiting.
-- Reset, delete, category switch, team invite/accept/leave, title, description, submit, and unlock flows.
-- Up to three camera poses per entry: right-click the Capture Camera View item to save the exact current view, then click a world marker to preview it. `/camera` remains available for optional slot management.
-- Full-screen, no-zoom camera preview mode with title and persistent status bar, exact position/angle lock, clickable camera markers, an exit item, and an owner-only remove-current-camera item.
-- Reset operations stay in a tracked in-progress state until world restoration finishes, then restore returning owners to Creative Mode.
-- Block/entity/command/portal/explosion protections.
-- Water, lava, and manually placed fire are allowed inside entry bounds; spread and boundary escape are blocked.
-- TNT and end crystals may be placed decoratively but cannot explode. Sneak-punch an end crystal to remove it safely.
-- Living mobs are blocked; armor stands, paintings, item frames, boats, minecarts, and other nonliving decorations remain usable within entry limits.
-- YAML persistence in `plugins/Hill175/competition-data.yml`.
-- Join, quit, and successful-authentication IP audit records in the same data file; operational purge remains scheduled for 30 days after the event once the event-end date is configured.
-
-## Commands
-
-| Command | Purpose |
-|---|---|
-| `/register <username> <password> <repeatPassword>` | Register the current offline nickname. |
-| `/login <password>` | Authenticate a registered nickname. |
-| `/hill175` or `/competition` | Open the competition GUI. |
-| `/hub` | Return to the exhibition hub. |
-| `/entry create <journey|place|people>` | Create an entry. |
-| `/entry home` | Return to the current entry. |
-| `/entry visit` | Browse all builds. |
-| `/entry reset` | Restore the current build space. |
-| `/entry delete` | Delete the current entry. |
-| `/entry switch <category>` | Replace the current entry with another category. |
-| `/entry title <text>` | Set the project title. |
-| `/entry description <text>` | Set the short description. |
-| `/entry submit` | Lock the entry after metadata and camera poses are ready. |
-| `/entry unlock` | Resume editing before the future competition deadline system is enabled. |
-| `/team invite <nickname>` | Invite a second participant to the current entry. |
-| `/team accept <nickname>` | Accept a team invite. |
-| `/team leave` | Leave the current team; a one-person entry is deleted. |
-| `/camera` or `/camera save` | Open the numbered Camera Controls UI. |
-| `/camera save <1-3>` | Save the current view to an explicit camera slot. |
-| `/camera list` | List saved poses. |
-| `/camera remove <1-3>` | Remove a pose. |
-
-## Build and local smoke test
+Use JDK 25 and the checked-in Gradle wrapper:
 
 ```powershell
 .\gradlew.bat clean test jar
 ```
 
-The built plugin is `build/libs/Hill-server-1.0-SNAPSHOT.jar`.
+On Linux/macOS: `bash ./gradlew clean test jar`. Output:
+`build/libs/Hill-server-1.0-SNAPSHOT.jar`. Paper is pinned to **26.2 build 119**.
+Local reconstruction launchers target other Minecraft versions and are separate.
 
-The local smoke runtime is intentionally excluded from Git. Use Paper 26.2 build 119 and Java 25 or newer. The production setup script downloads the pinned Paper build, verifies its SHA-256 checksum, installs the separately staged user-provided hub archive, and installs the systemd service.
+## Campus map
 
-## World assets
+People entries use the frozen **v19 campus at two blocks per metre**, packaged
+from the verified Java 1.21.11 port for Paper 26.2. Deployment pins live in
+[campus-template.env](server-assets/campus-template.env) and
+[worlds.yml](server-assets/worlds.yml). Existing People builds are preserved;
+a template change does not migrate students' worlds automatically.
 
-`server-assets/worlds.yml` is the machine-readable provenance manifest. Third-party world archives are never committed or republished. The main hub is the user-provided Minecraft 26.2 save and is packaged outside Git with `scripts/package-user-hub.ps1`; its checksum is pinned in the manifest and deployment scripts. The authentication lobby is the separately downloaded Small Medieval Church smoke asset. Journey and Place are generated by the plugin. People entries clone the prepared `world-templates/hill_people_template` Anvil world. The current template is the parcel-cropped VoxelEarth campus pinned in the manifest; `structure.nbt` is only an optional legacy fallback.
+The campus is unfinished and construction remains paused. Local launchers, source
+geometry, and saved worlds are described in the [workspace guide](docs/workspace-layout.md).
+The general local launcher still selects v14; the separate 1.21.11 launcher opens v19.
 
-Survival world generation is pinned separately in `server-assets/survival-worldgen-manifest.tsv`. The installer stages the official Modrinth datapack zips, verifies SHA-512 before moving a live world, and installs them into the primary `world/datapacks` folder before the primary survival trio `world`, `world_nether`, and `world_the_end` is generated. The survival seed is generated once, persisted outside Git in the runtime asset directory, and written to runtime `server.properties` as `level-seed`. On the first primary-world transition, the old primary `world` remains archived recoverably while every non-survival custom dimension namespace plus primary-root player data, stats, advancements, and scoreboard/custom data are copied back into the fresh primary world.
+## Layout
 
-The installer also pins Chunky `1.5.3` from Modrinth as a Paper/Bukkit server plugin at `plugins/Chunky-Bukkit-1.5.3.jar`. It is for manual operator pregeneration after smoke testing and requires no client mod. Install scripts do not create a pregeneration task, but saved tasks are configured to continue safely after a Paper restart.
+| Directory | Contents |
+| --- | --- |
+| `src/main`, `src/test` | Java plugin and tests |
+| `ops/` | Install, verify, backup, packaging, smoke tools, systemd units |
+| `server-config/` | Versioned server defaults |
+| `server-assets/` | Provenance, checksums, campus inputs, original resource packs |
+| `scripts/`, `tests/` | Campus reconstruction tools and tests |
+| `docs/` | Operations, architecture, research, historical plans |
+| `runtime/` | Ignored local worlds, downloads, screenshots, archives |
 
-The deployed campus is the strict hybrid VoxelEarth/Roofer/VoxCity v15 template generated at grid `64` and `1.0 blocks/metre`. Thirty-three parcel-intersecting VoxelEarth sectors cover the selected Hill properties; 23 neighborhood-only sectors were skipped before tile loading, and the final voxel stream was clipped again to the exact parcel geometry. Unmapped columns remain the original VoxelEarth ground geometry and material. Roofer LoD2 geometry, voxelized by the unmodified VoxCity mesh engine, replaces noisy photogrammetry only inside 92 validated building volumes; 16 edge or out-of-source models are rejected instead of being placed with guessed terrain. Terrain fallback and building-apron cleanup are both disabled. The hybrid audit checked `35,184,435` blocks plus `11,055` unchanged chunks outside the `499,917`-block edit mask with zero mismatches, while the support audit found zero floating floors or support mismatches. The Paper 26.2 template contains 21 region files, zero POI files, and campus chart bounds `[-283, 70, -1742, 1453, 133, 197]`.
-
-The final world and template archives are excluded from Git and retained under `runtime/assets/voxelearth/`: `hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831-paper26-final.tgz` for local inspection and `hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz` for production. Production installs the template-shaped archive from `/opt/hill175/assets/voxelearth/` into `world-templates/hill_people_template`; do not install the full-world archive at that path. Verify checksums against `server-assets/worlds.yml`. The older `scripts/generate-hill-campus.py` LiDAR/GIS generator remains only as historical research tooling and is not the deployed People map.
-
-Before a first production install (or when the pinned hub changes), copy `runtime/assets/Hill175-Exhibition-Hub-2026-08-26.zip` to `/opt/hill175/assets/` on the server. The installer refuses a missing or checksum-mismatched hub instead of silently falling back to another map.
-
-## Production deployment
-
-Repository workflow:
-
-```text
-edit locally
--> .\gradlew.bat clean test jar
--> push to GitHub
--> plink to 135.181.78.188
--> cd /opt/Hill-server
--> git pull
--> bash scripts/install-server.sh
-```
-
-The service runs as `hill175` from `/opt/hill175`. Minecraft TCP listens on port `25566` so it does not interrupt the existing server on `25565`; connect with `135.181.78.188:25566`. No web endpoint is added by this server-only implementation.
-
-The installer stops Paper before mutating runtime files, installs the selected survival datapacks, archives exact pre-transition world targets into `assets/survival-worldgen-archives/`, restores archived non-survival custom dimensions and primary-root state into the fresh `world`, and refuses to change the installed worldgen manifest later without a deliberate new-world operation.
+World archives, credentials, student records, and third-party binaries stay outside
+Git. Deployment follows **local changes → tests → GitHub push → PuTTY `plink.exe`
+→ server `git pull` → source build/install**.

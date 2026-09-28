@@ -1,5 +1,9 @@
 # Hill School 175th Anniversary Minecraft Competition — Implementation Plan
 
+> Historical August product specification. It includes unimplemented services.
+> Use the [current README](../README.md), [deployment guide](operations/deployment.md),
+> and [September SSO design](architecture/microsoft-sso.md) for current logistics.
+
 **Document date:** 2026-08-26
 **Implementation target:** Minecraft Java Edition, Paper 26.2, Java 25
 **Capacity target:** 100 concurrent players, approximately 150 entries

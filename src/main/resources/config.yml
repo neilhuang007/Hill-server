@@ -1,5 +1,5 @@
 # Hill 175 development configuration.
-# School account linking intentionally uses the always-approve stub until Hill selects an identity provider.
+# Microsoft school SSO is designed but not implemented; this is controlled demo access only.
 authentication:
   provider: always-approve-development-stub
   # Required safety acknowledgement. Replace the identity adapter before a real competition launch.
@@ -69,11 +69,11 @@ worlds:
   survival-end: world_the_end
 
 people:
-  # Extract a rights-cleared campus template to this folder before creating People entries.
+  # Frozen campus v19, two blocks/metre. Install the pinned archive before creating People entries.
   template-folder: world-templates/hill_people_template
   # Production must fail closed instead of silently substituting flat generated terrain.
   require-template: true
-  template-region-file-count: 21
+  template-region-file-count: 25
   template-poi-file-count: 0
   # Optional fallback. Leave blank when using a prepared Anvil template folder.
   structure-file: ""
@@ -85,8 +85,8 @@ people:
   build-radius: 1400
   world-border-size: 2865.0
   campus-chart:
-    # Exact parcel-cropped VoxelEarth/Roofer v15 campus bounds from voxelearth-hill-manifest.json.
-    # The generated map item uses X/Z for chart coverage; Y is retained for auditability.
+    # Legacy v15 chart fallback. New v19 worlds carry their own bounds and spawn
+    # in hill-campus-template.yml, preserving older participants' private worlds.
     block-bounds: [-283, 70, -1742, 1453, 133, 197]
 
 build-rules:
