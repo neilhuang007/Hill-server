@@ -46,6 +46,10 @@ integration, Microsoft SSO implementation, and repository/deployment maintenance
 
 - Update locally, push GitHub, then SSH and `git pull` in `/opt/Hill-server`.
   Do not copy edited source directly to the deployment checkout.
+- Routine deployment: `./ops/deploy.ps1 -Mode Microsoft` from clean, committed `main`;
+  use `-Mode Development` for the current demo. The wrapper performs push/pull,
+  build/test, backup, install and verification. Hill IT supplies the one-time
+  environment, Entra/Cloudflare setup and certificates described in the IT guide.
 - Runtime `/opt/hill175`, service `hill175.service`, demo TCP port `25566`.
 - Web requests must come through Cloudflare and nginx with a valid origin certificate.
   Origin CA alone does not restrict callers: also enforce Cloudflare ingress and

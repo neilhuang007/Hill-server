@@ -89,9 +89,42 @@ Server logs are retained at `/opt/hill175/assets/deploy-sso-20260928.log` and
 
 ## External acceptance still required
 
-IT must configure the Entra app/role and protected HTTPS hostname, install a
-compatible Geyser/Floodgate stack, and test real Java and Bedrock clients. Automated
+IT must configure the Entra app/role and protected HTTPS hostname, supply the
+certificates/environment, open the game ports, and test real Java and Bedrock clients. Automated
 tests do not prove Hill tenant eligibility, Cloudflare/firewall configuration,
 device link handling or real-name rendering. Existing development builds and
 survival inventories are preserved; automatic legacy-owner migration is not
 implemented. The deployed demo stays in development mode until those checks pass.
+
+## Deployment automation follow-up
+
+Deployment code `dc6ca28` was pushed to GitHub, pulled on the server, and exercised
+using `ops/deploy.ps1 -Mode Development` from a clean local checkout. The command
+completed push/pull, exact-revision validation, JDK 25 build/test/jar, cold backup,
+one continuous restart window, installation and file/log checks. Gradle reused its
+successful 79-test result; the plugin SHA-256 above is unchanged. The installed
+backup and shared-lock scripts match source. The service remains active.
+
+The automatic pre-deployment archive is
+`hill175-predeploy-2026-09-28T21-06-25Z`, fingerprint
+`e157dde67600ea2efe3ddab525845c976ad6400ad350fd9be9b2cd00c2bdca64`
+(3.95 GB / 2,751 files, runtime root `/opt/hill175`). The full command log is
+`/opt/hill175-deploy-20260928T210618Z.log`.
+
+All **33 deployment tests passed on Linux**: 5 environment, 8 proxy, 15 Bedrock,
+and 5 backup/locking tests. The proxy integration test generated disposable TLS
+credentials and validated the generated site with real nginx/OpenSSL, including
+rejection of a mismatched hostname; it did not install a public site. This caught
+and fixed OpenSSL's early exit when combining hostname and expiry checks.
+
+Two isolated Paper 26.2 starts loaded pinned Geyser 2.11.3 build 1247 and Floodgate
+2.2.5 build 141. Geyser opened the test UDP listener and the managed configurations
+survived restart unchanged. The test caught and fixed Floodgate's configuration
+rewrite; Hill's own account linking remains authoritative. That compatibility test
+used local JDK 26 and did not authenticate a real Xbox/student account. Logs remain
+ignored under `runtime/bedrock-smoke-20260928/`.
+
+The review also fixed backup's premature restart and serialized deployments with
+scheduled Hill backups. Microsoft deployment now handles transport downloads,
+configuration and nginx automatically after the one-time IT setup. Microsoft mode
+and Bedrock transport were not activated on the public development demo.
