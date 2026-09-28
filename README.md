@@ -15,6 +15,7 @@ account linking are designed, not implemented. The installer requires
 - [Microsoft SSO and Java/Bedrock design](docs/architecture/microsoft-sso.md)
 - [Player workflow and commands](docs/operations/player-guide.md)
 - [Smoke tests](docs/SMOKE_TEST.md)
+- [Latest deployment verification](docs/operations/deployment-verification-20260928.md)
 - [Repository conventions](CONTRIBUTING.md) and [documentation index](docs/README.md)
 
 ## Build

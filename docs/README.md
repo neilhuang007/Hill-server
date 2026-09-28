@@ -11,6 +11,7 @@
 - [Domain glossary](../CONTEXT.md)
 - [Repository conventions](../CONTRIBUTING.md)
 - [Cleanup record](operations/repository-cleanup-20260928.md)
+- [Deployment verification and remaining limits](operations/deployment-verification-20260928.md)
 
 The [August implementation plan](HILL_175_IMPLEMENTATION_PLAN.md) is a historical
 product specification, not evidence that its proposed services exist. The README

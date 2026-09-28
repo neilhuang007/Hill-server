@@ -13,6 +13,25 @@ cache/
 libraries/
 versions/
 
+# Downloaded binaries and generated maps, including accidental root-level output.
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.class
+*.zip
+*.tgz
+*.tar.gz
+*.mca
+*.nbt
+*.glb
+*.litematic
+*.schem
+/plugins/
+/logs/
+/world/
+/world_nether/
+/world_the_end/
+/usercache.json
+
 # Local generation scratch and Python bytecode
 tmp/
 __pycache__/
@@ -23,9 +42,6 @@ __pycache__/
 node_modules/
 
 # Large generated/source map assets stay outside Git and are deployed separately.
-combined_3d_tiles.glb
-structure.nbt
-structure (*).nbt
 world-templates/
 
 # Plugin data and generated worlds
