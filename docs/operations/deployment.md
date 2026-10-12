@@ -57,7 +57,7 @@ Do not merge region files from different revisions.
 
 The current requested IT handoff is **V29**, an unfinished floating exterior draft
 packaged from its preserved native Minecraft 26.1.2 conversion. This does not
-claim that the existing deployed server was updated. V19 pins are historical.
+claim that the existing deployed server was updated.
 
 For Windows, use [the asset folder instructions](windows-assets.md). For Linux:
 

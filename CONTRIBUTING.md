@@ -25,25 +25,23 @@ Display names must not replace verified game identities or become authorization 
 
 `ops/` contains server lifecycle tools; `ops/systemd/` contains service definitions
 and `ops/nginx/` contains the authentication proxy example.
-`server-config/` holds deployable defaults. `server-assets/` holds asset provenance,
-checksum pins, and reconstruction inputs. Keep packaging/verification pins synchronized.
+`server-config/` holds deployable defaults. `server-assets/` holds asset manifests,
+checksum pins, and original resource packs. Keep packaging/verification pins synchronized.
 Do not replace participant builds when updating a template.
 
-Campus tooling stays under `scripts/`, `tests/`, and `docs/research/`: immutable
-studies refer to those paths. Avoid moving them or running historical generators
-as deployment commands. Large competition/world modules can be extracted
-incrementally during SSO implementation; avoid unrelated rewrites during logistics.
+Keep this branch focused on server source, deployment tools, configuration,
+operator documentation, tests and asset/license manifests. Campus-authoring code,
+AI agent scratchpads, construction handoffs and research stay local or in a
+separate authoring repository. Do not add them to a deployment commit.
 
 ## Verification
 
 - Java: Gradle tests and affected [player smoke scenarios](docs/SMOKE_TEST.md).
 - Operations: Bash/PowerShell syntax checks, asset hashes, and controlled Paper startup.
-- Reconstruction: focused Python tests, immutable-state comparisons, native visual
-  review for geometry changes. GIS dependencies are separate from the server build.
 - Documentation: check links/command paths; distinguish implemented, planned, tested,
   and deployed work.
 
-Commit source, tests, original resource packs, defaults, and small reference files.
+Commit source, tests, original resource packs, defaults and deployment manifests.
 Exclude generated maps, downloads, world archives, student data, credentials, logs,
 proposal working copies, and caches. Preserve existing edits; inspect staged changes.
 Do not use blanket `git clean`, hard resets, force pushes, or delete old world inputs.

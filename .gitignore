@@ -75,3 +75,29 @@ crash-reports/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local campus authoring and agent work; not part of the deployment branch.
+/AGENTS.md
+/scripts/
+/Open-Hill-*.cmd
+/Open-Hill-*.ps1
+/docs/research/
+/docs/campus/
+/docs/internal/
+/docs/workspace-layout.md
+/docs/hill-*.md
+/docs/voxel-earth-hill-school.md
+/docs/HILL_175_IMPLEMENTATION_PLAN.md
+/docs/architecture/*-review-*.md
+/docs/operations/*-verification-*.md
+/docs/operations/repository-cleanup-*.md
+/server-assets/hill-*.json
+/server-assets/hill-campus-plan.template.html
+/server-assets/*-draft-*/
+/server-assets/campus-template.env
+/server-assets/resourcepacks/
+/ops/package-campus-template.py
+/tests/test_athey_physical_resolution.py
+/tests/test_court_structural_cap.py
+/.agents/
+/notes/

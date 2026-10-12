@@ -64,5 +64,5 @@ own compatible pack.
 
 This is the asset installation procedure, not complete Windows service setup.
 The [SSO guide](microsoft-sso-setup.md) explains required IT values and authentication
-boundaries, but its systemd/nginx automation targets Linux. The existing nightly
-systemd updater also targets Linux and has not been enabled for this Windows host.
+boundaries, but its systemd/nginx automation targets Linux. Nightly updates have
+not been configured for the Windows host.

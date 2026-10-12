@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/inner_stairs",
-  "textures": {
-    "bottom": "hill-brownstone:block/cut_brownstone",
-    "top": "hill-brownstone:block/cut_brownstone",
-    "side": "hill-brownstone:block/cut_brownstone"
-  }
-}

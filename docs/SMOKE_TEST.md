@@ -2,13 +2,14 @@
 
 Run against Minecraft Java Edition 26.2.
 
-This checks the development server. Microsoft SSO and Bedrock are not implemented;
-see the [identity acceptance plan](architecture/microsoft-sso.md) for that milestone.
+The password steps below apply to the controlled development mode. Microsoft SSO
+and Bedrock require the separate real-tenant/device pilot in the
+[IT setup guide](operations/microsoft-sso-setup.md).
 Deployment tools are in `ops/`; see the [source guide](operations/deployment.md).
 
 ## Authentication
 
-1. Join `135.181.78.188:25566` with a new offline nickname.
+1. Join the controlled development server using its configured address and port with a new offline nickname.
 2. Confirm spawn in the pinned authentication lobby.
 3. Confirm the title and chat instructions say to sign in.
 4. Run `/register <currentNickname> TestPassword123! TestPassword123!`.

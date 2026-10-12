@@ -14,7 +14,6 @@ authentication:
 hub:
   name: Hill 175 Exhibition Hub 2026-08-26
   creator: Hill project owner
-  source-save: C:/Users/neil_/AppData/Roaming/ModrinthApp/profiles/Fabric 26.2/saves/New World
   filename: Hill175-Exhibition-Hub-2026-08-26.zip
   sha256: d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de
   archive-root: Hill175 Exhibition Hub 2026-08-26
@@ -37,71 +36,22 @@ generated-worlds:
   people: one private hill_people_<entry> clone per People entry
 
 people-campus:
-  name: Hill School anniversary campus v19
-  revision: campus-v19-2x
-  deployment-pins: server-assets/campus-template.env
-  packaging-script: ops/package-campus-template.py
-  source-artifact-filename: Hill-School-175th-v19-Java-1.21.11.zip
-  source-artifact-sha256: afd71210f650f3e5adea9d4d6859b3c5295b1314b2330788af0bafbce0bd8c0f
-  source-minecraft-version: 1.21.11
-  source-data-version: 4671
-  template-artifact-filename: hill_people_template_campus_v19_2x.tgz
-  template-artifact-sha256: b913315523e35b8231b8a56647179830d5e8c4099e2908d610f1ef2ff320598e
-  template-archive-root: hill_people_template
+  name: Hill School anniversary campus
+  selection: operator-installed folder; no revision or region-count pin in code
   install-template: world-templates/hill_people_template
+  packaging-script: ops/package-deployment-assets.py
+  current-handoff-revision: campus-v29-2x
+  current-handoff-filename: Hill175-deployment-assets-v29.zip
+  current-handoff-sha256: 19f76f05f0a1321b6948435c01e8a93372d71aca4ea91f79eba36bbe6347353f
+  source-minecraft-version: 26.1.2
+  source-data-version: 4790
   runtime-minecraft-version: 26.2
   paper-build: 119
   blocks-per-metre: 2
-  block-bounds: [-576, 18, -1600, 1407, 319, 415]
-  preferred-spawn: [228, 91, 154]
-  region-files: 25
-  poi-files: 0
-  source-chunks: 15624
-  scope: frozen reviewed core and retained 44 campus components; construction remains unfinished
-  permission: School-authorized project asset; world archive staged separately from Git
-  existing-entries: preserved; new entries and owner-confirmed resets use this template
-
-historical-people-campus-v15:
-  name: Hill School strict hybrid VoxelEarth ground and Roofer/VoxCity buildings v15
-  address: 860 Beech Street, Pottstown, PA 19464
-  engine: VoxelEarth Java 3D Tiles voxelizer for terrain/context plus Roofer LoD2 geometry voxelized by VoxCity
-  upstream: https://github.com/ryanhlewis/VoxelEarth, https://github.com/3DBAG/roofer, and https://github.com/kunifujiwara/VoxCity
-  upstream-base: ed68433
-  hill-generator-commit: 80b23b8
-  world-artifact-filename: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831-paper26-final.tgz
-  world-artifact-sha256: b4980c8e387ada4e98ac5ff5b7424211306973087269bdb9974d602adefb2d21
-  world-archive-root: hill_school_hybrid_voxelearth_ground_roofer_v15_strict_1xg64_20260831
-  world-template-source: hill_school_hybrid_v15_strict_voxelearth_v11_roofer_npz_support_1x_20260831
-  template-artifact-filename: hill_people_template_hybrid_voxelearth_ground_roofer_v15_strict_20260831_deploy.tgz
-  template-artifact-sha256: c8476dcebf221aee02d193bc6534427e7cfc656fbb3de95a2bb534c3ea319e99
-  template-archive-root: hill_people_template
-  install-template: world-templates/hill_people_template
-  minecraft-version: 26.2
-  paper-build: 119
-  voxel-grid: 64
-  blocks-per-metre: 1.0
-  resolution-metres-per-block: 1.0
-  sector-radius-metres: 180
-  sector-candidates: 56
-  rendered-sectors: 33
-  skipped-disjoint-sectors: 23
-  source-tiles: 5875
-  kept-voxels: 7781053
-  clipped-voxels: 6655405
-  hybrid-changed-blocks: 536091
-  hybrid-edit-mask-blocks: 499917
-  hybrid-buildings: 92
-  hybrid-skipped-out-of-source-buildings: 16
-  hybrid-support-fill-columns: 25897
-  hybrid-terrain-fallback: false
-  hybrid-building-apron-cleanup: false
-  hybrid-invariance-blocks-checked: 35184435
-  hybrid-invariance-raw-chunks-checked: 11055
-  hybrid-invariance-mismatches: 0
-  block-bounds: [-283, 70, -1742, 1453, 133, 197]
-  region-files: 21
-  poi-files: 0
-  parcel-tax-pins: [160015116006, 160016044005, 160016052006]
-  scope: all selected Hill-owned parcels; neighborhood geometry is excluded by the parcel clip
-  sources: VoxelEarth 3D Tiles mesh, Roofer LoD2 buildings, VoxCity mesh voxelization, Montgomery County parcel/building/surface boundaries, and local visual QA previews
-  permission: School-authorized project asset; large world archive is deployed separately from Git
+  block-bounds: [-576, -64, -1600, 1471, 319, 415]
+  preferred-spawn: [137, 85, 24]
+  scope: unfinished floating exterior draft
+  permission: School-authorized project asset; delivered separately from Git
+  existing-entries: preserved; new entries and owner-confirmed resets use the installed folder
+  resource-pack: hill-exterior-asphalt-v1; optional Java client pack
+  credits: docs/credits/world-assets.md

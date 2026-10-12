@@ -13,7 +13,6 @@ repository root unless instructed otherwise.
 | `prepare-local-runtime.ps1` | Prepare an ignored local Paper runtime |
 | `prepare-local-survival-worldgen.ps1` | Local worldgen staging |
 | `package-user-hub.ps1` | Package the supplied exhibition hub |
-| `package-campus-template.py` | Package the frozen campus with deterministic checksums |
 | `package-deployment-assets.py` | Package an explicitly chosen campus folder and the verified hub for IT |
 | `prepare-local-campus-template.ps1` | Validate the campus already placed in the local runtime folder |
 | `prepare-smoke-bot.ps1` | Stage the pinned Mineflayer compatibility fork |
@@ -22,7 +21,7 @@ repository root unless instructed otherwise.
 | `systemd/` | Paper and backup service/timer units |
 | `nginx/` | Cloudflare-protected Microsoft sign-in proxy example |
 
-These tools moved from `scripts/` and `deploy/` during cleanup. Reconstruction
-tools retain their original paths. World archives are staged separately from Git.
+World archives are supplied separately from Git. Campus authoring tools and
+internal working notes are not part of this deployment branch.
 Use [the Hill IT guide](../docs/operations/microsoft-sso-setup.md) for environment
 variables, tenant registration and the Java/Bedrock pilot.
