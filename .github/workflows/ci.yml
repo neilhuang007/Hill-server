@@ -26,6 +26,7 @@ jobs:
           python3 -m unittest discover -s tests -p test_auth_environment.py
           python3 -m unittest discover -s tests -p test_auth_proxy.py
           python3 -m unittest discover -s tests -p test_bedrock_deployment.py
+          python3 -m unittest discover -s tests -p test_deployment_assets.py
       - name: Verify backup isolation with mocked system services
         run: sudo python3 -m unittest discover -s tests -p test_backup_isolation.py
       - name: Validate PowerShell syntax

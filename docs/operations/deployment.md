@@ -47,38 +47,46 @@ authentication. It must never point at a personal Minecraft save.
 
 ## 2. Stage separately supplied assets
 
-Git contains source and provenance, not worlds or third-party binaries. Required
-deployment assets are:
+The campus is selected by the contents of the server's
+`world-templates/hill_people_template/` directory. The code does not pin a campus
+revision, archive name or region-file count. A prepared folder contains `region/`
+and optional `hill-campus-template.yml` bounds/spawn metadata. Replace the whole
+folder while Paper is stopped, preserving the old folder separately. New entries
+and explicit owner resets use it; existing participant worlds remain unchanged.
+Do not merge region files from different revisions.
 
-| Asset | Local staging path | Server staging path |
-| --- | --- | --- |
-| Owner exhibition hub | `runtime/assets/Hill175-Exhibition-Hub-2026-08-26.zip` | `/opt/hill175/assets/Hill175-Exhibition-Hub-2026-08-26.zip` |
-| Frozen v19 People template | `runtime/assets/campus/hill_people_template_campus_v19_2x.tgz` | `/opt/hill175/assets/campus/hill_people_template_campus_v19_2x.tgz` |
+The current requested IT handoff is **V29**, an unfinished floating exterior draft
+packaged from its preserved native Minecraft 26.1.2 conversion. This does not
+claim that the existing deployed server was updated. V19 pins are historical.
 
-Package the owner-supplied hub with `ops/package-user-hub.ps1`; its expected source
-save and hash are recorded in [worlds.yml](../../server-assets/worlds.yml).
-Obtain the verified frozen campus ZIP from the project custodian, then run:
+For Windows, use [the asset folder instructions](windows-assets.md). For Linux:
+
+| Asset | Destination under `/opt/hill175/` |
+| --- | --- |
+| Owner exhibition hub ZIP | `assets/Hill175-Exhibition-Hub-2026-08-26.zip` |
+| Selected, extracted campus template | `world-templates/hill_people_template/` |
+
+Send the ZIP privately to the operator. Its README and `SHA256SUMS` explain
+placement and verification. It excludes internal construction notes, research,
+credentials and runtime account files. Deployment/SSO docs remain in GitHub.
+The optional Java resource-pack ZIP requires client installation or separate
+hosting; it does not install itself or provide Bedrock textures.
+
+To package an explicitly selected prepared folder from the owner workspace:
 
 ```powershell
-uv run --python 3.13 python ops/package-campus-template.py
+uv run --python 3.13 python ops/package-deployment-assets.py --campus-folder runtime/assets/campus-v29 --resource-pack server-assets/hill-exterior-asphalt-v1 --output runtime/handoff/Hill175-deployment-assets-v29.zip
 ```
 
-The packaging tool validates the source ZIP hash and imported-region CRCs, then produces a deterministic
-template archive, excluding player state and dimension metadata. Its default
-input is the ignored `runtime/campus-reconstruction/exports/` download. Compare
-the resulting SHA-256 to [campus-template.env](../../server-assets/campus-template.env).
-Do not invent a replacement asset when the exact input is unavailable.
+Use a new output filename for each handoff. The script preserves previous packets.
+Only map data, template metadata, the verified hub, optional resource-pack assets,
+checksums and the handoff README are included. Revision numbers and timestamps
+never select assets automatically.
 
-Use PuTTY tools for this host:
-
-```powershell
-plink.exe -batch -i "C:/Users/neil_/.ssh/hetzner.ppk" root@135.181.78.188 "mkdir -p /opt/hill175/assets/campus"
-pscp.exe -batch -i "C:/Users/neil_/.ssh/hetzner.ppk" "runtime/assets/Hill175-Exhibition-Hub-2026-08-26.zip" root@135.181.78.188:/opt/hill175/assets/
-pscp.exe -batch -i "C:/Users/neil_/.ssh/hetzner.ppk" "runtime/assets/campus/hill_people_template_campus_v19_2x.tgz" root@135.181.78.188:/opt/hill175/assets/campus/
-```
-
-Verify the SSH host key against a trusted fingerprint before first use; subsequent
-batch connections use PuTTY's stored key. Never bypass host-key validation.
+For transfers to the existing Linux host, use PuTTY `plink.exe`/`pscp.exe` with a
+verified/cached host key. Transfer only assets; source changes still go through
+GitHub and `git pull`. The installer validates and preserves the campus already
+extracted in the designated folder instead of overwriting it from an old archive.
 
 The installer separately downloads pinned Paper, Java, Chunky, the temporary
 authentication-lobby asset, and survival datapacks with checksum verification.
@@ -182,7 +190,7 @@ required by the installed unit and must be backed up separately from server data
 
 The new campus is a template for newly created People worlds. Existing entries
 are preserved; an owner-requested reset recreates an entry using the current template.
-The 1.21.11 source is imported by Paper 26.2; clients still use the server's version.
+The V29 packet contains Minecraft 26.1.2 region data for import by Paper 26.2; clients still use the server's version.
 
 ## 5. Verify the deployed service
 
@@ -200,7 +208,7 @@ Then run the [smoke checklist](../SMOKE_TEST.md), especially:
 1. Restricted lobby and authentication for the selected mode: Microsoft link/code
    and reconnect verification, or demo registration/password login.
 2. Hub navigation, Journey/Place creation, permissions and submission lock.
-3. New People entry with v19 terrain, safe ground spawn, campus chart, reset/reentry.
+3. New People entry with the installed campus terrain, safe ground spawn, campus chart, reset/reentry.
 4. Owner and visitor camera previews: exit item selected, right/left-click exits,
    `/camera exit`, no visitor camera removal.
 5. Existing People worlds and survival inventories remain intact after restart.
@@ -226,7 +234,7 @@ Minecraft installation must not select the Hill backup target. Check the archive
 log and stored paths for `/opt/hill175`, not just a successful Borg exit code.
 
 On startup/verification failure, the installer attempts to restore prior config,
-plugin, template and imported worlds. It retains failed replacements when needed
+plugin and imported hub/authentication worlds. The operator-managed campus template is never replaced by installation. It retains failed replacements when needed
 for recovery. Inspect the error and `/opt/hill175/assets/` recovery paths before
 retrying; do not delete the rollback evidence or restart repeatedly into bad data.
 Microsoft-mode failures leave Paper stopped after restoring recoverable files;
@@ -242,9 +250,9 @@ pre-conversion snapshot. Keep the other Minecraft service on port 25565 untouche
 
 ## Network and Microsoft SSO
 
-Current demo game traffic uses TCP 25566. Bedrock UDP ingress and Geyser/Floodgate
-are **not installed by the installer**; follow the [IT guide](microsoft-sso-setup.md)
-and record a compatible, tested stack.
+Current demo game traffic uses TCP 25566. In Microsoft mode the installer installs
+the pinned Geyser/Floodgate stack when Bedrock is enabled; IT supplies the UDP
+firewall rule and real-client pilot described in the [IT guide](microsoft-sso-setup.md).
 Do not put Minecraft ports behind the ordinary Cloudflare HTTP proxy.
 
 Browser authentication must follow browser → Cloudflare → nginx → loopback

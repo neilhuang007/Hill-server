@@ -735,62 +735,49 @@ public final class WorldModule {
         if (metadata != null) {
             return hasMatchingPeopleReadyMarker(templateFolder.toPath(), metadata);
         }
-        int expectedRegionFiles = Math.max(1,
-                plugin.getConfig().getInt("people.template-region-file-count", 26));
-        int expectedPoiFiles = Math.max(0,
-                plugin.getConfig().getInt("people.template-poi-file-count", 11));
-        return isGeneratedAnvilTemplateReady(templateFolder.toPath(), expectedRegionFiles, expectedPoiFiles);
+        // The operator selects the revision by replacing this folder while stopped.
+        // Older config files may still contain v19 file counts; they are no longer pins.
+        return isGeneratedAnvilTemplateReady(templateFolder.toPath());
     }
 
-    static boolean isGeneratedAnvilTemplateReady(
-            Path templateFolder,
-            int expectedRegionFiles,
-            int expectedPoiFiles
-    ) {
+    static boolean isGeneratedAnvilTemplateReady(Path templateFolder) {
         Path marker = templateFolder.resolve(PEOPLE_READY_MARKER);
         Path regionFolder = templateFolder.resolve("region");
         Path poiFolder = templateFolder.resolve("poi");
-        Path manifest = templateFolder.resolve("hill-campus-template.json");
-        if (!Files.isRegularFile(manifest)) {
-            manifest = templateFolder.resolve("voxelearth-hill-manifest.json");
-        }
-        if (!Files.isRegularFile(marker)
-                || !Files.isRegularFile(manifest)
+        if (Files.isSymbolicLink(templateFolder)
                 || !Files.isDirectory(regionFolder)
-                || (expectedPoiFiles > 0 && !Files.isDirectory(poiFolder))
                 || Files.exists(templateFolder.resolve("dimensions"))) {
             return false;
         }
         try {
-            if (!Files.readString(marker).trim().equals(GENERATED_READY_MARKER)
-                    || Files.size(manifest) == 0L) {
+            if (Files.exists(marker) && (!Files.isRegularFile(marker)
+                    || !Files.readString(marker).trim().equals(GENERATED_READY_MARKER))) {
                 return false;
             }
-            return hasExpectedAnvilFiles(regionFolder, expectedRegionFiles)
-                    && hasExpectedOptionalAnvilFiles(poiFolder, expectedPoiFiles);
-        } catch (IOException exception) {
+            // Bounds/spawn are optional for generic worlds, but malformed supplied
+            // metadata must not be accepted before an owner-requested reset.
+            CampusTemplateMetadata.read(templateFolder);
+            return hasValidAnvilFiles(regionFolder, true)
+                    && (!Files.exists(poiFolder) || hasValidAnvilFiles(poiFolder, false));
+        } catch (IOException | IllegalStateException exception) {
             return false;
         }
     }
 
-    private static boolean hasExpectedOptionalAnvilFiles(Path folder, int expectedCount) throws IOException {
-        if (expectedCount == 0 && !Files.isDirectory(folder)) {
-            return true;
+    private static boolean hasValidAnvilFiles(Path folder, boolean required) throws IOException {
+        if (!Files.isDirectory(folder) || Files.isSymbolicLink(folder)) {
+            return false;
         }
-        return hasExpectedAnvilFiles(folder, expectedCount);
-    }
-
-    private static boolean hasExpectedAnvilFiles(Path folder, int expectedCount) throws IOException {
         try (var paths = Files.list(folder)) {
             List<Path> regionFiles = paths
-                    .filter(path -> Files.isRegularFile(path)
-                            && path.getFileName().toString().matches("r\\.-?\\d+\\.-?\\d+\\.mca"))
+                    .filter(path -> path.getFileName().toString().matches("r\\.-?\\d+\\.-?\\d+\\.mca"))
                     .toList();
-            if (regionFiles.size() != expectedCount) {
+            if (required && regionFiles.isEmpty()) {
                 return false;
             }
             for (Path regionFile : regionFiles) {
-                if (Files.size(regionFile) < 8_192L) {
+                if (!Files.isRegularFile(regionFile) || Files.isSymbolicLink(regionFile)
+                        || Files.size(regionFile) < 8_192L) {
                     return false;
                 }
             }
@@ -1176,7 +1163,9 @@ public final class WorldModule {
 
     static boolean shouldSkipWorldClonePath(Path relative) {
         String name = relative.getFileName() == null ? "" : relative.getFileName().toString();
-        return name.equals("uid.dat")
+        String root = relative.getNameCount() == 0 ? "" : relative.getName(0).toString();
+        return Set.of("playerdata", "players", "stats", "advancements").contains(root)
+                || name.equals("uid.dat")
                 || name.equals("session.lock")
                 || name.equals("level.dat")
                 || name.equals("level.dat_old")

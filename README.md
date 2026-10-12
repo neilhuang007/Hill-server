@@ -47,15 +47,14 @@ includes the exact configuration, rollout checks and recovery limits.
 
 ## Campus map
 
-People entries use the frozen **v19 campus at two blocks per metre**, packaged
-from the verified Java 1.21.11 port for Paper 26.2. Deployment pins live in
-[campus-template.env](server-assets/campus-template.env) and
-[worlds.yml](server-assets/worlds.yml). Existing People builds are preserved;
-a template change does not migrate students' worlds automatically.
-
-The campus is unfinished and construction remains paused. Local launchers, source
-geometry, and saved worlds are described in the [workspace guide](docs/workspace-layout.md).
-The general local launcher still selects v14; the separate 1.21.11 launcher opens v19.
+People entries copy the campus installed in
+`world-templates/hill_people_template/` under the server folder. Replace that
+folder while Paper is stopped to choose another revision; no version pin or
+file-count change is required. Existing participant worlds are preserved.
+The requested IT handoff contains **V29** and the exhibition hub; follow the
+[Windows asset instructions](docs/operations/windows-assets.md). V29 is an
+unfinished exterior draft. The previously deployed V19 template and its
+reproduction pins remain historical inputs; no live server update is implied.
 
 ## Layout
 

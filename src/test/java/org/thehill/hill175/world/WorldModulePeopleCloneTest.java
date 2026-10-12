@@ -66,7 +66,7 @@ final class WorldModulePeopleCloneTest {
     }
 
     @Test
-    void acceptsGeneratedAnvilTemplateWithoutPoiFilesWhenConfigured(@TempDir Path template) throws IOException {
+    void acceptsAnyRegionCountWithoutPoiFiles(@TempDir Path template) throws IOException {
         Files.writeString(template.resolve(".hill175-people-ready"), "generated\n");
         Path region = Files.createDirectories(template.resolve("region"));
         Files.writeString(template.resolve("voxelearth-hill-manifest.json"), "{}\n");
@@ -74,7 +74,7 @@ final class WorldModulePeopleCloneTest {
             Files.write(region.resolve("r." + index + ".0.mca"), new byte[8_192]);
         }
 
-        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template, 20, 0));
+        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template));
     }
 
     @Test
@@ -84,22 +84,25 @@ final class WorldModulePeopleCloneTest {
         assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("level.dat")));
         assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("level.dat_old")));
         assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("data", "paper", "metadata.dat")));
+        assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("playerdata", "player.dat")));
+        assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("stats", "player.json")));
+        assertTrue(WorldModule.shouldSkipWorldClonePath(Path.of("advancements", "player.json")));
         assertFalse(WorldModule.shouldSkipWorldClonePath(Path.of("region", "r.0.0.mca")));
         assertFalse(WorldModule.shouldSkipWorldClonePath(Path.of("data", "paper", "unrelated.dat")));
     }
 
     @Test
     void validatesGeneratedAnvilTemplateShape(@TempDir Path template) throws IOException {
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
 
         Files.writeString(template.resolve(".hill175-people-ready"), "generated\n");
         Path region = Files.createDirectories(template.resolve("region"));
         Path poi = Files.createDirectories(template.resolve("poi"));
         Files.writeString(template.resolve("voxelearth-hill-manifest.json"), "{}\n");
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
 
         Files.write(region.resolve("r.0.-1.mca"), new byte[] {0});
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
 
         for (int index = 0; index < 26; index++) {
             Files.write(region.resolve("r." + index + ".0.mca"), new byte[8_192]);
@@ -107,16 +110,39 @@ final class WorldModulePeopleCloneTest {
         for (int index = 0; index < 11; index++) {
             Files.write(poi.resolve("r." + index + ".0.mca"), new byte[8_192]);
         }
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
         Files.delete(region.resolve("r.0.-1.mca"));
-        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template));
 
         Files.createDirectories(template.resolve("dimensions"));
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
         Files.delete(template.resolve("dimensions"));
 
         Files.writeString(template.resolve(".hill175-people-ready"), "wrong\n");
-        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template, 26, 11));
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
+    }
+
+    @Test
+    void acceptsOrdinaryAnvilFolderWithoutProjectManifestOrMarker(@TempDir Path template) throws IOException {
+        Path region = Files.createDirectories(template.resolve("region"));
+        Files.write(region.resolve("r.0.0.mca"), new byte[8_192]);
+        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template));
+        Path poi = Files.createDirectories(template.resolve("poi"));
+        Files.write(poi.resolve("r.0.0.mca"), new byte[8_192]);
+        assertTrue(WorldModule.isGeneratedAnvilTemplateReady(template));
+        Files.write(poi.resolve("r.1.0.mca"), new byte[1]);
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
+    }
+
+    @Test
+    void rejectsInvalidSuppliedSpawnBeforeReset(@TempDir Path template) throws IOException {
+        Path region = Files.createDirectories(template.resolve("region"));
+        Files.write(region.resolve("r.0.0.mca"), new byte[8_192]);
+        Files.writeString(template.resolve(CampusTemplateMetadata.FILE_NAME), """
+                block-bounds: [0, 0, 0, 10, 100, 10]
+                spawn: [999, 60, 999]
+                """);
+        assertFalse(WorldModule.isGeneratedAnvilTemplateReady(template));
     }
 
 }

@@ -70,12 +70,11 @@ worlds:
   survival-end: world_the_end
 
 people:
-  # Frozen campus v19, two blocks/metre. Install the pinned archive before creating People entries.
+  # Extract the chosen campus here (relative to the server folder). Replace this
+  # entire directory while Paper is stopped to select another revision.
   template-folder: world-templates/hill_people_template
   # Production must fail closed instead of silently substituting flat generated terrain.
   require-template: true
-  template-region-file-count: 25
-  template-poi-file-count: 0
   # Optional fallback. Leave blank when using a prepared Anvil template folder.
   structure-file: ""
   structure-import-blocks-per-tick: 12000
@@ -86,7 +85,7 @@ people:
   build-radius: 1400
   world-border-size: 2865.0
   campus-chart:
-    # Legacy v15 chart fallback. New v19 worlds carry their own bounds and spawn
+    # Legacy chart fallback. Prepared campus worlds carry their own bounds and spawn
     # in hill-campus-template.yml, preserving older participants' private worlds.
     block-bounds: [-283, 70, -1742, 1453, 133, 197]
 

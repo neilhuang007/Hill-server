@@ -14,7 +14,8 @@ repository root unless instructed otherwise.
 | `prepare-local-survival-worldgen.ps1` | Local worldgen staging |
 | `package-user-hub.ps1` | Package the supplied exhibition hub |
 | `package-campus-template.py` | Package the frozen campus with deterministic checksums |
-| `prepare-local-campus-template.ps1` | Stage the pinned campus locally |
+| `package-deployment-assets.py` | Package an explicitly chosen campus folder and the verified hub for IT |
+| `prepare-local-campus-template.ps1` | Validate the campus already placed in the local runtime folder |
 | `prepare-smoke-bot.ps1` | Stage the pinned Mineflayer compatibility fork |
 | `patch-smoke-bot-protocol.mjs` | Apply the pinned protocol-data correction |
 | `smoke-player.mjs` | Player regression scenarios |

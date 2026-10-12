@@ -16,6 +16,11 @@ $HubArchiveName = 'Hill175-Exhibition-Hub-2026-08-26.zip'
 $HubArchiveRoot = 'Hill175 Exhibition Hub 2026-08-26'
 $HubSha256 = 'd6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de'
 
+$RunningPaper = Get-CimInstance Win32_Process | Where-Object {
+    $_.Name -in @('java.exe', 'javaw.exe') -and $_.CommandLine -match '(?i)-jar\s+[^\r\n]*paper\.jar'
+}
+if ($RunningPaper) { throw 'Stop local Paper before preparing or replacing runtime files.' }
+
 Push-Location $Root
 try {
     & (Join-Path $Root 'ops\prepare-local-campus-template.ps1') -Runtime $Runtime

@@ -17,9 +17,7 @@ EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\t
 CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
 CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
 CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
-source "${REPO_DIR}/server-assets/campus-template.env"
-PEOPLE_TEMPLATE_ARCHIVE="${RUNTIME_DIR}/assets/campus/${PEOPLE_TEMPLATE_ARCHIVE_NAME}"
-PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/${PEOPLE_TEMPLATE_ARCHIVE_ROOT}"
+PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/hill_people_template"
 
 fail() {
   echo "verify-server failed: $*" >&2
@@ -30,18 +28,6 @@ verify_sha512() {
   local file="$1"
   local expected="$2"
   echo "${expected}  ${file}" | sha512sum --check --status
-}
-
-verify_sha256() {
-  local file="$1"
-  local expected="$2"
-  echo "${expected}  ${file}" | sha256sum --check --status
-}
-
-count_mca_files() {
-  local directory="$1"
-
-  find "${directory}" -maxdepth 1 -type f -name 'r.*.mca' | wc -l | tr -d '[:space:]'
 }
 
 verify_worldgen_datapacks() {
@@ -129,54 +115,13 @@ verify_chunky_plugin() {
 }
 
 verify_people_template() {
-  local marker
-  local nested_dimensions
-  local region_count
-  local poi_count
-
-  [[ -f "${PEOPLE_TEMPLATE_ARCHIVE}" ]] || fail "missing pinned People template archive: ${PEOPLE_TEMPLATE_ARCHIVE}"
-  verify_sha256 "${PEOPLE_TEMPLATE_ARCHIVE}" "${PEOPLE_TEMPLATE_SHA256}" \
-    || fail "People template archive hash mismatch: ${PEOPLE_TEMPLATE_ARCHIVE}"
-
   [[ -f "${PLUGIN_CONFIG}" ]] || fail "missing Hill175 plugin config: ${PLUGIN_CONFIG}"
   grep -Eq '^  template-folder:[[:space:]]*world-templates/hill_people_template[[:space:]]*$' "${PLUGIN_CONFIG}" \
     || fail "Hill175 config does not point People entries at world-templates/hill_people_template"
   grep -Eq '^  require-template:[[:space:]]*true[[:space:]]*$' "${PLUGIN_CONFIG}" \
     || fail "Hill175 config must fail closed when the People template is unavailable"
-  grep -Eq "^  template-region-file-count:[[:space:]]*${PEOPLE_TEMPLATE_REGION_MCA_COUNT}[[:space:]]*$" "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must require all ${PEOPLE_TEMPLATE_REGION_MCA_COUNT} campus region files"
-  grep -Eq '^  template-poi-file-count:[[:space:]]*0[[:space:]]*$' "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must require zero campus POI files"
-  grep -Eq "^  structure-file:[[:space:]]*(''|\"\"|)[[:space:]]*$" "${PLUGIN_CONFIG}" \
-    || fail "Hill175 config must leave people.structure-file blank for the Anvil template"
-
-  [[ ! -L "${PEOPLE_TEMPLATE_DIR}" ]] || fail "People template path must not be a symlink: ${PEOPLE_TEMPLATE_DIR}"
-  [[ -d "${PEOPLE_TEMPLATE_DIR}" ]] || fail "missing People template directory: ${PEOPLE_TEMPLATE_DIR}"
-  [[ -f "${PEOPLE_TEMPLATE_DIR}/.hill175-people-ready" ]] || fail "missing People template ready marker"
-  marker="$(tr -d '\r\n' < "${PEOPLE_TEMPLATE_DIR}/.hill175-people-ready")"
-  [[ "${marker}" == "${PEOPLE_TEMPLATE_READY_MARKER}" ]] \
-    || fail "People template marker was '${marker}', expected '${PEOPLE_TEMPLATE_READY_MARKER}'"
-  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-campus-template.json" ]] \
-    || fail "missing People template hill-campus-template.json"
-  [[ -f "${PEOPLE_TEMPLATE_DIR}/hill-campus-template.yml" ]] \
-    || fail "missing People template hill-campus-template.yml"
-  [[ -d "${PEOPLE_TEMPLATE_DIR}/region" ]] || fail "missing People template region directory"
-  if [[ "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" != "0" ]]; then
-    [[ -d "${PEOPLE_TEMPLATE_DIR}/poi" ]] || fail "missing People template POI directory"
-  fi
-
-  region_count="$(count_mca_files "${PEOPLE_TEMPLATE_DIR}/region")"
-  [[ "${region_count}" == "${PEOPLE_TEMPLATE_REGION_MCA_COUNT}" ]] \
-    || fail "People template has ${region_count} region MCA files; expected ${PEOPLE_TEMPLATE_REGION_MCA_COUNT}"
-  poi_count="0"
-  if [[ -d "${PEOPLE_TEMPLATE_DIR}/poi" ]]; then
-    poi_count="$(count_mca_files "${PEOPLE_TEMPLATE_DIR}/poi")"
-  fi
-  [[ "${poi_count}" == "${PEOPLE_TEMPLATE_POI_MCA_COUNT}" ]] \
-    || fail "People template has ${poi_count} POI MCA files; expected ${PEOPLE_TEMPLATE_POI_MCA_COUNT}"
-  nested_dimensions="$(find "${PEOPLE_TEMPLATE_DIR}" -type d -name dimensions -print -quit)"
-  [[ -z "${nested_dimensions}" ]] \
-    || fail "People template contains nested dimensions directory: ${nested_dimensions}"
+  python3 "${REPO_DIR}/ops/check-campus-template.py" "${PEOPLE_TEMPLATE_DIR}" \
+    || fail "invalid operator-selected People template"
 }
 
 require_line() {
