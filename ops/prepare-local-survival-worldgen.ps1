@@ -41,7 +41,7 @@ function Get-ManifestIdentityHash([string]$Path) {
     $bytes = [System.Text.UTF8Encoding]::new($false).GetBytes($normalized)
     $sha512 = [System.Security.Cryptography.SHA512]::Create()
     try {
-        return [Convert]::ToHexString($sha512.ComputeHash($bytes)).ToLowerInvariant()
+        return [BitConverter]::ToString($sha512.ComputeHash($bytes)).Replace('-', '').ToLowerInvariant()
     } finally {
         $sha512.Dispose()
     }
@@ -403,7 +403,7 @@ function Stage-WorldgenPackCache($Rows, [string]$CacheDir) {
         }
         if (-not (Test-Path -LiteralPath $cacheFile)) {
             $tmp = "$cacheFile.tmp"
-            Invoke-WebRequest -Uri $row.download_url -OutFile $tmp
+            Invoke-WebRequest -Uri $row.download_url -OutFile $tmp -UseBasicParsing
             if ((Get-LowerHash $tmp 'SHA512') -ne $row.sha512) {
                 Remove-Item -LiteralPath $tmp -Force -ErrorAction SilentlyContinue
                 Fail "downloaded $($row.filename) failed SHA-512 verification"

@@ -1,0 +1,13 @@
+[Unit]
+Description=Check GitHub for Hill175 updates nightly at 04:00 server time
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+AccuracySec=1s
+RandomizedDelaySec=0
+# Do not turn a missed maintenance window into a daytime restart after boot.
+Persistent=false
+Unit=hill175-update.service
+
+[Install]
+WantedBy=timers.target

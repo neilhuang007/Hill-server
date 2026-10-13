@@ -17,6 +17,9 @@ const host = process.env.HILL175_SMOKE_HOST ?? "127.0.0.1";
 const port = Number(process.env.HILL175_SMOKE_PORT ?? "25566");
 const scenario = process.argv[2] ?? "lobby-return";
 const skipLocalWorldFiles = process.env.HILL175_SMOKE_SKIP_LOCAL_WORLD_FILES === "1";
+// Server folder whose world files and installed maps the local checks read.
+const serverFolder = path.resolve(
+  process.env.HILL175_SMOKE_SERVER ?? path.resolve(scriptDirectory, "..", "runtime", "server"));
 const username = `Smoke${String(Date.now()).slice(-9)}`;
 const password = "SmokeTest123!";
 const transcript = [];
@@ -1321,10 +1324,24 @@ function currentWorldFolder() {
   const dimension = currentDimension(bot);
   const worldName = dimension.includes(":") ? dimension.split(":").at(-1) : dimension;
   const candidates = [
-    path.resolve(scriptDirectory, "..", "runtime", "server", "world", "dimensions", "minecraft", worldName),
-    path.resolve(scriptDirectory, "..", "runtime", "server", worldName),
+    path.join(serverFolder, "world", "dimensions", "minecraft", worldName),
+    path.join(serverFolder, worldName),
   ];
   return candidates.find((candidate) => existsSync(candidate));
+}
+
+// The campus is whatever the operator installed; expectations come from that folder.
+function installedCampusTemplate() {
+  const folder = path.join(serverFolder, "world-templates", "hill_people_template");
+  const manifestFile = path.join(folder, "hill-campus-template.json");
+  return {
+    manifest: existsSync(manifestFile) ? JSON.parse(readFileSync(manifestFile, "utf8")) : null,
+    regions: campusRegionCount(folder),
+  };
+}
+
+function campusRegionCount(folder) {
+  return readdirSync(path.join(folder, "region")).filter((name) => /^r\.-?\d+\.-?\d+\.mca$/.test(name)).length;
 }
 
 async function peopleCampusTemplateScenario() {
@@ -1335,22 +1352,33 @@ async function peopleCampusTemplateScenario() {
     "campus owner mode and chart", 30_000);
   await delay(2_000);
   const arrival = bot.entity.position.clone();
-  if (Math.abs(arrival.x - 228.5) > 4 || Math.abs(arrival.z - 154.5) > 4 || Math.abs(arrival.y - 86) > 1) {
-    throw new Error(`Campus arrival ${arrival} is not the verified core spawn [228,91,154]`);
-  }
+  // A just-started server can still be sending the arrival chunk.
+  await waitFor(() => bot.blockAt(arrival.offset(0, -1, 0).floored(), false) != null, "the campus arrival chunk", 30_000);
   const below = bot.blockAt(arrival.offset(0, -1, 0).floored(), false);
-  if (!below || ["air", "void_air"].includes(below.name)) {
-    throw new Error(`Campus spawn lacks solid ground: ${below?.name ?? "unloaded"}`);
+  if (["air", "void_air"].includes(below.name)) {
+    throw new Error(`Campus spawn lacks solid ground: ${below.name}`);
   }
+  let campus = "the installed campus";
   if (!skipLocalWorldFiles) {
+    const template = installedCampusTemplate();
+    const spawn = template.manifest?.spawn;
+    if (spawn && (Math.abs(arrival.x - (spawn[0] + 0.5)) > 4 || Math.abs(arrival.z - (spawn[2] + 0.5)) > 4)) {
+      throw new Error(`Campus arrival ${arrival} is not at the installed template's spawn [${spawn}]`);
+    }
     const folder = currentWorldFolder();
     if (!folder) throw new Error("Cannot resolve the private campus folder");
-    const manifest = JSON.parse(readFileSync(path.join(folder, "hill-campus-template.json"), "utf8"));
-    if (manifest.revision !== "campus-v19-2x" || manifest.blocks_per_metre !== 2 || manifest.source_chunks !== 15624) {
-      throw new Error("Private world has incorrect campus provenance");
+    if (template.manifest) {
+      const manifest = JSON.parse(readFileSync(path.join(folder, "hill-campus-template.json"), "utf8"));
+      if (manifest.revision !== template.manifest.revision) {
+        throw new Error(`Private world has campus ${manifest.revision}, not the installed ${template.manifest.revision}`);
+      }
+      campus = template.manifest.revision;
     }
-    const regions = readdirSync(path.join(folder, "region")).filter((name) => /^r\.-?\d+\.-?\d+\.mca$/.test(name));
-    if (regions.length !== 25) throw new Error(`Expected 25 campus regions, got ${regions.length}`);
+    const regions = campusRegionCount(folder);
+    if (regions !== template.regions) {
+      throw new Error(`Expected the template's ${template.regions} campus regions, got ${regions}`);
+    }
+    campus += ` (${regions} regions)`;
   }
   await holdHotbarItem("nether_star");
   await waitForWindow(() => bot.activateItem(), "campus controls before reset");
@@ -1363,7 +1391,7 @@ async function peopleCampusTemplateScenario() {
   await delay(1_000);
   if (bot.entity.position.distanceTo(arrival) > 2) throw new Error("Campus reset changed the core spawn");
   if (!hasHotbarItem("filled_map", "People Campus Chart")) throw new Error("Campus chart missing after reset");
-  console.log(`PASS: campus v19 at two blocks/metre cloned 25 regions, spawned safely on ${below.name}, supplied its chart, and reset/rejoined at ${bot.entity.position}`);
+  console.log(`PASS: ${campus} was cloned, spawned safely on ${below.name}, supplied its chart, and reset/rejoined at ${bot.entity.position}`);
 }
 
 async function peopleVoxelEarthTemplateScenario() {

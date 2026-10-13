@@ -1,5 +1,6 @@
 package org.thehill.hill175.world;
 
+import io.papermc.paper.math.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -63,6 +64,22 @@ final class WorldModulePeopleCloneTest {
         Path migrated = Path.of("server", "world", "dimensions", "minecraft", "hill_people_example");
 
         assertEquals(migrated, WorldModule.peopleTemplateCloneDestination(legacy, migrated));
+    }
+
+    @Test
+    void opensAClonedCampusAtItsOwnSpawnInsteadOfSearchingForOne(@TempDir Path folder) throws IOException {
+        Files.writeString(folder.resolve(CampusTemplateMetadata.FILE_NAME), """
+                block-bounds: [-576, 18, -1600, 1407, 319, 415]
+                spawn: [228, 91, 154]
+                """);
+
+        assertEquals(Position.block(228, 91, 154), WorldModule.peopleInitialSpawn(folder));
+    }
+
+    @Test
+    void opensAWorldWithoutCampusMetadataAtTheBuildOrigin(@TempDir Path runtime) {
+        assertEquals(Position.block(0, WorldModule.BUILD_BASE_Y + 2, 0),
+                WorldModule.peopleInitialSpawn(runtime.resolve("absent")));
     }
 
     @Test

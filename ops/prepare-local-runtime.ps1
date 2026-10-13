@@ -1,52 +1,160 @@
+# Prepares a Paper runtime on Windows with development sign-in. Maps are read from
+# <Runtime>\world-templates\; third-party programs come from server-assets\server-binaries.env.
+[CmdletBinding()]
+param(
+    # Server folder to prepare. Default: runtime\server in this checkout.
+    [string]$Runtime = '',
+    # Download cache for Paper, Chunky and (when needed) Java. Default: beside the server folder.
+    [string]$Assets = ''
+)
 $ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
 
 $Root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$Runtime = Join-Path $Root 'runtime\server'
-$Assets = Join-Path $Root 'runtime\assets'
-$PaperUrl = 'https://fill-data.papermc.io/v1/objects/a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629/paper-26.2-119.jar'
-$PaperSha256 = 'a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629'
-$AuthUrl = 'https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download'
-$AuthSha256 = 'de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630'
-$ChunkyProjectId = 'fALzjamp'
-$ChunkyVersionId = 'MdY6JATr'
-$ChunkyFilename = 'Chunky-Bukkit-1.5.3.jar'
-$ChunkyUrl = 'https://cdn.modrinth.com/data/fALzjamp/versions/MdY6JATr/Chunky-Bukkit-1.5.3.jar'
-$ChunkySha512 = '43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422'
-$HubArchiveName = 'Hill175-Exhibition-Hub-2026-08-26.zip'
-$HubArchiveRoot = 'Hill175 Exhibition Hub 2026-08-26'
-$HubSha256 = 'd6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de'
+if (-not $Runtime) { $Runtime = Join-Path $Root 'runtime\server' }
+$Runtime = [IO.Path]::GetFullPath($Runtime)
+if (-not $Assets) { $Assets = Join-Path (Split-Path -Parent $Runtime) 'assets' }
+$Assets = [IO.Path]::GetFullPath($Assets)
 
-$RunningPaper = Get-CimInstance Win32_Process | Where-Object {
-    $_.Name -in @('java.exe', 'javaw.exe') -and $_.CommandLine -match '(?i)-jar\s+[^\r\n]*paper\.jar'
+function Read-ServerBinaries([string]$Path) {
+    $Formats = @{
+        PAPER_URL = '^https://[A-Za-z0-9._~/%+-]+$'
+        PAPER_SHA256 = '^[0-9a-f]{64}$'
+        JAVA_WINDOWS_X64_URL = '^https://[A-Za-z0-9._~/%+-]+$'
+        JAVA_WINDOWS_X64_SHA256 = '^[0-9a-f]{64}$'
+        CHUNKY_FILENAME = '^[A-Za-z0-9._-]+\.jar$'
+        CHUNKY_URL = '^https://[A-Za-z0-9._~/%+-]+$'
+        CHUNKY_SHA512 = '^[0-9a-f]{128}$'
+    }
+    $Values = @{}
+    foreach ($Line in Get-Content -LiteralPath $Path) {
+        if ([string]::IsNullOrWhiteSpace($Line) -or $Line.StartsWith('#')) { continue }
+        $Name, $Value = $Line -split '=', 2
+        if ($Values.ContainsKey($Name)) { throw "Duplicate $Name in $Path" }
+        $Values[$Name] = $Value
+    }
+    foreach ($Name in $Formats.Keys) {
+        if ($Values[$Name] -cnotmatch $Formats[$Name]) { throw "Missing or invalid $Name in $Path" }
+    }
+    return $Values
 }
-if ($RunningPaper) { throw 'Stop local Paper before preparing or replacing runtime files.' }
+
+function Get-VerifiedDownload([string]$Url, [string]$Path, [string]$Algorithm, [string]$Expected) {
+    if ((Test-Path -LiteralPath $Path -PathType Leaf) -and
+            (Get-FileHash -LiteralPath $Path -Algorithm $Algorithm).Hash -eq $Expected) {
+        return
+    }
+    $Partial = "$Path.tmp"
+    Invoke-WebRequest -Uri $Url -OutFile $Partial -UseBasicParsing
+    if ((Get-FileHash -LiteralPath $Partial -Algorithm $Algorithm).Hash -ne $Expected) {
+        Remove-Item -LiteralPath $Partial -Force
+        throw "$Algorithm checksum mismatch for $Url"
+    }
+    Move-Item -LiteralPath $Partial -Destination $Path -Force
+}
+
+function Get-JavaMajor([string]$Java) {
+    # Java reports its version on stderr; keep that from becoming a terminating error.
+    $Previous = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { $Report = (& $Java -version 2>&1 | Out-String) } catch { return 0 } finally { $ErrorActionPreference = $Previous }
+    if ($Report -match 'version "(\d+)') { return [int]$Matches[1] }
+    return 0
+}
+
+# Use a JDK 25+ that is already installed; otherwise fetch the listed one into the cache.
+function Resolve-JavaHome([hashtable]$Binaries) {
+    $Candidates = @()
+    if ($env:JAVA_HOME) { $Candidates += $env:JAVA_HOME }
+    $OnPath = Get-Command java.exe -ErrorAction SilentlyContinue
+    if ($OnPath) { $Candidates += (Split-Path -Parent (Split-Path -Parent $OnPath.Source)) }
+    $Cached = Join-Path $Assets 'java25'
+    $Candidates += $Cached
+    foreach ($Candidate in $Candidates) {
+        $Java = Join-Path $Candidate 'bin\java.exe'
+        if ((Test-Path -LiteralPath (Join-Path $Candidate 'bin\javac.exe')) -and (Get-JavaMajor $Java) -ge 25) {
+            return $Candidate
+        }
+    }
+    if (-not [Environment]::Is64BitOperatingSystem -or $env:PROCESSOR_ARCHITECTURE -eq 'ARM64') {
+        throw 'Only an x86-64 JDK is listed for download. Install a JDK 25 and set JAVA_HOME first.'
+    }
+    Write-Host 'No JDK 25 or newer found; downloading the listed Temurin JDK.'
+    $Archive = Join-Path $Assets 'java25-windows-x64.zip'
+    Get-VerifiedDownload $Binaries.JAVA_WINDOWS_X64_URL $Archive 'SHA256' $Binaries.JAVA_WINDOWS_X64_SHA256
+    $Extract = Join-Path $Assets 'java25.extracting'
+    Remove-Item -LiteralPath $Extract, $Cached -Recurse -Force -ErrorAction SilentlyContinue
+    Expand-Archive -LiteralPath $Archive -DestinationPath $Extract
+    $Inner = @(Get-ChildItem -LiteralPath $Extract -Directory)
+    if ($Inner.Count -ne 1 -or -not (Test-Path -LiteralPath (Join-Path $Inner[0].FullName 'bin\java.exe'))) {
+        throw 'The downloaded JDK archive has an unexpected layout.'
+    }
+    Move-Item -LiteralPath $Inner[0].FullName -Destination $Cached
+    Remove-Item -LiteralPath $Extract -Recurse -Force
+    return $Cached
+}
+
+# A lobby or hub map is a world save placed directly in its designated folder.
+function Test-MapFolder([string]$Folder) {
+    if (-not (Test-Path -LiteralPath (Join-Path $Folder 'level.dat') -PathType Leaf)) {
+        throw "No level.dat directly inside $Folder. Extract the world save itself there, not a ZIP or a nested folder."
+    }
+    $Links = @(Get-ChildItem -LiteralPath $Folder -Recurse -Force |
+        Where-Object { $_.Attributes -band [IO.FileAttributes]::ReparsePoint })
+    if ($Links.Count -or ((Get-Item -LiteralPath $Folder).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+        throw "Map folders must not contain links: $Folder"
+    }
+    $Regions = @(Get-ChildItem -LiteralPath $Folder -Recurse -File -Filter 'r.*.mca' |
+        Where-Object { $_.Directory.Name -eq 'region' -and $_.Length -ge 8192 })
+    if ($Regions.Count -eq 0) { throw "No region data in $Folder" }
+}
+
+# Minecraft keeps this file open while the server runs.
+$SessionLock = Join-Path $Runtime 'world\session.lock'
+if (Test-Path -LiteralPath $SessionLock) {
+    try {
+        [IO.File]::Open($SessionLock, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None).Dispose()
+    } catch [IO.IOException] {
+        throw "Paper is running in $Runtime. Stop it before preparing or replacing its files."
+    }
+}
+
+$Templates = Join-Path $Runtime 'world-templates'
+$HubFolder = Join-Path $Templates 'hill_hub'
+$LobbyFolder = Join-Path $Templates 'hill_auth'
+if (-not (Test-Path -LiteralPath $Templates -PathType Container)) {
+    throw "No maps found. Copy the asset packet's world-templates folder to $Templates first (see docs\operations\windows-assets.md)."
+}
 
 Push-Location $Root
 try {
     & (Join-Path $Root 'ops\prepare-local-campus-template.ps1') -Runtime $Runtime
+    if (-not (Test-Path -LiteralPath $HubFolder -PathType Container)) {
+        throw "Missing exhibition hub map. Copy the supplied world-templates\hill_hub folder to $HubFolder, or build it from a world save with ops\stage-world-template.ps1."
+    }
+    Test-MapFolder $HubFolder
+    if (Test-Path -LiteralPath $LobbyFolder) {
+        Test-MapFolder $LobbyFolder
+    } else {
+        Write-Host "No lobby map in $LobbyFolder; the plugin keeps an installed lobby or builds its plain one."
+    }
+
+    New-Item -ItemType Directory -Force -Path $Runtime, $Assets, (Join-Path $Runtime 'plugins') | Out-Null
+    $Binaries = Read-ServerBinaries (Join-Path $Root 'server-assets\server-binaries.env')
+    $JavaHome = Resolve-JavaHome $Binaries
+    $env:JAVA_HOME = $JavaHome
+    $env:Path = (Join-Path $JavaHome 'bin') + [IO.Path]::PathSeparator + $env:Path
+
     & .\gradlew.bat clean test jar
     if ($LASTEXITCODE -ne 0) { throw 'Plugin build or tests failed.' }
-    New-Item -ItemType Directory -Force -Path $Runtime, $Assets, (Join-Path $Runtime 'plugins') | Out-Null
 
-    $PaperJar = Join-Path $Runtime 'paper.jar'
-    if (-not (Test-Path $PaperJar)) {
-        Invoke-WebRequest -Uri $PaperUrl -OutFile $PaperJar
-    }
-    if ((Get-FileHash $PaperJar -Algorithm SHA256).Hash.ToLowerInvariant() -ne $PaperSha256) {
-        throw 'Paper SHA-256 checksum mismatch.'
-    }
+    $PaperAsset = Join-Path $Assets 'paper-pinned.jar'
+    Get-VerifiedDownload $Binaries.PAPER_URL $PaperAsset 'SHA256' $Binaries.PAPER_SHA256
+    Copy-Item -LiteralPath $PaperAsset -Destination (Join-Path $Runtime 'paper.jar') -Force
 
+    $ChunkyFilename = $Binaries.CHUNKY_FILENAME
     $ChunkyAsset = Join-Path $Assets $ChunkyFilename
-    if (-not (Test-Path $ChunkyAsset)) {
-        Invoke-WebRequest -Uri $ChunkyUrl -OutFile $ChunkyAsset
-    }
-    if ((Get-FileHash $ChunkyAsset -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
-        Remove-Item -LiteralPath $ChunkyAsset -Force -ErrorAction SilentlyContinue
-        Invoke-WebRequest -Uri $ChunkyUrl -OutFile $ChunkyAsset
-    }
-    if ((Get-FileHash $ChunkyAsset -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
-        throw 'Chunky SHA-512 checksum mismatch.'
-    }
+    Get-VerifiedDownload $Binaries.CHUNKY_URL $ChunkyAsset 'SHA512' $Binaries.CHUNKY_SHA512
 
     Copy-Item -LiteralPath 'build\libs\Hill-server-1.0-SNAPSHOT.jar' -Destination (Join-Path $Runtime 'plugins\Hill175.jar') -Force
     foreach ($ExistingChunky in Get-ChildItem -LiteralPath (Join-Path $Runtime 'plugins') -Filter '*chunky*.jar' -File -ErrorAction SilentlyContinue) {
@@ -55,100 +163,20 @@ try {
         }
     }
     Copy-Item -LiteralPath $ChunkyAsset -Destination (Join-Path $Runtime "plugins\$ChunkyFilename") -Force
-    if ((Get-FileHash (Join-Path $Runtime "plugins\$ChunkyFilename") -Algorithm SHA512).Hash.ToLowerInvariant() -ne $ChunkySha512) {
-        throw 'Installed Chunky SHA-512 checksum mismatch.'
-    }
     Copy-Item -LiteralPath 'server-config\server.properties' -Destination (Join-Path $Runtime 'server.properties') -Force
     Copy-Item -LiteralPath 'server-config\spigot.yml' -Destination (Join-Path $Runtime 'spigot.yml') -Force
     $PluginData = Join-Path $Runtime 'plugins\Hill175'
     New-Item -ItemType Directory -Force -Path $PluginData | Out-Null
     Copy-Item -LiteralPath 'src\main\resources\config.yml' -Destination (Join-Path $PluginData 'config.yml') -Force
-    if (Test-Path -LiteralPath 'structure.nbt') {
-        Copy-Item -LiteralPath 'structure.nbt' -Destination (Join-Path $Runtime 'structure.nbt') -Force
-    }
     Set-Content -LiteralPath (Join-Path $Runtime 'eula.txt') -Value 'eula=true'
 
     & (Join-Path $Root 'ops\prepare-local-survival-worldgen.ps1') `
         -Runtime $Runtime `
         -Manifest (Join-Path $Root 'server-assets\survival-worldgen-manifest.tsv')
 
-    $AuthArchive = Join-Path $Assets 'Small-Medieval-Church-1.0.5.zip'
-    if (-not (Test-Path $AuthArchive)) {
-        Invoke-WebRequest -Uri $AuthUrl -OutFile $AuthArchive
-    }
-    if ((Get-FileHash $AuthArchive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $AuthSha256) {
-        throw 'Authentication world SHA-256 checksum mismatch.'
-    }
-
-    $AuthTarget = Join-Path $Runtime 'hill_auth'
-    $ModernAuthTarget = Join-Path $Runtime 'world\dimensions\minecraft\hill_auth'
-    $AuthInstallMarker = Join-Path $Assets '.small-medieval-church-1.0.5-installed'
-    if ((-not (Test-Path $AuthInstallMarker)) -or ((-not (Test-Path $AuthTarget)) -and (-not (Test-Path $ModernAuthTarget)))) {
-        # The local Paper process must be stopped before replacing this immutable scenery world.
-        Remove-Item -LiteralPath $AuthTarget -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath $ModernAuthTarget -Recurse -Force -ErrorAction SilentlyContinue
-        $Extract = Join-Path $Runtime 'auth-extract'
-        Expand-Archive -LiteralPath $AuthArchive -DestinationPath $Extract -Force
-        $AuthRoot = Join-Path $Extract 'Small Medieval Church 1.0.5'
-        if (-not (Test-Path (Join-Path $AuthRoot 'level.dat'))) {
-            throw 'Authentication world archive did not contain the expected Small Medieval Church 1.0.5 world root.'
-        }
-        Remove-Item -LiteralPath (Join-Path $AuthRoot 'playerdata') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $AuthRoot 'stats') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $AuthRoot 'advancements') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $AuthRoot 'uid.dat') -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $AuthRoot 'session.lock') -Force -ErrorAction SilentlyContinue
-        Move-Item -LiteralPath $AuthRoot -Destination $AuthTarget
-        Remove-Item -LiteralPath $Extract -Recurse -Force
-        New-Item -ItemType File -Force -Path $AuthInstallMarker | Out-Null
-    }
-
-    $HubArchive = Join-Path $Assets $HubArchiveName
-    if (-not (Test-Path $HubArchive)) {
-        & (Join-Path $Root 'ops\package-user-hub.ps1')
-    }
-    if ((Get-FileHash $HubArchive -Algorithm SHA256).Hash.ToLowerInvariant() -ne $HubSha256) {
-        throw 'Hub world SHA-256 checksum mismatch.'
-    }
-
-    $HubTarget = Join-Path $Runtime 'hill_hub'
-    $ModernHubTarget = Join-Path $Runtime 'world\dimensions\minecraft\hill_hub'
-    $HubInstallMarker = Join-Path $Assets '.hill175-exhibition-hub-2026-08-26-installed'
-    $InstalledHubSha = ''
-    if (Test-Path -LiteralPath $HubInstallMarker) {
-        $MarkerContent = Get-Content -LiteralPath $HubInstallMarker -Raw
-        if ($null -ne $MarkerContent) {
-            $InstalledHubSha = ([string]$MarkerContent).Trim()
-        }
-    }
-    if (($InstalledHubSha -ne $HubSha256) -or ((-not (Test-Path $HubTarget)) -and (-not (Test-Path $ModernHubTarget)))) {
-        $RunningPaper = Get-CimInstance Win32_Process | Where-Object {
-            $_.Name -in @('java.exe', 'javaw.exe') -and $_.CommandLine -match '(?i)-jar\s+[^\r\n]*paper\.jar'
-        }
-        if ($RunningPaper) {
-            throw 'Stop the local Paper server before replacing the hub world.'
-        }
-        Remove-Item -LiteralPath $HubTarget -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath $ModernHubTarget -Recurse -Force -ErrorAction SilentlyContinue
-        $Extract = Join-Path $Runtime 'hub-extract'
-        Expand-Archive -LiteralPath $HubArchive -DestinationPath $Extract -Force
-        $HubRoot = Join-Path $Extract $HubArchiveRoot
-        if (-not (Test-Path (Join-Path $HubRoot 'level.dat'))) {
-            throw "Hub archive did not contain the expected $HubArchiveRoot world root."
-        }
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'players') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'playerdata') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'stats') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'advancements') -Recurse -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'uid.dat') -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HubRoot 'session.lock') -Force -ErrorAction SilentlyContinue
-        Move-Item -LiteralPath $HubRoot -Destination $HubTarget
-        Remove-Item -LiteralPath $Extract -Recurse -Force
-        Set-Content -LiteralPath $HubInstallMarker -Value $HubSha256
-    }
-
     Write-Host "Prepared local runtime at $Runtime"
-    Write-Host "Start it with: cd '$Runtime'; java -Xms1G -Xmx2G -jar paper.jar nogui"
+    Write-Host 'Paper imports the lobby and hub maps from world-templates\ when it starts.'
+    Write-Host "Start it with: cd '$Runtime'; & '$(Join-Path $JavaHome 'bin\java.exe')' -Xms1G -Xmx2G -jar paper.jar nogui"
 } finally {
     Pop-Location
 }

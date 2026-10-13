@@ -2,18 +2,21 @@
 
 ## Authentication lobby
 
-**Small Medieval Church 1.0.5**, by **CoinCoffer and TheHyperboloid**.
-[Creator project](https://www.curseforge.com/minecraft/worlds/small-medieval-church).
-The map is All Rights Reserved and is currently for temporary smoke testing;
-obtain permission or replace it with an approved asset before the student event.
-The installer obtains the pinned archive from its creator. It is not redistributed
-in GitHub or the owner asset packet.
+The server needs no third-party lobby: without a map in
+`world-templates/hill_auth/` it builds its own plain lobby. Earlier smoke tests
+used **Small Medieval Church 1.0.5**, by **CoinCoffer and TheHyperboloid**
+([creator project](https://www.curseforge.com/minecraft/worlds/small-medieval-church)).
+That map is All Rights Reserved, permission for the event is still pending, and
+its creator's file listing has since been withdrawn. The installer no longer
+downloads it, and it is not redistributed in GitHub or the owner asset packet.
+Install only a lobby map the school is permitted to use.
 
 ## Exhibition hub
 
 **Hill 175 Exhibition Hub 2026-08-26**, supplied by the Hill project owner.
-The sanitized hub archive is delivered separately from Git and checked against
-its deployment hash. It excludes player-save directories and source entities;
+The hub is delivered separately from Git as a world-save folder for
+`world-templates/hill_hub/`, with its arrival point and guide positions in
+`hill-world.yml`. It excludes player-save directories and source entities;
 the plugin supplies the category personnel.
 
 ## People campus

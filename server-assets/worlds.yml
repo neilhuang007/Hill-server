@@ -1,34 +1,41 @@
-# Third-party archives are downloaded directly from their creators and are not redistributed in this repository.
+# Provenance notes for the maps. Nothing here is read by the server or the installers:
+# a map is selected by placing it in its designated folder under <server>/world-templates/.
 authentication:
-  name: Small Medieval Church 1.0.5
-  creators: CoinCoffer and TheHyperboloid
-  project-page: https://www.curseforge.com/minecraft/worlds/small-medieval-church
-  direct-download: https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download
-  filename: Small Medieval Church 1.0.5.zip
-  sha256: de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630
-  archive-root: Small Medieval Church 1.0.5
+  selection: optional operator-installed folder; without it the server keeps its lobby or builds a plain one
+  install-template: world-templates/hill_auth
   install-world-name: hill_auth
-  permission: All Rights Reserved; temporary smoke-test use pending direct permission from the creator.
-  minecraft-version: 26.2
+  placement-file: hill-world.yml (spawn)
+  smoke-test-map:
+    name: Small Medieval Church 1.0.5
+    creators: CoinCoffer and TheHyperboloid
+    project-page: https://www.curseforge.com/minecraft/worlds/small-medieval-church
+    availability: the creator's file listing was withdrawn; the former direct download returns 404 (checked 2026-10-12)
+    sha256: de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630
+    permission: All Rights Reserved; smoke-test use only, direct permission from the creator still pending. Not a deployment input and not redistributed.
+    spawn: [131.5, 52.1, 163.5, 0.0, 0.0]
+    minecraft-version: 26.2
 
 hub:
   name: Hill 175 Exhibition Hub 2026-08-26
   creator: Hill project owner
-  filename: Hill175-Exhibition-Hub-2026-08-26.zip
-  sha256: d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de
-  archive-root: Hill175 Exhibition Hub 2026-08-26
+  selection: operator-installed folder; no name, version or checksum pin in code
+  install-template: world-templates/hill_hub
   install-world-name: hill_hub
+  placement-file: hill-world.yml (spawn and guide positions below)
+  source-archive: Hill175-Exhibition-Hub-2026-08-26.zip
+  source-archive-sha256: d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de
   permission: User-provided project asset; no third-party redistribution dependency.
   minecraft-version: 26.2 (DataVersion 4903)
   source-size-bytes: 17686682
   sanitized-archive-size-bytes: 1544267
   sanitized-content: source entities, session locks, UIDs, player data, statistics, and advancements are excluded
-  packaging-script: ops/package-user-hub.ps1
+  staging-script: ops/stage-world-template.ps1
   spawn: [70.5, 66.1, 42.5, 0.0, 0.0]
   category-personnel:
     journey: [70.5, 67.0, 70.5, 180.0, 0.0]
     place: [70.5, 75.0, 70.5, 180.0, 0.0]
     people: [70.5, 61.0, 70.5, 180.0, 0.0]
+    survival: [70.5, 66.0, 31.5, 0.0, 0.0]
 
 generated-worlds:
   journey: hill_journey
@@ -41,8 +48,8 @@ people-campus:
   install-template: world-templates/hill_people_template
   packaging-script: ops/package-deployment-assets.py
   current-handoff-revision: campus-v29-2x
-  current-handoff-filename: Hill175-deployment-assets-v29.zip
-  current-handoff-sha256: 19f76f05f0a1321b6948435c01e8a93372d71aca4ea91f79eba36bbe6347353f
+  current-handoff-filename: Hill175-deployment-assets-v29-folders.zip
+  current-handoff-sha256: 0564ee5b3c333d3067aa6229fc956d02ff43daee717c52498bbe0db5e74677fa
   source-minecraft-version: 26.1.2
   source-data-version: 4790
   runtime-minecraft-version: 26.2

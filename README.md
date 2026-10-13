@@ -35,8 +35,9 @@ Use JDK 25 and the checked-in Gradle wrapper:
 ```
 
 On Linux/macOS: `bash ./gradlew clean test jar`. Output:
-`build/libs/Hill-server-1.0-SNAPSHOT.jar`. Paper is pinned to **26.2 build 119**.
-Campus world archives are supplied separately from GitHub.
+`build/libs/Hill-server-1.0-SNAPSHOT.jar`. The server programs (Paper **26.2 build 119**,
+Java, Chunky) are listed with their checksums in `server-assets/server-binaries.env`.
+Maps are supplied separately from GitHub.
 
 For school sign-in, copy [.env.example](.env.example) to the protected server
 environment file, configure the Entra application and HTTPS proxy, then install
@@ -45,10 +46,16 @@ and enters the browser's code with `/verify`. The same school account links thei
 Java and Bedrock identities. The [IT guide](docs/operations/microsoft-sso-setup.md)
 includes the exact configuration, rollout checks and recovery limits.
 
-## Campus map
+## Maps
+
+The server reads every map from a designated folder under
+`world-templates/` in the server folder: `hill_people_template/` (campus),
+`hill_hub/` (exhibition hub) and optionally `hill_auth/` (sign-in lobby). No map
+name, version or checksum is written into the code, and each hub or lobby map
+carries its own arrival point in `hill-world.yml`.
 
 People entries copy the campus installed in
-`world-templates/hill_people_template/` under the server folder. Replace that
+`world-templates/hill_people_template/`. Replace that
 folder while Paper is stopped to choose another revision; no version pin or
 file-count change is required. Existing participant worlds are preserved.
 The requested IT handoff contains **V29** and the exhibition hub; follow the

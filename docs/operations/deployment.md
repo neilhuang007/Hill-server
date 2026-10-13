@@ -11,11 +11,11 @@ and pilot through the real tenant, proxy and supported game clients.
 | --- | --- |
 | Source | `https://github.com/neilhuang007/Hill-server.git` |
 | Build | JDK 25, checked-in Gradle wrapper |
-| Runtime | Paper 26.2 build 119; pinned URL/hash in installer |
+| Runtime | Paper 26.2 build 119; URL and checksum listed in `server-assets/server-binaries.env` |
 | Host | `135.181.78.188`, Debian/Ubuntu-style Linux x86-64 with systemd |
 | Checkout | `/opt/Hill-server` |
 | Server data | `/opt/hill175` owned by service user `hill175` |
-| Java | `/opt/java25` (installer stages pinned Temurin JDK) |
+| Java | `/opt/java25` (installer stages the listed Temurin JDK) |
 | Service | `hill175.service` |
 | Current game port | TCP `25566`; existing TCP `25565` service stays separate |
 | Plugin output | `build/libs/Hill-server-1.0-SNAPSHOT.jar` |
@@ -39,11 +39,12 @@ The Gradle suite checks Java behavior; it is not a replacement for
 [in-game smoke testing](../SMOKE_TEST.md). The CI workflow repeats the source build
 and script syntax checks on a clean Linux runner.
 
-For a local Paper demo, stage the assets below, then use
-`./ops/prepare-local-runtime.ps1`. It prepares `runtime/server/`; stop an existing
-local Paper process before preparing or replacing its files. Start from that folder
-with `java -Xms1G -Xmx2G -jar paper.jar nogui`. This local helper also uses development
-authentication. It must never point at a personal Minecraft save.
+For a local Paper demo on Windows, put the map folders below in
+`runtime/server/world-templates/`, then run `./ops/prepare-local-runtime.ps1`
+(Windows PowerShell 5.1 or PowerShell 7). `-Runtime <folder>` prepares another
+server folder. It uses an installed JDK 25 or newer, or downloads the listed one,
+and prints the command that starts Paper. Stop a running local Paper first. This
+helper uses development authentication. Never point it at a personal Minecraft save.
 
 ## 2. Stage separately supplied assets
 
@@ -59,14 +60,42 @@ The current requested IT handoff is **V29**, an unfinished floating exterior dra
 packaged from its preserved native Minecraft 26.1.2 conversion. This does not
 claim that the existing deployed server was updated.
 
-For Windows, use [the asset folder instructions](windows-assets.md). For Linux:
+Every map is read from a designated folder under the server folder
+(`/opt/hill175/` on Linux, the folder containing `paper.jar` on Windows). The code
+names no map, version, archive or checksum; the folder's contents are the selection.
 
-| Asset | Destination under `/opt/hill175/` |
-| --- | --- |
-| Owner exhibition hub ZIP | `assets/Hill175-Exhibition-Hub-2026-08-26.zip` |
-| Selected, extracted campus template | `world-templates/hill_people_template/` |
+| Folder under `world-templates/` | Contents | Needed |
+| --- | --- | --- |
+| `hill_people_template/` | Campus: `region/` and optional metadata | Yes |
+| `hill_hub/` | Exhibition hub world save, `level.dat` directly inside | Yes |
+| `hill_auth/` | Sign-in lobby world save, `level.dat` directly inside | No |
 
-Send the ZIP privately to the operator. Its README and `SHA256SUMS` explain
+A hub or lobby folder is an ordinary Minecraft Java world save. Paper imports it
+when it next starts and records what it imported in
+`plugins/Hill175/imported-worlds.yml`; unchanged folders are not imported again.
+The world it replaces is kept under `replaced-worlds/<name>-<UTC time>/`. Without
+a lobby folder the server keeps the lobby it already has, or builds its own plain
+one. To build a folder from a save or an exported ZIP, leaving player data behind:
+
+```powershell
+./ops/stage-world-template.ps1 -Source <save folder or zip> -Destination <server>\world-templates\hill_hub
+```
+
+A map's coordinates travel with it in an optional `hill-world.yml` beside
+`level.dat`. Without one, players arrive at the save's own spawn and the guides
+stand around it.
+
+```yaml
+spawn: [70.5, 66.1, 42.5, 0.0, 0.0]        # x, y, z and optional yaw, pitch
+npcs:                                      # hub only; any may be omitted
+  journey: [70.5, 67.0, 70.5, 180.0, 0.0]
+  place: [70.5, 75.0, 70.5, 180.0, 0.0]
+  people: [70.5, 61.0, 70.5, 180.0, 0.0]
+  survival: [70.5, 66.0, 31.5, 0.0, 0.0]
+```
+
+For Windows, use [the asset folder instructions](windows-assets.md).
+Send the packet ZIP privately to the operator. Its README and `SHA256SUMS` explain
 placement and verification. It excludes internal construction notes, research,
 credentials and runtime account files. Deployment/SSO docs remain in GitHub.
 The optional Java resource-pack ZIP requires client installation or separate
@@ -75,23 +104,28 @@ hosting; it does not install itself or provide Bedrock textures.
 To package an explicitly selected prepared folder from the owner workspace:
 
 ```powershell
-uv run --python 3.13 python ops/package-deployment-assets.py --campus-folder runtime/assets/campus-v29 --resource-pack server-assets/hill-exterior-asphalt-v1 --output runtime/handoff/Hill175-deployment-assets-v29.zip
+uv run --python 3.13 python ops/package-deployment-assets.py --campus-folder runtime/assets/campus-v29 --hub-folder runtime/server/world-templates/hill_hub --resource-pack server-assets/hill-exterior-asphalt-v1 --output runtime/handoff/Hill175-deployment-assets-v29-folders.zip
 ```
 
 Use a new output filename for each handoff. The script preserves previous packets.
-Only map data, template metadata, the verified hub, optional resource-pack assets,
-checksums and the handoff README are included. Revision numbers and timestamps
-never select assets automatically.
+Only map data, `hill-world.yml`, template metadata, optional resource-pack assets,
+checksums and the handoff README are included; player data is left out. Revision
+numbers and timestamps never select assets automatically. `--lobby-folder` adds a
+lobby map: use it only for a map the school may redistribute.
 
 For transfers to the existing Linux host, use PuTTY `plink.exe`/`pscp.exe` with a
 verified/cached host key. Transfer only assets; source changes still go through
-GitHub and `git pull`. The installer validates and preserves the campus already
-extracted in the designated folder instead of overwriting it from an old archive.
+GitHub and `git pull`. The installer checks the designated folders before it
+stops Paper and never overwrites them.
 
-The installer separately downloads pinned Paper, Java, Chunky, the temporary
-authentication-lobby asset, and survival datapacks with checksum verification.
-The lobby's public-use permission is unresolved in the provenance manifest;
-replace it with an approved asset before the student event.
+The installer downloads Paper, Java and Chunky from the URLs listed with their
+checksums in `server-assets/server-binaries.env`, and the survival datapacks from
+`server-assets/survival-worldgen-manifest.tsv`. To move to another build, change
+those lists; no script names a version. It downloads no map. The lobby used
+during smoke testing is no longer offered by its creator's listing and its
+public-use permission is unresolved, so it is not a deployment input:
+supply an approved lobby map in `world-templates/hill_auth/`, or run with the
+plugin's plain lobby.
 
 ## 3. Push source, then pull on the server
 
@@ -110,10 +144,34 @@ Inside the SSH session, for a first checkout:
 
 ```bash
 apt-get update
-apt-get install -y git curl ca-certificates tar gzip unzip borgbackup util-linux python3 nginx openssl
+apt-get install -y git curl ca-certificates tar gzip borgbackup util-linux python3 iproute2 nginx openssl
 git clone https://github.com/neilhuang007/Hill-server.git /opt/Hill-server
 cd /opt/Hill-server
+mkdir -p /opt/hill175
 ```
+
+Then copy the packet's `world-templates` folder to `/opt/hill175/world-templates`.
+With the packet ZIP transferred to the host (no `unzip` package is needed):
+
+```bash
+python3 -m zipfile -e Hill175-deployment-assets-v29-folders.zip /root/hill175-assets
+(cd /root/hill175-assets && sha256sum --check --quiet SHA256SUMS)
+cp -a /root/hill175-assets/world-templates /opt/hill175/world-templates
+```
+
+The installer names the missing folder and changes nothing if a required map is absent.
+
+A server installed before maps moved to these folders already has its campus in
+`world-templates/hill_people_template`. Leave that folder as it is and add only
+what is missing beside it:
+
+```bash
+cp -a /root/hill175-assets/world-templates/hill_hub /opt/hill175/world-templates/
+```
+
+Paper then imports the hub once on its next start and keeps the previous one
+under `replaced-worlds/`. Without a `hill_auth` folder the installed lobby stays,
+and players arrive at that world's own spawn point.
 
 For an existing checkout:
 
@@ -181,6 +239,10 @@ before the outage. Managed Bedrock files participate in startup rollback. Secret
 rotation needs no source changes; run the same command after updating the host file.
 It writes `eula=true`; the operator must accept Minecraft's EULA before using it.
 
+The installer waits 180 seconds for Paper to report ready and restores the previous
+files if it does not. A first start on a slow host can be given longer:
+`HILL175_STARTUP_WAIT_SECONDS=600 bash ops/install-server.sh --microsoft`.
+
 Configuration is deployed from `server-config/` and `src/main/resources/config.yml`.
 Local edits to the deployed defaults are overwritten on installation. Persistent
 accounts, entries, inventories, worlds, and the generated survival seed stay under
@@ -234,9 +296,9 @@ Minecraft installation must not select the Hill backup target. Check the archive
 log and stored paths for `/opt/hill175`, not just a successful Borg exit code.
 
 On startup/verification failure, the installer attempts to restore prior config,
-plugin and imported hub/authentication worlds. The operator-managed campus template is never replaced by installation. It retains failed replacements when needed
-for recovery. Inspect the error and `/opt/hill175/assets/` recovery paths before
-retrying; do not delete the rollback evidence or restart repeatedly into bad data.
+plugin and imported hub/authentication worlds. The operator-managed map folders are never replaced by installation. It retains failed replacements when needed
+for recovery. Inspect the error, `/opt/hill175/replaced-worlds/` and the
+`/opt/hill175/assets/` recovery paths before retrying; do not delete the rollback evidence or restart repeatedly into bad data.
 Microsoft-mode failures leave Paper stopped after restoring recoverable files;
 they never automatically restart an older JAR that might lack school verification.
 Confirm the restored plugin supports SSO and the environment/proxy remain valid
@@ -245,7 +307,7 @@ before reopening admission.
 For manual recovery: stop `hill175.service`, preserve the failed runtime, restore
 a coherent snapshot (plugin/config/data/worlds together), correct ownership, then
 restart and repeat verification. Rebuild an earlier source revision only with its
-matching asset pins. Never downgrade converted world files without restoring their
+matching program list and maps. Never downgrade converted world files without restoring their
 pre-conversion snapshot. Keep the other Minecraft service on port 25565 untouched.
 
 ## Network and Microsoft SSO
@@ -261,3 +323,12 @@ Authenticated Origin Pulls, and firewall ingress restricted to Cloudflare networ
 Origin CA by itself does not prevent direct-origin requests. Keep database/internal
 plugin endpoints private. The [SSO architecture](../architecture/microsoft-sso.md)
 describes claims, account-linking rules and implementation limits.
+
+## Optional automatic updates
+
+After a successful initial deployment and backup setup, enable the
+[nightly GitHub updater](automatic-updates.md) with
+`bash ops/enable-auto-update.sh` on the host. It checks `main` at 04:00 server time
+and uses the same build, backup, installation and verification workflow when
+deployment inputs change. Enabling the timer is a separate operator action;
+routine installation alone does not schedule automatic restarts.

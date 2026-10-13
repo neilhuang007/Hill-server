@@ -1,5 +1,6 @@
 package org.thehill.hill175.world;
 
+import io.papermc.paper.math.Position;
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameRules;
@@ -18,12 +19,16 @@ import org.thehill.hill175.model.Entry;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -42,6 +47,8 @@ public final class WorldModule {
     private static final String PEOPLE_READY_MARKER = ".hill175-people-ready";
     private static final String GENERATED_READY_MARKER = "generated";
     private static final String PEOPLE_TEMPLATE_BUILD_WORLD = "hill_people_template_build";
+    private static final DateTimeFormatter REPLACED_WORLD_STAMP =
+            DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
 
     private final JavaPlugin plugin;
     private final VoidChunkGenerator voidGenerator = new VoidChunkGenerator();
@@ -52,6 +59,9 @@ public final class WorldModule {
     private final Map<UUID, Optional<CampusTemplateMetadata>> campusMetadata = new HashMap<>();
     private World authenticationWorld;
     private World hubWorld;
+    private WorldPlacement hubPlacement = WorldPlacement.NONE;
+    private Location authenticationSpawn;
+    private Location hubSpawn;
     private World journeyWorld;
     private World placeWorld;
     private World survivalWorld;
@@ -69,7 +79,10 @@ public final class WorldModule {
     }
 
     public void initialize() {
-        authenticationWorld = loadImportedWorld(plugin.getConfig().getString("worlds.authentication", "hill_auth"));
+        String authenticationName = plugin.getConfig().getString("worlds.authentication", "hill_auth");
+        WorldPlacement authenticationPlacement = installSuppliedWorld(
+                authenticationName, "worlds.authentication-template-folder", "world-templates/hill_auth");
+        authenticationWorld = loadImportedWorld(authenticationName);
         journeyWorld = loadVoidWorld(plugin.getConfig().getString("worlds.journey", "hill_journey"));
         placeWorld = loadVoidWorld(plugin.getConfig().getString("worlds.place", "hill_place"));
         String survivalName = plugin.getConfig().getString("worlds.survival", "world");
@@ -84,6 +97,7 @@ public final class WorldModule {
         );
 
         String hubName = plugin.getConfig().getString("worlds.hub", "hill_hub");
+        hubPlacement = installSuppliedWorld(hubName, "worlds.hub-template-folder", "world-templates/hill_hub");
         hubWorld = loadImportedWorld(hubName);
         if (hubWorld == null) {
             throw new IllegalStateException("Could not load hub world " + hubName);
@@ -102,10 +116,8 @@ public final class WorldModule {
         if (isNearlyEmpty(hubWorld)) {
             buildFallbackHub();
         }
-        Location configuredHubSpawn = configuredSpawn(hubWorld, "worlds.hub-spawn");
-        if (configuredHubSpawn != null) {
-            hubWorld.setSpawnLocation(configuredHubSpawn);
-        }
+        authenticationSpawn = arrivalPoint(authenticationWorld, authenticationPlacement, "worlds.authentication-spawn");
+        hubSpawn = arrivalPoint(hubWorld, hubPlacement, "worlds.hub-spawn");
         resolvePeopleStructureMetadata();
         beginPeopleTemplatePreparation();
     }
@@ -123,28 +135,11 @@ public final class WorldModule {
     }
 
     public Location authenticationSpawn() {
-        Location configuredOverride = configuredSpawn(authenticationWorld, "worlds.authentication-spawn");
-        if (configuredOverride != null) {
-            return configuredOverride;
-        }
-        Location configured = authenticationWorld.getSpawnLocation().clone().add(0.5, 0.1, 0.5);
-        if (configured.getY() < authenticationWorld.getMinHeight() + 2
-                || configured.getY() > authenticationWorld.getMaxHeight() - 2) {
-            return new Location(authenticationWorld, 0.5, BUILD_BASE_Y + 2, 0.5, 0.0f, 0.0f);
-        }
-        return configured;
+        return authenticationSpawn.clone();
     }
 
     public Location hubSpawn() {
-        Location configuredOverride = configuredSpawn(hubWorld, "worlds.hub-spawn");
-        if (configuredOverride != null) {
-            return configuredOverride;
-        }
-        Location configured = hubWorld.getSpawnLocation().clone().add(0.5, 0.1, 0.5);
-        if (configured.getY() < hubWorld.getMinHeight() + 2 || configured.getY() > hubWorld.getMaxHeight() - 2) {
-            return new Location(hubWorld, 0.5, BUILD_BASE_Y + 2, 0.5, 0.0f, 0.0f);
-        }
-        return configured;
+        return hubSpawn.clone();
     }
 
     public World hubWorld() {
@@ -183,11 +178,14 @@ public final class WorldModule {
     }
 
     public Location survivalNpcLocation() {
-        Location configured = configuredSpawn(hubWorld, "worlds.hub-npcs.survival");
-        if (configured != null) {
-            return configured;
+        Location supplied = suppliedNpcLocation("survival");
+        if (supplied != null) {
+            return supplied;
         }
-        return new Location(hubWorld, 70.5, 66.0, 31.5, 0.0f, 0.0f);
+        // Behind an arriving player, facing them, when the map names no position.
+        Location behind = hubSpawn().add(0, 0, 6);
+        behind.setYaw(180.0f);
+        return behind;
     }
 
     public Location hubNpcLocation(Category category) {
@@ -196,9 +194,9 @@ public final class WorldModule {
             case PLACE -> "place";
             case PEOPLE -> "people";
         };
-        Location configured = configuredSpawn(hubWorld, "worlds.hub-npcs." + categoryPath);
-        if (configured != null) {
-            return configured;
+        Location supplied = suppliedNpcLocation(categoryPath);
+        if (supplied != null) {
+            return supplied;
         }
         Location center = hubSpawn();
         return switch (category) {
@@ -504,7 +502,7 @@ public final class WorldModule {
         boolean templateReady = isConfiguredPeopleTemplateReady(template, metadata);
 
         if (migrated.isDirectory()) {
-            World migratedWorld = WorldCreator.name(worldName).createWorld();
+            World migratedWorld = peopleWorldCreator(worldName, migrated.toPath()).createWorld();
             if (migratedWorld == null) {
                 throw new IllegalStateException("Could not load migrated People world " + worldName);
             }
@@ -551,9 +549,9 @@ public final class WorldModule {
 
         World world;
         if (target.isDirectory() || migrated.isDirectory()) {
-            world = WorldCreator.name(worldName).createWorld();
+            world = peopleWorldCreator(worldName, (target.isDirectory() ? target : migrated).toPath()).createWorld();
         } else {
-            world = WorldCreator.name(worldName)
+            world = peopleWorldCreator(worldName, migrated.toPath())
                     .generator(voidGenerator)
                     .generateStructures(false)
                     .seed(plugin.getConfig().getLong("people.fallback-seed", 175L))
@@ -581,6 +579,21 @@ public final class WorldModule {
         buildPeopleFallback(world);
         markPeopleWorldReady(world, null);
         return world;
+    }
+
+    /**
+     * A People world takes its spawn from the campus or build region as soon as
+     * it opens. Naming that point up front stops Paper searching a newly cloned
+     * world for one, which generates terrain on the main thread for seconds.
+     */
+    private static WorldCreator peopleWorldCreator(String worldName, Path worldFolder) {
+        return WorldCreator.name(worldName).forcedSpawnPosition(peopleInitialSpawn(worldFolder), 0.0f, 0.0f);
+    }
+
+    static Position peopleInitialSpawn(Path worldFolder) {
+        return CampusTemplateMetadata.read(worldFolder)
+                .<Position>map(campus -> Position.block(campus.spawn().get(0), campus.spawn().get(1), campus.spawn().get(2)))
+                .orElseGet(() -> Position.block(0, BUILD_BASE_Y + 2, 0));
     }
 
     private void applyPeopleWorldSettings(World world) {
@@ -676,7 +689,15 @@ public final class WorldModule {
     }
 
     private File resolveTemplateFolder() {
-        String configured = plugin.getConfig().getString("people.template-folder", "world-templates/hill_people_template");
+        return serverPath(plugin.getConfig().getString("people.template-folder", "world-templates/hill_people_template"));
+    }
+
+    private File resolvePeopleStructureFile() {
+        return serverPath(plugin.getConfig().getString("people.structure-file", ""));
+    }
+
+    /** Operator-supplied files are named in config.yml, relative to the server folder. */
+    private static File serverPath(String configured) {
         if (configured == null || configured.isBlank()) {
             return null;
         }
@@ -687,16 +708,84 @@ public final class WorldModule {
         return file;
     }
 
-    private File resolvePeopleStructureFile() {
-        String configured = plugin.getConfig().getString("people.structure-file", "structure.nbt");
-        if (configured == null || configured.isBlank()) {
-            return null;
+    /**
+     * Imports the map found in a designated folder before its world loads, and
+     * returns the placement supplied with it. Without a map there, the installed
+     * world (or the generated fallback) is used unchanged.
+     */
+    private WorldPlacement installSuppliedWorld(String worldName, String folderSetting, String defaultFolder) {
+        File configured = serverPath(plugin.getConfig().getString(folderSetting, defaultFolder));
+        if (configured == null) {
+            return WorldPlacement.NONE;
         }
-        File file = new File(configured);
-        if (!file.isAbsolute()) {
-            file = new File(Bukkit.getWorldContainer(), configured);
+        Path folder = configured.toPath();
+        if (!SceneryTemplate.isWorldSave(folder)) {
+            if (Files.exists(folder)) {
+                plugin.getLogger().warning("Ignoring " + folder
+                        + ": a supplied map needs level.dat directly inside this folder.");
+            }
+            return WorldPlacement.NONE;
         }
-        return file;
+        WorldPlacement placement = WorldPlacement.read(folder);
+        if (Bukkit.getWorld(worldName) != null) {
+            return placement;
+        }
+        if (!worldName.matches("[a-z0-9_]+")) {
+            throw new IllegalStateException("Unsupported world name for a supplied map: " + worldName);
+        }
+        Path container = Bukkit.getWorldContainer().toPath();
+        Path retained = container.resolve("replaced-worlds")
+                .resolve(worldName + "-" + REPLACED_WORLD_STAMP.format(Instant.now()));
+        try {
+            if (SceneryTemplate.install(folder, worldName, container.resolve(worldName),
+                    migratedWorldFolder(worldName).toPath(), retained,
+                    plugin.getDataFolder().toPath().resolve("imported-worlds.yml"))) {
+                plugin.getLogger().info("Installed " + worldName + " from " + folder
+                        + (Files.isDirectory(retained) ? "; the previous copy is kept at " + retained : ""));
+            }
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Could not install " + worldName + " from " + folder, exception);
+        }
+        return placement;
+    }
+
+    /**
+     * The map's own placement, else a position still present in an older
+     * config.yml, else the world's spawn. A supplied point with nothing to
+     * stand on is refused so a replaced map cannot drop players into the void.
+     */
+    private Location arrivalPoint(World world, WorldPlacement placement, String legacySetting) {
+        Location supplied = placement.spawn().map(pose -> pose.in(world))
+                .orElseGet(() -> configuredSpawn(world, legacySetting));
+        if (supplied != null) {
+            if (hasFloor(supplied)) {
+                world.setSpawnLocation(supplied);
+                return supplied;
+            }
+            plugin.getLogger().warning("Ignoring the arrival point for " + world.getName()
+                    + ": nothing to stand on at " + supplied.toVector());
+        }
+        Location spawn = world.getSpawnLocation().clone().add(0.5, 0.1, 0.5);
+        if (spawn.getY() < world.getMinHeight() + 2 || spawn.getY() > world.getMaxHeight() - 2) {
+            return new Location(world, 0.5, BUILD_BASE_Y + 2, 0.5, 0.0f, 0.0f);
+        }
+        return spawn;
+    }
+
+    private static boolean hasFloor(Location location) {
+        World world = location.getWorld();
+        int lowest = Math.max(world.getMinHeight(), location.getBlockY() - 4);
+        for (int y = location.getBlockY() - 1; y >= lowest; y--) {
+            if (!world.getBlockAt(location.getBlockX(), y, location.getBlockZ()).getType().isAir()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Location suppliedNpcLocation(String name) {
+        WorldPlacement.Pose pose = hubPlacement.npcs().get(name);
+        return pose != null ? pose.in(hubWorld) : configuredSpawn(hubWorld, "worlds.hub-npcs." + name);
     }
 
     private StructureNbtLoader.Metadata resolvePeopleStructureMetadata() {
@@ -942,9 +1031,11 @@ public final class WorldModule {
     private World loadVoidWorld(String name) {
         World world = Bukkit.getWorld(name);
         if (world == null) {
+            // An empty world has no spawn to find; the search costs seconds on a first start.
             world = WorldCreator.name(name)
                     .generator(voidGenerator)
                     .generateStructures(false)
+                    .forcedSpawnPosition(Position.block(0, BUILD_BASE_Y + 2, 0), 0.0f, 0.0f)
                     .createWorld();
         }
         if (world == null) {

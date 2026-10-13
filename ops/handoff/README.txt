@@ -1,50 +1,72 @@
-Hill175 campus and exhibition hub - Windows asset handoff
-=======================================================
+Hill175 campus and exhibition hub - map folder handoff
+=====================================================
 
-This packet includes the explicitly selected campus in a ready-to-copy folder,
-the owner-supplied exhibition hub ZIP, and checksums. The campus revision and
-bounds are recorded in world-templates/hill_people_template/hill-campus-template.yml.
-V29 is an unfinished floating exterior draft. It has newer buildings and grounds
-than the previous V19 server input; it is not a finished reconstruction.
+This packet holds the maps the Hill175 server reads, each already in the folder
+the server expects. Nothing in the server code names a map, version or archive:
+whatever is in these folders is what the server uses.
 
-Campus installation on Windows
-------------------------------
+  world-templates/hill_people_template/   campus copied for each People entry
+  world-templates/hill_hub/               exhibition hub world
+  world-templates/hill_auth/              sign-in lobby world (only if included)
+
+The campus revision and bounds are recorded in
+world-templates/hill_people_template/hill-campus-template.yml. V29 is an
+unfinished floating exterior draft. It has newer buildings and grounds than the
+previous V19 server input; it is not a finished reconstruction.
+
+Installation
+------------
 1. Stop Paper and back up the server folder.
-2. Extract this outer ZIP to a temporary staging folder.
-3. Copy the complete world-templates/hill_people_template folder into the server
-   folder (the directory containing paper.jar). The result must be:
+2. Extract this ZIP to a temporary staging folder and check it (see Verification).
+   On a Linux host without unzip:  python3 -m zipfile -e <this zip> <staging folder>
+3. Copy the complete world-templates folder into the server folder:
+     Windows: the folder containing paper.jar
+     Linux:   /opt/hill175   (create it if needed; the installer sets file ownership)
+   The result must be, for example:
 
-   <server>\world-templates\hill_people_template\region\r.*.*.mca
-   <server>\world-templates\hill_people_template\hill-campus-template.yml
+     <server>/world-templates/hill_people_template/region/r.*.*.mca
+     <server>/world-templates/hill_hub/level.dat
+     <server>/world-templates/hill_hub/hill-world.yml
 
-   If a template already exists, move it aside as a backup first. Replace the
-   entire template directory; do not merge two revisions' region files.
-4. Install the updated Hill175 plugin built from the GitHub source. Its config at
-   <server>\plugins\Hill175\config.yml should contain:
+   If a folder already exists, move it aside as a backup first. Replace a whole
+   folder; do not merge two revisions' files.
+4. Install or update the Hill175 server from the GitHub source:
+     Windows: .\ops\prepare-local-runtime.ps1 -Runtime <server folder>
+     Linux:   bash ops/install-server.sh --microsoft   (or --allow-development-auth)
+   Both check these folders first and say which one is missing or incomplete.
+5. Start Paper. It imports the hub (and lobby, if supplied) on that start and
+   keeps the world it replaces under <server>/replaced-worlds/. New People
+   entries and explicit owner resets copy the campus folder. Existing participant
+   worlds remain unchanged.
 
-   people:
-     template-folder: world-templates/hill_people_template
-     require-template: true
-     structure-file: ""
+For the next revision of any map, stop Paper and replace the same folder; no
+version pin, configuration or code change is needed.
 
-   Keep other existing settings. The old template-region-file-count and
-   template-poi-file-count settings are no longer used by the updated plugin.
-5. Restart Paper. New People entries and explicit owner resets copy this folder.
-   Existing participant worlds remain unchanged. For the next campus revision,
-   stop Paper and replace the same folder; no version pin or code change is needed.
+Map coordinates
+---------------
+hill-world.yml inside a hub or lobby folder gives the arrival point and, for the
+hub, where the category guides stand:
+
+  spawn: [x, y, z, yaw, pitch]
+  npcs:
+    journey: [x, y, z, yaw, pitch]
+    place: [x, y, z, yaw, pitch]
+    people: [x, y, z, yaw, pitch]
+    survival: [x, y, z, yaw, pitch]
+
+Yaw and pitch are optional. Without the file, players arrive at the save's own
+spawn and the guides stand around it.
+
+Sign-in lobby
+-------------
+No lobby map is required. Without world-templates/hill_auth the server keeps the
+lobby it already has, or builds its own plain one. To use a different lobby, put
+an approved Minecraft Java world save (level.dat directly inside) in that folder.
 
 The prepared campus uses standard Anvil region files from the native Java 26.1.2
 conversion. The project server targets Paper 26.2. An empty, truncated or wrongly
-nested template is rejected when creating/resetting a People entry. The plugin
-is not an archive extractor: region/ must be directly inside the configured folder.
-
-Exhibition hub (first installation only)
----------------------------------------
-The assets/ directory contains Hill175-Exhibition-Hub-2026-08-26.zip. Extract its
-inner world folder and rename it hill_hub alongside paper.jar while the server
-is stopped. Do not replace an existing running hub or participant worlds. The
-repository's Windows local-runtime helper instead takes this ZIP in runtime/assets/.
-The same helper now expects the campus pre-extracted in runtime/server/world-templates/.
+nested folder is rejected. The server does not extract archives: the files must
+be directly inside the folders above.
 
 Optional campus resource pack
 -----------------------------
@@ -58,6 +80,8 @@ Verification
 ------------
 SHA256SUMS contains the SHA-256 of every included payload file. Windows PowerShell:
   Get-FileHash .\world-templates\hill_people_template\region\r.0.0.mca -Algorithm SHA256
+Linux, from the extracted folder:
+  sha256sum -c SHA256SUMS
 Compare the result to the matching entry in SHA256SUMS.
 
 Server source, configuration examples and deployment notes remain at:

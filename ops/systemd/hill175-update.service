@@ -1,0 +1,13 @@
+[Unit]
+Description=Update Hill175 from GitHub main with backup and verification
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/Hill-server
+ExecStart=/bin/bash /opt/Hill-server/ops/update-server.sh --apply
+UMask=0077
+# Let the installer complete its backup/startup/recovery transaction.
+TimeoutStartSec=infinity

@@ -14,10 +14,12 @@ SURVIVAL_SEED_FILE="${WORLDGEN_STATE_DIR}/survival-seed.txt"
 PRIMARY_TRANSITION_MARKER="${WORLDGEN_STATE_DIR}/primary-trio-managed.env"
 LAST_TRANSITION_ARCHIVE_FILE="${WORLDGEN_STATE_DIR}/last-transition-archive.txt"
 EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\tversion_id\tversion_number\tgame_versions\tloader\tclient_side\tserver_side\tfilename\tsize\tsha512\tsha1\tdownload_url\tlicense_id\tlicense_url\tproject_url'
-CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
-CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
+source "${REPO_DIR}/ops/load-server-binaries.sh"
+load_server_binaries "${HILL175_SERVER_BINARIES:-${REPO_DIR}/server-assets/server-binaries.env}"
 CHUNKY_CONFIG="${RUNTIME_DIR}/plugins/Chunky/config.yml"
 PEOPLE_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/hill_people_template"
+HUB_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/hill_hub"
+AUTH_TEMPLATE_DIR="${RUNTIME_DIR}/world-templates/hill_auth"
 
 fail() {
   echo "verify-server failed: $*" >&2
@@ -122,6 +124,25 @@ verify_people_template() {
     || fail "Hill175 config must fail closed when the People template is unavailable"
   python3 "${REPO_DIR}/ops/check-campus-template.py" "${PEOPLE_TEMPLATE_DIR}" \
     || fail "invalid operator-selected People template"
+}
+
+verify_supplied_maps() {
+  local imports="${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml"
+
+  require_line "${PLUGIN_CONFIG}" "  hub-template-folder: world-templates/hill_hub"
+  require_line "${PLUGIN_CONFIG}" "  authentication-template-folder: world-templates/hill_auth"
+  python3 "${REPO_DIR}/ops/check-world-template.py" "${HUB_TEMPLATE_DIR}" \
+    || fail "invalid operator-supplied hub map"
+  grep -Eq "^hill_hub: ['\"]?[0-9a-f]{64}['\"]?$" "${imports}" 2>/dev/null \
+    || fail "the plugin did not record importing the hub from ${HUB_TEMPLATE_DIR}"
+  [[ -d "${RUNTIME_DIR}/hill_hub" || -d "${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub" ]] \
+    || fail "the hub world is not installed"
+  if [[ -e "${AUTH_TEMPLATE_DIR}" || -L "${AUTH_TEMPLATE_DIR}" ]]; then
+    python3 "${REPO_DIR}/ops/check-world-template.py" "${AUTH_TEMPLATE_DIR}" \
+      || fail "invalid operator-supplied lobby map"
+    grep -Eq "^hill_auth: ['\"]?[0-9a-f]{64}['\"]?$" "${imports}" 2>/dev/null \
+      || fail "the plugin did not record importing the lobby from ${AUTH_TEMPLATE_DIR}"
+  fi
 }
 
 require_line() {
@@ -230,6 +251,7 @@ systemctl --no-pager --full status hill175.service
 ss -ltnp | grep -E '(:25566)([[:space:]]|$)'
 verify_chunky_plugin
 verify_people_template
+verify_supplied_maps
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
 if [[ "${AUTH_MODE}" == microsoft ]]; then

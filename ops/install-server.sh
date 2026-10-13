@@ -29,6 +29,8 @@ fi
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "${REPO_DIR}/ops/deployment-lock.sh"
+source "${REPO_DIR}/ops/load-server-binaries.sh"
+load_server_binaries "${REPO_DIR}/server-assets/server-binaries.env"
 AUTH_ENV_FILE=/etc/hill175/hill175.env
 command -v python3 >/dev/null || { echo "Install python3 before running this installer." >&2; exit 1; }
 if [[ "${AUTH_MODE}" == development && ! -e "${AUTH_ENV_FILE}" && ! -L "${AUTH_ENV_FILE}" ]]; then
@@ -40,6 +42,12 @@ RUNTIME_DIR="/opt/hill175"
 JAVA_HOME="/opt/java25"
 SERVICE_USER="hill175"
 SERVICE_NAME="hill175.service"
+# Paper's first start on a new or slow host can take longer than the default.
+STARTUP_WAIT_SECONDS="${HILL175_STARTUP_WAIT_SECONDS:-180}"
+[[ "${STARTUP_WAIT_SECONDS}" =~ ^[1-9][0-9]{1,3}$ ]] || {
+  echo "HILL175_STARTUP_WAIT_SECONDS must be a whole number of seconds from 10 to 9999." >&2
+  exit 2
+}
 service_was_active=false
 service_was_stopped=false
 runtime_files_committed=false
@@ -47,10 +55,8 @@ runtime_rollback_dir=""
 worldgen_transition_created=false
 startup_rollback_failed=false
 primary_transition_marker_existed=false
-auth_replacement_applied=false
-auth_replacement_backup=""
-hub_replacement_applied=false
-hub_replacement_backup=""
+paper_start_attempted=false
+replaced_worlds_before=""
 BEDROCK_ENABLED="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-enabled)"
 BEDROCK_PORT="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-port)"
 bedrock_paths=()
@@ -96,9 +102,7 @@ restore_runtime_files() {
   restore_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
   restore_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
   restore_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
-  restore_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
-  restore_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
-  restore_runtime_file "${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed" hub-install-marker
+  restore_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" imported-worlds.yml
   for index in "${!bedrock_paths[@]}"; do
     restore_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
   done
@@ -109,7 +113,7 @@ wait_for_server_ready() {
   local attempt
   local latest_log="${RUNTIME_DIR}/logs/latest.log"
 
-  for ((attempt=1; attempt<=180; attempt++)); do
+  for ((attempt=1; attempt<=STARTUP_WAIT_SECONDS; attempt++)); do
     if ! systemctl is-active --quiet "${SERVICE_NAME}"; then
       echo "${SERVICE_NAME} stopped before Paper reported ready." >&2
       return 1
@@ -120,7 +124,8 @@ wait_for_server_ready() {
     fi
     sleep 1
   done
-  echo "Timed out waiting 180 seconds for Paper's ready marker." >&2
+  echo "Timed out waiting ${STARTUP_WAIT_SECONDS} seconds for Paper's ready marker." >&2
+  echo "A slow first start can be given longer: HILL175_STARTUP_WAIT_SECONDS=600 bash ops/install-server.sh ..." >&2
   return 1
 }
 
@@ -221,8 +226,50 @@ rollback_imported_world_replacement() {
   return 0
 }
 
+# The plugin imports supplied maps as Paper starts and keeps whatever it replaced
+# under replaced-worlds/<world>-<UTC time>/. Put those back when this start is undone.
+rollback_supplied_world_imports() {
+  local retained base world
+  local restored=false
+
+  for retained in "${RUNTIME_DIR}"/replaced-worlds/*; do
+    [[ -d "${retained}" ]] || continue
+    base="$(basename "${retained}")"
+    [[ "${base}" =~ ^([a-z0-9_]+)-[0-9]{8}T[0-9]{6}Z$ ]] || continue
+    world="${BASH_REMATCH[1]}"
+    [[ $'\n'"${replaced_worlds_before}"$'\n' != *$'\n'"${base}"$'\n'* ]] || continue
+    rollback_imported_world_replacement "${world}" "${RUNTIME_DIR}/${world}" \
+      "${RUNTIME_DIR}/world/dimensions/minecraft/${world}" "${retained}" || return 1
+    rmdir "${retained}" 2>/dev/null || true
+    restored=true
+  done
+  if [[ "${restored}" == true ]]; then
+    # The folders still select those maps; this only undoes the failed start.
+    echo "The supplied maps remain in ${RUNTIME_DIR}/world-templates and are imported again when Paper next starts with this plugin." >&2
+  fi
+  return 0
+}
+
 validate_people_template_root() {
   python3 "${REPO_DIR}/ops/check-campus-template.py" "${PEOPLE_TEMPLATE_TARGET}"
+}
+
+# Maps are chosen by what the operator placed in the designated folders. The hub
+# is required; a lobby is optional because the plugin can build a plain one.
+validate_supplied_maps() {
+  if [[ ! -e "${HUB_TEMPLATE_TARGET}" && ! -L "${HUB_TEMPLATE_TARGET}" ]]; then
+    echo "Missing exhibition hub map. Copy the supplied world-templates/hill_hub folder to ${HUB_TEMPLATE_TARGET}" >&2
+    echo "(level.dat directly inside) before installing; see docs/operations/deployment.md." >&2
+    return 1
+  fi
+  python3 "${REPO_DIR}/ops/check-world-template.py" "${HUB_TEMPLATE_TARGET}"
+  if [[ -e "${AUTH_TEMPLATE_TARGET}" || -L "${AUTH_TEMPLATE_TARGET}" ]]; then
+    python3 "${REPO_DIR}/ops/check-world-template.py" "${AUTH_TEMPLATE_TARGET}"
+  elif [[ -d "${RUNTIME_DIR}/hill_auth" || -d "${RUNTIME_DIR}/world/dimensions/minecraft/hill_auth" ]]; then
+    echo "No lobby map in ${AUTH_TEMPLATE_TARGET}; keeping the lobby that is already installed."
+  else
+    echo "No lobby map in ${AUTH_TEMPLATE_TARGET}; the plugin will build its plain lobby."
+  fi
 }
 
 install_people_template() {
@@ -237,12 +284,7 @@ cleanup() {
   trap - EXIT INT TERM
   if [[ "${status}" -ne 0 && -n "${runtime_rollback_dir}" ]]; then
     systemctl stop "${SERVICE_NAME}" 2>/dev/null || true
-    if [[ "${hub_replacement_applied}" == true ]] \
-        && ! rollback_imported_world_replacement hub "${hub_target}" "${hub_modern_target}" "${hub_replacement_backup}"; then
-      startup_rollback_failed=true
-    fi
-    if [[ "${startup_rollback_failed}" == false && "${auth_replacement_applied}" == true ]] \
-        && ! rollback_imported_world_replacement authentication "${auth_target}" "${auth_modern_target}" "${auth_replacement_backup}"; then
+    if [[ "${paper_start_attempted}" == true ]] && ! rollback_supplied_world_imports; then
       startup_rollback_failed=true
     fi
     if [[ "${startup_rollback_failed}" == false && "${worldgen_transition_created}" == true ]]; then
@@ -280,26 +322,10 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-PAPER_URL="https://fill-data.papermc.io/v1/objects/a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629/paper-26.2-119.jar"
-PAPER_SHA256="a8c9140c3075bd7c04973e9cdc491b21bfe6bad472b674ef932a4ae0fec19629"
-
-JAVA_URL="https://github.com/adoptium/temurin25-binaries/releases/download/jdk-25.0.4.1%2B1/OpenJDK25U-jdk_x64_linux_hotspot_25.0.4.1_1.tar.gz"
-JAVA_SHA256="dbb698396d478e7fa2b1e50f4103324b2a99b90569ee27c33f2261f9215cf41e"
-
-AUTH_URL="https://www.curseforge.com/api/v1/mods/1469713/files/8692252/download"
-AUTH_SHA256="de98674487bcd69593c36a03b1204a7d14ff694f281508d156e53650e31e4630"
-
-CHUNKY_PROJECT_ID="fALzjamp"
-CHUNKY_VERSION_ID="MdY6JATr"
-CHUNKY_FILENAME="Chunky-Bukkit-1.5.3.jar"
-CHUNKY_URL="https://cdn.modrinth.com/data/fALzjamp/versions/MdY6JATr/Chunky-Bukkit-1.5.3.jar"
-CHUNKY_SHA512="43ffecc6e6a734b752da41575bbb316526c124c3f878942437d5133c377bfbd9b78bda975520dc074d7158c15dade58a444ccd0fd8d8a25d165b6fc450140422"
-
-HUB_ARCHIVE_NAME="Hill175-Exhibition-Hub-2026-08-26.zip"
-HUB_ARCHIVE_ROOT="Hill175 Exhibition Hub 2026-08-26"
-HUB_SHA256="d6ebfc048b5dc3351191182255ce77fe101c373bd6bb8a3330d8fc2672c858de"
-
+# Designated folders for operator-supplied maps; their contents select the maps.
 PEOPLE_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/hill_people_template"
+HUB_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/hill_hub"
+AUTH_TEMPLATE_TARGET="${RUNTIME_DIR}/world-templates/hill_auth"
 
 require_command() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -322,7 +348,6 @@ verify_sha512() {
 
 require_command curl
 require_command tar
-require_command unzip
 require_command borg
 require_command flock
 require_command find
@@ -330,16 +355,19 @@ require_command grep
 require_command sha256sum
 require_command sha512sum
 require_command systemctl
+require_command journalctl
+require_command ss
 require_command wc
 require_command git
 
-# The operator-supplied campus folder and hub archive must exist before an outage.
-validate_people_template_root
-hub_archive="${RUNTIME_DIR}/assets/${HUB_ARCHIVE_NAME}"
-[[ -f "${hub_archive}" ]] && verify_sha256 "${hub_archive}" "${HUB_SHA256}" || {
-  echo "Missing or mismatched hub asset: stage the checksum-verified IT asset packet first." >&2
+# Everything the operator supplies must be in place before an outage.
+if [[ ! -d "${RUNTIME_DIR}/world-templates" ]]; then
+  echo "No maps found. Copy the asset packet's world-templates folder to ${RUNTIME_DIR}/world-templates" >&2
+  echo "before installing; see docs/operations/deployment.md." >&2
   exit 1
-}
+fi
+validate_people_template_root
+validate_supplied_maps
 
 if ! id "${SERVICE_USER}" >/dev/null 2>&1; then
   useradd --system --home-dir "${RUNTIME_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
@@ -348,9 +376,13 @@ fi
 install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_USER}" "${RUNTIME_DIR}" "${RUNTIME_DIR}/plugins" "${RUNTIME_DIR}/assets"
 
 if [[ ! -x "${JAVA_HOME}/bin/java" ]] || ! "${JAVA_HOME}/bin/java" -version 2>&1 | head -n 1 | grep -q '25\.'; then
+  if [[ "$(uname -m)" != x86_64 ]]; then
+    echo "Only an x86-64 JDK is listed for download. Install a JDK 25 at ${JAVA_HOME} for $(uname -m) first." >&2
+    exit 1
+  fi
   java_archive="$(mktemp /tmp/hill175-java25.XXXXXX.tar.gz)"
-  curl --fail --location --silent --show-error "${JAVA_URL}" --output "${java_archive}"
-  verify_sha256 "${java_archive}" "${JAVA_SHA256}"
+  curl --fail --location --silent --show-error "${JAVA_LINUX_X64_URL}" --output "${java_archive}"
+  verify_sha256 "${java_archive}" "${JAVA_LINUX_X64_SHA256}"
   install -d -m 0755 "${JAVA_HOME}"
   tar --extract --gzip --file "${java_archive}" --directory "${JAVA_HOME}" --strip-components=1
   rm -f "${java_archive}"
@@ -383,6 +415,7 @@ for existing_chunky in "${RUNTIME_DIR}"/plugins/*[Cc]hunky*.jar; do
 done
 
 validate_people_template_root
+validate_supplied_maps
 if [[ "${BEDROCK_ENABLED}" == true ]]; then
   python3 "${REPO_DIR}/ops/install-bedrock.py" prepare --runtime "${RUNTIME_DIR}" --port "${BEDROCK_PORT}"
 fi
@@ -415,9 +448,7 @@ backup_runtime_file "${RUNTIME_DIR}/spigot.yml" spigot.yml
 backup_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
 backup_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
 backup_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
-backup_runtime_file "${RUNTIME_DIR}/structure.nbt" structure.nbt
-backup_runtime_file "${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed" auth-install-marker
-backup_runtime_file "${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed" hub-install-marker
+backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" imported-worlds.yml
 for index in "${!bedrock_paths[@]}"; do
   backup_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
 done
@@ -452,11 +483,6 @@ install -d -m 0750 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
   "${REPO_DIR}/src/main/resources/config.yml" \
   "${RUNTIME_DIR}/plugins/Hill175/config.yml"
-if [[ -f "${REPO_DIR}/structure.nbt" ]]; then
-  install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" \
-    "${REPO_DIR}/structure.nbt" \
-    "${RUNTIME_DIR}/structure.nbt"
-fi
 printf 'eula=true\n' > "${RUNTIME_DIR}/eula.txt"
 
 install_people_template
@@ -470,153 +496,6 @@ bash "${REPO_DIR}/ops/install-survival-worldgen.sh" \
 if [[ "${primary_transition_marker_existed}" == false \
     && -f "${RUNTIME_DIR}/assets/survival-worldgen/primary-trio-managed.env" ]]; then
   worldgen_transition_created=true
-fi
-
-auth_install_marker="${RUNTIME_DIR}/assets/.small-medieval-church-1.0.5-installed"
-auth_target="${RUNTIME_DIR}/hill_auth"
-auth_modern_target="${RUNTIME_DIR}/world/dimensions/minecraft/hill_auth"
-if [[ ! -f "${auth_install_marker}" || ! -d "${auth_target}" && ! -d "${auth_modern_target}" ]]; then
-  auth_archive="${RUNTIME_DIR}/assets/Small-Medieval-Church-1.0.5.zip"
-  curl --fail --location --silent --show-error "${AUTH_URL}" --output "${auth_archive}.tmp"
-  verify_sha256 "${auth_archive}.tmp" "${AUTH_SHA256}"
-  mv "${auth_archive}.tmp" "${auth_archive}"
-
-  auth_extract="$(mktemp -d /tmp/hill175-auth.XXXXXX)"
-  unzip -q "${auth_archive}" -d "${auth_extract}"
-  if [[ ! -f "${auth_extract}/Small Medieval Church 1.0.5/level.dat" ]]; then
-    echo "Authentication archive did not contain the expected Small Medieval Church 1.0.5 world root." >&2
-    exit 1
-  fi
-  rm -rf "${auth_extract}/Small Medieval Church 1.0.5/playerdata" \
-         "${auth_extract}/Small Medieval Church 1.0.5/stats" \
-         "${auth_extract}/Small Medieval Church 1.0.5/advancements"
-  rm -f "${auth_extract}/Small Medieval Church 1.0.5/uid.dat" \
-        "${auth_extract}/Small Medieval Church 1.0.5/session.lock"
-
-  # Move existing auth worlds aside only after the replacement has downloaded,
-  # passed its checksum, and exposed a valid level.dat. Keep the previous world
-  # recoverable just like the exhibition hub replacement.
-  auth_backup="$(mktemp -d "${RUNTIME_DIR}/assets/auth-backup.XXXXXX")"
-  auth_backup_has_world=false
-  auth_move_failed=false
-  if [[ -d "${auth_target}" ]]; then
-    if mv "${auth_target}" "${auth_backup}/legacy"; then
-      auth_backup_has_world=true
-    else
-      auth_move_failed=true
-    fi
-  fi
-  if [[ "${auth_move_failed}" == false && -d "${auth_modern_target}" ]]; then
-    if mv "${auth_modern_target}" "${auth_backup}/modern"; then
-      auth_backup_has_world=true
-    else
-      auth_move_failed=true
-    fi
-  fi
-  if [[ "${auth_move_failed}" == true ]]; then
-    [[ -d "${auth_backup}/legacy" ]] && mv "${auth_backup}/legacy" "${auth_target}"
-    if [[ -d "${auth_backup}/modern" ]]; then
-      mkdir -p "$(dirname "${auth_modern_target}")"
-      mv "${auth_backup}/modern" "${auth_modern_target}"
-    fi
-    echo "Authentication world could not be staged for replacement; the previous world was restored." >&2
-    exit 1
-  fi
-  if ! mv "${auth_extract}/Small Medieval Church 1.0.5" "${auth_target}"; then
-    [[ -d "${auth_backup}/legacy" ]] && mv "${auth_backup}/legacy" "${auth_target}"
-    if [[ -d "${auth_backup}/modern" ]]; then
-      mkdir -p "$(dirname "${auth_modern_target}")"
-      mv "${auth_backup}/modern" "${auth_modern_target}"
-    fi
-    echo "Authentication world replacement failed; the previous world was restored." >&2
-    exit 1
-  fi
-  auth_replacement_applied=true
-  auth_replacement_backup="${auth_backup}"
-  rm -rf "${auth_extract}"
-  touch "${auth_install_marker}"
-  if [[ "${auth_backup_has_world}" == true ]]; then
-    echo "Previous authentication world retained for recovery at ${auth_backup}"
-  else
-    rmdir "${auth_backup}"
-  fi
-fi
-
-hub_install_marker="${RUNTIME_DIR}/assets/.hill175-exhibition-hub-2026-08-26-installed"
-hub_target="${RUNTIME_DIR}/hill_hub"
-hub_modern_target="${RUNTIME_DIR}/world/dimensions/minecraft/hill_hub"
-installed_hub_sha=""
-if [[ -f "${hub_install_marker}" ]]; then
-  installed_hub_sha="$(tr -d '[:space:]' < "${hub_install_marker}")"
-fi
-if [[ "${installed_hub_sha}" != "${HUB_SHA256}" || ! -d "${hub_target}" && ! -d "${hub_modern_target}" ]]; then
-  hub_archive="${RUNTIME_DIR}/assets/${HUB_ARCHIVE_NAME}"
-  if [[ ! -f "${hub_archive}" ]]; then
-    echo "Missing user-provided hub archive: ${hub_archive}" >&2
-    echo "Package it with ops/package-user-hub.ps1 and stage it before running this installer." >&2
-    exit 1
-  fi
-  verify_sha256 "${hub_archive}" "${HUB_SHA256}"
-
-  hub_extract="$(mktemp -d /tmp/hill175-hub.XXXXXX)"
-  unzip -q "${hub_archive}" -d "${hub_extract}"
-  if [[ ! -f "${hub_extract}/${HUB_ARCHIVE_ROOT}/level.dat" ]]; then
-    echo "Hub archive did not contain the expected ${HUB_ARCHIVE_ROOT} world root." >&2
-    exit 1
-  fi
-  rm -rf "${hub_extract}/${HUB_ARCHIVE_ROOT}/players" \
-         "${hub_extract}/${HUB_ARCHIVE_ROOT}/playerdata" \
-         "${hub_extract}/${HUB_ARCHIVE_ROOT}/stats" \
-         "${hub_extract}/${HUB_ARCHIVE_ROOT}/advancements"
-  rm -f "${hub_extract}/${HUB_ARCHIVE_ROOT}/uid.dat" \
-        "${hub_extract}/${HUB_ARCHIVE_ROOT}/session.lock"
-
-  # Validate the replacement before stopping Paper, then move the previous
-  # world aside so an interrupted deployment remains recoverable.
-  hub_backup="$(mktemp -d "${RUNTIME_DIR}/assets/hub-backup.XXXXXX")"
-  hub_backup_has_world=false
-  hub_move_failed=false
-  if [[ -d "${hub_target}" ]]; then
-    if mv "${hub_target}" "${hub_backup}/legacy"; then
-      hub_backup_has_world=true
-    else
-      hub_move_failed=true
-    fi
-  fi
-  if [[ "${hub_move_failed}" == false && -d "${hub_modern_target}" ]]; then
-    if mv "${hub_modern_target}" "${hub_backup}/modern"; then
-      hub_backup_has_world=true
-    else
-      hub_move_failed=true
-    fi
-  fi
-  if [[ "${hub_move_failed}" == true ]]; then
-    [[ -d "${hub_backup}/legacy" ]] && mv "${hub_backup}/legacy" "${hub_target}"
-    if [[ -d "${hub_backup}/modern" ]]; then
-      mkdir -p "$(dirname "${hub_modern_target}")"
-      mv "${hub_backup}/modern" "${hub_modern_target}"
-    fi
-    echo "Hub world could not be staged for replacement; the previous world was restored." >&2
-    exit 1
-  fi
-  if ! mv "${hub_extract}/${HUB_ARCHIVE_ROOT}" "${hub_target}"; then
-    [[ -d "${hub_backup}/legacy" ]] && mv "${hub_backup}/legacy" "${hub_target}"
-    if [[ -d "${hub_backup}/modern" ]]; then
-      mkdir -p "${RUNTIME_DIR}/world/dimensions/minecraft"
-      mv "${hub_backup}/modern" "${hub_modern_target}"
-    fi
-    echo "Hub replacement failed; the previous world was restored." >&2
-    exit 1
-  fi
-  hub_replacement_applied=true
-  hub_replacement_backup="${hub_backup}"
-  rm -rf "${hub_extract}"
-  printf '%s\n' "${HUB_SHA256}" > "${hub_install_marker}"
-  if [[ "${hub_backup_has_world}" == true ]]; then
-    echo "Previous hub retained for recovery at ${hub_backup}"
-  else
-    rmdir "${hub_backup}"
-  fi
 fi
 
 chown -R "${SERVICE_USER}:${SERVICE_USER}" "${RUNTIME_DIR}"
@@ -633,6 +512,9 @@ if [[ -f "${RUNTIME_DIR}/logs/latest.log" ]]; then
   mv "${RUNTIME_DIR}/logs/latest.log" "${runtime_rollback_dir}/previous-latest.log"
 fi
 touch "${startup_probe_marker}"
+# Paper imports the supplied lobby and hub maps during this start.
+replaced_worlds_before="$(ls -1 "${RUNTIME_DIR}/replaced-worlds" 2>/dev/null || true)"
+paper_start_attempted=true
 systemctl restart "${SERVICE_NAME}"
 wait_for_server_ready "${startup_probe_marker}"
 bash "${REPO_DIR}/ops/verify-server.sh"
@@ -644,5 +526,19 @@ runtime_files_committed=true
 service_was_stopped=false
 rm -rf -- "${runtime_rollback_dir}"
 runtime_rollback_dir=""
+
+# Record only a verified, committed source deployment, separately from game data.
+# The nightly updater must compare against this, not just the checkout's HEAD:
+# a successful pull can be followed by a failed build/install.
+update_state="${HILL175_UPDATE_STATE_DIR:-/var/lib/hill175-update}"
+install -d -m 0700 -o root -g root "${update_state}"
+if [[ -z "$(git -C "${REPO_DIR}" status --porcelain --untracked-files=all)" ]]; then
+  (umask 077; git -C "${REPO_DIR}" rev-parse HEAD > "${update_state}/deployed-commit.tmp")
+  mv "${update_state}/deployed-commit.tmp" "${update_state}/deployed-commit"
+  rm -f -- "${update_state}/failed-commit"
+else
+  rm -f -- "${update_state}/deployed-commit"
+  echo "Uncommitted source deployment; automatic updates require a clean committed install."
+fi
 
 echo "Hill 175 is installed. Minecraft TCP port 25566 must be allowed by the host firewall/provider firewall. Daily Borg backups are scheduled by hill175-backup.timer."

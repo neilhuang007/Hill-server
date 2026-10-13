@@ -4,7 +4,10 @@ param(
     [Parameter(Mandatory)]
     [ValidateSet('Microsoft', 'Development')]
     [string]$Mode,
-    [string]$PrivateKey = 'C:/Users/neil_/.ssh/hetzner.ppk'
+    [string]$PrivateKey = 'C:/Users/neil_/.ssh/hetzner.ppk',
+    # SSH login of the host whose /opt/Hill-server checkout is deployed.
+    [ValidatePattern('^[a-z_][a-z0-9_-]*@[A-Za-z0-9][A-Za-z0-9.-]*$')]
+    [string]$Server = 'root@135.181.78.188'
 )
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -61,7 +64,7 @@ echo "Deployment log: $log"
         $escapedQuote = $quote + [char]34 + $quote + [char]34 + $quote
         $command = 'bash -lc ' + $quote + $remoteScript.Replace($quote, $escapedQuote).Replace("`r`n", "`n") + $quote
         [System.IO.File]::WriteAllText($commandFile, $command, [System.Text.UTF8Encoding]::new($false))
-        Invoke-Checked plink.exe @('-batch', '-i', $PrivateKey, 'root@135.181.78.188', '-m', $commandFile)
+        Invoke-Checked plink.exe @('-batch', '-i', $PrivateKey, $Server, '-m', $commandFile)
     }
     finally { Remove-Item -LiteralPath $commandFile -ErrorAction SilentlyContinue }
 }
