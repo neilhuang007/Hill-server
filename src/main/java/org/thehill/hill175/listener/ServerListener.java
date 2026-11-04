@@ -42,6 +42,9 @@ import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.EntityToggleGlideEvent;
 import org.bukkit.event.entity.EntityToggleSwimEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.hanging.HangingBreakByEntityEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
@@ -54,6 +57,7 @@ import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -63,11 +67,13 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
 import org.bukkit.event.world.PortalCreateEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Entry;
@@ -88,7 +94,7 @@ public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
     private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "verify", "rules", "help");
     private static final Set<String> COMPETITION_COMMANDS = Set.of(
-            "hill175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help"
+            "hill175", "h175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help", "campus", "campusbackup"
     );
     private static final Set<Material> TNT_IGNITERS = Set.of(Material.FLINT_AND_STEEL, Material.FIRE_CHARGE);
 
@@ -98,6 +104,32 @@ public final class ServerListener implements Listener {
     private final WorldModule worlds;
     private final Map<UUID, Instant> lastDenialMessage = new HashMap<>();
     private final Set<UUID> survivalDeaths = new HashSet<>();
+
+    @EventHandler
+    public void onCameraChunkLoad(ChunkLoadEvent event) {
+        competition.restoreCameraMarkers(event.getChunk());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCameraItemPickup(EntityPickupItemEvent event) {
+        if (CompetitionModule.isCameraMarker(event.getItem())) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCameraHopperPickup(InventoryPickupItemEvent event) {
+        if (CompetitionModule.isCameraMarker(event.getItem())) event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCameraItemMerge(ItemMergeEvent event) {
+        if (CompetitionModule.isCameraMarker(event.getEntity()) || CompetitionModule.isCameraMarker(event.getTarget()))
+            event.setCancelled(true);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onCameraItemDespawn(ItemDespawnEvent event) {
+        if (CompetitionModule.isCameraMarker(event.getEntity())) event.setCancelled(true);
+    }
 
     public ServerListener(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, WorldModule worlds) {
         this.plugin = plugin;
@@ -111,6 +143,18 @@ public final class ServerListener implements Listener {
         event.joinMessage(competition.usesMicrosoftAuthentication() ? null
                 : Component.text(event.getPlayer().getName() + " joined the Hill 175 server.", NamedTextColor.GRAY));
         competition.handleJoin(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCameraSelfInteraction(PlayerKickEvent event) {
+        // With a detached camera, vanilla can raycast the viewer's own body.
+        // Paper rejects that packet before the normal entity interaction event.
+        if (event.getCause() != PlayerKickEvent.Cause.SELF_INTERACTION
+                || !competition.isCameraPreviewing(event.getPlayer())) {
+            return;
+        }
+        event.setCancelled(true);
+        competition.exitCameraPreview(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -249,6 +293,11 @@ public final class ServerListener implements Listener {
         }
         if (event.getHand() == EquipmentSlot.HAND) {
             ItemStack item = event.getItem();
+            if (competition.isCompetitionItem(item, CompetitionModule.CAMPUS_UNDO_ITEM_ID)) {
+                event.setCancelled(true);
+                if (event.getAction().isRightClick()) competition.undoRecentBuild(player);
+                return;
+            }
             if (competition.isCompetitionItem(item, CompetitionModule.COMPASS_ITEM_ID)) {
                 event.setCancelled(true);
                 menus.openMain(player);
@@ -312,6 +361,9 @@ public final class ServerListener implements Listener {
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)) {
                 event.setCancelled(true);
+                if (event.getAction().isRightClick() && !competition.isCameraPreviewing(player)) {
+                    menus.openCampusMap(player);
+                }
                 return;
             }
         }
@@ -461,8 +513,8 @@ public final class ServerListener implements Listener {
                 || worlds.isSurvivalWorld(event.getToBlock().getWorld())) {
             return;
         }
-        Optional<Entry> sourceEntry = competition.entryAt(event.getBlock().getLocation());
-        if (sourceEntry.isEmpty() || !sourceEntry.get().region().contains(event.getToBlock().getLocation())) {
+        Optional<Entry> sourceEntry = environmentallyEditableEntry(event.getBlock().getLocation());
+        if (sourceEntry.isEmpty() || !sourceEntry.get().containsEditable(event.getToBlock().getLocation())) {
             event.setCancelled(true);
         }
     }
@@ -472,7 +524,7 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
+        Optional<Entry> entry = environmentallyEditableEntry(event.getBlock().getLocation());
         if (entry.isEmpty() || !(event.getBlock().getBlockData() instanceof Directional directional)) {
             event.setCancelled(true);
             return;
@@ -482,7 +534,7 @@ public final class ServerListener implements Listener {
         boolean unsafeProjectile = material == Material.FIRE_CHARGE
                 || material == Material.TNT
                 || material == Material.TNT_MINECART;
-        if (unsafeProjectile || !entry.get().region().contains(target)) {
+        if (unsafeProjectile || !entry.get().containsEditable(target)) {
             event.setCancelled(true);
         }
     }
@@ -496,8 +548,8 @@ public final class ServerListener implements Listener {
             case FLINT_AND_STEEL, FIREBALL -> event.getPlayer() != null
                     && competition.mayBuild(event.getPlayer(), event.getBlock().getLocation());
             case LAVA -> event.getIgnitingBlock() != null
-                    && competition.entryAt(event.getIgnitingBlock().getLocation())
-                    .filter(entry -> entry.region().contains(event.getBlock().getLocation()))
+                    && environmentallyEditableEntry(event.getIgnitingBlock().getLocation())
+                    .filter(entry -> entry.containsEditable(event.getBlock().getLocation()))
                     .isPresent();
             default -> false;
         };
@@ -514,8 +566,8 @@ public final class ServerListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        Optional<Entry> sourceEntry = competition.entryAt(event.getSource().getLocation());
-        if (sourceEntry.isEmpty() || !sourceEntry.get().region().contains(event.getBlock().getLocation())) {
+        Optional<Entry> sourceEntry = environmentallyEditableEntry(event.getSource().getLocation());
+        if (sourceEntry.isEmpty() || !sourceEntry.get().containsEditable(event.getBlock().getLocation())) {
             event.setCancelled(true);
         }
     }
@@ -525,7 +577,7 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
+        if (environmentallyEditableEntry(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -535,9 +587,9 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getWorld())) {
             return;
         }
-        Optional<Entry> sourceEntry = competition.entryAt(event.getLocation());
+        Optional<Entry> sourceEntry = environmentallyEditableEntry(event.getLocation());
         if (sourceEntry.isEmpty() || event.getBlocks().stream()
-                .anyMatch(state -> !sourceEntry.get().region().contains(state.getLocation()))) {
+                .anyMatch(state -> !sourceEntry.get().containsEditable(state.getLocation()))) {
             event.setCancelled(true);
         }
     }
@@ -547,7 +599,7 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
+        if (environmentallyEditableEntry(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -557,7 +609,7 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        if (competition.entryAt(event.getBlock().getLocation()).isEmpty()) {
+        if (environmentallyEditableEntry(event.getBlock().getLocation()).isEmpty()) {
             event.setCancelled(true);
         }
     }
@@ -628,7 +680,7 @@ public final class ServerListener implements Listener {
         Optional<Entry> entry = competition.entryAt(event.getEntity().getLocation());
         if (entry.isPresent()) {
             long entityCount = event.getEntity().getWorld().getEntities().stream()
-                    .filter(entity -> entry.get().region().contains(entity.getLocation()))
+                    .filter(entity -> entry.get().containsEditable(entity.getLocation()))
                     .count();
             int limit = plugin.getConfig().getInt("build-rules.max-non-player-entities-per-entry", 128);
             if (entityCount > limit) {
@@ -690,7 +742,7 @@ public final class ServerListener implements Listener {
             return;
         }
         Optional<Entry> entry = competition.entryAt(event.getFrom());
-        if (entry.isPresent() && !entry.get().region().contains(event.getTo())) {
+        if (entry.isPresent() && !entry.get().containsEditable(event.getTo())) {
             event.getVehicle().teleport(event.getFrom());
         }
     }
@@ -700,10 +752,10 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
+        Optional<Entry> entry = environmentallyEditableEntry(event.getBlock().getLocation());
         if (entry.isEmpty() || event.getBlocks().stream()
                 .map(block -> block.getRelative(event.getDirection()).getLocation())
-                .anyMatch(location -> !entry.get().region().contains(location))) {
+                .anyMatch(location -> !entry.get().containsEditable(location))) {
             event.setCancelled(true);
         }
     }
@@ -713,12 +765,12 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getBlock().getWorld())) {
             return;
         }
-        Optional<Entry> entry = competition.entryAt(event.getBlock().getLocation());
+        Optional<Entry> entry = environmentallyEditableEntry(event.getBlock().getLocation());
         BlockFace direction = event.getDirection();
         if (entry.isEmpty() || event.getBlocks().stream().anyMatch(block ->
-                !entry.get().region().contains(block.getLocation())
-                        || !entry.get().region().contains(block.getRelative(direction).getLocation())
-                        || !entry.get().region().contains(block.getRelative(direction.getOppositeFace()).getLocation()))) {
+                !entry.get().containsEditable(block.getLocation())
+                        || !entry.get().containsEditable(block.getRelative(direction).getLocation())
+                        || !entry.get().containsEditable(block.getRelative(direction.getOppositeFace()).getLocation()))) {
             event.setCancelled(true);
         }
     }
@@ -797,6 +849,7 @@ public final class ServerListener implements Listener {
                 || competition.isCompetitionItem(item, CompetitionModule.ENTRY_SUBMIT_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.CAMPUS_UNDO_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID);
     }
 
@@ -818,6 +871,11 @@ public final class ServerListener implements Listener {
             event.setRespawnLocation(worlds.survivalSpawn());
         }
         Bukkit.getScheduler().runTask(plugin, () -> competition.handleSurvivalRespawn(player));
+    }
+
+    private Optional<Entry> environmentallyEditableEntry(Location location) {
+        return competition.entryAt(location).filter(entry -> !entry.submitted()
+                && !competition.isPreparingSubmission(entry) && !worlds.isResetting(entry.id()));
     }
 
     private void deny(Player player, String text) {

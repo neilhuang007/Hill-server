@@ -1,0 +1,15 @@
+{
+  "sourceUrl": "https://resources.finalsite.net/images/v1787600757/thehillorg/fky5ch2qhgl6lcsvhz06/FY26CampusMap_Labeled.pdf",
+  "sourcePdfSha256": "a815cf8e058df9bdbb2997fba3a272249508e7175c536b907f984e9966477e59",
+  "description": "Official Hill School FY26 illustrated campus map selected by the user",
+  "builder": "ops/build-official-campus-map.py",
+  "fullCropPoints": [115, 118, 512, 515],
+  "coreCropPoints": [190, 274, 466, 514],
+  "heldMapPixels": [128, 128],
+  "dialogImagePixels": [256, 256],
+  "clickableImagePixels": [360, 360],
+  "labelManifest": "campus-map-labels.json",
+  "destinations": "src/main/resources/campus-map-destinations.json",
+  "projection": "Oblique illustration. Printed map numbers link to reviewed campus destinations.",
+  "preparedPackSha1": "3c4abcb3a76fd6a4310e32a596657c7e84a1aaf3"
+}

@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -127,7 +128,7 @@ class SchoolParticipantOwnershipTest {
         entry.description("Original description");
         Player player = f.player("JavaBuilder");
 
-        for (String invalidDescription : List.of("  ", "x".repeat(Entry.MAX_DESCRIPTION_LENGTH + 1))) {
+        for (String invalidDescription : List.of("x".repeat(Entry.MAX_DESCRIPTION_LENGTH + 1))) {
             assertEquals(CompetitionModule.DetailsUpdateResult.INVALID_DETAILS,
                     f.competition.saveSubmissionDetails(player, entry, "New title", invalidDescription));
         }
@@ -137,6 +138,17 @@ class SchoolParticipantOwnershipTest {
         assertEquals("Original title", entry.title());
         assertEquals("Original description", entry.description());
         verify(f.store, never()).saveEntry(any());
+    }
+
+    @Test
+    void blankSubmissionDetailsRemainOptionalAndAreNormalized() throws Exception {
+        Fixture fixture = new Fixture();
+        Entry entry = fixture.entry(Category.JOURNEY, PARTICIPANT);
+        assertEquals(CompetitionModule.DetailsUpdateResult.SAVED,
+                fixture.competition.saveSubmissionDetails(fixture.player("JavaBuilder"), entry, "  ", null));
+        assertEquals("", entry.title());
+        assertEquals("", entry.description());
+        verify(fixture.store).saveEntry(entry);
     }
 
     @ParameterizedTest
@@ -210,6 +222,8 @@ class SchoolParticipantOwnershipTest {
             when(server.getOnlineMode()).thenReturn(true);
             when(server.getPluginManager()).thenReturn(mock(PluginManager.class));
             when(store.entries()).thenReturn(entries);
+            when(store.entry(any(UUID.class))).thenAnswer(invocation -> entries.stream()
+                    .filter(entry -> entry.id().equals(invocation.getArgument(0))).findFirst());
             when(world.getName()).thenReturn("hill_journey");
             competition = new CompetitionModule(plugin, store, worlds, mock(PasswordHasher.class),
                     mock(IdentityLinker.class), mock(MicrosoftSsoService.class));

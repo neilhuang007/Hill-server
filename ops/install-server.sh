@@ -70,6 +70,7 @@ fi
 if [[ "${AUTH_MODE}" == microsoft ]]; then
   python3 "${REPO_DIR}/ops/configure-auth-proxy.py" prepare --env-file "${AUTH_ENV_FILE}"
 fi
+python3 "${REPO_DIR}/ops/configure-project-proxy.py" prepare --env-file "${AUTH_ENV_FILE}"
 
 backup_runtime_file() {
   local target="$1"
@@ -518,6 +519,7 @@ paper_start_attempted=true
 systemctl restart "${SERVICE_NAME}"
 wait_for_server_ready "${startup_probe_marker}"
 bash "${REPO_DIR}/ops/verify-server.sh"
+python3 "${REPO_DIR}/ops/configure-project-proxy.py" install --env-file "${AUTH_ENV_FILE}"
 if [[ "${AUTH_MODE}" == microsoft ]]; then
   python3 "${REPO_DIR}/ops/configure-auth-proxy.py" install --env-file "${AUTH_ENV_FILE}"
 fi

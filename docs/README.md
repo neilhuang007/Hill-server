@@ -5,6 +5,8 @@
 - [Microsoft SSO setup for Hill IT](operations/microsoft-sso-setup.md)
 - [Authentication architecture and limits](architecture/microsoft-sso.md)
 - [Player workflow and commands](operations/player-guide.md)
+- [Local Stoneborn build gallery](operations/build-gallery.md)
+- [Player action map and smoke evidence](operations/player-experience-review.md)
 - [Campus template operation](CAMPUS_TEMPLATE.md)
 - [Smoke checks](SMOKE_TEST.md)
 - [Survival world generation](SURVIVAL_WORLDGEN.md)

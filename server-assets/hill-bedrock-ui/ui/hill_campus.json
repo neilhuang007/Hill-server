@@ -1,0 +1,234 @@
+{
+  "namespace": "hill_campus",
+  "form_router": {
+    "type": "panel",
+    "size": ["100%", "100%"],
+    "controls": [
+      {
+        "vanilla@server_form.long_form": {
+          "bindings": [
+            {"binding_name": "#title_text", "binding_type": "global"},
+            {
+              "binding_type": "view",
+              "source_property_name": "(not (#title_text = 'Hill Campus Map'))",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      },
+      {
+        "map@hill_campus.map_screen": {
+          "bindings": [
+            {"binding_name": "#title_text", "binding_type": "global"},
+            {
+              "binding_type": "view",
+              "source_property_name": "(#title_text = 'Hill Campus Map')",
+              "target_property_name": "#visible"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "form_button@common_buttons.light_text_button": {
+    "$pressed_button_name": "button.form_button_click",
+    "$button_text": "#form_button_text",
+    "$button_text_binding_type": "collection",
+    "$button_text_grid_collection_name": "form_buttons",
+    "$button_text_max_size": ["100% - 6px", 24],
+    "$button_tts_header": "#form_button_text",
+    "collection_name": "form_buttons",
+    "bindings": [
+      {"binding_type": "collection_details", "binding_collection_name": "form_buttons"},
+      {"binding_type": "collection", "binding_collection_name": "form_buttons", "binding_name": "#form_button_text"}
+    ]
+  },
+  "map_pin@hill_campus.form_button": {
+    "size": [16, 16],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "$button_text_binding_type": "none",
+    "$button_text_max_size": [14, 10],
+    "$button_font_scale_factor": 0.85,
+    "$button_state_panel": "hill_campus.pin_state",
+    "$default_button_texture": "textures/hill175/map_pin",
+    "$hover_button_texture": "textures/hill175/map_pin_hover",
+    "$pressed_button_texture": "textures/hill175/map_pin_hover",
+    "$default_text_color": [1, 1, 1],
+    "$hover_text_color": [0.08, 0.16, 0.24],
+    "$pressed_text_color": [0.08, 0.16, 0.24],
+    "layer": 4
+  },
+  "pin_state": {
+    "type": "panel",
+    "size": ["100%", "100%"],
+    "controls": [
+      {"pin@common_buttons.new_ui_button_panel": {}},
+      {
+        "building_name": {
+          "type": "panel",
+          "size": [150, 34],
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": "$tooltip_offset",
+          "visible": "($hover_state or $pressed_state)",
+          "layer": 30,
+          "controls": [
+            {
+              "background": {
+                "type": "image",
+                "texture": "textures/hill175/screen_background",
+                "size": ["100%", "100%"]
+              }
+            },
+            {
+              "name": {
+                "type": "label",
+                "text": "$button_tts_header",
+                "size": [142, 28],
+                "font_scale_factor": 0.8,
+                "text_alignment": "center",
+                "color": [1, 1, 1],
+                "layer": 1
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "list_button@hill_campus.form_button": {
+    "size": ["100% - 3px", 32],
+    "$button_font_scale_factor": 0.85,
+    "$button_text_max_size": ["100% - 8px", 26]
+  },
+  "map_screen": {
+    "type": "panel",
+    "size": ["100% - 12px", "100% - 12px"],
+    "layer": 10,
+    "controls": [
+      {
+        "background": {
+          "type": "image",
+          "texture": "textures/hill175/screen_background",
+          "size": ["100%", "100%"]
+        }
+      },
+      {
+        "title": {
+          "type": "label",
+          "text": "Hill Campus Map",
+          "color": [1, 1, 1],
+          "font_scale_factor": 1.2,
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [10, 8],
+          "layer": 2
+        }
+      },
+      {
+        "hint": {
+          "type": "label",
+          "text": "Choose a numbered pin or a building name.",
+          "color": [0.7, 0.8, 0.87],
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [10, 24],
+          "size": ["100% - 54px", 10],
+          "font_scale_factor": 0.8,
+          "layer": 2
+        }
+      },
+      {
+        "close@common_buttons.light_text_button": {
+          "$button_text": "X",
+          "$button_tts_header": "Close campus map",
+          "$pressed_button_name": "button.menu_exit",
+          "$focus_id": "hillClose",
+          "anchor_from": "top_right",
+          "anchor_to": "top_right",
+          "offset": [-6, 6],
+          "size": [24, 24],
+          "layer": 4
+        }
+      },
+      {
+        "map_area": {
+          "type": "panel",
+          "anchor_from": "top_left",
+          "anchor_to": "top_left",
+          "offset": [9, 39],
+          "size": ["69% - 16px", "100% - 78px"],
+          "controls": [
+            {
+              "central@hill_campus.central_map": {
+                "anchor_from": "top_left",
+                "anchor_to": "top_left",
+                "size": ["100%", "72% - 3px"]
+              }
+            },
+            {
+              "north@hill_campus.north_map": {
+                "anchor_from": "bottom_left",
+                "anchor_to": "bottom_left",
+                "size": ["43%", "28% - 3px"]
+              }
+            },
+            {
+              "legend": {
+                "type": "label",
+                "text": "ATHLETICS / NORTH\n19 Kipp Pavilion (draft)\n25 Lehrman Pavilion\n26 Madden / Puccio (approx.)",
+                "anchor_from": "bottom_right",
+                "anchor_to": "bottom_right",
+                "size": ["54%", "28% - 3px"],
+                "color": [0.78, 0.86, 0.90],
+                "font_scale_factor": 0.75,
+                "text_alignment": "left",
+                "layer": 2
+              }
+            }
+          ]
+        }
+      },
+      {
+        "buildings@common.scrolling_panel": {
+          "anchor_from": "top_right",
+          "anchor_to": "top_right",
+          "offset": [-8, 39],
+          "size": ["31%", "100% - 78px"],
+          "$show_background": false,
+          "$scrolling_content": "hill_campus.building_list",
+          "$scroll_size": [5, "100% - 4px"],
+          "$scrolling_pane_size": ["100% - 5px", "100% - 2px"],
+          "$scroll_bar_right_padding_size": [0, 0],
+          "layer": 2
+        }
+      },
+      {
+        "back@hill_campus.form_button": {
+          "anchor_from": "bottom_left",
+          "anchor_to": "bottom_left",
+          "offset": [9, -7],
+          "size": [74, 24],
+          "$focus_id": "hillBack",
+          "$focus_override_up": "hillList0",
+          "layer": 3
+        }
+      },
+      {
+        "footer": {
+          "type": "label",
+          "text": "Choose a building, then start your project.",
+          "anchor_from": "bottom_right",
+          "anchor_to": "bottom_right",
+          "offset": [-9, -9],
+          "size": ["100% - 98px", 20],
+          "color": [0.7, 0.8, 0.87],
+          "font_scale_factor": 0.75,
+          "text_alignment": "right",
+          "layer": 2
+        }
+      }
+    ]
+  }
+}

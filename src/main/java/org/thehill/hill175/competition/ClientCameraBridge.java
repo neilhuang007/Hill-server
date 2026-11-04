@@ -8,6 +8,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 /**
@@ -24,6 +27,7 @@ final class ClientCameraBridge {
     private final Field serverPlayerConnection;
     private final Constructor<?> setCameraPacketConstructor;
     private final Method connectionSend;
+    private final Map<UUID, UUID> focusedTargets = new HashMap<>();
 
     private ClientCameraBridge(
             boolean available,
@@ -81,6 +85,17 @@ final class ClientCameraBridge {
         if (!available || viewer == null || cameraTarget == null || !viewer.isOnline()) {
             return false;
         }
+        if (cameraTarget.getUniqueId().equals(focusedTargets.get(viewer.getUniqueId()))) {
+            return true;
+        }
+        if (!sendFocus(viewer, cameraTarget)) {
+            return false;
+        }
+        focusedTargets.put(viewer.getUniqueId(), cameraTarget.getUniqueId());
+        return true;
+    }
+
+    private boolean sendFocus(Player viewer, Entity cameraTarget) {
         try {
             Object viewerHandle = craftPlayerGetHandle.invoke(viewer);
             Object targetHandle = craftEntityGetHandle.invoke(cameraTarget);
@@ -94,7 +109,12 @@ final class ClientCameraBridge {
     }
 
     boolean reset(Player viewer) {
-        return focus(viewer, viewer);
+        focusedTargets.remove(viewer.getUniqueId());
+        return available && viewer.isOnline() && sendFocus(viewer, viewer);
+    }
+
+    void refresh(Player viewer) {
+        focusedTargets.remove(viewer.getUniqueId());
     }
 
     boolean isAvailable() {

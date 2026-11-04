@@ -1,0 +1,192 @@
+# Measured campus footprint catalog; inclusive Minecraft X/Z blocks.
+# Source identities: server-assets/hill-campus-building-identities.json
+# Identity SHA256: 1689e7b469b964a87ac2fec97a67792ed1ec07d7f943933545cd217b33de9baf
+# County geometry SHA256: e1e8eded41cc5fc57ecae78b6cb1d3f4a68904c6b386f4b23ac3bfe193532853
+# County EPSG:6347 vertices -> WGS84 -> exact ECEF east/south tangent frame.
+# Origin: 40.24516 N, -75.63516 E; X=2*east_m, Z=2*south_m.
+# Shared county parents are one selectable complex; no invented internal split.
+# Chapel includes the preserved plan-based south addition (chapel-entry-v1-2x profile.geometry).
+# Kipp 19 and Madden 26 use explicitly approximate source proposals, not surveyed footprints.
+# Exterior and interiors remain the installed campus draft; this catalog claims location only.
+coordinate-frame: hill-local-east-south-2x
+buildings:
+  meigs-house:
+    name: "Meigs House / Admission Office"
+    map-number: 1
+    bounds-xz: [380, 157, 420, 190]
+    source: "16001511600620C-fff89cfae9"
+  ryan-library:
+    name: "John P. Ryan Library"
+    map-number: 2
+    bounds-xz: [229, 9, 316, 100]
+    source: "160015116006-567a5eddd9"
+  athey-dining:
+    name: "Athey Academic Center / Dining Hall (3, 4)"
+    map-number: 3
+    bounds-xz: [17, 66, 188, 232]
+    source: "16001511600613C-92645e8573"
+  alumni-chapel:
+    name: "Alumni Chapel"
+    map-number: 6
+    bounds-xz: [-27, -25, 23, 60]
+    source: "1600151160068C-6108d587dc; chapel-entry-v1-2x/profile.json south addition envelope"
+  warner-center:
+    name: "Warner Center"
+    map-number: 7
+    bounds-xz: [-96, -145, -71, -127]
+    source: "160015116006389O-f1989780fb"
+  davy-hall:
+    name: "Davy Hall"
+    map-number: 8
+    bounds-xz: [230, -254, 288, -138]
+    source: "16001511600633C-c14400ca75"
+  center-for-the-arts:
+    name: "Center For The Arts"
+    map-number: 9
+    bounds-xz: [317, -385, 441, -291]
+    source: "160031040003-894f07a81a"
+  mercer-sweeney:
+    name: "Mercer / Day Squash / Sweeney (12, 13)"
+    map-number: 12
+    bounds-xz: [-102, -261, 243, -114]
+    source: "160015116006-1f19950994"
+  tuck-eccleston:
+    name: "Tuck Hall Arena / Eccleston Rink"
+    map-number: 14
+    bounds-xz: [15, -338, 158, -245]
+    source: "16003036400434C-c86ee564a0"
+  annan-building:
+    name: "Annan Building"
+    map-number: 15
+    bounds-xz: [162, -318, 227, -236]
+    source: "1600303920031C-4b7d18d798"
+  kipp-pavilion:
+    name: "Kipp '46 Pavilion (plan-based draft)"
+    map-number: 19
+    bounds-xz: [703, -592, 780, -556]
+    source: "kipp_46_pavilion"
+  lehrman-pavilion:
+    name: "Lehrman '56 Pavilion"
+    map-number: 25
+    bounds-xz: [983, -1127, 1049, -1048]
+    source: "160015116006-081aa7dcac, 160015116006-f7611d45c7"
+  madden-press-box:
+    name: "Madden / Puccio '66 Press Box (approximate draft)"
+    map-number: 26
+    bounds-xz: [947, -992, 967, -969]
+    source: "madden_puccio_66_press_box"
+  hunt-hall:
+    name: "Hunt Upper School"
+    map-number: 29
+    bounds-xz: [83, -96, 234, -31]
+    source: "160015116006-d4f3b48752"
+  wendell-dormitory:
+    name: "Wendell Dormitory"
+    map-number: 30
+    bounds-xz: [326, -33, 416, 30]
+    source: "16001511600617C-403d7b1a51"
+  ferenbach-dormitory-dell-village:
+    name: "Ferenbach Dormitory - Dell Village"
+    map-number: 31
+    bounds-xz: [600, -131, 651, -96]
+    source: "16001511600641C-fab9d4a2e4"
+  senter-dormitory-dell-village:
+    name: "Senter Dormitory - Dell Village"
+    map-number: 32
+    bounds-xz: [590, -184, 637, -139]
+    source: "16001511600641C-d333862570"
+  lowndes-dormitory-dell-village:
+    name: "Lowndes Dormitory - Dell Village"
+    map-number: 33
+    bounds-xz: [641, -193, 693, -159]
+    source: "16001511600641C-6607e4a8a8"
+  scheerer-dormitory-dell-village:
+    name: "Scheerer Dormitory - Dell Village"
+    map-number: 34
+    bounds-xz: [654, -152, 704, -105]
+    source: "16001511600641C-7e1d6bacf8"
+  east-faculty-village:
+    name: "East Campus Faculty Village"
+    map-number: 35
+    bounds-xz: [856, -194, 993, -20]
+    source: "160006438008-47b633ec2f, 160006438008-5e66af9ae7, 160006438008-8e22af513e, 160006438008-b790426980, 160006438008-c0e2b642d9, 160006438008-ddefd3570f, 160006438008-e070cb1680"
+  foster-dormitory:
+    name: "Foster Dormitory"
+    map-number: 36
+    bounds-xz: [659, 51, 755, 127]
+    source: "16001511600621C-2c9084ad78"
+  rolfe-dormitory:
+    name: "Rolfe Dormitory"
+    map-number: 37
+    bounds-xz: [512, 127, 617, 178]
+    source: "16001511600625C-c108a9b9b6"
+  feroe-house-head-of-school-residence:
+    name: "Feroe House - Head of School Residence"
+    map-number: 38
+    bounds-xz: [-367, 43, -323, 86]
+    source: "16001511600623C-ba74e78741"
+  thomas-house:
+    name: "Thomas House"
+    map-number: 39
+    bounds-xz: [-361, -73, -337, -28]
+    source: "16001511600610C-e7f1a01cbc"
+  pine-court:
+    name: "Pine Court Faculty Village"
+    map-number: 40
+    bounds-xz: [-349, -164, -227, -89]
+    source: "16001511600611C-50fbc7ea98, 16001511600611C-a5bb4f8f72"
+  sherrerd-dormitory-dutch-village:
+    name: "Sherrerd Dormitory - Dutch Village"
+    map-number: 41
+    bounds-xz: [-255, -31, -213, 9]
+    source: "160015116006-07f1d5b7e0"
+  johnson-dormitory-dutch-village:
+    name: "Johnson Dormitory - Dutch Village"
+    map-number: 42
+    bounds-xz: [-211, -68, -180, -25]
+    source: "160015116006-36b81aa17d"
+  markle-dormitory-dutch-village:
+    name: "Markle Dormitory - Dutch Village"
+    map-number: 43
+    bounds-xz: [-161, -63, -118, -32]
+    source: "160015116006-53c8a9efca"
+  robins-dormitory-dutch-village:
+    name: "Robins Dormitory - Dutch Village"
+    map-number: 44
+    bounds-xz: [-136, -11, -103, 33]
+    source: "160015116006-451a0df37b"
+  hillrest-dormitory:
+    name: "Hillrest Dormitory"
+    map-number: 45
+    bounds-xz: [-224, 62, -189, 94]
+    source: "160015116006-c7b546273e"
+  the-sherrill-guest-house:
+    name: "The Sherrill Guest House"
+    map-number: 46
+    bounds-xz: [553, -123, 590, -99]
+    source: "16001511600619C-b4c5171aed"
+  music-house:
+    name: "Music House"
+    map-number: 47
+    bounds-xz: [306, -67, 338, -48]
+    source: "16001511600622C-57b5b354dc"
+  class-of-1960-alumni-house:
+    name: "Class of 1960 Alumni House"
+    map-number: 48
+    bounds-xz: [-330, 164, -306, 217]
+    source: "1600151120011C-e738fb4171"
+  hillhouse-moore-business-office:
+    name: "Hillhouse & Moore Business Office"
+    map-number: 49
+    bounds-xz: [-412, 156, -379, 206]
+    source: "1600151000041C-510dc616b8"
+  shirley-quadrivium:
+    name: "Shirley Quadrivium Center"
+    map-number: 50
+    bounds-xz: [137, 181, 324, 241]
+    source: "16001511600615C-ee30229dd5"
+  gatehouse:
+    name: "Gatehouse"
+    map-number: 51
+    bounds-xz: [765, -402, 772, -395]
+    source: "160015116006-143655d070"

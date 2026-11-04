@@ -18,6 +18,7 @@ SUPPORTED = {
     "HILL175_AUTH_PUBLIC_URL", "HILL175_AUTH_PORT", "HILL175_MAX_LINKED_ACCOUNTS",
     "HILL175_ORIGIN_CERT", "HILL175_ORIGIN_KEY", "HILL175_AOP_CA",
     "HILL175_BEDROCK_ENABLED", "HILL175_BEDROCK_PORT",
+    "HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL",
 }
 
 
@@ -51,8 +52,16 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
         raise ValueError("Installer mode differs from the environment file; no settings were changed")
     if values.get("HILL175_BEDROCK_ENABLED", "true") not in {"true", "false"}:
         raise ValueError("HILL175_BEDROCK_ENABLED must be true or false")
-    if not 1024 <= int(values.get("HILL175_BEDROCK_PORT", "19132")) <= 65535:
-        raise ValueError("HILL175_BEDROCK_PORT must be between 1024 and 65535")
+    if not 1024 <= int(values.get("HILL175_BEDROCK_PORT", "19132")) <= 65534:
+        raise ValueError("HILL175_BEDROCK_PORT must be between 1024 and 65534")
+    for key in ("HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL"):
+        if key not in values:
+            continue
+        url = urlsplit(values[key])
+        if (url.scheme != "https" or not url.hostname or url.username or url.password
+                or url.port not in (None, 443) or url.path not in ("", "/") or url.query or url.fragment
+                or not re.fullmatch(r"(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z][a-zA-Z0-9-]{0,62}", url.hostname)):
+            raise ValueError(f"{key} must be an HTTPS origin on port 443 with a DNS hostname")
     if mode == "development":
         return mode, 8087
     for key in ("HILL175_ENTRA_TENANT_ID", "HILL175_ENTRA_CLIENT_ID"):
@@ -101,7 +110,7 @@ def main() -> int:
         print("Authentication environment invalid. Check required keys, format, mode, and file permissions against .env.example.", file=sys.stderr)
         return 1
     fields = {"mode": mode, "port": port,
-              "bedrock-enabled": values.get("HILL175_BEDROCK_ENABLED", "true") if mode == "microsoft" else "false",
+              "bedrock-enabled": values.get("HILL175_BEDROCK_ENABLED", "true" if mode == "microsoft" else "false"),
               "bedrock-port": values.get("HILL175_BEDROCK_PORT", "19132")}
     print(fields[args.field] if args.field else f"Authentication environment valid ({mode}).")
     return 0

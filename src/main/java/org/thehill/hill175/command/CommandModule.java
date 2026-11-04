@@ -48,11 +48,13 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             competition.sendAuthenticationInstructions(player);
             return true;
         }
-        if (args.length != 3) {
-            player.sendMessage("Usage: /register <username> <password> <repeatPassword>");
-            return true;
+        if (args.length == 2) {
+            competition.register(player, args[0], args[1]);
+        } else if (args.length == 3) {
+            competition.register(player, args[0], args[1], args[2]);
+        } else {
+            player.sendMessage("Usage: /register <password> <repeatPassword>");
         }
-        competition.register(player, args[0], args[1], args[2]);
         return true;
     }
 
@@ -121,7 +123,10 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 Category.parse(args[1]).ifPresentOrElse(
-                        category -> competition.createEntry(player, category),
+                        category -> {
+                            if (category == Category.PLACE) menus.openCategory(player, category);
+                            else competition.createEntry(player, category);
+                        },
                         () -> player.sendMessage("Unknown category. Use journey, place, or people.")
                 );
             }
@@ -132,6 +137,12 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
             }
             case "list" -> menus.openMain(player);
             case "visit" -> menus.openVisits(player, 0);
+            case "map" -> {
+                if (competition.currentEntry(player).isPresent()) menus.openCampusMap(player);
+                else menus.showBuildingMap(player);
+            }
+            case "website", "web" -> competition.currentEntry(player).ifPresentOrElse(
+                    entry -> menus.showWebsite(player, entry), () -> menus.openMain(player));
             case "reset" -> competition.currentEntry(player)
                     .filter(entry -> entry.isMember(competition.participantKey(player)))
                     .ifPresentOrElse(
@@ -150,7 +161,10 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 Category.parse(args[1]).ifPresentOrElse(
-                        category -> competition.switchCurrentEntry(player, category),
+                        category -> competition.currentEntry(player)
+                                .filter(entry -> entry.isMember(competition.participantKey(player)))
+                                .ifPresentOrElse(entry -> menus.openCategorySwitchConfirmation(player, entry, category),
+                                        () -> player.sendMessage("Open one of your entries first.")),
                         () -> player.sendMessage("Unknown category. Use journey, place, or people.")
                 );
             }
@@ -225,7 +239,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                 return true;
             }
             try {
-                competition.recordCamera(player, Integer.parseInt(args[1]));
+                menus.requestCameraSave(player, Integer.parseInt(args[1]));
             } catch (NumberFormatException ignored) {
                 player.sendMessage("Camera slot must be 1, 2, or 3.");
             }
@@ -233,7 +247,18 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
         }
         switch (args[0].toLowerCase(Locale.ROOT)) {
             case "list" -> competition.listCameras(player);
-            case "preview" -> competition.previewNextCamera(player);
+            case "preview" -> {
+                if (args.length == 1) competition.previewNextCamera(player);
+                else if (args.length == 2) {
+                    try {
+                        int slot = Integer.parseInt(args[1]);
+                        competition.currentEntry(player).ifPresentOrElse(entry -> competition.previewCamera(player, entry, slot),
+                                () -> player.sendMessage("Open a build before previewing a camera."));
+                    } catch (NumberFormatException ignored) {
+                        player.sendMessage("Camera slot must be 1, 2, or 3.");
+                    }
+                } else player.sendMessage("Usage: /camera preview [1-3]");
+            }
             case "exit" -> competition.exitCameraPreview(player);
             case "remove" -> {
                 if (args.length != 2) {
@@ -241,7 +266,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 try {
-                    competition.removeCamera(player, Integer.parseInt(args[1]));
+                    menus.requestCameraRemove(player, Integer.parseInt(args[1]));
                 } catch (NumberFormatException ignored) {
                     player.sendMessage("Camera index must be 1, 2, or 3.");
                 }
@@ -255,7 +280,7 @@ public final class CommandModule implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (command.getName().equalsIgnoreCase("entry")) {
             if (args.length == 1) {
-                return filter(args[0], List.of("create", "home", "list", "visit", "reset", "delete", "switch", "title", "description", "submit", "unlock"));
+                return filter(args[0], List.of("create", "home", "list", "visit", "map", "website", "reset", "delete", "switch", "title", "description", "submit", "unlock"));
             }
             if (args.length == 2 && (args[0].equalsIgnoreCase("create") || args[0].equalsIgnoreCase("switch"))) {
                 return filter(args[1], List.of("journey", "place", "people"));

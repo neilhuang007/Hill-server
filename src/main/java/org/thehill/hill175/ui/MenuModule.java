@@ -13,8 +13,10 @@ import io.papermc.paper.registry.data.dialog.input.TextDialogInput;
 import io.papermc.paper.registry.data.dialog.type.DialogType;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -32,6 +34,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Category;
 import org.thehill.hill175.model.Entry;
+import org.thehill.hill175.world.BuildingCatalog;
+import org.thehill.hill175.world.CampusAreaCatalog;
+import org.thehill.hill175.world.WorldModule;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -39,6 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class MenuModule implements Listener {
     private static final int VISIT_PAGE_SIZE = 45;
@@ -47,23 +54,41 @@ public final class MenuModule implements Listener {
 
     private final JavaPlugin plugin;
     private final CompetitionModule competition;
+    private final WorldModule worlds;
+    private final BedrockForms bedrockForms;
     private final Map<UUID, MenuSession> sessions = new HashMap<>();
     private final Map<UUID, SubmissionDialogPrompt> submissionPrompts = new HashMap<>();
+    private final Set<UUID> choosingBuilding = new HashSet<>();
+    private final Set<UUID> choosingSingleBuilding = new HashSet<>();
+    private final Map<UUID, UUID> buildingSwitches = new HashMap<>();
+    private java.util.function.Consumer<Player> campusWorkshop;
 
-    public MenuModule(CompetitionModule competition) {
+    public void campusWorkshop(java.util.function.Consumer<Player> opener) {
+        this.campusWorkshop = java.util.Objects.requireNonNull(opener);
+    }
+
+    public MenuModule(CompetitionModule competition, WorldModule worlds) {
         this.plugin = JavaPlugin.getProvidingPlugin(MenuModule.class);
         this.competition = competition;
+        this.worlds = worlds;
+        this.bedrockForms = new BedrockForms(plugin);
     }
 
     public void openMain(Player player) {
+        if (campusWorkshop != null && worlds.sharedCampusEntry().isPresent()) {
+            campusWorkshop.accept(player);
+            return;
+        }
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 27, Component.text("Hill 175 Competition", NamedTextColor.GOLD));
+        Inventory inventory = createInventory(holder, 27, Component.text("Hill 175 Competition", NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
 
         fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
-        inventory.setItem(4, item(Material.NETHER_STAR, "Hill 175 Competition",
-                List.of("Your entries are on the left.", "Create or visit on the right."), NamedTextColor.GOLD));
+        inventory.setItem(4, item(Material.GRASS_BLOCK, "Open Shared Campus",
+                List.of("Choose a location on the campus image.", "Build together in the shared campus.",
+                        "Automatic backups protect your work."), NamedTextColor.GOLD));
+        session.actions.put(4, new MenuAction(ActionType.OPEN_WORKSHOP, null, null, 0));
 
         List<Entry> ownEntries = competition.entriesFor(competition.participantKey(player));
         for (int index = 0; index < Math.min(2, ownEntries.size()); index++) {
@@ -74,7 +99,7 @@ public final class MenuModule implements Listener {
         }
         if (ownEntries.isEmpty()) {
             inventory.setItem(10, item(Material.LIGHT_GRAY_DYE, "No entries yet",
-                    List.of("Choose a category on the right."), NamedTextColor.GRAY));
+                    List.of("Start with Journey, Place, or People."), NamedTextColor.GRAY));
         }
 
         inventory.setItem(13, item(Material.PLAYER_HEAD, "Visit Builds",
@@ -85,9 +110,9 @@ public final class MenuModule implements Listener {
         for (Category category : Category.values()) {
             boolean alreadyJoined = ownEntries.stream().anyMatch(entry -> entry.category() == category);
             Material material = alreadyJoined ? Material.BARRIER : category.icon();
-            String title = alreadyJoined ? category.displayName() + " — already entered" : "Create " + category.displayName();
+            String title = alreadyJoined ? category.displayName() + " — already entered" : "Start " + category.displayName();
             List<String> lore = alreadyJoined
-                    ? List.of("Open the existing entry on the left.")
+                    ? List.of("Continue your existing project.")
                     : categoryLore(category);
             inventory.setItem(slot, item(material, title, lore, alreadyJoined ? NamedTextColor.RED : NamedTextColor.GREEN));
             if (!alreadyJoined) {
@@ -96,8 +121,12 @@ public final class MenuModule implements Listener {
             slot++;
         }
 
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        competition.pendingInviter(player).ifPresent(name -> {
+            inventory.setItem(22, item(Material.PLAYER_HEAD, "Accept Team Invite",
+                    List.of("Join " + name + " in their project."), NamedTextColor.GREEN));
+            session.actions.put(22, new MenuAction(ActionType.ACCEPT_INVITE, null, null, 0, name));
+        });
+        presentMenu(player, session);
     }
 
     public void openCurrentEntry(Player player) {
@@ -117,8 +146,9 @@ public final class MenuModule implements Listener {
     }
 
     public void openEntryDetails(Player player, Entry entry) {
+        boolean preparing = competition.isPreparingSubmission(entry);
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 27,
+        Inventory inventory = createInventory(holder, 27,
                 Component.text("Build Options - " + entry.category().displayName(), NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -126,7 +156,7 @@ public final class MenuModule implements Listener {
 
         inventory.setItem(4, item(Material.NETHER_STAR, "Build Options",
                 List.of(
-                        entry.submitted() ? "This entry is locked." : "Manage this entry without hotbar clutter.",
+                        preparing ? "Preparing images; your build is paused." : entry.submitted() ? "This entry is locked." : "Build, capture, then submit.",
                         "Camera and navigation tools remain in the hotbar."
                 ), NamedTextColor.GOLD));
         inventory.setItem(10, entrySummary(entry));
@@ -143,6 +173,7 @@ public final class MenuModule implements Listener {
                         .reduce((left, right) -> left + " & " + right)
                         .orElse("Participant")),
                 NamedTextColor.AQUA));
+        session.actions.put(12, new MenuAction(ActionType.OPEN_TEAM, entry.id(), null, 0));
 
         inventory.setItem(14, item(Material.ENDER_PEARL, "Enter Build",
                 List.of(entry.submitted() ? "Open this entry in Visitor Mode." : "Teleport into this build."), NamedTextColor.GREEN));
@@ -152,7 +183,7 @@ public final class MenuModule implements Listener {
             inventory.setItem(15, item(Material.GRAY_DYE, "Editing Locked",
                     List.of("Resume editing before changing", "the title or description."), NamedTextColor.GRAY));
         } else {
-            inventory.setItem(15, item(Material.WRITABLE_BOOK, "Edit Submission",
+            inventory.setItem(15, item(Material.WRITABLE_BOOK, "Edit Details",
                     List.of("Open the editable title and", "description form."), NamedTextColor.AQUA));
             session.actions.put(15, new MenuAction(ActionType.EDIT_SUBMISSION, entry.id(), null, 0));
         }
@@ -161,6 +192,45 @@ public final class MenuModule implements Listener {
                 List.of("Open this entry in Visitor Mode."), NamedTextColor.YELLOW));
         session.actions.put(16, new MenuAction(ActionType.VISIT_ENTRY, entry.id(), null, 0));
 
+        inventory.setItem(18, item(Material.PAINTING, "Website Preview",
+                List.of("See your camera images on the website.", "Draft previews use a private link."), NamedTextColor.AQUA));
+        session.actions.put(18, new MenuAction(ActionType.OPEN_WEBSITE, entry.id(), null, 0));
+
+        inventory.setItem(19, item(Material.ENDER_EYE, "Camera Views",
+                List.of("Save, preview, replace or remove a view.", "Save at least one view before submitting."), NamedTextColor.AQUA));
+        session.actions.put(19, new MenuAction(ActionType.OPEN_CAMERA_CONTROLS, entry.id(), null, 0));
+        inventory.setItem(20, item(Material.FILLED_MAP, "Build Boundary",
+                List.of("See exactly where you can build.", "Your selected area is saved with this entry."), NamedTextColor.AQUA));
+        session.actions.put(20, new MenuAction(ActionType.SHOW_BOUNDARY, entry.id(), null, 0));
+
+        inventory.setItem(21, item(entry.submitted() ? Material.LIME_DYE : Material.TRIPWIRE_HOOK,
+                preparing ? "Cancel Submission Preparation" : entry.submitted() ? "Resume Editing" : "Submit Entry",
+                entry.submitted()
+                        ? List.of("Unlock the entry and return to", "Owner Mode before the deadline.")
+                        : List.of("Generate fresh images and publish automatically.", "Your build becomes read-only."),
+                entry.submitted() ? NamedTextColor.YELLOW : NamedTextColor.GREEN));
+        session.actions.put(21, new MenuAction(
+                entry.submitted() || preparing ? ActionType.TOGGLE_SUBMISSION : ActionType.CONFIRM_SUBMISSION,
+                entry.id(), null, 0));
+
+        inventory.setItem(22, item(Material.COMPARATOR, "Project Settings",
+                List.of("Change category, reset, or delete this project."), NamedTextColor.GRAY));
+        session.actions.put(22, new MenuAction(ActionType.OPEN_SETTINGS, entry.id(), null, 0));
+
+        inventory.setItem(26, item(Material.COMPASS, "Back to Main Menu", List.of(), NamedTextColor.GOLD));
+        session.actions.put(26, new MenuAction(ActionType.OPEN_MAIN, null, null, 0));
+
+        presentMenu(player, session);
+    }
+
+    private void openProjectSettings(Player player, Entry entry) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = createInventory(holder, 27, Component.text("Project Settings", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.COMPARATOR, "Manage this project",
+                List.of("These actions change or remove your build.", "You will confirm before anything is replaced."), NamedTextColor.YELLOW));
         if (entry.submitted()) {
             inventory.setItem(20, item(Material.GRAY_DYE, "Category Change Locked",
                     List.of("Resume editing before changing", "this entry's category."), NamedTextColor.GRAY));
@@ -170,16 +240,6 @@ public final class MenuModule implements Listener {
                     NamedTextColor.YELLOW));
             session.actions.put(20, new MenuAction(ActionType.OPEN_CATEGORY_SWITCH, entry.id(), null, 0));
         }
-
-        inventory.setItem(21, item(entry.submitted() ? Material.LIME_DYE : Material.TRIPWIRE_HOOK,
-                entry.submitted() ? "Resume Editing" : "Lock Submission",
-                entry.submitted()
-                        ? List.of("Unlock the entry and return to", "Owner Mode before the deadline.")
-                        : List.of("Submit the current title, description,", "and saved camera poses."),
-                entry.submitted() ? NamedTextColor.YELLOW : NamedTextColor.GREEN));
-        session.actions.put(21, new MenuAction(
-                entry.submitted() ? ActionType.TOGGLE_SUBMISSION : ActionType.CONFIRM_SUBMISSION,
-                entry.id(), null, 0));
 
         if (entry.submitted()) {
             inventory.setItem(22, item(Material.GRAY_DYE, "Reset Locked",
@@ -196,11 +256,59 @@ public final class MenuModule implements Listener {
             session.actions.put(23, new MenuAction(ActionType.CONFIRM_DELETE, entry.id(), null, 0));
         }
 
-        inventory.setItem(26, item(Material.COMPASS, "Back to Main Menu", List.of(), NamedTextColor.GOLD));
-        session.actions.put(26, new MenuAction(ActionType.OPEN_MAIN, null, null, 0));
+        inventory.setItem(26, item(Material.ARROW, "Back to Build Options", List.of(), NamedTextColor.GOLD));
+        session.actions.put(26, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
+        presentMenu(player, session);
+    }
 
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+    private void openTeam(Player player, Entry entry, int page) {
+        if (!entry.isMember(competition.participantKey(player))) return;
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = createInventory(holder, 54, Component.text("Project Team", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.PLAYER_HEAD, "Build together",
+                List.of("Up to two students per project.", "Choose an online student to invite.", "Invites last five minutes."), NamedTextColor.GOLD));
+        List<Player> candidates = Bukkit.getOnlinePlayers().stream().filter(competition::isAuthenticated)
+                .filter(other -> !entry.isMember(competition.participantKey(other)))
+                .filter(other -> competition.entriesFor(competition.participantKey(other)).size() < 2)
+                .filter(other -> competition.entriesFor(competition.participantKey(other)).stream()
+                        .noneMatch(existing -> existing.category() == entry.category()))
+                .sorted(Comparator.comparing(Player::getName)).map(other -> (Player) other).toList();
+        page = Math.clamp(page, 0, Math.max(0, (candidates.size() - 1) / 28));
+        boolean editable = !entry.submitted() && !competition.isPreparingSubmission(entry);
+        if (editable && entry.members().size() < 2) {
+            for (int offset = 0; offset < 28 && page * 28 + offset < candidates.size(); offset++) {
+                Player other = candidates.get(page * 28 + offset);
+                int slot = 10 + offset / 7 * 9 + offset % 7;
+                inventory.setItem(slot, item(Material.PLAYER_HEAD, "Invite " + other.getName(),
+                        List.of("They can accept from the Competition Compass."), NamedTextColor.GREEN));
+                session.actions.put(slot, new MenuAction(ActionType.INVITE_MEMBER, entry.id(), null, page, other.getName()));
+            }
+        } else {
+            inventory.setItem(13, item(Material.GRAY_DYE, editable ? "Team is full" : "Resume editing to change the team", List.of(), NamedTextColor.GRAY));
+        }
+        if (editable && candidates.isEmpty() && entry.members().size() < 2) {
+            inventory.setItem(13, item(Material.GRAY_DYE, "No available students online",
+                    List.of("Ask a friend to sign in, then reopen Team."), NamedTextColor.GRAY));
+        }
+        if (page > 0) {
+            inventory.setItem(45, item(Material.ARROW, "Previous", List.of(), NamedTextColor.GOLD));
+            session.actions.put(45, new MenuAction(ActionType.OPEN_TEAM, entry.id(), null, page - 1));
+        }
+        if ((page + 1) * 28 < candidates.size()) {
+            inventory.setItem(53, item(Material.ARROW, "Next", List.of(), NamedTextColor.GOLD));
+            session.actions.put(53, new MenuAction(ActionType.OPEN_TEAM, entry.id(), null, page + 1));
+        }
+        if (editable) {
+            inventory.setItem(50, item(Material.OAK_DOOR, "Leave Team",
+                    List.of(entry.members().size() == 1 ? "Leaving alone deletes this project. Confirmation required." : "Your teammate keeps the project. Confirmation required."), NamedTextColor.YELLOW));
+            session.actions.put(50, new MenuAction(ActionType.CONFIRM_LEAVE_TEAM, entry.id(), null, 0));
+        }
+        inventory.setItem(49, item(Material.ARROW, "Back to Build Options", List.of(), NamedTextColor.GOLD));
+        session.actions.put(49, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
+        presentMenu(player, session);
     }
 
     public void openCategory(Player player, Category category) {
@@ -215,15 +323,273 @@ public final class MenuModule implements Listener {
 
     public void openSurvival(Player player) {
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9,
+        Inventory inventory = createInventory(holder, 9,
                 Component.text("Enter Survival", NamedTextColor.GREEN));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
         inventory.setItem(4, item(Material.GRASS_BLOCK, "Enter Survival",
                 List.of("Resume your survival world."), NamedTextColor.GREEN));
         session.actions.put(4, new MenuAction(ActionType.ENTER_SURVIVAL, null, null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
+    }
+
+    public void showBuildingMap(Player player) {
+        choosingSingleBuilding.remove(player.getUniqueId());
+        if (worlds.isSurvivalWorld(player.getWorld())) competition.teleportHub(player);
+        choosingBuilding.add(player.getUniqueId());
+        openAreaList(player);
+    }
+
+    private void openAreaList(Player player) {
+        List<CampusAreaCatalog.Area> areas;
+        try {
+            areas = worlds.areas();
+        } catch (IllegalStateException exception) {
+            player.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));
+            openMain(player);
+            return;
+        }
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = createInventory(holder, 27, Component.text("Choose a Campus Area", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.FILLED_MAP, "Your campus area",
+                List.of("Choose an area, build, capture, then submit.", "Each project gets a private copy of the campus."), NamedTextColor.GOLD));
+        UUID switchId = buildingSwitches.get(player.getUniqueId());
+        for (int index = 0; index < areas.size() && index < 7; index++) {
+            CampusAreaCatalog.Area area = areas.get(index);
+            int slot = 10 + index;
+            inventory.setItem(slot, item(Material.GRASS_BLOCK, area.name(),
+                    List.of(area.description(), area.blocks() + " ground blocks", "Review this area before starting."), NamedTextColor.GREEN));
+            session.actions.put(slot, new MenuAction(ActionType.PREVIEW_AREA, switchId, Category.PLACE, 0, area.id()));
+        }
+        inventory.setItem(22, item(Material.BRICKS, "Choose a Single Building",
+                List.of("Prefer a smaller project? Open the building map."), NamedTextColor.AQUA));
+        session.actions.put(22, new MenuAction(ActionType.SINGLE_BUILDING, switchId, Category.PLACE, 0));
+        inventory.setItem(26, item(Material.COMPASS, "Back to Main Menu", List.of(), NamedTextColor.GOLD));
+        session.actions.put(26, new MenuAction(ActionType.CANCEL_BUILDING, null, null, 0));
+        presentMenu(player, session);
+    }
+
+    private void previewArea(Player player, MenuAction action) {
+        worlds.area(action.buildingId).ifPresent(area -> {
+            HillMenuHolder holder = new HillMenuHolder();
+            Inventory inventory = createInventory(holder, 27, Component.text(area.name(), NamedTextColor.GOLD));
+            holder.inventory = inventory;
+            MenuSession session = new MenuSession(inventory);
+            fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+            List<String> description = new ArrayList<>(List.of(area.description(), "Editable rectangles (X, Z):"));
+            for (var part : area.parts()) description.add(part.minX() + ", " + part.minZ() + " to " + part.maxX() + ", " + part.maxZ());
+            description.add("Only these rectangles can be changed.");
+            description.add("Capture a view and submit from Build Options.");
+            inventory.setItem(4, item(Material.FILLED_MAP, area.name(), description, NamedTextColor.GOLD));
+            inventory.setItem(11, item(Material.LIME_CONCRETE, action.entryId == null ? "Build Here" : "Replace Entry with This Area",
+                    action.entryId == null ? List.of("Create your private campus area.")
+                            : List.of("Replaces the current build, details and cameras."), NamedTextColor.GREEN));
+            session.actions.put(11, new MenuAction(ActionType.CREATE_BUILDING, action.entryId, Category.PLACE, 0, area.id()));
+            inventory.setItem(15, item(Material.ARROW, "Choose Another Area", List.of(), NamedTextColor.YELLOW));
+            session.actions.put(15, new MenuAction(ActionType.AREA_LIST, action.entryId, Category.PLACE, 0));
+            presentMenu(player, session);
+        });
+    }
+
+    private void showBoundary(Player player, Entry entry) {
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = createInventory(holder, 27, Component.text("Your Build Boundary", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        List<String> lines = new ArrayList<>(List.of("Editable rectangles (inclusive X, Z):"));
+        for (var part : entry.editableRegions()) lines.add(part.minX() + ", " + part.minZ() + " to " + part.maxX() + ", " + part.maxZ());
+        lines.add("Your map outlines these rectangles in green.");
+        lines.add("Outside them you can explore and take photos.");
+        inventory.setItem(4, item(Material.FILLED_MAP, "Where you can build", lines, NamedTextColor.GOLD));
+        inventory.setItem(11, item(Material.ENDER_PEARL, "Return to My Build", List.of(), NamedTextColor.GREEN));
+        session.actions.put(11, new MenuAction(ActionType.ENTER_BUILD, entry.id(), null, 0));
+        inventory.setItem(15, item(Material.ARROW, "Back to Build Options", List.of(), NamedTextColor.YELLOW));
+        session.actions.put(15, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
+        presentMenu(player, session);
+    }
+
+    private void showSingleBuildingMap(Player player) {
+        choosingSingleBuilding.add(player.getUniqueId());
+        try {
+            if (worlds.buildings().isEmpty()) throw new IllegalStateException("No buildings are available yet.");
+        } catch (IllegalStateException exception) {
+            player.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));
+            return;
+        }
+        if (worlds.isSurvivalWorld(player.getWorld())) {
+            competition.teleportHub(player);
+        }
+        choosingBuilding.add(player.getUniqueId());
+        player.closeInventory();
+        if (showNativeCampusMap(player, true)) return;
+        competition.giveCampusSelectionMap(player);
+        player.getInventory().setHeldItemSlot(1);
+        openBuildingList(player, true, 0);
+        player.sendMessage(Component.text("Choose your building", NamedTextColor.GOLD));
+        player.sendMessage(Component.text("Hold the map to see numbered buildings. Right-click to choose one. You can edit inside and outside.", NamedTextColor.GRAY));
+    }
+
+    public void openCampusMap(Player player) {
+        if (campusWorkshop != null && worlds.sharedCampusEntry().isPresent()) {
+            campusWorkshop.accept(player);
+            return;
+        }
+        Entry current = competition.currentEntry(player).orElse(null);
+        boolean selecting = choosingBuilding.contains(player.getUniqueId())
+                || current == null || (!WorldModule.isPrivatePlace(current) && current.category() != Category.PEOPLE);
+        if (selecting && !choosingSingleBuilding.contains(player.getUniqueId())) openAreaList(player);
+        else if (!showNativeCampusMap(player, selecting)) openBuildingList(player, selecting, 0);
+    }
+
+    private boolean showNativeCampusMap(Player player, boolean selecting) {
+        if (!bedrockForms.isBedrock(player)) return false;
+        List<BuildingCatalog.Building> buildings = worlds.buildings();
+        List<String> buttons = new ArrayList<>(buildings.stream().map(BuildingCatalog.Building::name).toList());
+        buttons.add("Back to projects");
+        UUID switchId = buildingSwitches.get(player.getUniqueId());
+        sessions.remove(player.getUniqueId());
+        return bedrockForms.show(player, "Hill Campus Map",
+                selecting ? "Choose a building to make your own. Tap a building on the map to see more."
+                        : "Tap a building to explore it. Editing remains limited to your project's saved boundary.",
+                buttons, index -> {
+                    if (!competition.isAuthenticated(player)) return;
+                    if (index == buildings.size()) {
+                        choosingBuilding.remove(player.getUniqueId());
+                        buildingSwitches.remove(player.getUniqueId());
+                        openMain(player);
+                    } else if (index >= 0 && index < buildings.size()) {
+                        BuildingCatalog.Building building = buildings.get(index);
+                        if (selecting) previewBuilding(player, new MenuAction(ActionType.PREVIEW_BUILDING,
+                                switchId, Category.PLACE, 0, building.id()));
+                        else showBuildingDirections(player, building.id());
+                    }
+                }, () -> {});
+    }
+
+    public void showWebsite(Player player, Entry entry) {
+        if (!entry.isMember(competition.participantKey(player)) && !entry.submitted()) {
+            player.sendMessage(Component.text("Only this entry's team can open its draft preview.", NamedTextColor.RED));
+            return;
+        }
+        String link = competition.galleryLink(entry);
+        player.closeInventory();
+        if (link == null || link.isBlank()) {
+            player.sendMessage(Component.text("The website preview is not configured yet.", NamedTextColor.YELLOW));
+            return;
+        }
+        player.sendMessage(Component.text("Open Website Preview", NamedTextColor.AQUA)
+                .clickEvent(ClickEvent.openUrl(link)));
+        player.sendMessage(Component.text("Camera images appear automatically after capture.", NamedTextColor.GRAY));
+    }
+
+    public void requestCameraSave(Player player, int slot) {
+        competition.currentEntry(player).ifPresentOrElse(entry -> {
+            if (!competition.canEditEntry(player, entry)) {
+                player.sendMessage(Component.text("Open an editable entry that you own first.", NamedTextColor.RED));
+            } else if (entry.cameraPose(slot).isPresent()) {
+                openCameraReplaceConfirmation(player, entry, slot);
+            } else {
+                competition.recordCamera(player, slot);
+            }
+        }, () -> player.sendMessage("Open your build before saving a camera."));
+    }
+
+    public void requestCameraRemove(Player player, int slot) {
+        competition.currentEntry(player).ifPresentOrElse(entry -> {
+            if (!competition.canEditEntry(player, entry) || entry.cameraPose(slot).isEmpty()) {
+                player.sendMessage(Component.text("Choose a saved camera in your editable entry.", NamedTextColor.RED));
+            } else {
+                openCameraRemoveConfirmation(player, entry, slot);
+            }
+        }, () -> player.sendMessage("Open your build before removing a camera."));
+    }
+
+    private void openBuildingList(Player player, boolean selecting, int page) {
+        List<BuildingCatalog.Building> buildings;
+        try {
+            buildings = worlds.buildings();
+        } catch (IllegalStateException exception) {
+            player.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));
+            return;
+        }
+        int pageSize = 28;
+        int lastPage = Math.max(0, (buildings.size() - 1) / pageSize);
+        page = Math.max(0, Math.min(page, lastPage));
+        HillMenuHolder holder = new HillMenuHolder();
+        Inventory inventory = createInventory(holder, 54,
+                Component.text(selecting ? "Choose a Hill Building" : "Campus Navigation", NamedTextColor.GOLD));
+        holder.inventory = inventory;
+        MenuSession session = new MenuSession(inventory);
+        fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+        inventory.setItem(4, item(Material.FILLED_MAP, selecting ? "Your building, inside and out" : "Find your way",
+                List.of("Numbers match the map in your hand.", selecting
+                        ? "Select a building to review its build area." : "Select a building for its location."), NamedTextColor.GOLD));
+        UUID switchId = buildingSwitches.get(player.getUniqueId());
+        for (int offset = 0; offset < pageSize && page * pageSize + offset < buildings.size(); offset++) {
+            BuildingCatalog.Building building = buildings.get(page * pageSize + offset);
+            int slot = 10 + (offset / 7) * 9 + offset % 7;
+            inventory.setItem(slot, item(Material.BRICKS, "#" + building.mapNumber() + " " + building.name(),
+                    List.of(building.width() + " x " + building.depth() + " blocks, plus outdoor space",
+                            selecting ? "Click to preview your choice." : "Click to show location and direction."), NamedTextColor.WHITE));
+            session.actions.put(slot, new MenuAction(selecting ? ActionType.PREVIEW_BUILDING : ActionType.BUILDING_DIRECTIONS,
+                    switchId, Category.PLACE, page, building.id()));
+        }
+        if (page > 0) {
+            inventory.setItem(45, item(Material.ARROW, "Previous", List.of(), NamedTextColor.GOLD));
+            session.actions.put(45, new MenuAction(selecting ? ActionType.BUILDING_PAGE : ActionType.NAVIGATION_PAGE, switchId, null, page - 1));
+        }
+        if (page < lastPage) {
+            inventory.setItem(53, item(Material.ARROW, "Next", List.of(), NamedTextColor.GOLD));
+            session.actions.put(53, new MenuAction(selecting ? ActionType.BUILDING_PAGE : ActionType.NAVIGATION_PAGE, switchId, null, page + 1));
+        }
+        inventory.setItem(49, item(Material.FILLED_MAP, "View Map", List.of("Close this menu and hold your map.", "Right-click the map to return."), NamedTextColor.AQUA));
+        session.actions.put(49, new MenuAction(ActionType.CLOSE_MENU, null, null, 0));
+        inventory.setItem(48, item(Material.COMPASS, "Main Menu", List.of(), NamedTextColor.GOLD));
+        session.actions.put(48, new MenuAction(ActionType.CANCEL_BUILDING, null, null, 0));
+        presentMenu(player, session);
+    }
+
+    private void previewBuilding(Player player, MenuAction action) {
+        worlds.building(action.buildingId).ifPresent(building -> {
+            HillMenuHolder holder = new HillMenuHolder();
+            Inventory inventory = createInventory(holder, 27, Component.text(building.name(), NamedTextColor.GOLD));
+            holder.inventory = inventory;
+            MenuSession session = new MenuSession(inventory);
+            fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+            inventory.setItem(4, item(Material.BRICKS, "#" + building.mapNumber() + " " + building.name(),
+                    List.of("Original building: " + building.width() + " x " + building.depth() + " blocks",
+                            "Private campus copy with outdoor space.", "Change walls, roof, rooms and furnishings."), NamedTextColor.GOLD));
+            inventory.setItem(11, item(Material.LIME_CONCRETE, action.entryId == null ? "Build Here" : "Replace Entry with This Building",
+                    action.entryId == null ? List.of("Create your private building area.")
+                            : List.of("Replaces your current entry's blocks,", "title, description and camera views."), NamedTextColor.GREEN));
+            session.actions.put(11, new MenuAction(ActionType.CREATE_BUILDING, action.entryId, Category.PLACE, 0, building.id()));
+            inventory.setItem(15, item(Material.ARROW, "Choose Another Building", List.of(), NamedTextColor.YELLOW));
+            session.actions.put(15, new MenuAction(ActionType.BUILDING_PAGE, action.entryId, Category.PLACE, action.page));
+            presentMenu(player, session);
+        });
+    }
+
+    private void showBuildingDirections(Player player, String buildingId) {
+        worlds.building(buildingId).ifPresent(building -> {
+            HillMenuHolder holder = new HillMenuHolder();
+            Inventory inventory = createInventory(holder, 27, Component.text(building.name(), NamedTextColor.GOLD));
+            holder.inventory = inventory;
+            MenuSession session = new MenuSession(inventory);
+            fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
+            inventory.setItem(4, item(Material.FILLED_MAP, building.name(),
+                    List.of("X " + building.centerX() + ", Z " + building.centerZ(),
+                            "Visiting does not change your editable area."), NamedTextColor.GOLD));
+            inventory.setItem(11, item(Material.ENDER_PEARL, "Go here",
+                    List.of("Travel if this destination is inside your visiting area."), NamedTextColor.GREEN));
+            session.actions.put(11, new MenuAction(ActionType.TRAVEL_BUILDING, null, null, 0, buildingId));
+            inventory.setItem(15, item(Material.ARROW, "Back to campus map", List.of(), NamedTextColor.YELLOW));
+            session.actions.put(15, new MenuAction(ActionType.NAVIGATION_PAGE, null, null, 0));
+            presentMenu(player, session);
+        });
     }
 
     public void openCameraControls(Player player) {
@@ -242,7 +608,7 @@ public final class MenuModule implements Listener {
         boolean editor = competition.canEditEntry(player, entry);
         boolean owner = entry.isMember(competition.participantKey(player));
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 27,
+        Inventory inventory = createInventory(holder, 27,
                 Component.text(editor ? "Camera Controls" : "Camera Views", NamedTextColor.AQUA));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -276,8 +642,7 @@ public final class MenuModule implements Listener {
         inventory.setItem(26, item(owner ? Material.NETHER_STAR : Material.COMPASS,
                 owner ? "Back to Build Options" : "Back to Main Menu", List.of(), NamedTextColor.GOLD));
         session.actions.put(26, new MenuAction(owner ? ActionType.OPEN_ENTRY : ActionType.OPEN_MAIN, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     private void openCameraSlotControls(Player player, Entry entry, int cameraSlot) {
@@ -286,7 +651,7 @@ public final class MenuModule implements Listener {
             return;
         }
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9,
+        Inventory inventory = createInventory(holder, 9,
                 Component.text("Camera " + cameraSlot, NamedTextColor.AQUA));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -302,8 +667,7 @@ public final class MenuModule implements Listener {
         session.actions.put(5, new MenuAction(ActionType.CONFIRM_REMOVE_CAMERA, entry.id(), null, cameraSlot));
         inventory.setItem(8, item(Material.ARROW, "Back to Cameras", List.of(), NamedTextColor.GOLD));
         session.actions.put(8, new MenuAction(ActionType.OPEN_CAMERA_CONTROLS, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     private void openCameraReplaceConfirmation(Player player, Entry entry, int cameraSlot) {
@@ -366,7 +730,7 @@ public final class MenuModule implements Listener {
             ActionType confirmAction
     ) {
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9, Component.text(menuTitle, NamedTextColor.GOLD));
+        Inventory inventory = createInventory(holder, 9, Component.text(menuTitle, NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
         fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
@@ -375,8 +739,7 @@ public final class MenuModule implements Listener {
         session.actions.put(4, new MenuAction(confirmAction, entry.id(), null, cameraSlot));
         inventory.setItem(6, item(Material.RED_CONCRETE, "Back Without Changes", List.of(), NamedTextColor.RED));
         session.actions.put(6, new MenuAction(ActionType.OPEN_CAMERA_CONTROLS, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     public void openVisits(Player player, int page) {
@@ -387,7 +750,7 @@ public final class MenuModule implements Listener {
         int maxPage = Math.max(0, (entries.size() - 1) / VISIT_PAGE_SIZE);
         int safePage = Math.max(0, Math.min(page, maxPage));
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 54,
+        Inventory inventory = createInventory(holder, 54,
                 Component.text("Visit Builds — Page " + (safePage + 1), NamedTextColor.AQUA));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -418,24 +781,26 @@ public final class MenuModule implements Listener {
             inventory.setItem(22, item(Material.PAPER, "No public entries yet", List.of(), NamedTextColor.GRAY));
         }
 
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     private void openCreateConfirmation(Player player, Category category) {
+        if (category == Category.PLACE) {
+            showBuildingMap(player);
+            return;
+        }
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9,
+        Inventory inventory = createInventory(holder, 9,
                 Component.text("Create " + category.displayName() + "?", NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
         fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
         inventory.setItem(3, item(Material.LIME_CONCRETE, "Create Entry",
-                List.of("Create the build space, then open", "the title and description form."), NamedTextColor.GREEN));
+                List.of("Go straight to your new build.", "Add a title and description whenever you're ready."), NamedTextColor.GREEN));
         session.actions.put(3, new MenuAction(ActionType.CREATE_ENTRY, null, category, 0));
         inventory.setItem(5, item(Material.RED_CONCRETE, "Cancel", List.of(), NamedTextColor.RED));
         session.actions.put(5, new MenuAction(ActionType.OPEN_MAIN, null, null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     public void openResetConfirmation(Player player, Entry entry) {
@@ -452,19 +817,25 @@ public final class MenuModule implements Listener {
     }
 
     public void openSubmitConfirmation(Player player, Entry entry) {
+        if (entry.cameraPoses().isEmpty()) {
+            player.sendMessage(Component.text("Save a camera view, then choose Submit Entry in Build Options.", NamedTextColor.YELLOW));
+            openCameraControls(player, entry);
+            return;
+        }
         openEntryConfirmation(
                 player,
                 entry,
-                "Lock this submission?",
+                "Submit this entry?",
                 Material.TRIPWIRE_HOOK,
-                "Submission checklist",
+                "Ready to share your build?",
                 List.of(
-                        "Title: " + (entry.title().isBlank() ? "MISSING" : "ready"),
-                        "Description: " + (entry.description().isBlank() ? "MISSING" : "ready"),
+                        "Title: " + (entry.title().isBlank() ? "use category name" : "ready"),
+                        "Description: " + (entry.description().isBlank() ? "optional" : "ready"),
                         "Cameras: " + entry.cameraPoses().size() + "/3",
-                        "Locking switches the build to Visitor Mode."
+                        "Images are captured and published automatically.",
+                        "Your build locks after the images are ready."
                 ),
-                "Confirm Lock",
+                "Confirm Submission",
                 ActionType.SUBMIT_ENTRY
         );
     }
@@ -484,7 +855,7 @@ public final class MenuModule implements Listener {
 
     private void openCategorySwitch(Player player, Entry entry) {
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 27,
+        Inventory inventory = createInventory(holder, 27,
                 Component.text("Change Category", NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -507,13 +878,17 @@ public final class MenuModule implements Listener {
         }
         inventory.setItem(26, item(Material.ARROW, "Back to Build Options", List.of(), NamedTextColor.GOLD));
         session.actions.put(26, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
-    private void openCategorySwitchConfirmation(Player player, Entry entry, Category category) {
+    public void openCategorySwitchConfirmation(Player player, Entry entry, Category category) {
+        if (category == Category.PLACE) {
+            buildingSwitches.put(player.getUniqueId(), entry.id());
+            showBuildingMap(player);
+            return;
+        }
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9,
+        Inventory inventory = createInventory(holder, 9,
                 Component.text("Replace with " + category.displayName() + "?", NamedTextColor.RED));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
@@ -526,8 +901,7 @@ public final class MenuModule implements Listener {
         session.actions.put(4, new MenuAction(ActionType.SWITCH_CATEGORY, entry.id(), category, 0));
         inventory.setItem(6, item(Material.RED_CONCRETE, "Back Without Changes", List.of(), NamedTextColor.RED));
         session.actions.put(6, new MenuAction(ActionType.OPEN_CATEGORY_SWITCH, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     private void openEntryConfirmation(
@@ -541,7 +915,7 @@ public final class MenuModule implements Listener {
             ActionType confirmAction
     ) {
         HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = Bukkit.createInventory(holder, 9, Component.text(menuTitle, NamedTextColor.GOLD));
+        Inventory inventory = createInventory(holder, 9, Component.text(menuTitle, NamedTextColor.GOLD));
         holder.inventory = inventory;
         MenuSession session = new MenuSession(inventory);
         fill(inventory, Material.GRAY_STAINED_GLASS_PANE);
@@ -552,8 +926,7 @@ public final class MenuModule implements Listener {
         inventory.setItem(6, item(Material.RED_CONCRETE, "Back Without Changes",
                 List.of("Return to entry controls."), NamedTextColor.RED));
         session.actions.put(6, new MenuAction(ActionType.OPEN_ENTRY, entry.id(), null, 0));
-        sessions.put(player.getUniqueId(), session);
-        player.openInventory(inventory);
+        presentMenu(player, session);
     }
 
     private void openSubmissionDialog(Player player, Entry entry, boolean newlyCreated) {
@@ -567,12 +940,22 @@ public final class MenuModule implements Listener {
             String initialTitle,
             String initialDescription
     ) {
+        if (bedrockForms.showFields(player, "About your build", "Add a title and a short description. Choose Submit to save.",
+                List.of(new BedrockForms.Field("title", "Build title", initialTitle, Entry.MAX_TITLE_LENGTH),
+                        new BedrockForms.Field("description", "Description", initialDescription, Entry.MAX_DESCRIPTION_LENGTH)),
+                values -> {
+                    CompetitionModule.DetailsUpdateResult result = competition.saveSubmissionDetails(
+                            player, entry, values.get(0).trim(), values.get(1).trim());
+                    if (result == CompetitionModule.DetailsUpdateResult.SAVED) openEntryDetails(player, entry);
+                    else if (result == CompetitionModule.DetailsUpdateResult.INVALID_DETAILS)
+                        openSubmissionDialog(player, entry, false, values.get(0), values.get(1));
+                }, () -> {})) return;
         player.sendMessage(Component.text("[Hill 175] ", NamedTextColor.GOLD, TextDecoration.BOLD)
-                .append(Component.text("Enter a title and description, then choose Save. Cancel removes a newly created unnamed entry.", NamedTextColor.YELLOW)
+                .append(Component.text("Add a title and description whenever you're ready.", NamedTextColor.YELLOW)
                         .decoration(TextDecoration.BOLD, false)));
         DialogBase base = DialogBase.builder(Component.text("Submission Details", NamedTextColor.GOLD))
                 .externalTitle(Component.text("Edit Hill 175 Submission"))
-                .canCloseWithEscape(false)
+                .canCloseWithEscape(true)
                 .pause(false)
                 .afterAction(DialogBase.DialogAfterAction.CLOSE)
                 .body(List.of(DialogBody.plainMessage(Component.text(
@@ -594,14 +977,14 @@ public final class MenuModule implements Listener {
                 ))
                 .build();
         ActionButton save = ActionButton.create(
-                Component.text("Save Submission", NamedTextColor.GREEN),
+                Component.text("Save Details", NamedTextColor.GREEN),
                 Component.text("Save the title and description."),
                 170,
                 DialogAction.customClick(SAVE_SUBMISSION_ACTION, null)
         );
         ActionButton cancel = ActionButton.create(
-                Component.text(newlyCreated ? "Cancel & Delete Entry" : "Back Without Saving", NamedTextColor.RED),
-                Component.text(newlyCreated ? "Delete this newly created entry." : "Return to entry controls."),
+                Component.text(newlyCreated ? "Start Building" : "Back Without Saving", NamedTextColor.YELLOW),
+                Component.text(newlyCreated ? "Keep the entry and add details later." : "Return to entry controls."),
                 170,
                 DialogAction.customClick(CANCEL_SUBMISSION_ACTION, null)
         );
@@ -635,8 +1018,69 @@ public final class MenuModule implements Listener {
         if (action == null) {
             return;
         }
+        executeAction(player, action);
+    }
+
+    private void executeAction(Player player, MenuAction action) {
+        if (!competition.isAuthenticated(player)) {
+            competition.sendAuthenticationInstructions(player);
+            return;
+        }
         switch (action.type) {
+            case OPEN_TEAM -> competition.entry(action.entryId).ifPresent(entry -> openTeam(player, entry, action.page));
+            case INVITE_MEMBER -> competition.entry(action.entryId).ifPresent(entry -> {
+                competition.invite(player, entry, action.buildingId);
+                openTeam(player, entry, action.page);
+            });
+            case ACCEPT_INVITE -> {
+                player.closeInventory();
+                competition.acceptInvite(player, action.buildingId);
+            }
+            case CONFIRM_LEAVE_TEAM -> competition.entry(action.entryId).ifPresent(entry -> openEntryConfirmation(
+                    player, entry, "Leave this team?", Material.OAK_DOOR, "Leave Team",
+                    List.of(entry.members().size() == 1 ? "You are the only member. This deletes the project." : "Your teammate keeps the project."),
+                    "Confirm Leave", ActionType.LEAVE_TEAM));
+            case LEAVE_TEAM -> competition.entry(action.entryId).ifPresent(entry -> {
+                player.closeInventory();
+                competition.leaveTeam(player, entry);
+            });
+            case AREA_LIST -> openAreaList(player);
+            case PREVIEW_AREA -> previewArea(player, action);
+            case SINGLE_BUILDING -> showSingleBuildingMap(player);
+            case SHOW_BOUNDARY -> competition.entry(action.entryId).ifPresent(entry -> showBoundary(player, entry));
+            case OPEN_WEBSITE -> competition.entry(action.entryId).ifPresent(entry -> showWebsite(player, entry));
+            case CANCEL_BUILDING -> {
+                choosingSingleBuilding.remove(player.getUniqueId());
+                choosingBuilding.remove(player.getUniqueId());
+                buildingSwitches.remove(player.getUniqueId());
+                openMain(player);
+            }
+            case BUILDING_PAGE -> { if (!showNativeCampusMap(player, true)) openBuildingList(player, true, action.page); }
+            case NAVIGATION_PAGE -> { if (!showNativeCampusMap(player, false)) openBuildingList(player, false, action.page); }
+            case PREVIEW_BUILDING -> previewBuilding(player, action);
+            case BUILDING_DIRECTIONS -> showBuildingDirections(player, action.buildingId);
+            case TRAVEL_BUILDING -> {
+                player.closeInventory();
+                competition.travelToBuilding(player, action.buildingId);
+            }
+            case CREATE_BUILDING -> {
+                choosingSingleBuilding.remove(player.getUniqueId());
+                player.closeInventory();
+                choosingBuilding.remove(player.getUniqueId());
+                buildingSwitches.remove(player.getUniqueId());
+                if (action.entryId == null) {
+                    competition.createEntry(player, Category.PLACE, action.buildingId);
+                } else {
+                    competition.entry(action.entryId).ifPresent(entry ->
+                            competition.switchEntry(player, entry, Category.PLACE, action.buildingId));
+                }
+            }
+            case OPEN_SETTINGS -> competition.entry(action.entryId).ifPresent(entry -> openProjectSettings(player, entry));
             case OPEN_MAIN -> openMain(player);
+            case OPEN_WORKSHOP -> {
+                if (campusWorkshop != null) campusWorkshop.accept(player);
+                else openCategory(player, Category.PEOPLE);
+            }
             case OPEN_VISITS -> openVisits(player, action.page);
             case OPEN_ENTRY -> competition.entry(action.entryId).ifPresent(entry -> openEntryDetails(player, entry));
             case CONFIRM_CREATE -> openCreateConfirmation(player, action.category);
@@ -649,7 +1093,7 @@ public final class MenuModule implements Listener {
                     .ifPresent(entry -> openCategorySwitchConfirmation(player, entry, action.category));
             case CREATE_ENTRY -> {
                 player.closeInventory();
-                competition.createEntry(player, action.category).ifPresent(entry -> openSubmissionDialog(player, entry, true));
+                competition.createEntry(player, action.category);
             }
             case ENTER_BUILD -> competition.entry(action.entryId).ifPresent(entry -> {
                 player.closeInventory();
@@ -706,7 +1150,7 @@ public final class MenuModule implements Listener {
             });
             case TOGGLE_SUBMISSION -> competition.entry(action.entryId).ifPresent(entry -> {
                 player.closeInventory();
-                if (entry.submitted()) {
+                if (entry.submitted() || competition.isPreparingSubmission(entry)) {
                     competition.unlockEntry(player, entry);
                 } else {
                     openSubmitConfirmation(player, entry);
@@ -754,6 +1198,10 @@ public final class MenuModule implements Listener {
         UUID playerId = event.getPlayer().getUniqueId();
         sessions.remove(playerId);
         submissionPrompts.remove(playerId);
+        choosingBuilding.remove(playerId);
+        choosingSingleBuilding.remove(playerId);
+        buildingSwitches.remove(playerId);
+        bedrockForms.clear(event.getPlayer());
     }
 
     @EventHandler
@@ -773,7 +1221,7 @@ public final class MenuModule implements Listener {
         competition.entry(prompt.entryId()).ifPresent(entry -> {
             if (event.getIdentifier().equals(CANCEL_SUBMISSION_ACTION)) {
                 if (prompt.newlyCreated()) {
-                    competition.deleteEntry(player, entry);
+                    player.sendMessage(Component.text("Your building is ready. Add a title later in Entry Controls.", NamedTextColor.GREEN));
                 } else {
                     Bukkit.getScheduler().runTaskLater(plugin, () -> openEntryDetails(player, entry), 1L);
                 }
@@ -808,7 +1256,7 @@ public final class MenuModule implements Listener {
         lore.add(entry.title().isBlank() ? "Untitled project" : entry.title());
         lore.add(entry.submitted() ? "Submitted and locked" : "Building open");
         lore.add(ownEntry ? "Click to open entry controls." : "Click to visit.");
-        return item(entry.category().icon(), entry.category().displayName(), lore,
+        return item(entry.category().icon(), (ownEntry ? "Continue " : "") + (entry.title().isBlank() ? entry.category().displayName() : entry.title()), lore,
                 entry.submitted() ? NamedTextColor.GREEN : NamedTextColor.GOLD);
     }
 
@@ -854,9 +1302,9 @@ public final class MenuModule implements Listener {
 
     private static List<String> categoryLore(Category category) {
         return switch (category) {
-            case JOURNEY -> List.of("Recreate a Hill building, landmark, or area.", "64 x 64 protected outdoor plot.");
-            case PLACE -> List.of("Design a useful Hill interior.", "32 x 32 protected interior shell.");
-            case PEOPLE -> List.of("Imagine Hill's future.", "Private Hill campus world generated from the VoxelEarth template.");
+            case JOURNEY -> List.of("Build a Hill spot or landmark.", "64 x 64 outdoor plot.");
+            case PLACE -> List.of("Choose your own campus area.", "Build, capture a view, then submit.");
+            case PEOPLE -> List.of("Recreate a Hill scene.", "Your own copy of the campus.");
         };
     }
 
@@ -874,7 +1322,75 @@ public final class MenuModule implements Listener {
         return text.substring(0, maxLength - 3) + "...";
     }
 
+    private static Inventory createInventory(HillMenuHolder holder, int size, Component title) {
+        holder.title = title;
+        return Bukkit.createInventory(holder, size, title);
+    }
+
+    /** Use touch-friendly native actions on Bedrock and inventory controls on Java. */
+    private void presentMenu(Player player, MenuSession session) {
+        sessions.put(player.getUniqueId(), session);
+        if (bedrockForms.isBedrock(player)) {
+            player.closeInventory();
+            List<Integer> slots = session.actions.keySet().stream().sorted().toList();
+            List<String> labels = slots.stream().map(slot -> {
+                ItemMeta meta = session.inventory.getItem(slot).getItemMeta();
+                String label = plain(meta.displayName());
+                List<Component> lore = meta.lore();
+                if (lore != null && !lore.isEmpty()) label += "\n" + plain(lore.getFirst());
+                return label;
+            }).toList();
+            List<String> descriptions = new ArrayList<>();
+            for (int slot = 0; slot < session.inventory.getSize(); slot++) {
+                if (session.actions.containsKey(slot)) continue;
+                ItemStack card = session.inventory.getItem(slot);
+                if (card == null || !card.hasItemMeta()) continue;
+                ItemMeta meta = card.getItemMeta();
+                if (plain(meta.displayName()).isBlank()) continue;
+                descriptions.add(plain(meta.displayName()));
+                if (meta.hasLore()) descriptions.addAll(meta.lore().stream().map(MenuModule::plain).toList());
+            }
+            String content = String.join("\n", descriptions);
+            String title = plain(((HillMenuHolder) session.inventory.getHolder()).title);
+            if (bedrockForms.show(player, title, content, labels, index -> {
+                if (sessions.get(player.getUniqueId()) != session || index < 0 || index >= slots.size()) return;
+                sessions.remove(player.getUniqueId(), session);
+                executeAction(player, session.actions.get(slots.get(index)));
+            }, () -> sessions.remove(player.getUniqueId(), session))) return;
+        }
+        player.openInventory(session.inventory);
+    }
+
+    private static String plain(Component text) {
+        return text == null ? "" : PlainTextComponentSerializer.plainText().serialize(text);
+    }
+
+    public void shutdown() {
+        bedrockForms.close();
+        sessions.clear();
+        submissionPrompts.clear();
+    }
+
     private enum ActionType {
+        OPEN_WORKSHOP,
+        OPEN_TEAM,
+        INVITE_MEMBER,
+        ACCEPT_INVITE,
+        CONFIRM_LEAVE_TEAM,
+        LEAVE_TEAM,
+        AREA_LIST,
+        PREVIEW_AREA,
+        SINGLE_BUILDING,
+        SHOW_BOUNDARY,
+        TRAVEL_BUILDING,
+        OPEN_WEBSITE,
+        CANCEL_BUILDING,
+        BUILDING_PAGE,
+        NAVIGATION_PAGE,
+        PREVIEW_BUILDING,
+        BUILDING_DIRECTIONS,
+        CREATE_BUILDING,
+        OPEN_SETTINGS,
         OPEN_MAIN,
         OPEN_VISITS,
         OPEN_ENTRY,
@@ -906,7 +1422,10 @@ public final class MenuModule implements Listener {
         SWITCH_CATEGORY
     }
 
-    private record MenuAction(ActionType type, UUID entryId, Category category, int page) {
+    private record MenuAction(ActionType type, UUID entryId, Category category, int page, String buildingId) {
+        MenuAction(ActionType type, UUID entryId, Category category, int page) {
+            this(type, entryId, category, page, null);
+        }
     }
 
     private record SubmissionDialogPrompt(UUID entryId, boolean newlyCreated) {
@@ -923,6 +1442,7 @@ public final class MenuModule implements Listener {
 
     private static final class HillMenuHolder implements InventoryHolder {
         private Inventory inventory;
+        private Component title;
 
         @Override
         public Inventory getInventory() {

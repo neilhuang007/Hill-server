@@ -8,10 +8,12 @@ import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapCursorCollection;
 import org.bukkit.map.MapRenderer;
 import org.bukkit.map.MapView;
+import org.bukkit.map.MinecraftFont;
 import org.thehill.hill175.model.BuildRegion;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public final class CampusChartMapRenderer extends MapRenderer {
@@ -31,11 +33,26 @@ public final class CampusChartMapRenderer extends MapRenderer {
 
     private final BuildRegion bounds;
     private final Color[] basePixels;
+    private final List<BuildingCatalog.Building> buildings;
 
     public CampusChartMapRenderer(BuildRegion bounds) {
+        this(bounds, List.of());
+    }
+
+    public CampusChartMapRenderer(BuildRegion bounds, List<BuildingCatalog.Building> buildings) {
+        this(bounds, buildings, List.of());
+    }
+
+    public CampusChartMapRenderer(BuildRegion bounds, List<BuildingCatalog.Building> buildings, List<BuildRegion> editableRegions) {
         super(true);
         this.bounds = Objects.requireNonNull(bounds, "bounds");
-        this.basePixels = basePixels();
+        this.buildings = List.copyOf(Objects.requireNonNull(buildings, "buildings"));
+        this.basePixels = this.buildings.isEmpty() ? basePixels() : campusPixels();
+        drawBuildings();
+        for (BuildRegion part : editableRegions) {
+            drawRect(basePixels, worldXToPixel(bounds, part.minX()), worldZToPixel(bounds, part.minZ()),
+                    worldXToPixel(bounds, part.maxX()), worldZToPixel(bounds, part.maxZ()), new Color(30, 150, 70));
+        }
     }
 
     @Override
@@ -46,8 +63,9 @@ public final class CampusChartMapRenderer extends MapRenderer {
                 canvas.setPixelColor(x, y, basePixels[row + x]);
             }
         }
+        MapCursorCollection cursors = buildingCursors(canvas);
         if (player == null || player.getWorld() == null || !bounds.worldName().equals(player.getWorld().getName())) {
-            canvas.setCursors(new MapCursorCollection());
+            canvas.setCursors(cursors);
             return;
         }
         Location location = player.getLocation();
@@ -55,16 +73,62 @@ public final class CampusChartMapRenderer extends MapRenderer {
         int markerY = worldZToPixel(bounds, location.getZ());
         drawCurrentLocation(canvas, markerX, markerY);
 
-        MapCursorCollection cursors = new MapCursorCollection();
         cursors.addCursor(new MapCursor(
                 pixelToCursorCoordinate(markerX),
                 pixelToCursorCoordinate(markerY),
-                (byte) 0,
+                cursorDirection(location.getYaw()),
                 MapCursor.Type.PLAYER,
                 true,
                 Component.text("You")
         ));
         canvas.setCursors(cursors);
+    }
+
+    private void drawBuildings() {
+        for (BuildingCatalog.Building building : buildings) {
+            int minX = worldXToPixel(bounds, building.minX());
+            int minZ = worldZToPixel(bounds, building.minZ());
+            int maxX = worldXToPixel(bounds, building.maxX());
+            int maxZ = worldZToPixel(bounds, building.maxZ());
+            fillRect(basePixels, minX, minZ, maxX, maxZ, CAMPUS_BORDER_COLOR);
+        }
+    }
+
+    private MapCursorCollection buildingCursors(MapCanvas canvas) {
+        MapCursorCollection cursors = new MapCursorCollection();
+        for (ChartMarker marker : buildingMarkers()) {
+            int x = marker.pixelX();
+            int z = marker.pixelZ();
+            String label = Integer.toString(marker.mapNumber());
+            canvas.drawText(Math.min(x + 2, MAP_SIZE - MinecraftFont.Font.getWidth(label) - 1),
+                    Math.min(z + 1, MAP_SIZE - MinecraftFont.Font.getHeight() - 1), MinecraftFont.Font, label);
+            cursors.addCursor(new MapCursor(pixelToCursorCoordinate(x), pixelToCursorCoordinate(z),
+                    (byte) 0, MapCursor.Type.BANNER_BLUE, true,
+                    Component.text(marker.caption())));
+        }
+        return cursors;
+    }
+
+    List<ChartMarker> buildingMarkers() {
+        return buildings.stream().map(building -> new ChartMarker(building.mapNumber(),
+                worldXToPixel(bounds, building.centerX()), worldZToPixel(bounds, building.centerZ()),
+                "#" + building.mapNumber() + " " + building.name())).toList();
+    }
+
+    record ChartMarker(int mapNumber, int pixelX, int pixelZ, String caption) {
+    }
+
+    static byte cursorDirection(float yaw) {
+        return (byte) (Math.floorMod(Math.round(yaw / 22.5f), 16));
+    }
+
+    private static Color[] campusPixels() {
+        Color[] pixels = new Color[MAP_SIZE * MAP_SIZE];
+        Arrays.fill(pixels, BACKGROUND_COLOR);
+        fillRect(pixels, CHART_MIN_PIXEL, CHART_MIN_PIXEL, CHART_MAX_PIXEL, CHART_MAX_PIXEL, CAMPUS_FILL_COLOR);
+        drawRect(pixels, CHART_MIN_PIXEL, CHART_MIN_PIXEL, CHART_MAX_PIXEL, CHART_MAX_PIXEL, CAMPUS_BORDER_COLOR);
+        drawNorthArrow(pixels);
+        return pixels;
     }
 
     static int worldXToPixel(BuildRegion bounds, double worldX) {

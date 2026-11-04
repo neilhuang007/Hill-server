@@ -2,17 +2,37 @@
 
 Run against Minecraft Java Edition 26.2.
 
-The password steps below apply to the controlled development mode. Microsoft SSO
-and Bedrock require the separate real-tenant/device pilot in the
-[IT setup guide](operations/microsoft-sso-setup.md).
+The password steps below apply to controlled development mode. Microsoft SSO
+requires a real Hill tenant; see the [IT setup guide](operations/microsoft-sso-setup.md).
+Bedrock gameplay checks are automated through Geyser/Floodgate with the runner
+below. Its isolated unsigned clients do not verify Xbox authentication or native
+device rendering.
 Deployment tools are in `ops/`; see the [source guide](operations/deployment.md).
+
+## Automated checks
+
+The [player action map and recorded results](operations/player-experience-review.md)
+separate remote baseline checks from the current local implementation. Use JDK 25
+for `./gradlew.bat clean test jar`. Against the local development server:
+
+```powershell
+node ops/smoke-camera-gallery.mjs
+node ops/smoke-building-selection.mjs
+node ops/smoke-player.mjs people-campus-template
+py tests/gallery_browser_smoke.py --base-url http://127.0.0.1:8788
+```
+
+`ops/run-bedrock-smoke.py` starts its own disposable loopback Paper/Geyser/Floodgate
+server, runs `ops/smoke-bedrock.mjs`, and stops/restores it afterward. It does not
+operate the Minecraft app or require manual player actions. See
+[automated Bedrock checks](operations/bedrock-smoke.md) for setup and evidence limits.
 
 ## Authentication
 
 1. Join the controlled development server using its configured address and port with a new offline nickname.
 2. Confirm spawn in the pinned authentication lobby.
 3. Confirm the title and chat instructions say to sign in.
-4. Run `/register <currentNickname> TestPassword123! TestPassword123!`.
+4. Run `/register TestPassword123! TestPassword123!`; confirm the current Minecraft name is used automatically.
 5. Confirm a temporary browser link appears.
 6. Confirm the development identity adapter approves after approximately one second.
 7. Confirm teleport to the exhibition hub and receipt of the Competition Compass and Rules book.
@@ -28,16 +48,22 @@ Deployment tools are in `ops/`; see the [source guide](operations/deployment.md)
 1. Right-click the Compass.
 2. Create Journey; confirm the creation screen before allocation.
 3. Confirm teleport to a 64x64 grass plot in Creative Mode.
-4. Leave the plot boundary; confirm automatic Spectator Mode.
+4. Leave the plot boundary; confirm Adventure Mode with flight for exterior camera views within the viewing area.
 5. Re-enter the owned plot; confirm Creative Mode returns.
-6. Return to the hub and create Place; confirm the two-entry limit.
+6. Return to the hub and choose Place. On Bedrock, accept the campus UI pack and
+   confirm the screen map offers clickable pins and building names. On Java,
+   confirm the held map and building selector. Choose Build Here and confirm arrival
+   beside the selected building in its private copy. Confirm inside/outside editing
+   and the two-entry limit.
 7. Try to create People as a third entry; confirm rejection.
 8. Delete or switch one entry, then create People; confirm a private `hill_people_<entry>` world.
 9. Open Visit Builds; confirm player-head entry cards and read-only visitor teleport.
 10. Confirm the three category guides and the Survival Guide are Player entities (not armor stands), have floating titles plus `CLICK TO OPEN`, and do not remain listed in the player list. Confirm the Survival Guide is at `70.5,66,31.5`.
 11. Left-click and right-click each category guide; confirm each action opens exactly one category entry/creation GUI.
 12. In an owned entry, confirm the hotbar contains Return to Hub, Camera, Rules, and Entry Controls, but no standalone Reset or Lock item.
-13. Open Entry Controls; confirm Build Options contains submission lock/unlock, reset, delete, and category change, with confirmations for destructive actions.
+13. Open Entry Controls; confirm Edit Details and submission controls are visible,
+    with reset, delete, and category change inside Project Settings. Destructive
+    actions require confirmation.
 14. Reset an entry, leave its region, and re-enter it; confirm the owner returns to Creative Mode and may build. Repeat once while another reset request is attempted and confirm the second request is rejected until the first completes.
 
 ## Teams
@@ -73,13 +99,20 @@ Deployment tools are in `ops/`; see the [source guide](operations/deployment.md)
 5. While previewing, try walking, flying, sneaking, swimming, gliding, and rotating the view; confirm both position and angle remain continuously locked and camera markers are hidden.
 6. Confirm Exit Camera Preview is automatically selected. Use it with a right-click, preview again, then use it with a left-click; confirm both return and restore the owner hotbar. Repeat as a visitor and verify `/camera exit` also returns safely.
 7. As the entry owner, preview a camera and confirm the Remove This Camera item appears and requires confirmation. As a visitor, confirm that removal item and all removal actions are absent/denied.
-8. Left-click and right-click each visible camera marker; confirm both enter that marker's exact locked preview and show its camera number.
+8. Confirm each camera has a floating eye and label. Left-click and right-click the
+   marker; confirm both enter its locked preview and show its camera number. Fly
+   outside the editable building area, save an exterior view, and confirm preview
+   and return work while block editing remains blocked outside the build boundary.
 9. Run `/entry title <title>`.
 10. Run `/entry description <description>`.
-11. Open Entry Controls, choose Lock Submission, confirm the checklist appears, then choose Confirm Lock.
-12. Confirm the entry changes to read-only Spectator Mode for both team members.
+11. Open Entry Controls, choose Submit Entry, then Confirm Submission. Title and
+    description are optional; at least one camera is required. Confirm editing
+    pauses while all camera images regenerate and the gallery publishes automatically.
+12. Confirm the entry changes to read-only Spectator Mode for both team members
+    and its website page shows the newly captured views.
 13. Confirm reset/delete/switch/title/description/camera/team changes are rejected while submitted.
-14. Run `/entry unlock`; confirm Creative Mode/building returns.
+14. Run `/entry unlock`; confirm Creative Mode/building returns and public gallery
+    access is withdrawn. The holder's private preview remains available.
 
 ## Persistence and restart
 

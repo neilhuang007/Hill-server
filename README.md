@@ -1,8 +1,14 @@
 # Hill School 175th Anniversary Server
 
-Paper plugin and deployment tooling for the anniversary competition: Journey
-outdoor plots, Place interiors, People campus worlds, teams, saved camera views,
-submissions, and a separate survival area.
+The active local mode is one shared Hill campus. Every signed in student can
+build in Creative mode, use the campus image to travel, and see nearby building
+names. Staff can restore a campus recovery point saved every five minutes.
+Neil selected V60 from `../Hill-campus-work` on November 3, 2026.
+
+See the [shared campus guide](docs/operations/shared-campus.md) for joining,
+map controls, backup commands and recovery behavior. Earlier competition projects
+and submission features remain available in the code and existing saves.
+This update is local; remote deployment remains separate.
 
 **Status: logistics and controlled testing.** The plugin implements Microsoft
 school verification and shared participant ownership across Java/Floodgate accounts.
@@ -23,6 +29,8 @@ Use `-Mode Development` for the current demo.
 - [Microsoft SSO setup for Hill IT](docs/operations/microsoft-sso-setup.md)
 - [Authentication architecture and limits](docs/architecture/microsoft-sso.md)
 - [Player workflow and commands](docs/operations/player-guide.md)
+- [Local build gallery](docs/operations/build-gallery.md)
+- [Player action map and smoke evidence](docs/operations/player-experience-review.md)
 - [Smoke tests](docs/SMOKE_TEST.md)
 - [Repository conventions](CONTRIBUTING.md) and [documentation index](docs/README.md)
 

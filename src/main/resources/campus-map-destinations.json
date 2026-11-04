@@ -1,0 +1,449 @@
+{
+  "schema": 1,
+  "destinations": [
+    {
+      "number": 1,
+      "name": "Meigs House - Admission Office",
+      "buildingId": "meigs-house",
+      "x": 400,
+      "z": 173,
+      "source": "src/main/resources/hill-buildings.yml#buildings.meigs-house; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 2,
+      "name": "John P. Ryan Library",
+      "buildingId": "ryan-library",
+      "x": 272,
+      "z": 54,
+      "source": "src/main/resources/hill-buildings.yml#buildings.ryan-library; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 3,
+      "name": "Athey Academic Center",
+      "buildingId": "athey-dining",
+      "x": 102,
+      "z": 149,
+      "source": "src/main/resources/hill-buildings.yml#buildings.athey-dining; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 4,
+      "name": "Dining Hall",
+      "buildingId": "athey-dining",
+      "x": 102,
+      "z": 149,
+      "source": "src/main/resources/hill-buildings.yml#buildings.athey-dining; measured catalog bounds midpoint; shared measured complex alias, no internal split",
+      "approximate": false
+    },
+    {
+      "number": 5,
+      "name": "Class of 1971 Garden",
+      "x": 6,
+      "z": 164,
+      "source": "scripts/hill_audit_zone_athey_20261012.py#garden; center of existing gravel terrace local rectangle [-17,82,3,114], transformed by ORIGIN=(44,74), C=.9497, S=.3132; registered imagery interpretation",
+      "approximate": true
+    },
+    {
+      "number": 6,
+      "name": "Alumni Chapel",
+      "buildingId": "alumni-chapel",
+      "x": -2,
+      "z": 17,
+      "source": "src/main/resources/hill-buildings.yml#buildings.alumni-chapel; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 7,
+      "name": "Warner Center for Spiritual Life and Equity",
+      "buildingId": "warner-center",
+      "x": -84,
+      "z": -136,
+      "source": "src/main/resources/hill-buildings.yml#buildings.warner-center; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 8,
+      "name": "Davy Hall Dormitory",
+      "buildingId": "davy-hall",
+      "x": 259,
+      "z": -196,
+      "source": "src/main/resources/hill-buildings.yml#buildings.davy-hall; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 9,
+      "name": "Center For The Arts (CFTA)",
+      "buildingId": "center-for-the-arts",
+      "x": 379,
+      "z": -338,
+      "source": "src/main/resources/hill-buildings.yml#buildings.center-for-the-arts; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 10,
+      "name": "CFTA Lot",
+      "x": 393,
+      "z": -444,
+      "source": "E:/projects/Hill-campus-work/runtime/research/videos-20261017/s3/locate.md#Standing point; source bearings and registered aerial solve, uncertainty +/-3 blocks",
+      "approximate": true
+    },
+    {
+      "number": 11,
+      "name": "The Dell Pond",
+      "x": 318,
+      "z": -243,
+      "source": "E:/projects/Hill-campus-work/runtime/research/videos-20261017/s5/locate.md#Standing point; west pond bank on land, source bearings and coping solve, uncertainty +/-3 blocks",
+      "approximate": true
+    },
+    {
+      "number": 12,
+      "name": "David H. Mercer Field House and Jerry Day ’37 Squash Center",
+      "buildingId": "mercer-sweeney",
+      "x": 70,
+      "z": -188,
+      "source": "src/main/resources/hill-buildings.yml#buildings.mercer-sweeney; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 13,
+      "name": "Sweeney Gymnasium",
+      "buildingId": "mercer-sweeney",
+      "x": 70,
+      "z": -188,
+      "source": "src/main/resources/hill-buildings.yml#buildings.mercer-sweeney; measured catalog bounds midpoint; shared measured complex alias, no internal split",
+      "approximate": false
+    },
+    {
+      "number": 14,
+      "name": "Edward Tuck Hall Arena and Thomas Eccleston Jr. Rink",
+      "buildingId": "tuck-eccleston",
+      "x": 86,
+      "z": -292,
+      "source": "src/main/resources/hill-buildings.yml#buildings.tuck-eccleston; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 15,
+      "name": "Annan Building",
+      "buildingId": "annan-building",
+      "x": 194,
+      "z": -277,
+      "source": "src/main/resources/hill-buildings.yml#buildings.annan-building; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 16,
+      "name": "Chapel Tennis Courts",
+      "x": -79,
+      "z": 27,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/1488359323.world_block_geometry; court center plus 10 blocks along long axis from scripts/hill_exterior_sports_20261002.py#axes, clear of center net",
+      "approximate": false
+    },
+    {
+      "number": 17,
+      "name": "Wells-Davidson ’16 Soccer Pitch",
+      "x": 571,
+      "z": 21,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/263155609.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 18,
+      "name": "Dell Field",
+      "x": 589,
+      "z": -383,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/263135533.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 19,
+      "name": "Reese ’75 Tennis Center / Kipp ’46 Pavilion",
+      "x": 734,
+      "z": -509,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/956158568.world_block_geometry; court center plus 10 blocks along long axis from scripts/hill_exterior_sports_20261002.py#axes, clear of center net",
+      "approximate": false
+    },
+    {
+      "number": 20,
+      "name": "Nam Family Field",
+      "x": 967,
+      "z": -625,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/324146950.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 21,
+      "name": "Jim Long Field",
+      "x": 721,
+      "z": -852,
+      "source": "runtime/campus-reconstruction/exterior-floating-20261003/sports/sports-completion-v1.json#features.jim-long.mound_blocks; georeferenced PEMA approximate diamond trace",
+      "approximate": true
+    },
+    {
+      "number": 22,
+      "name": "Far Fields Athletic Complex",
+      "x": 668,
+      "z": -1172,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/324146948.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 23,
+      "name": "Harry L. Price Field",
+      "x": 833,
+      "z": -1065,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/324146943.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 24,
+      "name": "Briggs S. Cunningham ’26 ’50 Field",
+      "x": 988,
+      "z": -1249,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/source-scan-v1/source-sports-inspection.json#way/324146944.world_block_geometry; registered field polygon centroid; names joined by scripts/hill_sports_completion_20261003.py",
+      "approximate": false
+    },
+    {
+      "number": 25,
+      "name": "Lehrman ’56 Pavilion",
+      "buildingId": "lehrman-pavilion",
+      "x": 1016,
+      "z": -1088,
+      "source": "src/main/resources/hill-buildings.yml#buildings.lehrman-pavilion; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 26,
+      "name": "Madden Stadium",
+      "x": 1013,
+      "z": -922,
+      "source": "runtime/campus-reconstruction/exterior-completion-20261002/research/madden-fixtures-v1.json#field_registration; center of registered 109.728m by 48.768m field at two blocks per metre; manual fit uncertainty 7 to 8 metres",
+      "approximate": true
+    },
+    {
+      "number": 27,
+      "name": "William West Hauser ’81 Track",
+      "x": 1202,
+      "z": -1053,
+      "source": "runtime/campus-reconstruction/exterior-floating-20261003/sports/sports-completion-v1.json#features.hauser; center_blocks + short_axis*(inner_radius_blocks+10), within the recorded 19.52 block lane band; PEMA controls approximate +/-3 pixels",
+      "approximate": true
+    },
+    {
+      "number": 28,
+      "name": "Brookside Country Club",
+      "available": false,
+      "unavailableReason": "Brookside Country Club is outside the shared campus.",
+      "source": "runtime/research/quad-landscape-20260905/campus-completeness-checklist.json#nonbuilding_or_external_context_map_labels[school_map_number=28]; E:/projects/Hill-campus-work/runtime/research/v40-pass-20261015/gis/overpass.json#way/62119320; V60 campus-crop.geojson excludes golf course",
+      "approximate": false
+    },
+    {
+      "number": 29,
+      "name": "Hunt Upper School Dormitory",
+      "buildingId": "hunt-hall",
+      "x": 158,
+      "z": -64,
+      "source": "src/main/resources/hill-buildings.yml#buildings.hunt-hall; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 30,
+      "name": "Wendell Dormitory",
+      "buildingId": "wendell-dormitory",
+      "x": 371,
+      "z": -2,
+      "source": "src/main/resources/hill-buildings.yml#buildings.wendell-dormitory; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 31,
+      "name": "Ferenbach Dormitory (Dell Village)",
+      "buildingId": "ferenbach-dormitory-dell-village",
+      "x": 625,
+      "z": -114,
+      "source": "src/main/resources/hill-buildings.yml#buildings.ferenbach-dormitory-dell-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 32,
+      "name": "Senter Dormitory (Dell Village)",
+      "buildingId": "senter-dormitory-dell-village",
+      "x": 613,
+      "z": -162,
+      "source": "src/main/resources/hill-buildings.yml#buildings.senter-dormitory-dell-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 33,
+      "name": "Lowndes Dormitory (Dell Village)",
+      "buildingId": "lowndes-dormitory-dell-village",
+      "x": 667,
+      "z": -176,
+      "source": "src/main/resources/hill-buildings.yml#buildings.lowndes-dormitory-dell-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 34,
+      "name": "Scheerer Dormitory (Dell Village)",
+      "buildingId": "scheerer-dormitory-dell-village",
+      "x": 679,
+      "z": -129,
+      "source": "src/main/resources/hill-buildings.yml#buildings.scheerer-dormitory-dell-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 35,
+      "name": "East Campus Faculty Village",
+      "buildingId": "east-faculty-village",
+      "x": 924,
+      "z": -107,
+      "source": "src/main/resources/hill-buildings.yml#buildings.east-faculty-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 36,
+      "name": "Foster Dormitory",
+      "buildingId": "foster-dormitory",
+      "x": 707,
+      "z": 89,
+      "source": "src/main/resources/hill-buildings.yml#buildings.foster-dormitory; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 37,
+      "name": "Rolfe Dormitory",
+      "buildingId": "rolfe-dormitory",
+      "x": 564,
+      "z": 152,
+      "source": "src/main/resources/hill-buildings.yml#buildings.rolfe-dormitory; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 38,
+      "name": "Feroe House (Head of School Residence)",
+      "buildingId": "feroe-house-head-of-school-residence",
+      "x": -345,
+      "z": 64,
+      "source": "src/main/resources/hill-buildings.yml#buildings.feroe-house-head-of-school-residence; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 39,
+      "name": "Thomas House",
+      "buildingId": "thomas-house",
+      "x": -349,
+      "z": -51,
+      "source": "src/main/resources/hill-buildings.yml#buildings.thomas-house; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 40,
+      "name": "Pine Court Faculty Village",
+      "buildingId": "pine-court",
+      "x": -288,
+      "z": -127,
+      "source": "src/main/resources/hill-buildings.yml#buildings.pine-court; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 41,
+      "name": "Sherrerd Dormitory (Dutch Village)",
+      "buildingId": "sherrerd-dormitory-dutch-village",
+      "x": -234,
+      "z": -11,
+      "source": "src/main/resources/hill-buildings.yml#buildings.sherrerd-dormitory-dutch-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 42,
+      "name": "Johnson Dormitory (Dutch Village)",
+      "buildingId": "johnson-dormitory-dutch-village",
+      "x": -196,
+      "z": -47,
+      "source": "src/main/resources/hill-buildings.yml#buildings.johnson-dormitory-dutch-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 43,
+      "name": "Markle Dormitory (Dutch Village)",
+      "buildingId": "markle-dormitory-dutch-village",
+      "x": -140,
+      "z": -48,
+      "source": "src/main/resources/hill-buildings.yml#buildings.markle-dormitory-dutch-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 44,
+      "name": "Robins Dormitory (Dutch Village)",
+      "buildingId": "robins-dormitory-dutch-village",
+      "x": -120,
+      "z": 11,
+      "source": "src/main/resources/hill-buildings.yml#buildings.robins-dormitory-dutch-village; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 45,
+      "name": "Hillrest Dormitory (Dutch Village)",
+      "buildingId": "hillrest-dormitory",
+      "x": -207,
+      "z": 78,
+      "source": "src/main/resources/hill-buildings.yml#buildings.hillrest-dormitory; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 46,
+      "name": "The Sherrill Guest House",
+      "buildingId": "the-sherrill-guest-house",
+      "x": 571,
+      "z": -111,
+      "source": "src/main/resources/hill-buildings.yml#buildings.the-sherrill-guest-house; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 47,
+      "name": "Music House",
+      "buildingId": "music-house",
+      "x": 322,
+      "z": -58,
+      "source": "src/main/resources/hill-buildings.yml#buildings.music-house; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 48,
+      "name": "Class of 1960 Alumni House",
+      "buildingId": "class-of-1960-alumni-house",
+      "x": -318,
+      "z": 190,
+      "source": "src/main/resources/hill-buildings.yml#buildings.class-of-1960-alumni-house; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 49,
+      "name": "Hillhouse & Moore Business Office",
+      "buildingId": "hillhouse-moore-business-office",
+      "x": -396,
+      "z": 181,
+      "source": "src/main/resources/hill-buildings.yml#buildings.hillhouse-moore-business-office; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 50,
+      "name": "Shirley Quadrivium Center",
+      "buildingId": "shirley-quadrivium",
+      "x": 230,
+      "z": 211,
+      "source": "src/main/resources/hill-buildings.yml#buildings.shirley-quadrivium; measured catalog bounds midpoint",
+      "approximate": false
+    },
+    {
+      "number": 51,
+      "name": "Gatehouse",
+      "buildingId": "gatehouse",
+      "x": 768,
+      "z": -399,
+      "source": "src/main/resources/hill-buildings.yml#buildings.gatehouse; measured catalog bounds midpoint",
+      "approximate": false
+    }
+  ]
+}

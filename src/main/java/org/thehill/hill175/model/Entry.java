@@ -17,11 +17,14 @@ public final class Entry {
     private final LinkedHashSet<String> members;
     private String worldName;
     private BuildRegion region;
+    private List<BuildRegion> editableRegions = List.of();
     private int allocationIndex;
     private String title;
     private String description;
     private boolean submitted;
     private Instant submittedAt;
+    private String selectedBuildingId;
+    private String previewToken;
     private final ArrayList<CameraPose> cameraPoses;
 
     public Entry(UUID id, Category category, Set<String> members, String worldName, BuildRegion region, int allocationIndex) {
@@ -33,6 +36,8 @@ public final class Entry {
         this.allocationIndex = allocationIndex;
         this.title = "";
         this.description = "";
+        this.selectedBuildingId = "";
+        this.previewToken = UUID.randomUUID().toString().replace("-", "");
         this.cameraPoses = new ArrayList<>();
         for (int slot = 0; slot < MAX_CAMERA_SLOTS; slot++) {
             this.cameraPoses.add(null);
@@ -83,6 +88,27 @@ public final class Entry {
         this.region = region;
     }
 
+    /** Frozen at creation so changing a catalog cannot expand an existing student's permissions. */
+    public List<BuildRegion> editableRegions() {
+        return editableRegions.isEmpty() ? List.of(region) : editableRegions;
+    }
+
+    public void editableRegions(List<BuildRegion> regions) {
+        if (regions == null || regions.isEmpty()) throw new IllegalArgumentException("Editable regions are required.");
+        for (BuildRegion part : regions) {
+            if (!worldName.equals(part.worldName())
+                    || !region.contains(part.minX(), part.minY(), part.minZ())
+                    || !region.contains(part.maxX(), part.maxY(), part.maxZ())) {
+                throw new IllegalArgumentException("Editable region must stay inside its entry world and bounds.");
+            }
+        }
+        editableRegions = List.copyOf(regions);
+    }
+
+    public boolean containsEditable(org.bukkit.Location location) {
+        return editableRegions().stream().anyMatch(part -> part.contains(location));
+    }
+
     public int allocationIndex() {
         return allocationIndex;
     }
@@ -96,7 +122,7 @@ public final class Entry {
     }
 
     public void title(String title) {
-        this.title = title;
+        this.title = title == null ? "" : title;
         clearSubmission();
     }
 
@@ -105,8 +131,29 @@ public final class Entry {
     }
 
     public void description(String description) {
-        this.description = description;
+        this.description = description == null ? "" : description;
         clearSubmission();
+    }
+
+    public String selectedBuildingId() {
+        return selectedBuildingId;
+    }
+
+    public void selectedBuildingId(String selectedBuildingId) {
+        this.selectedBuildingId = selectedBuildingId == null ? "" : selectedBuildingId;
+        clearSubmission();
+    }
+
+    /** Private capability for draft viewing; never included in public gallery metadata. */
+    public String previewToken() {
+        return previewToken;
+    }
+
+    public void previewToken(String previewToken) {
+        if (previewToken == null || !previewToken.matches("[A-Za-z0-9_-]{22,64}")) {
+            return;
+        }
+        this.previewToken = previewToken;
     }
 
     public boolean submitted() {

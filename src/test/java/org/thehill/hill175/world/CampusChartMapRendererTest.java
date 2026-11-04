@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.thehill.hill175.model.BuildRegion;
 
 import java.awt.Color;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,6 +68,27 @@ final class CampusChartMapRendererTest {
         assertEquals((byte) -128, CampusChartMapRenderer.pixelToCursorCoordinate(0));
         assertEquals((byte) 0, CampusChartMapRenderer.pixelToCursorCoordinate(64));
         assertEquals((byte) 126, CampusChartMapRenderer.pixelToCursorCoordinate(127));
+    }
+
+    @Test
+    void preservesNumberedBuildingMarkersWhenHeldInTheHub() {
+        CampusChartMapRenderer renderer = new CampusChartMapRenderer(CAMPUS, List.of(
+                new BuildingCatalog.Building("chapel", "Alumni Chapel", 6, -20, -25, 30, 60)));
+        assertEquals(1, renderer.buildingMarkers().size());
+        var marker = renderer.buildingMarkers().getFirst();
+        assertEquals(6, marker.mapNumber());
+        assertEquals("#6 Alumni Chapel", marker.caption());
+        assertEquals(CampusChartMapRenderer.worldXToPixel(CAMPUS, 5), marker.pixelX());
+        assertEquals(CampusChartMapRenderer.worldZToPixel(CAMPUS, 17), marker.pixelZ());
+    }
+
+    @Test
+    void convertsPlayerHeadingThroughNorthWraparound() {
+        assertEquals(0, CampusChartMapRenderer.cursorDirection(0));
+        assertEquals(4, CampusChartMapRenderer.cursorDirection(90));
+        assertEquals(8, CampusChartMapRenderer.cursorDirection(180));
+        assertEquals(12, CampusChartMapRenderer.cursorDirection(-90));
+        assertEquals(0, CampusChartMapRenderer.cursorDirection(360));
     }
 
     private static Color pixel(Color[] pixels, int x, int y) {

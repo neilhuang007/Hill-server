@@ -1,0 +1,17 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Hill 175 Campus Map",
+    "description": "An interactive campus map for Hill 175 building selection.",
+    "uuid": "d758ee27-e437-434b-bb9c-17bfc51cd529",
+    "version": [1, 0, 0],
+    "min_engine_version": [1, 21, 80]
+  },
+  "modules": [
+    {
+      "type": "resources",
+      "uuid": "7bad838a-3b81-4302-978f-a447c9ede512",
+      "version": [1, 0, 0]
+    }
+  ]
+}

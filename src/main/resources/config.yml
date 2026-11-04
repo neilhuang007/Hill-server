@@ -65,6 +65,18 @@ people:
 build-rules:
   max-non-player-entities-per-entry: 128
 
+shared-campus:
+  enabled: true
+  # The selected People template seeds hill_campus once. Later restarts preserve
+  # the shared world. A changed source never overwrites student work.
+
 privacy:
   # Purge this audit data 30 days after the event; the exact event-end timestamp is not configured yet.
   connection-audit-retention-days-after-event: 30
+
+# Local preview first. Public hosting needs a Cloudflare-protected nginx origin.
+gallery:
+  enabled: true
+  port: 8788
+  public-base-url: http://localhost:8788
+  asset-directory: plugins/Hill175/gallery-assets

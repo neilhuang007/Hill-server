@@ -309,7 +309,7 @@ async function helpScenario() {
   const transcriptStart = transcript.length;
   bot.chat("/help");
   await waitFor(
-    () => transcript.slice(transcriptStart).some((line) => line.includes("Hill 175 Commands")),
+    () => transcript.slice(transcriptStart).some((line) => line.includes("Most actions are also available")),
     "Hill command help",
   );
   const response = transcript.slice(transcriptStart);
@@ -398,7 +398,7 @@ async function lobbyItemAirScenario() {
   const transcriptStart = transcript.length;
   bot.activateItem();
   await waitFor(
-    () => transcript.slice(transcriptStart).some((line) => line.includes("right-click the Compass or a category guide")),
+    () => transcript.slice(transcriptStart).some((line) => line.includes("right-click the Compass") && line.includes("guide")),
     "lobby teleport from right-clicking the Ender Pearl into empty air",
   );
   const changedDimension = bot.game.dimension !== buildDimension;
@@ -614,7 +614,7 @@ async function confirmationNavigationScenario() {
     throw new Error(`Category Build Option opened the wrong GUI: ${windowTitle(categoryWindow)}`);
   }
   const categoryConfirmation = await waitForWindow(
-    () => bot.clickWindow(13, 0, 0),
+    () => bot.clickWindow(15, 0, 0),
     "category-change confirmation",
   );
   if (!windowTitle(categoryConfirmation).includes("Replace with")) {
@@ -637,7 +637,7 @@ async function confirmationNavigationScenario() {
     () => bot.clickWindow(21, 0, 0),
     "Lock confirmation from Build Options",
   );
-  if (!windowTitle(lockWindow).includes("Lock this submission?")) {
+  if (!windowTitle(lockWindow).includes("Submit this entry?")) {
     throw new Error(`Lock Build Option skipped confirmation: ${windowTitle(lockWindow)}`);
   }
   const buildOptionsAfterLockCancel = await waitForWindow(
@@ -660,9 +660,10 @@ async function confirmationNavigationScenario() {
   );
   bot.closeWindow(buildOptionsAfterDeleteCancel);
 
+  const hubReturnStart = transcript.length;
   bot.chat("/hub");
   await waitFor(
-    () => transcript.some((line) => line.includes("right-click the Compass or a category guide")),
+    () => transcript.slice(hubReturnStart).some((line) => line.includes("right-click the Compass") && line.includes("guide")),
     "hub return after confirmation checks",
   );
   await delay(500);
@@ -745,7 +746,7 @@ async function verifyVisitorCannotRemoveCamera(entryTitle) {
     const deniedStart = visitorTranscript.length;
     visitor.chat("/camera remove 1");
     await waitFor(
-      () => visitorTranscript.slice(deniedStart).some((line) => line.includes("Open one of your entries first")),
+      () => visitorTranscript.slice(deniedStart).some((line) => /Open one of your entries first|That is not one of your entries|Only an entry owner|editable entry|not a member|own.*entry|your editable entry|Exit camera preview/.test(line)),
       "visitor camera-removal denial",
     );
     if (visitorTranscript.slice(deniedStart).some((line) => line.includes("Camera pose 1 removed"))) {
@@ -800,6 +801,7 @@ async function verifyVisitorCannotRemoveCamera(entryTitle) {
     await waitFor(() => visitorTranscript.slice(fallbackExitStart).some((line) => line.includes("Camera preview closed")),
       "visitor command exit fallback");
   } finally {
+    console.log(`Visitor checks: ${visitorTranscript.slice(-12).join(" | ")}`);
     visitor.quit("Visitor camera smoke complete");
     await delay(250);
   }
@@ -1348,7 +1350,7 @@ async function peopleCampusTemplateScenario() {
   bot.chat("/entry create people");
   await waitFor(() => transcript.some((line) => line.includes("People entry created.")), "People creation", 120_000);
   await waitFor(() => currentDimension(bot).includes("hill_people_"), "private campus arrival", 120_000);
-  await waitFor(() => bot.game.gameMode === "creative" && hasHotbarItem("filled_map", "People Campus Chart"),
+  await waitFor(() => bot.game.gameMode === "creative" && hasHotbarItem("filled_map", "Hill Campus Map"),
     "campus owner mode and chart", 30_000);
   await delay(2_000);
   const arrival = bot.entity.position.clone();
@@ -1390,7 +1392,7 @@ async function peopleCampusTemplateScenario() {
   await waitFor(() => currentDimension(bot).includes("hill_people_") && bot.game.gameMode === "creative", "campus reentry", 30_000);
   await delay(1_000);
   if (bot.entity.position.distanceTo(arrival) > 2) throw new Error("Campus reset changed the core spawn");
-  if (!hasHotbarItem("filled_map", "People Campus Chart")) throw new Error("Campus chart missing after reset");
+  if (!hasHotbarItem("filled_map", "Hill Campus Map")) throw new Error("Campus chart missing after reset");
   console.log(`PASS: ${campus} was cloned, spawned safely on ${below.name}, supplied its chart, and reset/rejoined at ${bot.entity.position}`);
 }
 
@@ -1412,8 +1414,8 @@ async function peopleVoxelEarthTemplateScenario() {
     120_000,
   );
   await waitFor(
-    () => hasHotbarItem("filled_map", "People Campus Chart"),
-    `People Campus Chart filled_map in hotbar: ${hotbarSummary()}`,
+    () => hasHotbarItem("filled_map", "Hill Campus Map"),
+    `Hill Campus Map filled_map in hotbar: ${hotbarSummary()}`,
     30_000,
   );
 
@@ -1503,7 +1505,12 @@ bot.once("kicked", (reason) => {
 });
 
 try {
-  await new Promise((resolve) => bot.once("spawn", resolve));
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Server join did not reach spawn within 60 seconds")), 60_000);
+    bot.once("spawn", () => { clearTimeout(timeout); resolve(); });
+    bot.once("error", (error) => { clearTimeout(timeout); reject(error); });
+    bot.once("kicked", (reason) => { clearTimeout(timeout); reject(new Error(`Join rejected: ${JSON.stringify(reason)}`)); });
+  });
   if (scenario === "authentication-lock") {
     await authenticationLockScenario();
   } else {

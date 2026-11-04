@@ -12,9 +12,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -99,7 +102,8 @@ public final class YamlCompetitionStore implements CompetitionStore {
     public synchronized void flush() {
         YamlConfiguration yaml = new YamlConfiguration();
         for (Account account : accounts.values()) {
-            String path = "accounts." + account.nicknameKey();
+            String path = "accounts." + accountStorageKey(account.nicknameKey());
+            yaml.set(path + ".nickname-key", account.nicknameKey());
             yaml.set(path + ".nickname", account.nickname());
             yaml.set(path + ".school-identity", account.schoolIdentity());
             yaml.set(path + ".display-name", account.displayName());
@@ -116,9 +120,14 @@ public final class YamlCompetitionStore implements CompetitionStore {
             yaml.set(path + ".allocation-index", entry.allocationIndex());
             yaml.set(path + ".title", entry.title());
             yaml.set(path + ".description", entry.description());
+            yaml.set(path + ".selected-building-id", entry.selectedBuildingId());
+            yaml.set(path + ".preview-token", entry.previewToken());
             yaml.set(path + ".submitted", entry.submitted());
             yaml.set(path + ".submitted-at", entry.submittedAt() == null ? null : entry.submittedAt().toString());
             writeRegion(yaml, path + ".region", entry.region());
+            for (int index = 0; index < entry.editableRegions().size(); index++) {
+                writeRegion(yaml, path + ".editable-regions." + index, entry.editableRegions().get(index));
+            }
             for (int slot : entry.savedCameraSlots()) {
                 entry.cameraPose(slot).ifPresent(pose -> writeCamera(yaml, path + ".cameras." + (slot - 1), pose));
             }
@@ -151,6 +160,14 @@ public final class YamlCompetitionStore implements CompetitionStore {
         }
     }
 
+    private static String accountStorageKey(String nicknameKey) {
+        // Dots are YAML path separators. Keep existing Java keys readable and
+        // encode other names in a disjoint namespace, retaining the original key.
+        return nicknameKey.matches("[A-Za-z0-9_]+") ? nicknameKey
+                : "~" + Base64.getUrlEncoder().withoutPadding()
+                        .encodeToString(nicknameKey.getBytes(StandardCharsets.UTF_8));
+    }
+
     private void load() {
         if (!file.exists()) {
             return;
@@ -158,8 +175,9 @@ public final class YamlCompetitionStore implements CompetitionStore {
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
         ConfigurationSection accountSection = yaml.getConfigurationSection("accounts");
         if (accountSection != null) {
-            for (String nicknameKey : accountSection.getKeys(false)) {
-                String path = "accounts." + nicknameKey;
+            for (String storageKey : accountSection.getKeys(false)) {
+                String path = "accounts." + storageKey;
+                String nicknameKey = yaml.getString(path + ".nickname-key", storageKey);
                 Account account = new Account(
                         nicknameKey,
                         yaml.getString(path + ".nickname", nicknameKey),
@@ -193,6 +211,16 @@ public final class YamlCompetitionStore implements CompetitionStore {
                     );
                     entry.title(yaml.getString(path + ".title", ""));
                     entry.description(yaml.getString(path + ".description", ""));
+                    entry.selectedBuildingId(yaml.getString(path + ".selected-building-id", ""));
+                    ConfigurationSection editable = yaml.getConfigurationSection(path + ".editable-regions");
+                    if (editable != null) {
+                        List<BuildRegion> parts = new ArrayList<>();
+                        for (String key : editable.getKeys(false)) parts.add(readRegion(yaml, path + ".editable-regions." + key));
+                        entry.editableRegions(parts);
+                    } else if (entry.selectedBuildingId().startsWith("area-")) {
+                        throw new IllegalStateException("An area entry is missing its saved edit boundaries: " + id);
+                    }
+                    entry.previewToken(yaml.getString(path + ".preview-token"));
                     ConfigurationSection cameras = yaml.getConfigurationSection(path + ".cameras");
                     if (cameras != null) {
                         for (String key : cameras.getKeys(false)) {

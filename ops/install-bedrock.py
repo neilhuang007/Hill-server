@@ -27,6 +27,7 @@ STATE = "assets/bedrock-managed.json"
 MANAGED_PATHS = (
     "plugins/Geyser-Spigot.jar",
     "plugins/floodgate-spigot.jar",
+    "plugins/ViaVersion.jar",
     "plugins/Geyser-Spigot/config.yml",
     "plugins/floodgate/config.yml",
     STATE,
@@ -63,8 +64,9 @@ def load_manifest(path=MANIFEST):
     manifest = json.loads(path.read_text(encoding="utf-8"))
     artifacts = manifest.get("artifacts", [])
     expected = {"geyser": ("Geyser-Spigot", "Geyser-Spigot.jar"),
-                "floodgate": ("floodgate", "floodgate-spigot.jar")}
-    if manifest.get("schema") != 1 or len(artifacts) != 2:
+                "floodgate": ("floodgate", "floodgate-spigot.jar"),
+                "viaversion": ("ViaVersion", "ViaVersion.jar")}
+    if manifest.get("schema") != 1 or len(artifacts) != 3:
         raise ValueError("Invalid Bedrock artifact manifest")
     for artifact in artifacts:
         project = artifact.get("project")
@@ -75,6 +77,8 @@ def load_manifest(path=MANIFEST):
         if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) or type(build) is not int or build < 1:
             raise ValueError("Bedrock artifacts must pin an exact version and build")
         url = f"https://download.geysermc.org/v2/projects/{project}/versions/{version}/builds/{build}/downloads/spigot"
+        if project == "viaversion":
+            url = f"https://github.com/ViaVersion/ViaVersion/releases/download/{version}/ViaVersion-{version}.jar"
         if artifact.get("url") != url or not re.fullmatch(r"[0-9a-f]{64}", artifact.get("sha256", "")):
             raise ValueError("Bedrock artifacts require official immutable URLs and SHA-256")
     return manifest
@@ -82,13 +86,16 @@ def load_manifest(path=MANIFEST):
 
 
 def config_bytes(port):
-    if type(port) is not int or not 1024 <= port <= 65535:
-        raise ValueError("Bedrock UDP port must be between 1024 and 65535")
+    if type(port) is not int or not 1024 <= port <= 65534:
+        raise ValueError("Bedrock base port must be between 1024 and 65534; WebRTC uses the next port")
     # Geyser's YAML loader supports JSON. Floodgate needs its native YAML template.
     # Pin schema versions to avoid an automatic migration changing managed files.
-    # RakNet opens UDP only: NetherNet would introduce a separate web listener.
+    # TCP signaling must be firewalled from public ingress and proxied through
+    # Cloudflare and nginx. RakNet and WebRTC require separate UDP ports.
     geyser = {
-        "bedrock": {"address": "0.0.0.0", "port": port, "clone-remote-port": False, "transport": "raknet"},
+        "bedrock": {"address": "0.0.0.0", "port": port, "webrtc-port": port + 1,
+                    "clone-remote-port": False, "transport": "both",
+                    "signaling": {"mode": "builtin"}},
         "java": {"auth-type": "floodgate"},
         "motd": {"primary-motd": "Hill School 175", "secondary-motd": "School verification required",
                  "passthrough-motd": False, "passthrough-player-counts": False,
@@ -97,10 +104,11 @@ def config_bytes(port):
         "log-player-ip-addresses": False,
         "saved-user-logins": [],
         "advanced": {"bedrock": {"validate-bedrock-login": True, "use-haproxy-protocol": False,
-                                  "use-waterdogpe-forwarding": False},
+                                  "use-waterdogpe-forwarding": False,
+                                  "signaling-trusted-proxies": ["127.0.0.1", "::1"]},
                      "java": {"use-direct-connection": True, "use-haproxy-protocol": False}},
         "debug-mode": False,
-        "config-version": 8,
+        "config-version": 11,
     }
     return {"plugins/Geyser-Spigot/config.yml": (CONFIG_HEADER + json.dumps(geyser, indent=2) + "\n").encode(),
             "plugins/floodgate/config.yml": FLOODGATE_CONFIG.read_text(encoding="utf-8").encode()}
@@ -130,7 +138,9 @@ def preflight(runtime, manifest):
     marker = paths[STATE]
     state = json.loads(marker.read_text(encoding="utf-8")) if marker.exists() else None
     if state is not None:
-        if state.get("schema") != 1 or set(state.get("files", {})) != set(MANAGED_PATHS) - {STATE}:
+        current_files = set(MANAGED_PATHS) - {STATE}
+        legacy_files = current_files - {"plugins/ViaVersion.jar"}
+        if state.get("schema") != 1 or set(state.get("files", {})) not in (current_files, legacy_files):
             raise ValueError("Invalid Bedrock management state; restore its backup before deploying")
     for relative, path in paths.items():
         if relative == STATE or not path.exists():

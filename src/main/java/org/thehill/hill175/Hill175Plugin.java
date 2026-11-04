@@ -19,6 +19,15 @@ import org.thehill.hill175.listener.ServerListener;
 import org.thehill.hill175.ui.HubNpcModule;
 import org.thehill.hill175.ui.MenuModule;
 import org.thehill.hill175.world.WorldModule;
+import org.thehill.hill175.gallery.GalleryHttpServer;
+import org.thehill.hill175.backup.CampusBackupService;
+import org.thehill.hill175.listener.CampusSafetyListener;
+import org.thehill.hill175.ui.BuildingLocationService;
+import org.thehill.hill175.ui.CampusMapMenu;
+import org.thehill.hill175.ui.CampusMapPack;
+import org.thehill.hill175.ui.CampusWorkshop;
+import org.thehill.hill175.undo.CampusUndoService;
+import org.thehill.hill175.world.OfficialCampusMapRenderer;
 
 import java.util.List;
 import java.util.Objects;
@@ -31,10 +40,17 @@ public final class Hill175Plugin extends JavaPlugin {
     private HubNpcModule hubNpcs;
     private WorldModule worlds;
     private MicrosoftSsoService schoolIdentity;
+    private GalleryHttpServer gallery;
+    private MenuModule menus;
+    private CampusBackupService campusBackups;
+    private BuildingLocationService locations;
+    private CampusMapMenu campusMap;
+    private CampusUndoService campusUndo;
 
     @Override
     public void onEnable() {
         try {
+            CampusBackupService.applyPendingRestore(this);
             initialize();
         } catch (RuntimeException exception) {
             stopAfterStartupFailure(exception);
@@ -72,6 +88,10 @@ public final class Hill175Plugin extends JavaPlugin {
                 identityLinker,
                 schoolIdentity
         );
+        if (worlds.sharedCampusEntry().isPresent()) {
+            campusBackups = new CampusBackupService(this, competition::isAuthenticated);
+            campusBackups.initialize();
+        }
         if (schoolIdentity != null) {
             // Session construction validates online-mode and Floodgate before any browser endpoint opens.
             try {
@@ -80,15 +100,43 @@ public final class Hill175Plugin extends JavaPlugin {
                 throw new UncheckedIOException("Cannot open Microsoft school verification safely.", exception);
             }
         }
-        MenuModule menus = new MenuModule(competition);
+        if (getConfig().getBoolean("gallery.enabled", true)) {
+            java.nio.file.Path assets = java.nio.file.Path.of(getConfig().getString(
+                    "gallery.asset-directory", "plugins/Hill175/gallery-assets"));
+            if (!assets.isAbsolute()) assets = getServer().getWorldContainer().toPath().resolve(assets);
+            gallery = new GalleryHttpServer(getConfig().getInt("gallery.port", 8788), competition.galleryPublisher(), assets);
+            try {
+                gallery.start();
+                getLogger().info("Build gallery listening on loopback port " + gallery.port() + ".");
+            } catch (IOException exception) {
+                throw new UncheckedIOException("Cannot start the local build gallery.", exception);
+            }
+        }
+        menus = new MenuModule(competition, worlds);
         hubNpcs = new HubNpcModule(this, competition, menus, worlds);
         ServerListener serverListener = new ServerListener(this, competition, menus, worlds);
         CommandModule commands = new CommandModule(competition, menus);
 
         PluginManager pluginManager = getServer().getPluginManager();
+        campusUndo = new CampusUndoService(this, competition::mayBuild, worlds::isSharedCampus);
+        competition.campusUndo(campusUndo::undo);
+        pluginManager.registerEvents(campusUndo, this);
         pluginManager.registerEvents(menus, this);
         pluginManager.registerEvents(hubNpcs, this);
         pluginManager.registerEvents(serverListener, this);
+        pluginManager.registerEvents(new CampusSafetyListener(world -> !worlds.isSurvivalWorld(world)), this);
+        locations = new BuildingLocationService(this, worlds::campusBuildings,
+                world -> worlds.isSharedCampus(world) || world.getName().startsWith("hill_people_") || world.getName().startsWith("hill_place_"),
+                player -> competition.isAuthenticated(player) && !competition.isCameraPreviewing(player));
+        pluginManager.registerEvents(locations, this);
+        locations.start();
+        if (campusBackups != null) {
+            var backupCommand = Objects.requireNonNull(getCommand("campusbackup"));
+            var backupActions = campusBackups.commands();
+            backupCommand.setExecutor(backupActions);
+            backupCommand.setTabCompleter(backupActions);
+        }
+        initializeCampusWorkshop(pluginManager);
 
         for (String commandName : List.of("register", "login", "verify", "hill175", "competition", "hub", "lobby", "help", "rules", "entry", "team", "camera")) {
             var command = Objects.requireNonNull(getCommand(commandName), "Missing command in plugin.yml: " + commandName);
@@ -116,6 +164,55 @@ public final class Hill175Plugin extends JavaPlugin {
                 : "Hill 175 competition server enabled with Microsoft school verification.");
     }
 
+    private void initializeCampusWorkshop(PluginManager pluginManager) {
+        CampusWorkshop workshop = new CampusWorkshop(competition, worlds);
+        java.nio.file.Path assets = java.nio.file.Path.of(getConfig().getString(
+                "gallery.asset-directory", "plugins/Hill175/gallery-assets"));
+        if (!assets.isAbsolute()) assets = getServer().getWorldContainer().toPath().resolve(assets);
+        java.nio.file.Path heldMap = assets.resolve("campus-held.png");
+        if (java.nio.file.Files.isRegularFile(heldMap)) {
+            try {
+                java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(heldMap.toFile());
+                if (image == null) throw new IOException("The held campus map is not a readable image.");
+                competition.officialMapRenderer(() -> new OfficialCampusMapRenderer(image));
+                getLogger().info("Official campus illustration loaded for held maps.");
+            } catch (IOException exception) {
+                throw new UncheckedIOException("Cannot load the official held campus map.", exception);
+            }
+        }
+        CampusMapPack pack = null;
+        if (java.nio.file.Files.isRegularFile(assets.resolve("campus-pack.zip"))) {
+            String publicUrl = System.getenv("HILL175_GALLERY_PUBLIC_URL");
+            if (publicUrl == null || publicUrl.isBlank()) publicUrl = getConfig().getString("gallery.public-base-url", "http://localhost:8788");
+            try { pack = new CampusMapPack(assets, publicUrl); }
+            catch (IOException | IllegalArgumentException exception) {
+                getLogger().log(java.util.logging.Level.WARNING, "Campus imagery is unavailable. Named selection remains active.", exception);
+            }
+        }
+        java.nio.file.Path template = java.nio.file.Path.of(getConfig().getString("people.template-folder"));
+        if (!template.isAbsolute()) template = getServer().getWorldContainer().toPath().resolve(template);
+        String revision = org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(
+                template.resolve("hill-campus-template.yml").toFile()).getString("revision", "Selected campus");
+        campusMap = new CampusMapMenu(this, revision, worlds.campusSelectionRegion(), worlds.buildings(), pack,
+                competition::isAuthenticated, workshop::select, player -> player.closeInventory());
+        campusMap.undoAction(competition::undoRecentBuild);
+        try {
+            var labels = org.thehill.hill175.ui.CampusMapLabels.load(assets,
+                    getResource("campus-map-destinations.json"), worlds.campusSelectionRegion(), worlds.buildings());
+            campusMap.labels(labels);
+            labels.artworkWarning().ifPresent(warning -> getLogger().warning(
+                    "Clickable campus artwork is unavailable. Named destinations remain active. " + warning));
+        } catch (IOException exception) {
+            throw new UncheckedIOException("Cannot load safe campus map destinations.", exception);
+        }
+        workshop.map(campusMap);
+        menus.campusWorkshop(workshop::open);
+        pluginManager.registerEvents(campusMap, this);
+        var command = Objects.requireNonNull(getCommand("campus"));
+        command.setExecutor(workshop);
+        command.setTabCompleter(workshop);
+    }
+
     private void stopAfterStartupFailure(RuntimeException exception) {
         // Disabling only this plugin would remove admission and world protections
         // while leaving Paper open to player connections.
@@ -126,6 +223,12 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (campusMap != null) campusMap.close();
+        if (campusUndo != null) campusUndo.close();
+        if (locations != null) locations.close();
+        if (campusBackups != null) campusBackups.close();
+        if (menus != null) menus.shutdown();
+        if (gallery != null) gallery.close();
         if (schoolIdentity != null && !getServer().isStopping()) {
             // Hot-disabling admission protection must not leave an unprotected production server open.
             getServer().shutdown();

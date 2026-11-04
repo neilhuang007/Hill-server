@@ -1,0 +1,18 @@
+{
+  "namespace": "server_form",
+  "main_screen_content": {
+    "type": "panel",
+    "size": ["100%", "100%"],
+    "controls": [
+      {
+        "server_form_factory": {
+          "type": "factory",
+          "control_ids": {
+            "long_form": "@hill_campus.form_router",
+            "custom_form": "@server_form.custom_form"
+          }
+        }
+      }
+    ]
+  }
+}

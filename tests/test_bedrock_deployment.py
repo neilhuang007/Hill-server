@@ -49,6 +49,10 @@ class BedrockDeploymentTest(unittest.TestCase):
             self.assertNotIn("latest", artifact["url"])
             self.assertEqual(64, len(artifact["sha256"]))
         self.assertEqual("26.2", manifest["java_minecraft"])
+        self.assertEqual("26.40-26.60", manifest["bedrock_minecraft"])
+        geyser = next(artifact for artifact in manifest["artifacts"] if artifact["project"] == "geyser")
+        self.assertEqual("2.12.1", geyser["version"])
+        self.assertIn(f"https://github.com/GeyserMC/Geyser/commit/{geyser['source_commit']}", manifest["sources"])
 
     def test_generated_configuration_authenticates_bedrock_and_defers_linking_to_hill(self):
         data = bedrock.config_bytes(19135)
@@ -56,7 +60,10 @@ class BedrockDeploymentTest(unittest.TestCase):
         floodgate = data["plugins/floodgate/config.yml"].decode()
         self.assertEqual("floodgate", geyser["java"]["auth-type"])
         self.assertEqual(19135, geyser["bedrock"]["port"])
-        self.assertEqual("raknet", geyser["bedrock"]["transport"])
+        self.assertEqual("both", geyser["bedrock"]["transport"])
+        self.assertEqual(19136, geyser["bedrock"]["webrtc-port"])
+        self.assertEqual("builtin", geyser["bedrock"]["signaling"]["mode"])
+        self.assertEqual(11, geyser["config-version"])
         self.assertTrue(geyser["advanced"]["bedrock"]["validate-bedrock-login"])
         self.assertFalse(geyser["motd"]["passthrough-player-counts"])
         self.assertFalse(geyser["log-player-ip-addresses"])
@@ -88,6 +95,19 @@ class BedrockDeploymentTest(unittest.TestCase):
         bedrock.verify(self.runtime, self.manifest, 19133)
         with self.assertRaisesRegex(ValueError, "environment"):
             bedrock.verify(self.runtime, self.manifest, 19132)
+
+    def test_upgrades_the_previous_two_plugin_manifest_without_overwriting_unmanaged_via(self):
+        self.installed()
+        via = self.runtime / "plugins/ViaVersion.jar"
+        state_path = self.runtime / bedrock.STATE
+        state = json.loads(state_path.read_text())
+        del state["files"]["plugins/ViaVersion.jar"]
+        state_path.write_text(json.dumps(state))
+        with self.assertRaisesRegex(ValueError, "unmanaged|edited"):
+            bedrock.preflight(self.runtime, self.manifest)
+        via.unlink()
+        bedrock.install(self.runtime, self.manifest, 19132)
+        bedrock.verify(self.runtime, self.manifest, 19132)
 
     def test_rejects_unknown_config_before_downloading_or_writing(self):
         path = self.runtime / "plugins/Geyser-Spigot/config.yml"

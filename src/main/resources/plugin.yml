@@ -11,8 +11,8 @@ commands:
     description: Sign in with your Hill Microsoft account and confirm the browser code
     usage: /verify [browser-code]
   register:
-    description: Register a competition nickname and password
-    usage: /register <username> <password> <repeatPassword>
+    description: Register your connected Minecraft account with a competition password
+    usage: /register <password> <repeatPassword>
   login:
     description: Authenticate with the competition password
     usage: /login <password>
@@ -35,7 +35,14 @@ commands:
     description: Manage a two-person entry team
   camera:
     description: Save and manage submission camera poses
+  campus:
+    description: Open your campus map and building controls
+  campusbackup:
+    description: List, save and restore shared campus backups
 permissions:
+  hill175.campus.rollback:
+    description: Save and restore the shared campus
+    default: op
   hill175.staff:
-    description: Reserved for future faculty moderation tools
+    description: Faculty moderation tools
     default: op

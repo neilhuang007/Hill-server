@@ -64,6 +64,7 @@ public final class WorldModule {
     private Location hubSpawn;
     private World journeyWorld;
     private World placeWorld;
+    private Entry sharedCampusEntry;
     private World survivalWorld;
     private World survivalNetherWorld;
     private World survivalEndWorld;
@@ -120,6 +121,42 @@ public final class WorldModule {
         hubSpawn = arrivalPoint(hubWorld, hubPlacement, "worlds.hub-spawn");
         resolvePeopleStructureMetadata();
         beginPeopleTemplatePreparation();
+        if (plugin.getConfig().getBoolean("shared-campus.enabled", false)) {
+            World campus = loadSharedCampus();
+            sharedCampusEntry = new Entry(UUID.nameUUIDFromBytes("hill175:shared-campus".getBytes(StandardCharsets.UTF_8)),
+                    Category.PEOPLE, Set.of(), campus.getName(), peopleRegion(campus.getName(), campus), 0);
+            sharedCampusEntry.title("Shared Hill Campus");
+        }
+    }
+
+    /** Environmental bounds only. A shared campus is never stored as a participant submission. */
+    public Optional<Entry> sharedCampusEntry() { return Optional.ofNullable(sharedCampusEntry); }
+
+    public boolean isSharedCampus(Entry entry) { return entry != null && entry == sharedCampusEntry; }
+
+    public boolean isSharedCampus(World world) {
+        return sharedCampusEntry != null && world != null && sharedCampusEntry.worldName().equals(world.getName());
+    }
+
+    /** Existing student work is independent of later template or structure changes. */
+    World loadSharedCampus() {
+        String name = "hill_campus";
+        World world = Bukkit.getWorld(name);
+        if (world == null) {
+            Path original = new File(Bukkit.getWorldContainer(), name).toPath();
+            Path migrated = migratedWorldFolder(name).toPath();
+            Path saved = Files.isDirectory(migrated) ? migrated : original;
+            if (!Files.exists(saved)) return createPeopleWorld(name);
+            if (CampusTemplateMetadata.read(saved).isEmpty()) {
+                throw new IllegalStateException("The saved shared campus metadata is missing. Existing student work was preserved at " + saved);
+            }
+            world = peopleWorldCreator(name, saved).createWorld();
+            if (world == null) throw new IllegalStateException("Could not open the saved shared campus.");
+        }
+        configureWorld(world);
+        applyPeopleWorldSettings(world);
+        markPeopleWorldReady(world, null);
+        return world;
     }
 
     public boolean isPeopleWorldReady(String worldName) {
@@ -207,17 +244,71 @@ public final class WorldModule {
     }
 
     public Allocation allocate(Category category, int allocationIndex, UUID entryId) {
+        return allocate(category, allocationIndex, entryId, null);
+    }
+
+    public Allocation allocate(Category category, int allocationIndex, UUID entryId, String buildingId) {
         return switch (category) {
             case JOURNEY -> allocatePlot(journeyWorld, category, allocationIndex, 96);
-            case PLACE -> allocatePlot(placeWorld, category, allocationIndex, 64);
+            case PLACE -> allocateBuilding(entryId, buildingId);
             case PEOPLE -> allocatePeople(entryId);
         };
+    }
+
+    public List<BuildingCatalog.Building> buildings() {
+        return buildingCatalog().buildings();
+    }
+
+    public Optional<Location> campusDestination(Entry entry, int x, int z) {
+        if (entry.category() != Category.PEOPLE && !isPrivatePlace(entry)) return Optional.empty();
+        BuildRegion region = entry.region();
+        if (x < region.minX() || x > region.maxX() || z < region.minZ() || z > region.maxZ()) {
+            return Optional.empty();
+        }
+        ensureEntryWorld(entry);
+        World world = Bukkit.getWorld(entry.worldName());
+        if (world == null) return Optional.empty();
+        int y = Math.clamp(world.getHighestBlockYAt(x, z) + 1, region.minY() + 1, region.maxY() - 1);
+        return safeStandingLocation(world, region, new Location(world, x + 0.5, y, z + 0.5));
+    }
+
+    public Optional<BuildingCatalog.Building> building(String id) {
+        if (id != null && id.startsWith("area-")) return area(id).map(CampusAreaCatalog.Area::envelope);
+        return buildingCatalog().find(id);
+    }
+
+    public List<CampusAreaCatalog.Area> areas() {
+        buildingCatalog();
+        return CampusAreaCatalog.read(resolveTemplateFolder().toPath()).areas();
+    }
+
+    public Optional<CampusAreaCatalog.Area> area(String id) {
+        return areas().stream().filter(area -> area.id().equals(id)).findFirst();
+    }
+
+    private BuildingCatalog buildingCatalog() {
+        File template = resolveTemplateFolder();
+        if (template == null || !isGeneratedAnvilTemplateReady(template.toPath())) {
+            throw new IllegalStateException("The installed campus template is unavailable; Place selection is paused.");
+        }
+        return BuildingCatalog.read(template.toPath());
+    }
+
+    public BuildRegion campusSelectionRegion() {
+        File template = resolveTemplateFolder();
+        buildingCatalog();
+        return CampusTemplateMetadata.read(template.toPath())
+                .map(metadata -> metadata.region("hill_campus_selection", -64, 320))
+                .orElseThrow(() -> new IllegalStateException("The installed campus needs measured bounds for its building map."));
     }
 
     public void ensureEntryWorld(Entry entry) {
         World world = Bukkit.getWorld(entry.worldName());
         if (world == null && entry.category() == Category.PEOPLE) {
             world = createPeopleWorld(entry.worldName());
+        }
+        if (world == null && isPrivatePlace(entry)) {
+            world = loadBuildingWorld(entry.worldName(), entry.region(), false);
         }
         if (world == null && entry.category() != Category.PEOPLE) {
             throw new IllegalStateException("Plot world is unavailable: " + entry.worldName());
@@ -226,6 +317,9 @@ public final class WorldModule {
             configureWorld(world);
             if (entry.category() == Category.PEOPLE) {
                 applyPeopleWorldSettings(world);
+            }
+            if (isPrivatePlace(entry)) {
+                applyBuildingWorldSettings(world, entry.region());
             }
         }
     }
@@ -253,6 +347,10 @@ public final class WorldModule {
         if (world == null) {
             return hubSpawn();
         }
+        if (isPrivatePlace(entry)) {
+            Location preferred = placeArrival(entry, world);
+            return safeBuildingStandingLocation(world, entry.region(), preferred).orElse(preferred);
+        }
         if (entry.category() == Category.PEOPLE) {
             return world.getSpawnLocation().clone().add(0.5, 0.1, 0.5);
         }
@@ -271,8 +369,23 @@ public final class WorldModule {
         if (world == null || preferred.getWorld() == null || !entry.worldName().equals(preferred.getWorld().getName())) {
             return Optional.empty();
         }
+        return isPrivatePlace(entry) ? safeBuildingStandingLocation(world, entry.region(), preferred)
+                : safeStandingLocation(world, entry.region(), preferred);
+    }
+
+    private Optional<Location> safeBuildingStandingLocation(World world, BuildRegion region, Location preferred) {
+        int x = Math.clamp(preferred.getBlockX(), region.minX(), region.maxX());
+        int y = Math.clamp(preferred.getBlockY(), region.minY() + 1, region.maxY() - 1);
+        int z = Math.clamp(preferred.getBlockZ(), region.minZ(), region.maxZ());
+        BuildRegion nearby = new BuildRegion(region.worldName(),
+                Math.max(region.minX(), x - 16), Math.max(region.minY(), y - 16), Math.max(region.minZ(), z - 16),
+                Math.min(region.maxX(), x + 16), Math.min(region.maxY(), y + 16), Math.min(region.maxZ(), z + 16));
+        return safeStandingLocation(world, nearby, preferred);
+    }
+
+    private Optional<Location> safeStandingLocation(World world, BuildRegion region, Location preferred) {
         return SafeSpawnFinder.find(
-                entry.region(),
+                region,
                 preferred.getBlockX(),
                 preferred.getBlockY(),
                 preferred.getBlockZ(),
@@ -301,18 +414,108 @@ public final class WorldModule {
         ));
     }
 
+    private Location placeArrival(Entry entry, World world) {
+        if (entry.selectedBuildingId().startsWith("area-")) {
+            BuildRegion part = entry.editableRegions().getFirst();
+            return surfaceLocation(world, part.centerX(), part.centerZ());
+        }
+        return campusBuildings(world).stream()
+                .filter(building -> building.id().equals(entry.selectedBuildingId()))
+                .findFirst()
+                .map(building -> buildingApproach(world, building, entry.region()))
+                .orElseGet(() -> surfaceLocation(world, entry.region().centerX(), entry.region().centerZ()));
+    }
+
+    private Location buildingApproach(World world, BuildingCatalog.Building building, BuildRegion bounds) {
+        int x = Math.clamp(building.centerX(), bounds.minX(), bounds.maxX());
+        int z = Math.clamp(building.maxZ() + 3, bounds.minZ(), bounds.maxZ());
+        Location location = surfaceLocation(world, x, z);
+        double deltaX = building.centerX() + 0.5 - location.getX();
+        double deltaZ = building.centerZ() + 0.5 - location.getZ();
+        location.setYaw((float) Math.toDegrees(Math.atan2(-deltaX, deltaZ)));
+        return location;
+    }
+
+    private Location surfaceLocation(World world, int x, int z) {
+        int y = Math.clamp(world.getHighestBlockYAt(x, z) + 1, world.getMinHeight() + 1, world.getMaxHeight() - 2);
+        return new Location(world, x + 0.5, y + 0.05, z + 0.5, 0.0f, 0.0f);
+    }
+
+    /** A safe campus-map destination, restricted to the terrain available to this entry. */
+    public Optional<Location> buildingDestination(Entry entry, String buildingId) {
+        if (entry == null || buildingId == null || buildingId.isBlank()) {
+            return Optional.empty();
+        }
+        ensureEntryWorld(entry);
+        World world = Bukkit.getWorld(entry.worldName());
+        if (world == null) {
+            return Optional.empty();
+        }
+        BuildRegion bounds = cameraRegion(entry);
+        return campusBuildings(world).stream()
+                .filter(building -> building.id().equals(buildingId))
+                .filter(building -> bounds.contains(building.centerX(), bounds.minY(), building.centerZ()))
+                .findFirst()
+                .flatMap(building -> safeBuildingStandingLocation(world, bounds, buildingApproach(world, building, bounds)));
+    }
+
+    /** Viewing space is deliberately separate from the region that grants block editing. */
+    public BuildRegion cameraRegion(Entry entry) {
+        World world = Bukkit.getWorld(entry.worldName());
+        int minHeight = world == null ? -64 : world.getMinHeight();
+        int maxHeight = world == null ? 320 : world.getMaxHeight();
+        if (isPrivatePlace(entry)) {
+            Optional<CampusTemplateMetadata> campus = world == null
+                    ? CampusTemplateMetadata.read(locateWorldFolder(entry.worldName(), null)) : campusMetadata(world);
+            return campus.map(metadata -> buildingCameraRegion(entry.region(), minHeight, maxHeight, metadata))
+                    .orElse(entry.region());
+        }
+        int margin = entry.category() == Category.PEOPLE ? 0 : 24;
+        return expandedCameraRegion(entry.region(), margin, minHeight, maxHeight, null);
+    }
+
+    static BuildRegion expandedCameraRegion(BuildRegion region, int margin, int minHeight, int maxHeight,
+                                             BuildRegion campus) {
+        int minX = region.minX() - margin;
+        int maxX = region.maxX() + margin;
+        int minZ = region.minZ() - margin;
+        int maxZ = region.maxZ() + margin;
+        if (campus != null) {
+            minX = Math.max(minX, campus.minX());
+            maxX = Math.min(maxX, campus.maxX());
+            minZ = Math.max(minZ, campus.minZ());
+            maxZ = Math.min(maxZ, campus.maxZ());
+        }
+        return new BuildRegion(region.worldName(), minX, minHeight, minZ, maxX, maxHeight - 1, maxZ);
+    }
+
+    private static BuildRegion buildingCameraRegion(BuildRegion region, int minHeight, int maxHeight,
+                                                     CampusTemplateMetadata campus) {
+        return expandedCameraRegion(region, 96, minHeight, maxHeight,
+                campus.region(region.worldName(), minHeight, maxHeight));
+    }
+
+    private BuildRegion templateCameraRegion(BuildRegion region) {
+        CampusTemplateMetadata campus = CampusTemplateMetadata.read(resolveTemplateFolder().toPath())
+                .orElseThrow(() -> new IllegalStateException("The installed campus needs measured bounds for Place entries."));
+        return buildingCameraRegion(region, -64, 320, campus);
+    }
+
     /**
      * Resolves the safe feet position that reproduces a saved eye-level camera pose without
      * teleporting the player's body into a block, dangerous fluid, another world, or outside the
      * entry/world border.
      */
     public Optional<Location> safeCameraTeleport(Entry entry, CameraPose pose, double eyeHeight) {
+        if (entry == null || pose == null) {
+            return Optional.empty();
+        }
         World world = Bukkit.getWorld(pose.worldName());
         if (world == null || !entry.worldName().equals(pose.worldName())) {
             return Optional.empty();
         }
         return CameraPoseResolver.resolve(
-                entry.region(),
+                cameraRegion(entry),
                 pose,
                 eyeHeight,
                 (x, y, z) -> world.getWorldBorder().isInside(new Location(world, x, y, z)),
@@ -374,6 +577,10 @@ public final class WorldModule {
                 resetPeople(entry);
                 return;
             }
+            if (isPrivatePlace(entry)) {
+                resetBuilding(entry);
+                return;
+            }
             ensureEntryWorld(entry);
             World world = Bukkit.getWorld(entry.worldName());
             if (world == null) {
@@ -391,7 +598,8 @@ public final class WorldModule {
     }
 
     public boolean deletePrivateWorld(Entry entry) {
-        if (entry.category() != Category.PEOPLE || !entry.worldName().startsWith("hill_people_")) {
+        if (!((entry.category() == Category.PEOPLE && entry.worldName().startsWith("hill_people_"))
+                || isPrivatePlace(entry))) {
             return false;
         }
         readyPeopleWorlds.remove(entry.worldName());
@@ -457,6 +665,146 @@ public final class WorldModule {
         );
         preparePlot(world, category, region);
         return new Allocation(world.getName(), region, allocationIndex);
+    }
+
+    public static boolean isPrivatePlace(Entry entry) {
+        return entry != null && entry.category() == Category.PLACE
+                && entry.worldName().matches("hill_place_[a-f0-9]{12}");
+    }
+
+    private Allocation allocateBuilding(UUID entryId, String buildingId) {
+        BuildingCatalog.Building selected = building(buildingId).orElseThrow(() ->
+                new IllegalStateException("Choose a campus area or building from the Place menu before creating an entry."));
+        String worldName = "hill_place_" + entryId.toString().replace("-", "").substring(0, 12);
+        Optional<CampusAreaCatalog.Area> area = buildingId.startsWith("area-") ? area(buildingId) : Optional.empty();
+        BuildRegion region = selected.region(worldName, -64, 320, area.isPresent() ? 0 : 16);
+        Path destination = migratedWorldFolder(worldName).toPath();
+        if (Files.exists(destination) || Files.exists(new File(Bukkit.getWorldContainer(), worldName).toPath())
+                || Bukkit.getWorld(worldName) != null) {
+            throw new IllegalStateException("A saved world already uses this entry identifier; it was preserved.");
+        }
+        try {
+            BuildingTemplate.copy(resolveTemplateFolder().toPath(), destination, templateCameraRegion(region));
+            World world = loadBuildingWorld(worldName, region, true);
+            return new Allocation(world.getName(), region, 0, area.map(value -> value.regions(worldName)).orElse(List.of(region)));
+        } catch (IOException exception) {
+            deleteDirectorySafely(destination);
+            throw new IllegalStateException("Could not copy the selected Hill building; no entry was created.", exception);
+        } catch (RuntimeException exception) {
+            World loaded = Bukkit.getWorld(worldName);
+            if (loaded == null || unloadPeopleWorld(loaded)) {
+                deleteDirectorySafely(destination);
+            }
+            throw exception;
+        }
+    }
+
+    private World loadBuildingWorld(String worldName, BuildRegion region, boolean isNew) {
+        Path folder = locateWorldFolder(worldName, null);
+        if (!Files.isDirectory(folder)) {
+            throw new IllegalStateException("Your saved Place world is unavailable: " + worldName
+                    + ". Ask an operator to restore it or explicitly reset the entry.");
+        }
+        if (!isNew) {
+            extendBuildingTerrain(folder, region);
+        }
+        World world = WorldCreator.name(worldName)
+                .generator(voidGenerator)
+                .generateStructures(false)
+                .forcedSpawnPosition(Position.block(region.minX() + 2, BUILD_BASE_Y + 2, region.maxZ() - 2), 0, 0)
+                .createWorld();
+        if (world == null) {
+            throw new IllegalStateException("Could not open your selected Hill building: " + worldName);
+        }
+        configureWorld(world);
+        applyBuildingWorldSettings(world, region);
+        if (isNew) {
+            int x = region.minX() + 2;
+            int z = region.maxZ() - 2;
+            int y = Math.min(world.getMaxHeight() - 2, world.getHighestBlockYAt(x, z) + 1);
+            world.setSpawnLocation(x, y, z);
+        }
+        return world;
+    }
+
+    private void applyBuildingWorldSettings(World world, BuildRegion region) {
+        BuildRegion viewing = campusMetadata(world)
+                .map(campus -> buildingCameraRegion(region, world.getMinHeight(), world.getMaxHeight(), campus))
+                .orElse(region);
+        world.getWorldBorder().setCenter((viewing.minX() + viewing.maxX() + 1) / 2.0,
+                (viewing.minZ() + viewing.maxZ() + 1) / 2.0);
+        world.getWorldBorder().setSize(Math.max(viewing.maxX() - viewing.minX(), viewing.maxZ() - viewing.minZ()) + 3.0);
+    }
+
+    private void extendBuildingTerrain(Path folder, BuildRegion region) {
+        File source = resolveTemplateFolder();
+        if (source == null) {
+            return;
+        }
+        try {
+            Optional<CampusTemplateMetadata> campus = CampusTemplateMetadata.read(folder);
+            if (campus.isPresent()) {
+                BuildRegion viewing = buildingCameraRegion(region, -64, 320, campus.get());
+                BuildingTemplate.copyMissingTerrain(source.toPath(), folder, viewing);
+            }
+        } catch (IOException | IllegalStateException exception) {
+            plugin.getLogger().log(Level.WARNING,
+                    "Could not extend exterior viewing terrain for " + region.worldName() + "; saved blocks were preserved.", exception);
+        }
+    }
+
+    private void resetBuilding(Entry entry) {
+        // Reset the saved boundary. Catalog updates must not grant a larger area.
+        BuildRegion region = entry.region();
+        Path current = locateWorldFolder(entry.worldName(), Bukkit.getWorld(entry.worldName()));
+        Path staged = current.resolveSibling(entry.worldName() + "_reset_" + UUID.randomUUID().toString().substring(0, 8));
+        try {
+            BuildingTemplate.copy(resolveTemplateFolder().toPath(), staged, templateCameraRegion(region));
+            replaceBuildingWorld(entry, current, staged, region);
+            completeReset(entry.id());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not reset the selected Hill building; the saved world was retained.", exception);
+        } finally {
+            deleteDirectorySafely(staged);
+        }
+    }
+
+    private void replaceBuildingWorld(Entry entry, Path current, Path staged, BuildRegion region) throws IOException {
+        World oldWorld = Bukkit.getWorld(entry.worldName());
+        if (oldWorld != null) {
+            for (org.bukkit.entity.Player player : List.copyOf(oldWorld.getPlayers())) {
+                player.teleport(hubSpawn());
+            }
+            if (!unloadPeopleWorld(oldWorld)) {
+                throw new IllegalStateException("Could not unload your Place world; its saved blocks were preserved.");
+            }
+        }
+        Path retained = Bukkit.getWorldContainer().toPath().resolve("replaced-worlds")
+                .resolve(entry.worldName() + "-" + REPLACED_WORLD_STAMP.format(Instant.now()) + "-" + UUID.randomUUID().toString().substring(0, 8));
+        Files.createDirectories(retained.getParent());
+        if (Files.exists(current)) {
+            Files.move(current, retained);
+        }
+        try {
+            Files.move(staged, current);
+            loadBuildingWorld(entry.worldName(), region, true);
+            entry.region(region);
+        } catch (IOException | RuntimeException exception) {
+            restoreBuildingWorld(entry, current, retained);
+            throw exception;
+        }
+    }
+
+    private void restoreBuildingWorld(Entry entry, Path current, Path retained) throws IOException {
+        World failed = Bukkit.getWorld(entry.worldName());
+        if (failed != null && !unloadPeopleWorld(failed)) {
+            throw new IllegalStateException("The replacement could not close; the previous Place world is retained at " + retained);
+        }
+        deleteDirectorySafely(current);
+        if (Files.exists(retained)) {
+            Files.move(retained, current);
+            loadBuildingWorld(entry.worldName(), entry.region(), false);
+        }
     }
 
     private Allocation allocatePeople(UUID entryId) {
@@ -990,6 +1338,18 @@ public final class WorldModule {
                 metadata.region(world.getName(), world.getMinHeight(), world.getMaxHeight()));
     }
 
+    /** Older entries keep navigation even while the operator replaces the creation template. */
+    public List<BuildingCatalog.Building> campusBuildings(World world) {
+        if (world == null) {
+            return List.of();
+        }
+        try {
+            return BuildingCatalog.read(world.getWorldFolder().toPath()).buildings();
+        } catch (IllegalStateException exception) {
+            return List.of();
+        }
+    }
+
     private void writePeopleReadyMarker(Path worldFolder, StructureNbtLoader.Metadata metadata) {
         try {
             Files.writeString(worldFolder.resolve(PEOPLE_READY_MARKER), readyMarkerValue(metadata));
@@ -1309,7 +1669,9 @@ public final class WorldModule {
     private boolean deleteDirectorySafely(Path target) {
         Path worldContainer = Bukkit.getWorldContainer().toPath().toAbsolutePath().normalize();
         Path normalized = target.toAbsolutePath().normalize();
-        if (!normalized.startsWith(worldContainer) || !normalized.getFileName().toString().startsWith("hill_people_")) {
+        String folderName = normalized.getFileName().toString();
+        if (!normalized.startsWith(worldContainer)
+                || !(folderName.startsWith("hill_people_") || folderName.matches("hill_place_[a-f0-9]{12}(?:_reset_[a-f0-9]{8})?"))) {
             plugin.getLogger().severe("Refused to delete unexpected world path: " + normalized);
             return false;
         }
@@ -1348,7 +1710,11 @@ public final class WorldModule {
         return migratedWorldFolder;
     }
 
-    public record Allocation(String worldName, BuildRegion region, int allocationIndex) {
+    public record Allocation(String worldName, BuildRegion region, int allocationIndex, List<BuildRegion> editableRegions) {
+        public Allocation { editableRegions = List.copyOf(editableRegions); }
+        public Allocation(String worldName, BuildRegion region, int allocationIndex) {
+            this(worldName, region, allocationIndex, List.of(region));
+        }
     }
 
     private final class PeopleStructureImportTask extends BukkitRunnable {

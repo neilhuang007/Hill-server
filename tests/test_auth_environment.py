@@ -4,6 +4,9 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
+from unittest.mock import patch
 
 
 SPEC = importlib.util.spec_from_file_location(
@@ -27,6 +30,15 @@ class AuthEnvironmentTest(unittest.TestCase):
         self.assertEqual(("microsoft", 8087), auth_config.validate(self.config()))
         self.assertEqual(("development", 8087), auth_config.validate({"HILL175_AUTH_MODE": "development"}))
 
+    def test_explicit_bedrock_enable_is_honored_in_development(self):
+        for values, expected in [({'HILL175_AUTH_MODE': 'development'}, 'false'),
+                                 ({'HILL175_AUTH_MODE': 'development', 'HILL175_BEDROCK_ENABLED': 'true'}, 'true')]:
+            output = StringIO()
+            with patch('sys.argv', ['check-auth-config.py', '--print', 'bedrock-enabled']), \
+                    patch.object(auth_config, 'read_environment', return_value=values), redirect_stdout(output):
+                self.assertEqual(0, auth_config.main())
+            self.assertEqual(expected, output.getvalue().strip())
+
     def test_cannot_silently_change_modes(self):
         for values, mode in [({}, None), (self.config(), "development"), ({"HILL175_AUTH_MODE": "stub"}, None)]:
             with self.subTest(values=tuple(values), mode=mode), self.assertRaises(ValueError):
@@ -40,7 +52,7 @@ class AuthEnvironmentTest(unittest.TestCase):
             "HILL175_AUTH_PORT": ["0", "65536", "bad"],
             "HILL175_MAX_LINKED_ACCOUNTS": ["1", "21"],
             "HILL175_BEDROCK_ENABLED": ["yes", "1", "TRUE"],
-            "HILL175_BEDROCK_PORT": ["0", "65536", "bad"],
+            "HILL175_BEDROCK_PORT": ["0", "65535", "65536", "bad"],
         }
         for key, values in invalid.items():
             for value in values:

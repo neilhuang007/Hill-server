@@ -1,0 +1,33 @@
+# Campus work: scripts/hill_owner_20261020.py, BOXES (inclusive X/Z blocks).
+# Referenced by the explicitly selected V46 campus draft on 2026-10-29.
+# These are construction work areas, not surveyed property boundaries.
+coordinate-frame: hill-local-east-south-2x
+areas:
+  area-s1:
+    name: Chapel and Warner Grounds
+    description: Reimagine the chapel surroundings, Warner lawn, paths and planting.
+    boxes: [[-380, -300, 69, 45]]
+  area-s2:
+    name: Arts Center and North Pond Shore
+    description: Build around the arts center, its east lawn and the pond shore.
+    boxes: [[360, -400, 600, -261], [520, -545, 600, -401]]
+  area-s3:
+    name: Arts Center Northeast Approach
+    description: Design an inviting arrival space, paths and landscaping.
+    boxes: [[300, -545, 519, -401]]
+  area-s4:
+    name: Arts Forecourt and Bus Loop
+    description: Rework the west entrance, forecourt and arrival loop.
+    boxes: [[160, -545, 289, -261], [290, -545, 299, -401], [290, -400, 359, -261]]
+  area-s5:
+    name: Dell Pond and Davy Grounds
+    description: Create a place to gather beside the pond, drive and Davy entrances.
+    boxes: [[280, -260, 700, -131]]
+  area-s6:
+    name: Wendell and Music House Grounds
+    description: Shape the residential walks, Music House approach and shared outdoor spaces.
+    boxes: [[320, -130, 700, -30], [320, -29, 420, 35]]
+  area-s7:
+    name: Hunt and Sweeney Connections
+    description: Improve the walks, steps, gathering spaces and connections around Hunt.
+    boxes: [[70, -260, 279, -131], [70, -130, 319, -30], [70, -29, 319, 45]]

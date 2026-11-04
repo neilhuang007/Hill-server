@@ -1,22 +1,25 @@
 {
   "schema": 1,
-  "checked_on": "2026-09-28",
+  "checked_on": "2026-10-29",
   "java_minecraft": "26.2",
-  "bedrock_minecraft": "26.30-26.51",
+  "bedrock_minecraft": "26.40-26.60",
   "sources": [
     "https://geysermc.org/wiki/geyser/supported-versions/",
-    "https://geysermc.org/wiki/floodgate/setup/"
+    "https://geysermc.org/wiki/floodgate/setup/",
+    "https://download.geysermc.org/v2/projects/geyser/versions/2.12.1/builds/1276",
+    "https://github.com/GeyserMC/Geyser/commit/e963aeca854711b5ba843541f6e03ccfcadd3ef1",
+    "https://github.com/ViaVersion/ViaVersion/releases/tag/5.12.2"
   ],
   "artifacts": [
     {
       "project": "geyser",
       "plugin_name": "Geyser-Spigot",
-      "version": "2.11.3",
-      "build": 1247,
-      "source_commit": "63a4e2b79b12f0d138777d5fd80176a112b4bd72",
+      "version": "2.12.1",
+      "build": 1276,
+      "source_commit": "e963aeca854711b5ba843541f6e03ccfcadd3ef1",
       "filename": "Geyser-Spigot.jar",
-      "url": "https://download.geysermc.org/v2/projects/geyser/versions/2.11.3/builds/1247/downloads/spigot",
-      "sha256": "6fed2d9711e2db3c365508ec10db36d06a0199abd226159d23d57f82662fd7a6"
+      "url": "https://download.geysermc.org/v2/projects/geyser/versions/2.12.1/builds/1276/downloads/spigot",
+      "sha256": "d747d9f0b74370fae40e1c329193cf178bcb3fc3b2adc51cbe618ad4cfaf8945"
     },
     {
       "project": "floodgate",
@@ -27,6 +30,16 @@
       "filename": "floodgate-spigot.jar",
       "url": "https://download.geysermc.org/v2/projects/floodgate/versions/2.2.5/builds/141/downloads/spigot",
       "sha256": "21570aff9ce17d6983928e8552777760e1ede5050026b04c686b0ae112e6fd7e"
+    },
+    {
+      "project": "viaversion",
+      "plugin_name": "ViaVersion",
+      "version": "5.12.2",
+      "build": 425626612,
+      "filename": "ViaVersion.jar",
+      "url": "https://github.com/ViaVersion/ViaVersion/releases/download/5.12.2/ViaVersion-5.12.2.jar",
+      "sha256": "24e4876fefe73e08a4c87cd6c457ee0916e62dd69656631caf41e26f909d504b"
     }
-  ]
+  ],
+  "bridge_java_minecraft": "26.3"
 }
