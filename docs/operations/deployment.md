@@ -265,6 +265,9 @@ systemctl status hill175-backup.timer --no-pager
 
 Check for a new Paper ready marker, enabled Hill175 plugin, no startup errors,
 the expected commit and plugin build, and the pinned template checksum/counts.
+The log check reports the preserved map's specific optional Forge gravity and
+step height attribute warnings separately. Different registry failures, error
+levels, exceptions and datapack failures still stop deployment.
 Then run the [smoke checklist](../SMOKE_TEST.md), especially:
 
 1. Restricted lobby and authentication for the selected mode: Microsoft link/code

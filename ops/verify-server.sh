@@ -83,7 +83,6 @@ verify_worldgen_datapacks() {
 
 check_latest_log() {
   local latest_log="${RUNTIME_DIR}/logs/latest.log"
-  local pattern='Failed to load datapack|Could not load datapack|Failed to parse|Couldn.t parse|registry.*error|Unknown registry|Missing required feature|watchdog|Exception|ERROR'
 
   [[ -f "${latest_log}" ]] || fail "missing latest log: ${latest_log}"
   local provider_message='Hill 175 competition server enabled with development identity linking.'
@@ -92,8 +91,7 @@ check_latest_log() {
   fi
   grep -Fq "${provider_message}" "${latest_log}" \
     || fail "Paper started without the configured Hill175 authentication provider"
-  if grep -Eiq "${pattern}" "${latest_log}"; then
-    grep -Ein "${pattern}" "${latest_log}" >&2
+  if ! python3 "${REPO_DIR}/ops/check-startup-log.py" "${latest_log}"; then
     fail "latest.log contains datapack, registry, watchdog, exception, or ERROR lines"
   fi
 }
