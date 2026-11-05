@@ -254,6 +254,9 @@ verify_people_template
 verify_supplied_maps
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
+python3 "${REPO_DIR}/ops/install-campus-recovery.py" verify --runtime "${RUNTIME_DIR}"
+grep -Fq 'Campus recovery: Restic every 300 seconds' "${RUNTIME_DIR}/logs/latest.log" \
+  || fail "Campus recovery did not initialize"
 if [[ "${AUTH_MODE}" == microsoft ]]; then
   require_line "${SERVER_PROPERTIES}" "online-mode=true"
   auth_port="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print port)"

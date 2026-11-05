@@ -3,7 +3,7 @@ version: '${version}'
 main: org.thehill.hill175.Hill175Plugin
 api-version: '26.2'
 load: POSTWORLD
-softdepend: [floodgate]
+softdepend: [floodgate, WorldEdit, LuckPerms]
 authors: [The Hill School]
 description: Hill School 175th Anniversary Minecraft competition server
 commands:
@@ -38,10 +38,10 @@ commands:
   campus:
     description: Open your campus map and building controls
   campusbackup:
-    description: List, save and restore shared campus backups
+    description: Save recovery points and restore individual campus areas
 permissions:
   hill175.campus.rollback:
-    description: Save and restore the shared campus
+    description: Save snapshots and restore any campus area
     default: op
   hill175.staff:
     description: Faculty moderation tools

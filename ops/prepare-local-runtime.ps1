@@ -169,6 +169,8 @@ try {
     New-Item -ItemType Directory -Force -Path $PluginData | Out-Null
     Copy-Item -LiteralPath 'src\main\resources\config.yml' -Destination (Join-Path $PluginData 'config.yml') -Force
     Set-Content -LiteralPath (Join-Path $Runtime 'eula.txt') -Value 'eula=true'
+    & uv run --python 3.13 python (Join-Path $Root 'ops/install-campus-recovery.py') install --runtime $Runtime
+    if ($LASTEXITCODE -ne 0) { throw 'Campus recovery dependency installation failed.' }
 
     & (Join-Path $Root 'ops\prepare-local-survival-worldgen.ps1') `
         -Runtime $Runtime `

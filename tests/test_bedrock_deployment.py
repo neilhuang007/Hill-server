@@ -63,7 +63,7 @@ class BedrockDeploymentTest(unittest.TestCase):
         self.assertEqual("both", geyser["bedrock"]["transport"])
         self.assertEqual(19136, geyser["bedrock"]["webrtc-port"])
         self.assertEqual("builtin", geyser["bedrock"]["signaling"]["mode"])
-        self.assertEqual(11, geyser["config-version"])
+        self.assertEqual(12, geyser["config-version"])
         self.assertTrue(geyser["advanced"]["bedrock"]["validate-bedrock-login"])
         self.assertFalse(geyser["motd"]["passthrough-player-counts"])
         self.assertFalse(geyser["log-player-ip-addresses"])

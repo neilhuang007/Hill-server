@@ -108,7 +108,7 @@ def config_bytes(port):
                                   "signaling-trusted-proxies": ["127.0.0.1", "::1"]},
                      "java": {"use-direct-connection": True, "use-haproxy-protocol": False}},
         "debug-mode": False,
-        "config-version": 11,
+        "config-version": 12,
     }
     return {"plugins/Geyser-Spigot/config.yml": (CONFIG_HEADER + json.dumps(geyser, indent=2) + "\n").encode(),
             "plugins/floodgate/config.yml": FLOODGATE_CONFIG.read_text(encoding="utf-8").encode()}

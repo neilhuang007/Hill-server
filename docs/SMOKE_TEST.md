@@ -11,6 +11,11 @@ Deployment tools are in `ops/`; see the [source guide](operations/deployment.md)
 
 ## Automated checks
 
+`ops/run-campus-recovery-smoke.py` checks scoped staff recovery through real Java
+and Bedrock command clients in a disposable campus. It verifies confirmation,
+exact area isolation, chest contents and the real five minute timer. See the
+[shared campus guide](operations/shared-campus.md) for commands and installation.
+
 The [player action map and recorded results](operations/player-experience-review.md)
 separate remote baseline checks from the current local implementation. Use JDK 25
 for `./gradlew.bat clean test jar`. Against the local development server:

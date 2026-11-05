@@ -102,6 +102,9 @@ restore_runtime_files() {
   restore_runtime_file "${RUNTIME_DIR}/spigot.yml" spigot.yml
   restore_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
   restore_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
+  restore_runtime_file "${RUNTIME_DIR}/plugins/WorldEdit.jar" worldedit.jar
+  restore_runtime_file "${RUNTIME_DIR}/plugins/LuckPerms.jar" luckperms.jar
+  restore_runtime_file "${RUNTIME_DIR}/tools/restic" restic
   restore_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
   restore_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" imported-worlds.yml
   for index in "${!bedrock_paths[@]}"; do
@@ -369,6 +372,7 @@ if [[ ! -d "${RUNTIME_DIR}/world-templates" ]]; then
 fi
 validate_people_template_root
 validate_supplied_maps
+python3 "${REPO_DIR}/ops/install-campus-recovery.py" prepare --runtime "${RUNTIME_DIR}"
 
 if ! id "${SERVICE_USER}" >/dev/null 2>&1; then
   useradd --system --home-dir "${RUNTIME_DIR}" --shell /usr/sbin/nologin "${SERVICE_USER}"
@@ -448,12 +452,16 @@ backup_runtime_file "${RUNTIME_DIR}/server.properties" server.properties
 backup_runtime_file "${RUNTIME_DIR}/spigot.yml" spigot.yml
 backup_runtime_file "${RUNTIME_DIR}/plugins/${CHUNKY_FILENAME}" chunky.jar
 backup_runtime_file "${RUNTIME_DIR}/plugins/Chunky/config.yml" chunky-config.yml
+backup_runtime_file "${RUNTIME_DIR}/plugins/WorldEdit.jar" worldedit.jar
+backup_runtime_file "${RUNTIME_DIR}/plugins/LuckPerms.jar" luckperms.jar
+backup_runtime_file "${RUNTIME_DIR}/tools/restic" restic
 backup_runtime_file "${RUNTIME_DIR}/eula.txt" eula.txt
 backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" imported-worlds.yml
 for index in "${!bedrock_paths[@]}"; do
   backup_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
 done
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" "${paper_target}" "${RUNTIME_DIR}/paper.jar"
+python3 "${REPO_DIR}/ops/install-campus-recovery.py" install --runtime "${RUNTIME_DIR}"
 if [[ "${BEDROCK_ENABLED}" == true ]]; then
   python3 "${REPO_DIR}/ops/install-bedrock.py" install --runtime "${RUNTIME_DIR}" --port "${BEDROCK_PORT}"
 fi

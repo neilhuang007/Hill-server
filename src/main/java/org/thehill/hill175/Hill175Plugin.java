@@ -21,6 +21,7 @@ import org.thehill.hill175.ui.MenuModule;
 import org.thehill.hill175.world.WorldModule;
 import org.thehill.hill175.gallery.GalleryHttpServer;
 import org.thehill.hill175.backup.CampusBackupService;
+import org.thehill.hill175.backup.CampusRecoveryService;
 import org.thehill.hill175.listener.CampusSafetyListener;
 import org.thehill.hill175.ui.BuildingLocationService;
 import org.thehill.hill175.ui.CampusMapMenu;
@@ -42,7 +43,7 @@ public final class Hill175Plugin extends JavaPlugin {
     private MicrosoftSsoService schoolIdentity;
     private GalleryHttpServer gallery;
     private MenuModule menus;
-    private CampusBackupService campusBackups;
+    private CampusRecoveryService campusBackups;
     private BuildingLocationService locations;
     private CampusMapMenu campusMap;
     private CampusUndoService campusUndo;
@@ -89,8 +90,8 @@ public final class Hill175Plugin extends JavaPlugin {
                 schoolIdentity
         );
         if (worlds.sharedCampusEntry().isPresent()) {
-            campusBackups = new CampusBackupService(this, competition::isAuthenticated);
-            campusBackups.initialize();
+            campusBackups = new CampusRecoveryService(this, competition::isAuthenticated);
+            campusBackups.initialize(worlds);
         }
         if (schoolIdentity != null) {
             // Session construction validates online-mode and Floodgate before any browser endpoint opens.
@@ -118,8 +119,14 @@ public final class Hill175Plugin extends JavaPlugin {
         CommandModule commands = new CommandModule(competition, menus);
 
         PluginManager pluginManager = getServer().getPluginManager();
-        campusUndo = new CampusUndoService(this, competition::mayBuild, worlds::isSharedCampus);
-        competition.campusUndo(campusUndo::undo);
+        campusUndo = new CampusUndoService(this,
+                (player, location) -> (campusBackups == null || !campusBackups.isRestoring()) && competition.mayBuild(player, location),
+                worlds::isSharedCampus);
+        competition.campusUndo(player -> {
+            if (campusBackups != null && campusBackups.isRestoring()) {
+                player.sendMessage("Undo is paused while a campus area is being restored.");
+            } else campusUndo.undo(player);
+        });
         pluginManager.registerEvents(campusUndo, this);
         pluginManager.registerEvents(menus, this);
         pluginManager.registerEvents(hubNpcs, this);

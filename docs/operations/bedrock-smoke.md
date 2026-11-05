@@ -6,12 +6,12 @@ accounts without requiring a separate Java account. Two independent game servers
 are unnecessary for this setup. See the [official Geyser overview](https://geysermc.org/)
 and [Floodgate setup](https://geysermc.org/wiki/floodgate/setup/).
 
-The deployment manifest pins **Geyser 2.11.3 build 1249**, **Floodgate 2.2.5
-build 141**, and Java **26.2**. The [pinned Geyser change](https://github.com/GeyserMC/Geyser/commit/f66329d9d21b3c836edc014fbb9d8312fbe34285)
-explicitly supports Bedrock 26.30–26.52; 26.50, 26.51 and 26.52 share protocol
-2193. Installing the current Geyser release without reviewing Java compatibility
-would change this combination: the [current version page](https://geysermc.org/wiki/geyser/supported-versions/)
-describes Java 26.3. The manifest records immutable download URLs and SHA-256.
+The deployment manifest pins **Geyser 2.12.1 build 1289**, **Floodgate 2.2.5
+build 141**, **ViaVersion 5.12.2**, and Paper **26.2**. ViaVersion provides the
+Java 26.3 protocol required by the bridge. The [pinned Geyser source](https://github.com/GeyserMC/Geyser/commit/3a1ebeb51901ddcbadb7d90c6bd9150053571ed6)
+uses configuration schema 12 and accepts `both` or `nethernet` transport.
+The smoke fixture uses `both`, loopback binds and disabled STUN discovery.
+The manifest records immutable download URLs and SHA-256.
 
 ## Run the script
 

@@ -86,6 +86,7 @@ def stageRuntime(args):
     (runtime / "eula.txt").write_text("eula=true\n", encoding="utf-8")
     (runtime / "server.properties").write_text(serverProperties(args.javaPort), encoding="utf-8")
     (runtime / '.hill175-smoke-fixture').write_text('Disposable Hill175 fixture\n', encoding='utf-8')
+    subprocess.run([sys.executable, str(repository / 'ops/install-campus-recovery.py'), 'install', '--runtime', str(runtime)], check=True)
     return runtime
 
 
@@ -104,9 +105,10 @@ def writeBridgeConfig(runtime, securedConfig, shouldValidate):
     header, body = securedConfig.decode().split("\n", 1)
     config = json.loads(body)
     config["bedrock"]["address"] = "127.0.0.1"
-    # Unsigned fixtures stay exclusively on loopback. NetherNet refuses a
-    # loopback bind; its public signaling is verified separately with auth on.
-    config["bedrock"]["transport"] = "raknet"
+    # Unsigned fixtures stay exclusively on loopback. Geyser 1289 requires
+    # both transports to retain RakNet; public NetherNet is checked separately.
+    config["bedrock"]["transport"] = "both"
+    config["bedrock"]["signaling"] = {"mode": "builtin", "stun-discovery": False}
     config["advanced"]["bedrock"]["validate-bedrock-login"] = shouldValidate
     target = runtime / "plugins/Geyser-Spigot/config.yml"
     target.write_text(header + "\n" + json.dumps(config, indent=2) + "\n", encoding="utf-8")

@@ -2,7 +2,8 @@
 
 The active local mode is one shared Hill campus. Every signed in student can
 build in Creative mode, use the campus image to travel, and see nearby building
-names. Staff can restore a campus recovery point saved every five minutes.
+names. Staff can restore individual campus areas from compressed, deduplicated
+Restic recovery points saved every five minutes, using WorldEdit and LuckPerms.
 Neil selected V60 from `../Hill-campus-work` on November 3, 2026.
 
 See the [shared campus guide](docs/operations/shared-campus.md) for joining,

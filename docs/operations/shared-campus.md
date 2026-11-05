@@ -84,26 +84,74 @@ These campus protections do not change the separate survival worlds.
 
 ## Staff recovery
 
-The server saves an initial recovery point and another every five minutes.
-Staff need `hill175.campus.rollback` (operators receive it by default).
+The server saves an initial recovery point and another every five minutes using
+[Restic](https://restic.readthedocs.io/en/stable/040_backup.html). Its compressed,
+encrypted repository deduplicates data across recovery points. Unchanged campus
+data is stored once. Each snapshot still represents the complete campus, so any
+available area can be recovered independently from the same timestamp.
 
-1. `/campusbackup list` shows recent snapshots. Use a page number for older ones.
-2. `/campusbackup save` creates a recovery point immediately.
-3. `/campusbackup restore <backup> confirm` verifies the selected snapshot,
-   saves the current campus, and stops the server for restoration.
+[WorldEdit](https://worldedit.enginehub.org/en/latest/usage/snapshots/) restores
+only the selected area's blocks and block entities, including chest contents.
+Players stay connected. Account records, player inventories, free entities and
+biomes are outside this area restore. Neighboring areas keep their current work.
+Measured building footprints and exact construction area unions are reused.
+Grounds tiles cover the rest of the campus. Every selection uses the world's
+full build height and is clipped to the campus boundary.
 
-The local preview supervisor and the supplied systemd service restart after a
-requested restore. Students reconnect afterward.
-Restore affects the whole campus, including all building changes since that
-snapshot. It is not a rollback of one student's actions. Accounts and school
-identity records remain current. The current campus is preserved before the
-restore, so staff can recover from choosing the wrong snapshot.
+1. `/campusbackup here` shows the recovery areas covering your location.
+2. `/campusbackup areas [page]` lists area IDs and names.
+3. `/campusbackup list [page]` lists snapshot IDs and their UTC timestamps.
+4. `/campusbackup save` creates a recovery point immediately.
+5. `/campusbackup restore <snapshot> <area>` prepares a confirmation command.
+6. `/campusbackup restore <snapshot> <area> confirm` verifies source data,
+   creates a safety snapshot, and restores that area in small WorldEdit batches.
 
-Snapshots are stored in `campus-backups/shared-campus` inside the server folder.
-The restore verifies file checksums before replacing the campus. An interrupted
-replacement resumes from its saved request on startup. Backups remain on the
-same disk and are retained until an operator archives them. Copy important
-recovery points elsewhere for protection against disk failure.
+Building and interaction inside the selected area pause during recovery. Undo
+pauses during an area restore. Other areas remain available. A persistent restore
+request resumes on startup if the server stops during editing. Failed edits keep
+the selected area locked and preserve the safety snapshot. Retry the recorded
+snapshot and area to finish the request, then restore its safety snapshot if
+needed. A source verification failure changes no blocks.
+
+Use the installed [LuckPerms](https://luckperms.net/wiki/Permission-Commands)
+from the server console to grant recovery access without operator privileges:
+
+```text
+lp user <player> permission set hill175.campus.rollback true
+```
+
+For access to one area only, use its exact permission node:
+
+```text
+lp user <player> permission set hill175.campus.rollback.area-s7 true
+```
+
+The player must sign in before using recovery commands. Bedrock uses the same
+commands and permissions through Floodgate. Use the player's Floodgate UUID as
+the LuckPerms subject for Bedrock accounts. Set the same permission
+to `false` to revoke access. Area staff can list and create recovery points but
+can restore only their assigned area. Do not grant broad WorldEdit or operator
+permissions to this role.
+
+Install the checksum verified Restic 0.19.1, WorldEdit 7.4.6 and LuckPerms 5.5.71
+with `uv run --python 3.13 python ops/install-campus-recovery.py install --runtime <server>`
+while Paper is stopped. The normal installer and new disposable fixtures do this
+automatically. Existing local previews need the same one time installation.
+Snapshot I/O runs away from the game thread, with world saving flushed and paused
+until Restic finishes. Saving is restored after success, failure or shutdown.
+
+The repository is `campus-backups/restic`; its required password file is
+`campus-backups/restic-password`. Protect and back up both. Existing folder
+snapshots in `campus-backups/shared-campus` are preserved as legacy recovery
+material. The older pending whole campus recovery format remains readable.
+Snapshots are retained until an operator archives them. The existing daily Borg
+backup also captures the repository and key. Offsite storage remains an operator
+responsibility.
+
+Run `ops/run-campus-recovery-smoke.py` with the source runtime and unused ports
+to test real Java and Bedrock staff clients, scoped authorization, confirmation,
+area isolation, chest restoration, secure Xbox rejection and an actual scheduled
+five minute snapshot. Evidence is written only in its disposable runtime.
 
 The earlier private project worlds remain preserved. Shared building does not
 require a project, review request, submission or merge.

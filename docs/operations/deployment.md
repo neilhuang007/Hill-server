@@ -284,6 +284,13 @@ success as real Java/Bedrock client or Microsoft SSO acceptance.
 
 ## Backups and recovery
 
+Shared campus recovery uses Restic for compressed, deduplicated snapshots every
+five minutes and WorldEdit for restoring individual areas while players remain
+connected. LuckPerms controls staff access, including access to one named area.
+The installer includes their pinned, checksum verified releases. Commands,
+repository protection and the Java and Bedrock restore smoke test are documented
+in the [shared campus guide](shared-campus.md).
+
 The installer enables a daily cold Borg backup timer at 04:25 with up to 30 minutes
 jitter. Configure `/etc/minecraft-backup.env` for the existing backup script;
 protect it with root-only permissions. The script requires `BORG_REPO_PATH` and

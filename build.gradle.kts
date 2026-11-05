@@ -5,12 +5,18 @@ plugins {
 repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
+    exclusiveContent {
+        forRepository { maven("https://api.modrinth.com/maven") }
+        filter { includeGroup("maven.modrinth") }
+    }
 }
 
 dependencies {
     implementation("com.nimbusds:oauth2-oidc-sdk:11.38.2")
     compileOnly("io.papermc.paper:paper-api:26.2.build.119-stable")
+    compileOnly("maven.modrinth:worldedit:YFnqiUlL") // Official WorldEdit Bukkit 7.4.6
     testImplementation("io.papermc.paper:paper-api:26.2.build.119-stable")
+    testImplementation("maven.modrinth:worldedit:YFnqiUlL")
     testImplementation(platform("org.junit:junit-bom:6.0.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core:5.23.0")
