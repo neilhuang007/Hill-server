@@ -40,6 +40,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -51,14 +53,17 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
     private final Predicate<Player> authenticated;
     private final ResticRepository repository;
     private final ExecutorService worker = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService clock = Executors.newSingleThreadScheduledExecutor(
+            Thread.ofPlatform().daemon(true).name("campus-backup-clock").factory());
     private final Path server;
     private List<CampusRecoveryAreas.Area> areas;
     private World campus;
-    private BukkitTask timer;
+    private ScheduledFuture<?> timer;
     private BukkitTask restoreTask;
     private WorldEditAreaRestore operation;
     private CampusRecoveryAreas.Area lockedArea;
     private boolean busy;
+    private boolean scheduledPending;
     private volatile boolean closing;
     private Boolean previousAutoSave;
 
@@ -89,7 +94,9 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
                 Bukkit.getScheduler().runTask(plugin, () -> startRestore(Bukkit.getConsoleSender(), request.getProperty("snapshot"), area, request.getProperty("safety")));
             } catch (IOException exception) { throw new IllegalStateException("Cannot read interrupted area restore.", exception); }
         } else Bukkit.getScheduler().runTask(plugin, () -> scheduledCapture("initial"));
-        timer = Bukkit.getScheduler().runTaskTimer(plugin, () -> scheduledCapture("five-minute"), 20L * 300, 20L * 300);
+        timer = clock.scheduleAtFixedRate(() -> {
+            if (!closing) Bukkit.getScheduler().runTask(plugin, () -> scheduledCapture("five-minute"));
+        }, 300, 300, TimeUnit.SECONDS);
         plugin.getLogger().info("Campus recovery: Restic every 300 seconds, WorldEdit area restore, " + areas.size() + " available areas.");
     }
 
@@ -148,11 +155,13 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
     }
 
     private void scheduledCapture(String reason) {
-        if (busy || closing) return;
+        if (closing) return;
+        if (busy) { if (reason.equals("five-minute")) scheduledPending = true; return; }
         busy = true;
         capture(reason, (id, error) -> {
             busy = false;
             if (error != null) plugin.getLogger().log(Level.SEVERE, "Campus Restic backup failed. Previous recovery points are preserved.", error);
+            runPendingCapture();
         });
     }
 
@@ -234,6 +243,11 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
         // If editing was interrupted, keep this area locked until the recorded request is resumed.
         if (!Files.exists(journal())) lockedArea = null;
         busy = false;
+        runPendingCapture();
+    }
+
+    private void runPendingCapture() {
+        if (scheduledPending && !closing && lockedArea == null) { scheduledPending = false; scheduledCapture("five-minute"); }
     }
 
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -270,6 +284,7 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
                         busy = false;
                         if (error != null) fail(sender, error);
                         else sender.sendMessage("Campus backup saved: " + id);
+                        runPendingCapture();
                     });
                 }
                 case "restore" -> {
@@ -326,7 +341,8 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
 
     @Override public void close() {
         closing = true;
-        if (timer != null) timer.cancel();
+        if (timer != null) timer.cancel(false);
+        clock.shutdownNow();
         if (restoreTask != null) restoreTask.cancel();
         worker.shutdownNow();
         try { worker.awaitTermination(30, TimeUnit.SECONDS); }

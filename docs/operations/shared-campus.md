@@ -89,6 +89,9 @@ The server saves an initial recovery point and another every five minutes using
 encrypted repository deduplicates data across recovery points. Unchanged campus
 data is stored once. Each snapshot still represents the complete campus, so any
 available area can be recovered independently from the same timestamp.
+The five minute interval follows the wall clock rather than Minecraft tick speed.
+If a restore is active when a backup becomes due, that backup runs when the
+restore finishes.
 
 [WorldEdit](https://worldedit.enginehub.org/en/latest/usage/snapshots/) restores
 only the selected area's blocks and block entities, including chest contents.
