@@ -29,6 +29,10 @@ def console_command(request):
         # Floodgate assigns this UUID to unsigned clients with no XUID in the isolated fixture.
         subject = '00000000-0000-0000-0000-000000000000' if name.startswith('.') else name
         return [f'lp user {subject} permission set hill175.campus.rollback.area-s7 true', tell('RECOVERY_GRANT')]
+    if action == 'inventory':
+        return [f'minecraft:item replace entity {name} hotbar.3 with minecraft:netherite_ingot 7', tell('RECOVERY_INVENTORY')]
+    if action == 'restart':
+        return ['stop']
     if action in ('seed', 'damage'):
         block = 'blue_wool' if action == 'seed' else 'gold_block'
         neighbor = 'emerald_block' if action == 'seed' else 'diamond_block'
@@ -39,9 +43,21 @@ def console_command(request):
                 world + f'minecraft:setblock 71 200 -40 {chest}']
         if action == 'seed':
             commands.append(world + 'minecraft:item replace block 71 200 -40 container.0 with minecraft:diamond 3')
+            if os.environ.get('HILL175_RECOVERY_PREVIEW') == '1':
+                commands.append(f'minecraft:item replace entity {name} hotbar.3 with minecraft:netherite_ingot 7')
         return commands + [tell('RECOVERY_SEEDED' if action == 'seed' else 'RECOVERY_DAMAGED')]
     if action == 'assert-damaged':
         return [world + f'minecraft:execute if block 70 200 -40 gold_block run {tell("RECOVERY_STILL_DAMAGED")}']
+    if action == 'assert-preview':
+        return [world + f'minecraft:execute if block 70 200 -40 gold_block as {name} at @s unless dimension minecraft:hill_campus '
+                + 'if entity @s[gamemode=adventure] if block 70 200 -40 blue_wool if items block 71 200 -40 container.0 minecraft:diamond run '
+                + tell('RECOVERY_PREVIEW_EXACT')]
+    if action == 'load-preview':
+        return [f'minecraft:execute as {name} at @s run minecraft:forceload add 64 -48 80 -32',
+                f'minecraft:execute as {name} at @s run minecraft:tp @s 72 203 -37', tell('RECOVERY_PREVIEW_POSITION')]
+    if action == 'assert-canceled':
+        return [f'minecraft:execute as {name} at @s if dimension minecraft:hill_campus if entity @s[gamemode=creative] '
+                + 'if block 70 200 -40 gold_block if items entity @s hotbar.3 minecraft:netherite_ingot run ' + tell('RECOVERY_CANCEL_EXACT')]
     if action == 'assert-restored':
         return [world + 'minecraft:execute if block 70 200 -40 blue_wool if block 69 200 -40 diamond_block '
                 + 'if block 71 200 -40 chest if items block 71 200 -40 container.0 minecraft:diamond run '
@@ -49,16 +65,16 @@ def console_command(request):
     raise ValueError('Unknown fixture action.')
 
 
-def client(args, runtime, server, platform):
-    if platform == 'bedrock':
+def client(args, runtime, server, platform, phase='flow'):
+    if platform == 'bedrock' and phase == 'flow':
         server.stdin.write('lp user 00000000-0000-0000-0000-000000000000 permission unset hill175.campus.rollback.area-s7\n')
         server.stdin.flush()
         time.sleep(1)
     env = os.environ | {'HILL175_RECOVERY_FIXTURE': str(runtime), 'HILL175_RECOVERY_JAVA_PORT': str(args.javaPort),
                         'HILL175_RECOVERY_BEDROCK_PORT': str(args.bedrockPort)}
-    with subprocess.Popen([args.node, str(ROOT / 'ops/smoke-campus-recovery.mjs'), platform], cwd=ROOT, env=env,
+    with subprocess.Popen([args.node, str(ROOT / 'ops/smoke-campus-recovery.mjs'), platform, phase], cwd=ROOT, env=env,
                           stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding='utf-8') as process:
-        with (runtime / f'client-recovery-{platform}.log').open('w', encoding='utf-8') as log:
+        with (runtime / f'client-recovery-{platform}-{phase}.log').open('w', encoding='utf-8') as log:
             for line in process.stdout:
                 log.write(line); log.flush()
                 if line.startswith('SMOKE_RECOVERY '):
@@ -97,18 +113,25 @@ def main():
         with runner.runningServer(args, runtime, 'recovery') as server:
             started = time.monotonic()
             started_wall = time.time()
-            client(args, runtime, server, 'java')
-            client(args, runtime, server, 'bedrock')
+            if os.environ.get('HILL175_RECOVERY_PREVIEW_RESTART_ONLY') != '1':
+                client(args, runtime, server, 'java')
+                client(args, runtime, server, 'bedrock')
             log = runtime / 'server-recovery.log'
-            while time.monotonic() - started < 390:
-                if any('five-minute' in snapshot.get('tags', []) and datetime.fromisoformat(snapshot['time']).timestamp() >= started_wall for snapshot in snapshots(runtime)):
-                    print('PASS: real scheduled five minute recovery point created.', flush=True)
-                    break
-                print('Waiting for the real five minute recovery timer...', flush=True)
-                time.sleep(20)
+            if os.environ.get('HILL175_RECOVERY_PREVIEW') == '1':
+                client(args, runtime, server, 'java', 'prepare-restart')
             else:
-                raise RuntimeError('Scheduled five minute recovery snapshot was not created.')
-        print('PASS: Java and Bedrock scoped recovery, neighbor isolation, chest NBT, Xbox rejection and five minute scheduling. ' + str(runtime))
+                while time.monotonic() - started < 390:
+                    if any('five-minute' in snapshot.get('tags', []) and datetime.fromisoformat(snapshot['time']).timestamp() >= started_wall for snapshot in snapshots(runtime)):
+                        print('PASS: real scheduled five minute recovery point created.', flush=True)
+                        break
+                    print('Waiting for the real five minute recovery timer...', flush=True)
+                    time.sleep(20)
+                else:
+                    raise RuntimeError('Scheduled five minute recovery snapshot was not created.')
+        if os.environ.get('HILL175_RECOVERY_PREVIEW') == '1':
+            with runner.runningServer(args, runtime, 'recovery-preview-restart') as server:
+                client(args, runtime, server, 'java', 'after-restart')
+        print('PASS: Java and Bedrock recovery, neighbor isolation and chest NBT. Preview mode also checks menus, cancel, version switching, disconnect and restart. ' + str(runtime))
     finally:
         config.write_bytes(secured)
         runner.installer.verify(runtime, manifest, args.bedrockPort)

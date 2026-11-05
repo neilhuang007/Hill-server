@@ -69,6 +69,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public final class CompetitionModule {
+    private java.util.function.Predicate<Player> recoveryPreview = player -> false;
+    public void recoveryPreview(java.util.function.Predicate<Player> predicate) { recoveryPreview = java.util.Objects.requireNonNull(predicate); }
     public static final String COMPASS_ITEM_ID = "competition-compass";
     public static final String CAMERA_ITEM_ID = "submission-camera";
     public static final String ENTRY_MENU_ITEM_ID = "entry-controls";
@@ -556,7 +558,7 @@ public final class CompetitionModule {
             message(player, NamedTextColor.WHITE, "Hotbar 9: campus map. Hotbar 8: Undo. Right click to use either tool.");
             message(player, NamedTextColor.WHITE, "/rules: read the shared building rules");
             if (player.hasPermission("hill175.campus.rollback")) {
-                message(player, NamedTextColor.WHITE, "/campusbackup list, /campusbackup save, /campusbackup restore <backup> confirm");
+                message(player, NamedTextColor.WHITE, "Campus Map, Staff Recovery: preview saved versions and confirm an area restore from your hotbar. /campusbackup also opens recovery.");
             }
             return;
         }
@@ -861,6 +863,7 @@ public final class CompetitionModule {
     }
 
     public boolean mayBuild(Player player, Location location) {
+        if (recoveryPreview.test(player)) return false;
         if (!isAuthenticated(player)) {
             return false;
         }
@@ -876,6 +879,7 @@ public final class CompetitionModule {
     }
 
     public void refreshMovementMode(Player player, Location location) {
+        if (recoveryPreview.test(player)) return;
         if (!isAuthenticated(player)) {
             return;
         }
@@ -1807,6 +1811,10 @@ public final class CompetitionModule {
         activeKitByPlayer.put(player.getUniqueId(), "shared-campus");
     }
 
+    public void refreshCampusTools(Player player) {
+        if (isAuthenticated(player) && worlds.isSharedCampus(player.getWorld())) giveSharedCampusItems(player);
+    }
+
     private void placeCampusTool(Player player, int slot, ItemStack tool) {
         PlayerInventory inventory = player.getInventory();
         ItemStack previous = inventory.getItem(slot);
@@ -1959,6 +1967,10 @@ public final class CompetitionModule {
         } catch (IllegalStateException exception) {
             message(player, NamedTextColor.YELLOW, exception.getMessage());
         }
+    }
+
+    public ItemStack recoveryControl(Material material, String name, String lore) {
+        return competitionItem(material, "campus-recovery-preview", name, lore);
     }
 
     private ItemStack competitionItem(Material material, String id, String name, String lore) {

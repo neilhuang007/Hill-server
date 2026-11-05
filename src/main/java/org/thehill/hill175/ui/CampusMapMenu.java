@@ -57,6 +57,8 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
     private final Set<UUID> offeredPack = new HashSet<>();
     private final Set<UUID> loadedPack = new HashSet<>();
     private Consumer<Player> undoAction;
+    private Predicate<Player> canRecover = player -> false;
+    private Consumer<Player> recoveryAction;
     private volatile boolean isClosed;
 
     public CampusMapMenu(JavaPlugin plugin, String revision, BuildRegion campusBounds,
@@ -77,6 +79,7 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
     }
 
     public void undoAction(Consumer<Player> action) { undoAction = Objects.requireNonNull(action); }
+    public void recoveryAction(Predicate<Player> allowed, Consumer<Player> action) { canRecover = Objects.requireNonNull(allowed); recoveryAction = Objects.requireNonNull(action); }
     public void labels(CampusMapLabels value) {
         labels = Objects.requireNonNull(value);
         destinations = value.destinations();
@@ -99,8 +102,11 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
             choices.add(new Choice(isZoomed ? "Whole Campus" : "Zoom Buildings", next -> openMap(next, !isZoomed)));
         }
         choices.add(new Choice("Undo Last 15 Seconds", next -> undoAction.accept(next)));
+        if (recoveryAction != null && canRecover.test(player)) choices.add(new Choice("Staff Recovery", next -> recoveryAction.accept(next)));
         addPackChoice(player, choices, isZoomed);
-        show(player, session, isZoomed ? "Campus Buildings" : "Hill Campus Map", mapBody(player, session, isZoomed),
+        // Older Bedrock map packs have fixed button indices. Staff tools use a native form.
+        String title = bedrock.isBedrock(player) && canRecover.test(player) ? "Campus Map and Staff Tools" : isZoomed ? "Campus Buildings" : "Hill Campus Map";
+        show(player, session, title, mapBody(player, session, isZoomed),
                 "Choose Buildings, then a numbered destination. Everyone builds together in the shared campus.", choices);
     }
 

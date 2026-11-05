@@ -22,6 +22,7 @@ import org.thehill.hill175.world.WorldModule;
 import org.thehill.hill175.gallery.GalleryHttpServer;
 import org.thehill.hill175.backup.CampusBackupService;
 import org.thehill.hill175.backup.CampusRecoveryService;
+import org.thehill.hill175.backup.CampusRecoveryPreview;
 import org.thehill.hill175.listener.CampusSafetyListener;
 import org.thehill.hill175.ui.BuildingLocationService;
 import org.thehill.hill175.ui.CampusMapMenu;
@@ -44,6 +45,7 @@ public final class Hill175Plugin extends JavaPlugin {
     private GalleryHttpServer gallery;
     private MenuModule menus;
     private CampusRecoveryService campusBackups;
+    private CampusRecoveryPreview recoveryPreview;
     private BuildingLocationService locations;
     private CampusMapMenu campusMap;
     private CampusUndoService campusUndo;
@@ -203,6 +205,13 @@ public final class Hill175Plugin extends JavaPlugin {
         campusMap = new CampusMapMenu(this, revision, worlds.campusSelectionRegion(), worlds.buildings(), pack,
                 competition::isAuthenticated, workshop::select, player -> player.closeInventory());
         campusMap.undoAction(competition::undoRecentBuild);
+        if (campusBackups != null) {
+            recoveryPreview = new CampusRecoveryPreview(this, campusBackups, competition);
+            competition.recoveryPreview(recoveryPreview::contains);
+            recoveryPreview.initialize();
+            campusBackups.menuAction(recoveryPreview::open);
+            campusMap.recoveryAction(recoveryPreview::canOpen, recoveryPreview::open);
+        }
         try {
             var labels = org.thehill.hill175.ui.CampusMapLabels.load(assets,
                     getResource("campus-map-destinations.json"), worlds.campusSelectionRegion(), worlds.buildings());
@@ -230,6 +239,7 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (recoveryPreview != null) recoveryPreview.close();
         if (campusMap != null) campusMap.close();
         if (campusUndo != null) campusUndo.close();
         if (locations != null) locations.close();

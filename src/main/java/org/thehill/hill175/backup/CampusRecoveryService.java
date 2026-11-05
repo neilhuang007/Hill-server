@@ -44,6 +44,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 
 /** Staff controls shared by Java and Floodgate, backed by established recovery tools. */
@@ -66,6 +67,7 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
     private boolean scheduledPending;
     private volatile boolean closing;
     private Boolean previousAutoSave;
+    private Consumer<Player> menuAction;
 
     public CampusRecoveryService(JavaPlugin plugin, Predicate<Player> authenticated) {
         this(plugin, authenticated, List.of());
@@ -101,6 +103,60 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
     }
 
     public CampusRecoveryService commands() { return this; }
+    public void menuAction(Consumer<Player> action) { menuAction = action; }
+    public boolean canUse(Player player) {
+        try { requireStaff(player); return true; } catch (SecurityException denied) { return false; }
+    }
+    public List<CampusRecoveryAreas.Area> permittedAreas(Player player) {
+        requireStaff(player);
+        return areas.stream().filter(a -> player.hasPermission(ALL) || player.hasPermission(ALL + "." + a.id())).toList();
+    }
+    void snapshots(Player player, Consumer<List<ResticRepository.Snapshot>> callback) {
+        requireStaff(player);
+        background(repository::list, (snapshots, error) -> {
+            if (error != null) player.sendMessage("Campus recovery: " + error.getMessage());
+            else if (player.isOnline() && canUse(player)) callback.accept(snapshots);
+        });
+    }
+
+    /** Restore into an isolated, marked folder. No live world data or student identities are copied. */
+    void preparePreview(Player player, String id, CampusRecoveryAreas.Area area, String name,
+                        BiConsumer<PreparedPreview, Exception> callback) {
+        requireArea(player, area);
+        if (!name.matches("hill_recovery_[a-f0-9]{32}")) throw new IllegalArgumentException("Invalid preview world name.");
+        Path destination = CampusRecoveryPreview.dimensionRoot(plugin).resolve(name);
+        Path relative = server.relativize(campus.getWorldFolder().toPath().toAbsolutePath().normalize());
+        Path stage = server.resolve("campus-backups/restore-stage-" + UUID.randomUUID());
+        background(() -> {
+            var snapshot = repository.requireSnapshot(id);
+            try {
+                Path source = repository.stage(snapshot.id(), relative, stage);
+                Files.createDirectory(destination);
+                Files.writeString(destination.resolve(".hill175-recovery-preview"), name);
+                Files.move(source.resolve("region"), destination.resolve("region"));
+                for (String file : List.of("hill-campus-template.yml", "hill-buildings.yml", "hill-areas.yml")) {
+                    if (Files.isRegularFile(source.resolve(file))) Files.copy(source.resolve(file), destination.resolve(file));
+                }
+                return new PreparedPreview(snapshot, destination);
+            } finally { if (Files.exists(stage)) deleteStage(stage); }
+        }, callback);
+    }
+
+    void removePreview(Path folder) {
+        background(() -> { CampusRecoveryPreview.deleteWorldFolder(folder); return true; }, (result, error) -> {
+            if (error != null) plugin.getLogger().log(Level.WARNING, "Could not remove temporary recovery world " + folder, error);
+        });
+    }
+
+    void restorePreview(Player player, String snapshot, CampusRecoveryAreas.Area area) throws IOException {
+        checkRestore(player, snapshot, area);
+        startRestore(player, snapshot, area, null);
+    }
+    void checkRestore(Player player, String snapshot, CampusRecoveryAreas.Area area) throws IOException {
+        idle(); requireArea(player, area);
+        if (Files.exists(journal())) throw new IllegalStateException("Finish the pending area restore before starting another.");
+    }
+    record PreparedPreview(ResticRepository.Snapshot snapshot, Path folder) { }
     public boolean isRestoring() { return lockedArea != null; }
     private Path journal() { return server.resolve("campus-backups/area-restore-request.properties"); }
     private CampusRecoveryAreas.Area area(String id) {
@@ -253,8 +309,12 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         try {
             requireStaff(sender);
-            String action = args.length == 0 ? "list" : args[0];
+            String action = args.length == 0 && sender instanceof Player && menuAction != null ? "menu" : args.length == 0 ? "list" : args[0];
             switch (action) {
+                case "menu" -> {
+                    if (!(sender instanceof Player player) || menuAction == null) throw new IllegalStateException("Open recovery from Minecraft.");
+                    menuAction.accept(player);
+                }
                 case "list" -> {
                     int page = args.length > 1 ? Integer.parseInt(args[1]) : 1;
                     if (page < 1) throw new IllegalArgumentException("Page must be positive.");
@@ -309,7 +369,7 @@ public final class CampusRecoveryService implements CommandExecutor, TabComplete
 
     @Override public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         try { requireStaff(sender); } catch (SecurityException denied) { return List.of(); }
-        if (args.length == 1) return List.of("list", "areas", "here", "save", "restore").stream().filter(a -> a.startsWith(args[0])).toList();
+        if (args.length == 1) return List.of("menu", "list", "areas", "here", "save", "restore").stream().filter(a -> a.startsWith(args[0])).toList();
         if (args.length == 3 && args[0].equals("restore")) return areas.stream().filter(a -> sender.hasPermission(ALL) || sender.hasPermission(ALL + "." + a.id())).map(CampusRecoveryAreas.Area::id).filter(id -> id.startsWith(args[2])).toList();
         if (args.length == 4 && args[0].equals("restore")) return List.of("confirm");
         return List.of();

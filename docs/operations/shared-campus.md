@@ -101,6 +101,23 @@ Measured building footprints and exact construction area unions are reused.
 Grounds tiles cover the rest of the campus. Every selection uses the world's
 full build height and is clipped to the campus boundary.
 
+Staff can use the recovery window without typing restore commands:
+
+1. Right click the Campus Map and choose **Staff Recovery**.
+2. Choose an area, then a saved timestamp.
+3. Explore that version in a temporary world. The preview is read only.
+4. Hotbar slot 1 holds **Confirm Restore**, slot 5 holds **Choose Another Version**,
+   and slot 9 holds **Cancel Preview**. Right click the item to use it.
+5. Confirm returns you to campus and restores only the selected area, with a new
+   safety snapshot first. Cancel returns without changing the live campus.
+
+Your inventory and movement settings are preserved. Disconnecting or restarting
+ends the preview and recovers the inventory. Unused previews expire after ten
+minutes, and up to three staff can preview independently. Temporary world data
+is removed after use. `/campusbackup` opens the same recovery window.
+
+The command controls remain available:
+
 1. `/campusbackup here` shows the recovery areas covering your location.
 2. `/campusbackup areas [page]` lists area IDs and names.
 3. `/campusbackup list [page]` lists snapshot IDs and their UTC timestamps.
@@ -155,6 +172,9 @@ Run `ops/run-campus-recovery-smoke.py` with the source runtime and unused ports
 to test real Java and Bedrock staff clients, scoped authorization, confirmation,
 area isolation, chest restoration, secure Xbox rejection and an actual scheduled
 five minute snapshot. Evidence is written only in its disposable runtime.
+Set `HILL175_RECOVERY_PREVIEW=1` for the window and hotbar workflow checks. This
+mode also tests canceling, version switching, disconnecting and a server restart
+while the preview is open.
 
 The earlier private project worlds remain preserved. Shared building does not
 require a project, review request, submission or merge.

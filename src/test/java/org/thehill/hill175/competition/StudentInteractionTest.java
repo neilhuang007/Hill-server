@@ -51,6 +51,17 @@ class StudentInteractionTest {
     @TempDir Path directory;
 
     @Test
+    void recoveryPreviewBlocksEditingEvenForAnAuthenticatedBuilder() throws Exception {
+        Fixture fixture = new Fixture("PreviewStaff");
+        fixture.<Set<UUID>>state("authenticatedSessions").add(fixture.player.getUniqueId());
+        when(fixture.worlds.isSurvivalWorld(any(Location.class))).thenReturn(true);
+        Location location = new Location(fixture.world, 20, 72, 20);
+        assertTrue(fixture.competition.mayBuild(fixture.player, location));
+        fixture.competition.recoveryPreview(player -> true);
+        assertFalse(fixture.competition.mayBuild(fixture.player, location));
+    }
+
+    @Test
     void sharedCampusAllowsEveryAuthenticatedStudentWithinItsBoundary() throws Exception {
         Fixture fixture = new Fixture("Builder");
         Entry campus = new Entry(UUID.randomUUID(), Category.PEOPLE, Set.of(), "hill_journey",
