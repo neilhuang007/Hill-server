@@ -73,13 +73,18 @@ def render(values, ranges):
     return MARKER + peers + template
 
 
-def run(*args):
+def run(*args, conflict_hosts=None):
     result = subprocess.run(args, capture_output=True, timeout=30)
     if result.returncode:
         # nginx diagnostics may contain request information from another site; keep deployment output bounded.
         raise RuntimeError(f"{args[0]} validation/action failed; inspect the operator configuration and service logs")
     if args[0] == "nginx" and b"conflicting server name" in result.stderr:
-        raise RuntimeError("Another nginx site already uses the authentication hostname")
+        # Shared hosts may already have warnings for unrelated sites. Managed
+        # hostnames must still be rejected when nginx would ignore our server.
+        if conflict_hosts is None or any(
+                f'conflicting server name "{host}"'.encode() in result.stderr
+                for host in conflict_hosts):
+            raise RuntimeError("Another nginx site already uses a managed hostname")
     return result.stdout
 
 

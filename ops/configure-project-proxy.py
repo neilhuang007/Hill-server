@@ -72,6 +72,7 @@ server {{
 
 def configure(values, install):
     selected = sites(values)
+    managed_hosts = {host for host, _, _ in selected}
     if not selected:
         if TARGET.exists():
             raise ValueError('Existing project proxy needs its public URLs preserved')
@@ -97,14 +98,14 @@ def configure(values, install):
         try:
             TARGET.write_text(content)
             TARGET.chmod(0o644)
-            auth.run('nginx', '-t')
+            auth.run('nginx', '-t', conflict_hosts=managed_hosts)
             auth.run('systemctl', 'reload', 'nginx.service')
         except Exception:
             if previous is None:
                 TARGET.unlink(missing_ok=True)
             else:
                 TARGET.write_bytes(previous)
-            auth.run('nginx', '-t')
+            auth.run('nginx', '-t', conflict_hosts=managed_hosts)
             auth.run('systemctl', 'reload', 'nginx.service')
             raise
 

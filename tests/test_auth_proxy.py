@@ -100,6 +100,16 @@ class AuthProxyTest(unittest.TestCase):
         with patch.object(proxy.subprocess, "run", return_value=result), self.assertRaises(RuntimeError):
             proxy.run("nginx", "-t")
 
+    def test_scoped_nginx_check_allows_unrelated_hostname_warning(self):
+        result = subprocess.CompletedProcess([], 0, b"ok", b'[warn] conflicting server name "_" ignored')
+        with patch.object(proxy.subprocess, "run", return_value=result):
+            self.assertEqual(b"ok", proxy.run("nginx", "-t", conflict_hosts={"campus.example.org"}))
+
+    def test_scoped_nginx_check_rejects_managed_hostname_warning(self):
+        result = subprocess.CompletedProcess([], 0, b"", b'[warn] conflicting server name "campus.example.org" ignored')
+        with patch.object(proxy.subprocess, "run", return_value=result), self.assertRaises(RuntimeError):
+            proxy.run("nginx", "-t", conflict_hosts={"campus.example.org"})
+
     @unittest.skipUnless(os.name == "posix" and os.geteuid() == 0 and shutil.which("nginx") and shutil.which("openssl"),
                          "Linux root nginx/OpenSSL integration test; no live site is installed")
     def test_real_tls_and_standalone_nginx_validation(self):
