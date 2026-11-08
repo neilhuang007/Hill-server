@@ -31,14 +31,14 @@ def sites(values):
 
 def render(values, ranges):
     cert, key, ca = auth.certificate_paths(values)
-    content = MARKER + 'geo $realip_remote_addr $hill175_project_cloudflare {\n    default 0;\n'
+    listeners, peer = auth.nginx_ingress(values)
+    content = MARKER + f'geo {peer} $hill175_project_cloudflare {{\n    default 0;\n'
     content += ''.join(f'    {network} 1;\n' for network in ranges) + '}\n'
     for host, port, signaling in sites(values):
         location = '/v1/join' if signaling else '/'
         content += f'''
 server {{
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    {listeners}
     server_name {host};
     ssl_certificate {cert};
     ssl_certificate_key {key};

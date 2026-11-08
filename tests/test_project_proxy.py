@@ -26,6 +26,14 @@ class ProjectProxyTest(unittest.TestCase):
         self.assertIn('access_log off;', content)
         self.assertIn('proxy_cache off;', content)
 
+    def test_stream_backend_keeps_origin_auth_and_original_peer(self):
+        content = proxy.render(self.config() | {'HILL175_NGINX_PROXY_PROTOCOL_PORT': '8444'},
+                               [ipaddress.ip_network('173.245.48.0/20')])
+        self.assertEqual(2, content.count('listen 127.0.0.1:8444 ssl proxy_protocol;'))
+        self.assertIn('geo $proxy_protocol_addr $hill175_project_cloudflare', content)
+        self.assertEqual(2, content.count('ssl_verify_client on;'))
+        self.assertNotIn('listen 443 ssl;', content)
+
     def test_rejects_injection_and_ambiguous_hosts(self):
         for url in ('http://example.org', 'https://example.org/path', 'https://user@example.org',
                     'https://example.org:19132', 'https://bad;host.org'):

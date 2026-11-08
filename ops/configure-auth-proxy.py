@@ -52,6 +52,14 @@ def cloudflare_ranges():
     return result
 
 
+def nginx_ingress(values):
+    CONFIG.validate(values)
+    port = values.get("HILL175_NGINX_PROXY_PROTOCOL_PORT")
+    if port is not None:
+        return f"listen 127.0.0.1:{int(port)} ssl proxy_protocol;", "$proxy_protocol_addr"
+    return "listen 443 ssl;\n    listen [::]:443 ssl;", "$realip_remote_addr"
+
+
 def render(values, ranges):
     _, port = CONFIG.validate(values, "microsoft")
     host = urlsplit(values["HILL175_AUTH_PUBLIC_URL"]).hostname.lower()
@@ -60,13 +68,15 @@ def render(values, ranges):
     cert, key, ca = certificate_paths(values)
     template = (ROOT / "ops/nginx/hill175-auth.conf.example").read_text(encoding="utf-8")
     template = template[template.index("server {"):]
+    listeners, peer = nginx_ingress(values)
+    template = template.replace("listen 443 ssl;\n    listen [::]:443 ssl;", listeners)
     template = template.replace("auth.example.org", host).replace("127.0.0.1:8087", f"127.0.0.1:{port}")
     for old, new in (("/etc/nginx/certs/hill175-origin.pem", cert),
                      ("/etc/nginx/certs/hill175-origin.key", key),
                      ("/etc/nginx/certs/hill175-aop-ca.pem", ca)):
         template = template.replace(old, str(new))
     # realip_remote_addr retains the TCP peer even if a global real-IP rule rewrites remote_addr.
-    peers = "geo $realip_remote_addr $hill175_cloudflare_peer {\n    default 0;\n"
+    peers = f"geo {peer} $hill175_cloudflare_peer {{\n    default 0;\n"
     peers += "".join(f"    {network} 1;\n" for network in ranges)
     peers += "}\n\n"
     template = template.replace("    location / {", "    if ($hill175_cloudflare_peer = 0) { return 444; }\n\n    location / {")

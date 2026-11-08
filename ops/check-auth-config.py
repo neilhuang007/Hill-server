@@ -19,6 +19,7 @@ SUPPORTED = {
     "HILL175_ORIGIN_CERT", "HILL175_ORIGIN_KEY", "HILL175_AOP_CA",
     "HILL175_BEDROCK_ENABLED", "HILL175_BEDROCK_PORT",
     "HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL",
+    "HILL175_NGINX_PROXY_PROTOCOL_PORT",
 }
 
 
@@ -54,6 +55,9 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
         raise ValueError("HILL175_BEDROCK_ENABLED must be true or false")
     if not 1024 <= int(values.get("HILL175_BEDROCK_PORT", "19132")) <= 65534:
         raise ValueError("HILL175_BEDROCK_PORT must be between 1024 and 65534")
+    if "HILL175_NGINX_PROXY_PROTOCOL_PORT" in values:
+        if not 1024 <= int(values["HILL175_NGINX_PROXY_PROTOCOL_PORT"]) <= 65535:
+            raise ValueError("HILL175_NGINX_PROXY_PROTOCOL_PORT must be between 1024 and 65535")
     for key in ("HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL"):
         if key not in values:
             continue

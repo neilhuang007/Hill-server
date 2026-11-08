@@ -53,6 +53,7 @@ class AuthEnvironmentTest(unittest.TestCase):
             "HILL175_MAX_LINKED_ACCOUNTS": ["1", "21"],
             "HILL175_BEDROCK_ENABLED": ["yes", "1", "TRUE"],
             "HILL175_BEDROCK_PORT": ["0", "65535", "65536", "bad"],
+            "HILL175_NGINX_PROXY_PROTOCOL_PORT": ["0", "1023", "65536", "bad", "8444;"],
         }
         for key, values in invalid.items():
             for value in values:

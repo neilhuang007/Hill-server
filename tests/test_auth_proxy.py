@@ -43,6 +43,14 @@ class AuthProxyTest(unittest.TestCase):
         self.assertNotIn("test-only-value", content)
         self.assertNotIn("auth.example.org", content)
 
+    def test_stream_backend_uses_loopback_and_original_proxy_peer(self):
+        content = proxy.render(self.config() | {"HILL175_NGINX_PROXY_PROTOCOL_PORT": "8444"}, self.ranges())
+        self.assertIn("listen 127.0.0.1:8444 ssl proxy_protocol;", content)
+        self.assertIn("geo $proxy_protocol_addr $hill175_cloudflare_peer", content)
+        self.assertIn("ssl_verify_client on;", content)
+        self.assertNotIn("listen 443 ssl;", content)
+        self.assertNotIn("listen [::]:443", content)
+
     def test_rejects_unsafe_ranges_and_nginx_syntax(self):
         for text, version in [("", 4), ("0.0.0.0/0", 4), ("::/0", 6),
                               ("2400:cb00::/32", 4), ("1.2.3.4/24", 4)]:
