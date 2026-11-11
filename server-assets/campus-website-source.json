@@ -1,11 +1,11 @@
 {
   "workspace": "../Hill-campus-work",
-  "revision": "campus-context-v72-2x",
-  "draft": "runtime/campus-reconstruction/campus-context-v72-2x",
+  "revision": "campus-context-v76-2x",
+  "draft": "runtime/campus-reconstruction/campus-context-v76-2x",
   "resource_pack": "runtime/resource-packs/hill-exterior-asphalt-fine-v2",
-  "label": "V72",
+  "label": "V76",
   "game_version": "1.21.11",
   "selected_on": "2026-11-11",
-  "selection": "Neil selected V72 for the website tour and world download.",
+  "selection": "Neil selected V76 for the website tour and world download.",
   "status": "Campus draft. Website selection is separate from the multiplayer world."
 }
