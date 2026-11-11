@@ -78,12 +78,14 @@ def mesh_bounds(path):
 
 def write_preload_manifest(web):
     """Warm a small first-view cache from the complete server-rendered export."""
-    if not (web / 'maps/campus/settings.json').is_file():
-        raise ValueError('Render the campus before preparing its preload list.')
-    settings = json.loads((web / 'maps/campus/settings.json').read_text())
     app_settings_path = web / 'settings.json'
     app_settings = json.loads(app_settings_path.read_text())
-    app_settings['startLocation'] = OPENING_LOCATION
+    map_id = app_settings['maps'][0]
+    map_root = web / 'maps' / map_id
+    if not (map_root / 'settings.json').is_file():
+        raise ValueError('Render the campus before preparing its preload list.')
+    settings = json.loads((map_root / 'settings.json').read_text())
+    app_settings['startLocation'] = map_id + ':' + OPENING_LOCATION.split(':', 1)[1]
     app_settings['hiresSliderDefault'] = OPENING_DETAIL_DISTANCE
     app_settings_path.write_text(json.dumps(app_settings) + '\n', encoding='utf-8')
     start = app_settings['startLocation'].split(':')
@@ -91,14 +93,14 @@ def write_preload_manifest(web):
     tile_x, tile_z = settings['hires']['tileSize']
     translate_x, translate_z = settings['hires']['translate']
     scale_x, scale_z = settings['hires']['scale']
-    initial = [web / 'index.html', web / 'settings.json', web / 'maps/campus/settings.json',
-               web / 'maps/campus/textures.json.gz']
+    initial = [web / 'index.html', web / 'settings.json', map_root / 'settings.json',
+               map_root / 'textures.json.gz']
     initial += sorted(p for p in (web / 'assets').iterdir() if p.suffix in {'.js', '.css', '.ttf'})
     tiles = []
     coordinates = []
     bounds_cache_path = web.parent / 'bluemap/tile-bounds.json'
     bounds_cache = json.loads(bounds_cache_path.read_text()) if bounds_cache_path.exists() else {}
-    tile_root = web / 'maps/campus/tiles/0'
+    tile_root = map_root / 'tiles/0'
     for path in tile_root.rglob('*.prbm.gz'):
         match = re.fullmatch(r'x(-?\d+)z(-?\d+)\.prbm\.gz', path.relative_to(tile_root).as_posix().replace('/', ''))
         if not match:
@@ -125,7 +127,7 @@ def write_preload_manifest(web):
             tiles.append((distance, path))
     # Readiness requires the real meshes, not just completion of network requests.
     (web / 'ready.json').write_text(json.dumps({
-        'map': 'campus', 'center': [center_x, center_z],
+        'map': map_id, 'center': [center_x, center_z],
         'detailDistance': OPENING_DETAIL_DISTANCE, 'tiles': sorted(coordinates),
     }) + '\n', encoding='utf-8')
     bounds_cache_path.write_text(json.dumps(bounds_cache), encoding='utf-8')
@@ -211,11 +213,18 @@ def normalize_render_states(snapshot, output):
     return changed_chunks
 
 
-def prepare(output, logo, render):
+def prepare(output, logo, render, selection_path):
     import nbtlib
-    selection = json.loads((ROOT / 'server-assets/shared-campus-source.json').read_text())
+    selection = json.loads(selection_path.read_text())
     source = (ROOT / selection['workspace'] / selection['draft'] / 'world').resolve(strict=True)
     revision = selection['revision']
+    if not re.fullmatch(r'[a-z0-9_-]+', revision):
+        raise ValueError('The website revision must be a safe map identifier.')
+    # BlueMap normalizes config names to underscores for storage identifiers.
+    map_id = revision.replace('-', '_')
+    pack_root = (ROOT / selection['workspace'] / selection['resource_pack']).resolve(strict=True)
+    if not (pack_root / 'pack.mcmeta').is_file():
+        raise ValueError('The selected campus resource pack is missing.')
     output.mkdir(parents=True, exist_ok=True)
     if (output / 'campus.json').exists():
         previous = json.loads((output / 'campus.json').read_text())
@@ -234,10 +243,8 @@ def prepare(output, logo, render):
         data['allowCommands'] = nbtlib.Byte(1)
         data['SpawnX'], data['SpawnY'], data['SpawnZ'] = map(nbtlib.Int, [137, 85, 24])
         level.save(snapshot / 'level.dat')
-        # The campus uses blocks introduced after its authoring file's legacy version label.
-        # Recommend the same Minecraft version as the current Paper runtime.
+        # Package the textures explicitly selected for this campus revision.
         with zipfile.ZipFile(snapshot / 'resources.zip', 'w', zipfile.ZIP_DEFLATED) as pack:
-            pack_root = ROOT / 'server-assets/hill-exterior-asphalt-v1'
             for path in sorted(pack_root.rglob('*')):
                 if path.is_file():
                     pack.write(path, path.relative_to(pack_root).as_posix())
@@ -271,13 +278,13 @@ def prepare(output, logo, render):
 webroot: {path_string(web)}
 use-cookies: false
 client-decompression: true
-start-location: "{OPENING_LOCATION}"
+start-location: "{map_id}:{OPENING_LOCATION.split(':', 1)[1]}"
 hires-slider-default: {OPENING_DETAIL_DISTANCE}
 hires-slider-max: 700
 ''', encoding='utf-8')
     (config / 'webserver.conf').write_text(f'enabled: false\nwebroot: {path_string(web)}\nip: "127.0.0.1"\nport: 18129\n', encoding='utf-8')
     (config / 'storages/file.conf').write_text(f'storage-type: file\nroot: {path_string(web / "maps")}\ncompression: gzip\n', encoding='utf-8')
-    (config / 'maps/campus.conf').write_text(f'''world: {path_string(snapshot)}
+    (config / f'maps/{map_id}.conf').write_text(f'''world: {path_string(snapshot)}
 dimension: "minecraft:overworld"
 name: "The Hill School"
 start-pos: {{ x: 137, z: 24 }}
@@ -292,7 +299,7 @@ storage: "file"
     packs.mkdir(exist_ok=True)
     shutil.copy2(snapshot / 'resources.zip', packs / 'hill-asphalt.zip')
     manifest = {
-        'revision': revision, 'label': 'V60', 'edition': 'Java Edition', 'gameVersion': '26.2',
+        'revision': revision, 'label': selection['label'], 'edition': 'Java Edition', 'gameVersion': selection['game_version'],
         'download': '/downloads/hill-campus.zip', 'bytes': archive.stat().st_size,
         'sha256': hashlib.file_digest(archive.open('rb'), 'sha256').hexdigest(),
         'selectedOn': selection['selected_on'],
@@ -309,7 +316,7 @@ storage: "file"
         subprocess.run([str(java), '-Xmx4G', '-jar', str(ROOT / 'runtime/tools/bluemap/bluemap-5.23-cli.jar'),
                         '-c', str(config), '-v', '1.21.11', '-g', '-s', '-r', '-f', '--markers',
                         '-l', str(output / 'bluemap/render.log')], check=True)
-        if not (web / 'maps/campus/settings.json').is_file():
+        if not (web / 'maps' / map_id / 'settings.json').is_file():
             raise ValueError('BlueMap did not produce the selected campus.')
         manifest['mapReady'] = True
         manifest_path.write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
@@ -322,10 +329,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / 'runtime/campus-site')
     parser.add_argument('--logo', type=Path)
+    parser.add_argument('--selection', type=Path, default=ROOT / 'server-assets/campus-website-source.json')
     parser.add_argument('--render', action='store_true')
     parser.add_argument('--preload-only', action='store_true', help='Prepare the opening view cache from an existing map render')
     args = parser.parse_args()
     if args.preload_only:
         write_preload_manifest(args.output.resolve() / 'map')
     else:
-        prepare(args.output.resolve(), args.logo, args.render)
+        prepare(args.output.resolve(), args.logo, args.render, args.selection.resolve())
