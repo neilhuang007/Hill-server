@@ -48,6 +48,7 @@ world-templates/
 competition-data.yml
 school-identities.json
 school-identities.json.*
+download-password.properties
 hill175.env
 *.log
 *.log.*

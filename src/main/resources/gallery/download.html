@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#202321" />
+        <title>Download campus | Hill 175</title>
+        <link rel="icon" href="/site-assets/hill-school-icon.svg" type="image/svg+xml" />
+        <link rel="stylesheet" href="/landing.css" />
+    </head>
+    <body class="download-page">
+        <header class="site-nav">
+            <a class="brand" href="/" aria-label="Hill 175 home"><img class="school-logo" src="/site-assets/hill-school-logo-light.svg" alt="The Hill School" width="161" height="57" /></a>
+            <nav aria-label="Campus navigation"><a href="/">Home</a><a href="/visit/">Explore campus</a></nav>
+        </header>
+        <main class="download-entry">
+            <section class="download-card stoneborn-frame" aria-labelledby="download-title">
+                <img class="download-key item-icon" src="/assets/item-trial_key.png" alt="" width="48" height="48" />
+                <h1 id="download-title">Take The Hill with you.</h1>
+                <p id="download-message" role="status">{{message}}</p>
+                <form action="/downloads/hill-campus.zip" method="post">
+                    <label for="download-password">Download password</label>
+                    <input id="download-password" name="password" type="password" autocomplete="current-password" maxlength="256" aria-describedby="download-message" required {{disabled}} />
+                    <button class="block-button" type="submit" {{disabled}}><span class="button-label">Download map</span></button>
+                </form>
+                <p class="download-edition">Minecraft Java Edition 26.2 · Campus draft</p>
+            </section>
+        </main>
+    </body>
+</html>

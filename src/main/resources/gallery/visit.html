@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#202321" />
+        <title>Explore campus | Hill 175</title>
+        <link
+            rel="icon"
+            href="/site-assets/hill-school-icon.svg"
+            type="image/svg+xml"
+        />
+        <link rel="stylesheet" href="/landing.css" />
+        <script src="/visit.js" type="module"></script>
+    </head>
+    <body class="visit-page">
+        <a class="skip-link" href="#campus-view">Skip to campus view</a>
+        <main class="map-frame" id="campus-view" aria-busy="true">
+            <iframe
+                class="map-pending"
+                name="campus-map"
+                title="Interactive 3D tour of The Hill School campus"
+                src="/map/"
+                allow="fullscreen"
+                allowfullscreen
+                aria-hidden="true"
+                inert
+            ></iframe>
+            <div class="map-loading" id="map-loading">
+                <div class="map-loading-card stoneborn-frame">
+                    <img class="item-icon" src="/assets/item-compass_16.png" alt="" width="32" height="32" />
+                    <h1 id="map-loading-title">Opening campus.</h1>
+                    <p id="map-loading-status" role="status">Getting the detailed view ready.</p>
+                    <progress id="map-loading-progress" aria-label="Campus loading progress" max="100"></progress>
+                    <button class="block-button" id="map-retry" type="button" hidden><span class="button-label">Try again</span></button>
+                    <a href="/">Back to Hill 175</a>
+                </div>
+            </div>
+            <noscript><p class="map-script-help">Enable JavaScript to explore campus. <a href="/">Return home</a>.</p></noscript>
+        </main>
+        <p class="visit-help">
+            Drag to explore. Scroll or pinch to zoom. Use the map menu for a
+            ground level view. <span>V60 campus draft.</span>
+
+        </p>
+    </body>
+</html>

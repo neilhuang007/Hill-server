@@ -37,6 +37,20 @@ def prepareAssets(archivePath, outputDirectory, minecraftClient=None):
         "arrow-next.png": ("assets/minecraft/textures/gui/sprites/widget/page_forward.png", None),
         "arrow-back.png": ("assets/minecraft/textures/gui/sprites/widget/page_backward.png", None),
     }
+    # Keep the demonstration window's ornaments at their native pixel scale.
+    window = "assets/minecraft/textures/gui/demo_background.png"
+    selections.update({
+        "window-tl.png": (window, (0, 0, 8, 8)),
+        "window-tr.png": (window, (240, 0, 248, 8)),
+        "window-bl.png": (window, (0, 158, 8, 166)),
+        "window-br.png": (window, (240, 158, 248, 166)),
+        "window-tc.png": (window, (112, 0, 136, 6)),
+        "window-bc.png": (window, (112, 160, 136, 166)),
+        "window-top.png": (window, (24, 0, 25, 4)),
+        "window-bottom.png": (window, (24, 162, 25, 166)),
+        "window-left.png": (window, (0, 24, 4, 25)),
+        "window-right.png": (window, (244, 24, 248, 25)),
+    })
     with ZipFile(archivePath) as archive:
         for outputName, (sourceName, cropBox) in selections.items():
             entry = archive.getinfo(sourceName)
@@ -64,8 +78,25 @@ def prepareAssets(archivePath, outputDirectory, minecraftClient=None):
     }
     if minecraftClient:
         manifest["font"] = prepareMinecraftFont(minecraftClient, outputDirectory)
+        manifest["items"] = prepareCampusItemIcons(minecraftClient, outputDirectory)
     (outputDirectory / "asset-source.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(f"Prepared {len(selections)} UI textures in {outputDirectory}")
+
+
+def prepareCampusItemIcons(minecraftClient, outputDirectory):
+    """Copy original item pixels from the supplied game client, without redrawing them."""
+    items = ("compass_16", "map", "trial_key", "ender_pearl")
+    files = {}
+    with ZipFile(minecraftClient) as client:
+        for item in items:
+            source = f"assets/minecraft/textures/item/{item}.png"
+            entry = client.getinfo(source)
+            if entry.file_size > 1024 * 1024:
+                raise ValueError("Unexpectedly large Minecraft item texture.")
+            name = f"item-{item}.png"
+            (outputDirectory / name).write_bytes(client.read(entry))
+            files[name] = source
+    return {"source": minecraftClient.name, "author": "Mojang", "files": files}
 
 
 def main():

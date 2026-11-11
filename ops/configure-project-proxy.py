@@ -36,6 +36,9 @@ def render(values, ranges):
     content += ''.join(f'    {network} 1;\n' for network in ranges) + '}\n'
     for host, port, signaling in sites(values):
         location = '/v1/join' if signaling else '/'
+        # The campus handler caches only public map exports. Preserve its policy
+        # while keeping the separate Bedrock signaling endpoint uncached.
+        cache_header = '        add_header Cache-Control "no-store" always;\n' if signaling else ''
         content += f'''
 server {{
     {listeners}
@@ -61,7 +64,7 @@ server {{
         proxy_cache off;
         proxy_connect_timeout 3s;
         proxy_read_timeout 45s;
-        add_header Cache-Control "no-store" always;
+{cache_header.rstrip()}
     }}
 '''
         if signaling:

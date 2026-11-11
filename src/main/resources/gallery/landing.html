@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#202321" />
+        <meta name="description" content="Explore The Hill School in Minecraft." />
+        <title>Hill 175 | The campus, in Minecraft</title>
+        <link rel="icon" href="/site-assets/hill-school-icon.svg" type="image/svg+xml" />
+        <link rel="preload" href="/site-assets/minecraft.woff2" as="font" type="font/woff2" crossorigin />
+        <link rel="stylesheet" href="/landing.css" />
+        <script src="/landing.js" defer></script>
+        <script src="/download.js" defer></script>
+        <script src="/map-preload.js" defer></script>
+    </head>
+    <body class="landing-page">
+        <a class="skip-link" href="#main">Skip to campus</a>
+        <main id="main">
+            <section class="hero" aria-labelledby="hero-title">
+                <img class="hero-scene" id="campus-photo" src="/site-assets/campus-photo-02.jpg" alt="Campus courtyard and covered walkways viewed from above" width="2048" height="1204" fetchpriority="high" />
+                <div class="hero-shade"></div>
+                <div class="hero-content">
+                    <h1 id="hero-title"><span class="sr-only">Hill 175th Anniversary</span><img class="anniversary-logo" src="/site-assets/hill-175-gold.png" alt="" width="1664" height="1101" fetchpriority="high" /></h1>
+                    <div class="hero-actions">
+                        <a class="block-button item-button" href="/visit/"><span class="button-label"><img class="item-icon" src="/assets/item-compass_16.png" alt="" width="32" height="32" />Explore campus</span></a>
+                        <a class="block-button item-button" href="/download/" data-download><span class="button-label"><img class="item-icon" src="/assets/item-map.png" alt="" width="32" height="32" />Download map</span></a>
+                        <button class="block-button item-button" type="button" data-open-server aria-haspopup="dialog"><span class="button-label"><img class="item-icon" src="/assets/item-ender_pearl.png" alt="" width="32" height="32" />Get server IP</span></button>
+                    </div>
+                </div>
+                <nav class="photo-selector" aria-label="Campus photos">
+                    <a class="photo-choice" href="/site-assets/campus-photo-01.jpg" data-photo aria-label="Show photo 1: The Quad" data-description="Wide view of the Quad with stone steps, gardens and brick campus buildings"><img src="/site-assets/campus-photo-01.jpg" alt="" width="2048" height="1204" loading="lazy" /></a>
+                    <a class="photo-choice" href="/site-assets/campus-photo-02.jpg" data-photo aria-current="true" aria-label="Show photo 2: The courtyard" data-description="Campus courtyard and covered walkways viewed from above"><img src="/site-assets/campus-photo-02.jpg" alt="" width="2048" height="1204" /></a>
+                    <a class="photo-choice" href="/site-assets/campus-photo-03.jpg" data-photo aria-label="Show photo 3: The glass entrance" data-description="Brick campus building with a glass entrance beside a tree lined path"><img src="/site-assets/campus-photo-03.jpg" alt="" width="2048" height="1204" loading="lazy" /></a>
+                    <a class="photo-choice" href="/site-assets/campus-photo-04.jpg" data-photo aria-label="Show photo 4: Stone arches and steps" data-description="Stone arches and broad steps across a campus building entrance"><img src="/site-assets/campus-photo-04.jpg" alt="" width="2048" height="1204" loading="lazy" /></a>
+                    <a class="photo-choice" href="/site-assets/campus-photo-05.jpg" data-photo aria-label="Show photo 5: The blue trimmed building" data-description="Small brick campus building with blue trim beneath a bright sky"><img src="/site-assets/campus-photo-05.jpg" alt="" width="2048" height="1204" loading="lazy" /></a>
+                </nav>
+                <p class="sr-only" id="photo-status" role="status"></p>
+            </section>
+        </main>
+        <dialog class="download-dialog server-dialog" id="server-dialog" aria-labelledby="server-title" aria-describedby="server-preview">
+            <section class="download-card stoneborn-frame">
+                <button class="welcome-close" type="button" aria-label="Close server addresses" data-close-server>×</button>
+                <img class="download-key item-icon" src="/assets/item-ender_pearl.png" alt="" width="48" height="48" />
+                <h2 id="server-title">Join campus.</h2>
+                <p id="server-preview">Preview addresses</p>
+                <div class="server-address-list">
+                    <div>
+                        <label for="java-address">Java Edition</label>
+                        <div class="server-copy-row"><input id="java-address" value="java.thehill.org" readonly spellcheck="false" /><button class="block-button server-copy" type="button" data-copy-address="java-address" aria-label="Copy Java server address"><span class="button-label">Copy</span></button></div>
+                    </div>
+                    <div>
+                        <label for="bedrock-address">Bedrock Edition</label>
+                        <div class="server-copy-row"><input id="bedrock-address" value="bedrock.thehill.org" readonly spellcheck="false" /><button class="block-button server-copy" type="button" data-copy-address="bedrock-address" aria-label="Copy Bedrock server address"><span class="button-label">Copy</span></button></div>
+                    </div>
+                </div>
+                <p class="server-copy-status" id="server-copy-status" role="status"></p>
+                <div class="join-guides">
+                    <details class="join-guide" name="join-guide">
+                        <summary>How to join on Java</summary>
+                        <ol>
+                            <li><p>Open Minecraft, choose <strong>Multiplayer</strong>, then <strong>Add Server</strong>.</p><img src="/site-assets/join-java-servers.jpg" alt="Minecraft Java Multiplayer screen with Add Server along the bottom" width="1280" height="720" loading="lazy" /></li>
+                            <li><p>Name it <strong>The Hill</strong>. Paste <strong>java.thehill.org</strong> into Server Address, then choose <strong>Done</strong>.</p><img src="/site-assets/join-java-address.jpg" alt="Java Edit Server Info screen showing the Server Name and Server Address fields" width="1280" height="720" loading="lazy" /></li>
+                            <li><p>Select The Hill in your list and choose <strong>Join Server</strong>.</p></li>
+                        </ol>
+                    </details>
+                    <details class="join-guide" name="join-guide">
+                        <summary>How to join on Bedrock</summary>
+                        <p class="join-platform">For Windows and mobile.</p>
+                        <ol>
+                            <li><p>Open Minecraft, choose <strong>Play</strong>, then <strong>Servers</strong>. Scroll down to <strong>Add Server</strong>.</p><img src="/site-assets/join-bedrock-servers.jpg" alt="Minecraft Bedrock Servers tab showing the server list" width="1280" height="720" loading="lazy" /></li>
+                            <li><p>Name it <strong>The Hill</strong>. Enter <strong>bedrock.thehill.org</strong> as the address and keep port <strong>19132</strong>.</p><img src="/site-assets/join-bedrock-address.jpg" alt="Bedrock Add External Server screen with name, address and port fields" width="1280" height="720" loading="lazy" /></li>
+                            <li><p>Choose <strong>Save</strong>, then select The Hill and join.</p></li>
+                        </ol>
+                    </details>
+                    <p class="join-caption">Example screens from Minecraft. Use the address above.</p>
+                </div>
+            </section>
+        </dialog>
+    </body>
+</html>

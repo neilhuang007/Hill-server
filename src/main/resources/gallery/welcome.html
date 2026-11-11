@@ -1,0 +1,68 @@
+<dialog
+    class="welcome-dialog"
+    aria-labelledby="welcome-title"
+    aria-describedby="welcome-intro"
+    aria-modal="true"
+>
+    <div class="welcome-window stoneborn-frame">
+        <button
+            class="welcome-close"
+            type="button"
+            aria-label="Close event guide"
+            data-close-event-guide
+        >
+            <span aria-hidden="true">×</span>
+        </button>
+        <div class="welcome-scroll">
+            <p class="welcome-kicker">HILL 175</p>
+            <h2 id="welcome-title" tabindex="-1">Welcome to campus.</h2>
+            <p class="welcome-intro" id="welcome-intro">
+                Explore The Hill, make your own copy, or build together.
+            </p>
+            <div class="welcome-instructions">
+                <p>
+                    <strong>Explore campus</strong> opens the 3D browser tour.
+                    No Minecraft or server login needed.
+                </p>
+                <p>
+                    <strong>Download map</strong> gives you your own Java
+                    Edition world. Your changes stay in that copy.
+                </p>
+                <p>
+                    <strong>Join the shared build</strong> with the server
+                    address and joining instructions from the event organizer.
+                </p>
+            </div>
+            <details class="welcome-tips">
+                <summary>A few tips for the shared campus</summary>
+                <p>
+                    Leave other people’s work as you found it unless you’ve
+                    agreed on a change, and keep chat welcoming.
+                </p>
+                <p>
+                    Use the map in hotbar slot 9, or type <code>/campus</code>,
+                    to find a building. The Undo item in slot 8 can help with a
+                    recent mistake. If something bigger goes wrong, tell a staff
+                    member where it happened.
+                </p>
+                <p>
+                    Follow the login instructions you’re given, and keep your
+                    password and verification codes private. If you need a hand
+                    joining, ask the event organizer.
+                </p>
+            </details>
+            <div class="welcome-actions">
+                <a class="block-button" href="/visit/" data-start-campus-tour
+                    ><span class="button-label">Explore campus</span></a
+                >
+                <button
+                    class="welcome-dismiss"
+                    type="button"
+                    data-close-event-guide
+                >
+                    Continue browsing
+                </button>
+            </div>
+        </div>
+    </div>
+</dialog>

@@ -116,7 +116,7 @@ def main():
         page = browser.new_page(viewport={"width": 1440, "height": 1050}, device_scale_factor=1)
         if arguments.source_overrides:
             overrideSource(page, arguments.assets)
-        response = page.goto(arguments.base_url, wait_until="networkidle")
+        response = page.goto(arguments.base_url.rstrip("/") + "/gallery", wait_until="networkidle")
         assert "font-src 'self'" in response.headers.get("content-security-policy", ""), "Font CSP must remain restricted to this origin"
         inspectFont(page)
         expect(page.locator(".build-card")).not_to_have_count(0)

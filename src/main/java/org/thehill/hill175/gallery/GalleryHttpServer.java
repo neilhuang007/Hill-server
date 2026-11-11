@@ -26,25 +26,38 @@ public final class GalleryHttpServer implements AutoCloseable {
     private static final String idPattern = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
     private static final String tokenPattern = "[A-Za-z0-9_-]{22,64}";
     private static final Map<String, String> pageResources = Map.of(
-            "/gallery.css", "text/css; charset=utf-8", "/gallery.js", "text/javascript; charset=utf-8");
+            "/gallery.css", "text/css; charset=utf-8", "/gallery.js", "text/javascript; charset=utf-8",
+            "/landing.css", "text/css; charset=utf-8", "/landing.js", "text/javascript; charset=utf-8",
+            "/download.js", "text/javascript; charset=utf-8",
+            "/map-preload.js", "text/javascript; charset=utf-8",
+            "/welcome.js", "text/javascript; charset=utf-8", "/welcome.html", "text/html; charset=utf-8",
+            "/visit.js", "text/javascript; charset=utf-8", "/favicon.svg", "image/svg+xml");
     private static final Set<String> assetFiles = Set.of(
             "stone.png", "parchment.png", "wood.png", "button.png", "button-active.png", "button-disabled.png",
             "frame.png", "divider.png", "footer-divider.png", "crest.png", "arrow-next.png", "arrow-back.png",
             "divider-left.png", "divider-center.png", "divider-right.png", "divider-fill.png",
             "footer-divider-left.png", "footer-divider-center.png", "footer-divider-right.png", "footer-divider-fill.png",
-            "minecraft.woff2");
+            "window-tl.png", "window-tr.png", "window-bl.png", "window-br.png", "window-tc.png", "window-bc.png",
+            "window-top.png", "window-bottom.png", "window-left.png", "window-right.png",
+            "minecraft.woff2", "item-compass_16.png", "item-map.png", "item-trial_key.png", "item-ender_pearl.png");
     private final EntryGalleryPublisher publisher;
     private final Path assetDirectory;
+    private final CampusSiteFiles campusSite;
     private final int configuredPort;
     private final ThreadPoolExecutor workers;
     private HttpServer server;
     private boolean isClosed;
 
     public GalleryHttpServer(int port, EntryGalleryPublisher publisher, Path assetDirectory) {
+        this(port, publisher, assetDirectory, assetDirectory.resolve("campus-site"));
+    }
+
+    public GalleryHttpServer(int port, EntryGalleryPublisher publisher, Path assetDirectory, Path campusDirectory) {
         if (port < 0 || port > 65535) throw new IllegalArgumentException("Gallery port must be 0..65535.");
         configuredPort = port;
         this.publisher = Objects.requireNonNull(publisher, "Gallery publisher is required.");
         this.assetDirectory = Objects.requireNonNull(assetDirectory, "Gallery asset directory is required.").toAbsolutePath().normalize();
+        this.campusSite = new CampusSiteFiles(Objects.requireNonNull(campusDirectory, "Campus site directory is required."));
         workers = new ThreadPoolExecutor(2, 2, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(32), task -> {
             Thread worker = new Thread(task, "hill175-gallery-browser");
             worker.setDaemon(true);
@@ -69,7 +82,9 @@ public final class GalleryHttpServer implements AutoCloseable {
     private void handle(HttpExchange exchange) throws IOException {
         try (exchange) {
             securityHeaders(exchange);
-            if (!exchange.getRequestMethod().equals("GET") && !exchange.getRequestMethod().equals("HEAD")) {
+            boolean downloadPost = exchange.getRequestMethod().equals("POST")
+                    && "/downloads/hill-campus.zip".equals(exchange.getRequestURI().getRawPath());
+            if (!exchange.getRequestMethod().equals("GET") && !exchange.getRequestMethod().equals("HEAD") && !downloadPost) {
                 exchange.getResponseHeaders().set("Allow", "GET, HEAD");
                 respond(exchange, 405, "text/plain; charset=utf-8", "Method not allowed.");
                 return;
@@ -94,10 +109,13 @@ public final class GalleryHttpServer implements AutoCloseable {
         if (exchange.getRequestURI().getRawQuery() != null) { notFound(exchange); return; }
         if (path.equals("/health")) { respond(exchange, 200, "application/json; charset=utf-8", "{\"status\":\"ok\"}"); return; }
         if (path.equals("/robots.txt")) { respond(exchange, 200, "text/plain; charset=utf-8", "User-agent: *\nDisallow: /\n"); return; }
+        if (path.equals("/")) { resource(exchange, "/landing.html", "text/html; charset=utf-8"); return; }
+        if (path.equals("/visit/")) { resource(exchange, "/visit.html", "text/html; charset=utf-8"); return; }
+        if (campusSite.serve(exchange, path)) return;
         if (path.equals("/campus-pack.zip") || path.equals("/campus-map.png")) { campusAsset(exchange, path); return; }
         if (pageResources.containsKey(path)) { resource(exchange, path, pageResources.get(path)); return; }
         if (path.startsWith("/assets/")) { asset(exchange, path.substring(8)); return; }
-        if (path.equals("/") || path.matches("/entries/" + idPattern) || path.matches("/preview/" + tokenPattern)) {
+        if (path.equals("/gallery") || path.matches("/entries/" + idPattern) || path.matches("/preview/" + tokenPattern)) {
             resource(exchange, "/index.html", "text/html; charset=utf-8");
             return;
         }
@@ -193,7 +211,11 @@ public final class GalleryHttpServer implements AutoCloseable {
         headers.set("X-Content-Type-Options", "nosniff");
         headers.set("X-Frame-Options", "DENY");
         headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-        headers.set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'");
+        headers.set("Content-Security-Policy", "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'");
+        String path = exchange.getRequestURI().getRawPath();
+        if ("/download/".equals(path) || "/downloads/hill-campus.zip".equals(path)) {
+            headers.set("Content-Security-Policy", headers.getFirst("Content-Security-Policy").replace("form-action 'none'", "form-action 'self'"));
+        }
         headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
     }
 

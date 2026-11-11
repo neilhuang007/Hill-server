@@ -26,6 +26,12 @@ class ProjectProxyTest(unittest.TestCase):
         self.assertIn('access_log off;', content)
         self.assertIn('proxy_cache off;', content)
 
+    def test_campus_keeps_application_cache_policy(self):
+        content = proxy.render(self.config(), [ipaddress.ip_network('173.245.48.0/20')])
+        campus, bedrock = content.split('server_name bedrock.example.org;', 1)
+        self.assertNotIn('add_header Cache-Control', campus)
+        self.assertIn('add_header Cache-Control "no-store" always;', bedrock)
+
     def test_stream_backend_keeps_origin_auth_and_original_peer(self):
         content = proxy.render(self.config() | {'HILL175_NGINX_PROXY_PROTOCOL_PORT': '8444'},
                                [ipaddress.ip_network('173.245.48.0/20')])

@@ -72,7 +72,7 @@ def inspectActualEntry(page, output, isMobile=False):
 
 
 def inspectGallery(page, baseUrl, output, hasFixtures):
-    page.goto(baseUrl, wait_until="networkidle")
+    page.goto(f"{baseUrl}/gallery", wait_until="networkidle")
     expect(page.locator("main")).to_have_attribute("aria-busy", "false")
     expect(page.get_by_role("heading", name="Build gallery.")).to_be_visible()
     assertLayout(page)
@@ -104,7 +104,7 @@ def inspectGallery(page, baseUrl, output, hasFixtures):
     screenshot(page, output, "gallery-private-desktop.png")
     page.goto(f"{baseUrl}/entries/{fixtureIds[2]}", wait_until="networkidle")
     expect(page.get_by_text("This build is unavailable.", exact=True)).to_be_visible()
-    page.goto(baseUrl, wait_until="networkidle")
+    page.goto(f"{baseUrl}/gallery", wait_until="networkidle")
     page.get_by_role("button", name="All builds", exact=True).click()
     expect(page.locator(".build-card")).to_have_count(2)
     page.route("**/api/entries", lambda route: route.fulfill(status=200, json={"entries": []}))
@@ -118,7 +118,7 @@ def inspectGallery(page, baseUrl, output, hasFixtures):
 def inspectFailureStates(page, baseUrl, output):
     page.unroute("**/api/**")
     page.route("**/api/entries", lambda route: route.fulfill(status=503, json={"error": "Fixture unavailable"}))
-    page.goto(baseUrl, wait_until="networkidle")
+    page.goto(f"{baseUrl}/gallery", wait_until="networkidle")
     expect(page.get_by_role("alert")).to_contain_text("The gallery is resting.")
     page.unroute("**/api/entries")
     page.route("**/api/entries", lambda route: route.fulfill(status=200, json={"entries": []}))
@@ -140,7 +140,7 @@ def inspectLoadingAndMissingImage(page, baseUrl, output, imagePath):
     page.unroute("**/api/**")
     pendingRoutes = []
     page.route("**/api/entries", lambda route: pendingRoutes.append(route))
-    page.goto(baseUrl, wait_until="domcontentloaded")
+    page.goto(f"{baseUrl}/gallery", wait_until="domcontentloaded")
     expect(page.get_by_role("status")).to_contain_text("Opening the gallery…")
     screenshot(page, output, "gallery-loading.png")
     assert len(pendingRoutes) == 1
@@ -171,7 +171,7 @@ def main():
             installFixtures(page, arguments.fixture_image)
         inspectGallery(page, baseUrl, arguments.output, bool(arguments.fixture_image))
         page.set_viewport_size({"width": 390, "height": 844})
-        page.goto(baseUrl, wait_until="networkidle")
+        page.goto(f"{baseUrl}/gallery", wait_until="networkidle")
         assertLayout(page)
         screenshot(page, arguments.output, "gallery-mobile.png")
         if not arguments.fixture_image:

@@ -187,7 +187,7 @@
     if (!entry) throw new Error('unavailable');
     let selectedSlot = preferredSlot;
     const back = node('a', 'back-link', 'All builds');
-    back.href = '/';
+    back.href = '/gallery';
     const title = heading(entry.title, categoryLabels[entry.category].toUpperCase());
     title.className = 'detail-heading';
     const titleGroup = node('div');
@@ -235,7 +235,7 @@
 
   function resolveRoute() {
     const parts = location.pathname.split('/').filter(Boolean);
-    if (!parts.length) return { api: '/api/entries', kind: 'gallery' };
+    if (parts.length === 1 && parts[0] === 'gallery') return { api: '/api/entries', kind: 'gallery' };
     if (parts.length === 2 && parts[0] === 'entries' && entryIdPattern.test(parts[1])) {
       return { api: `/api/entries/${parts[1]}`, kind: 'entry' };
     }
@@ -311,6 +311,7 @@
     if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const url = new URL(link.href);
     if (url.origin !== location.origin || url.hash) return;
+    if (!/^\/(gallery|entries\/|preview\/)/.test(url.pathname)) return;
     event.preventDefault();
     history.pushState({}, '', url.pathname);
     loadRoute();
