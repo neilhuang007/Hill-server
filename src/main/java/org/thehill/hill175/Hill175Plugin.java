@@ -127,6 +127,7 @@ public final class Hill175Plugin extends JavaPlugin {
             blueprint = new BlueprintService(this, store, competition, worlds);
             blueprint.textAllowed(chatSafety::allows);
             blueprint.initialize();
+            if (blueprint.ready()) getLogger().info("Personal campuses and blueprint ready at update #" + blueprint.latestUpdate() + ".");
             parties = new PartyService(this, competition, store, worlds,
                     blueprint::ensureCanCreateBranch, blueprint::registerBranch,
                     entry -> !blueprint.isRegistered(entry) || blueprint.isFrozen(entry));

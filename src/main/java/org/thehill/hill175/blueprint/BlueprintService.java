@@ -483,6 +483,8 @@ public final class BlueprintService implements AutoCloseable {
 
     public long latestUpdate() { return approvals.size(); }
 
+    public boolean ready() { return initialized && !failed && !closing; }
+
     /** Copies a saved version into a temporary look-only world, off the server thread. */
     public CompletableFuture<World> openPreview(Player staff, long number) {
         requireMainThread();

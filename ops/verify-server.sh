@@ -258,8 +258,15 @@ if [[ "$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}
   grep -Fq 'Private packet replay enabled:' "${RUNTIME_DIR}/logs/latest.log" \
     || fail "Private packet recorder did not initialize"
 fi
-grep -Fq 'Campus recovery: Restic every 300 seconds' "${RUNTIME_DIR}/logs/latest.log" \
-  || fail "Campus recovery did not initialize"
+if grep -Fq 'Blueprint initialization/recovery failed' "${RUNTIME_DIR}/logs/latest.log"; then
+  fail "Blueprint did not initialize"
+elif grep -Fq 'Personal campuses and blueprint ready' "${RUNTIME_DIR}/logs/latest.log"; then
+  # Personal campuses keep blueprint recovery snapshots; shared-campus Restic recovery only runs in shared mode.
+  :
+else
+  grep -Fq 'Campus recovery: Restic every 300 seconds' "${RUNTIME_DIR}/logs/latest.log" \
+    || fail "Campus recovery did not initialize"
+fi
 if [[ "${AUTH_MODE}" == microsoft ]]; then
   require_line "${SERVER_PROPERTIES}" "online-mode=true"
   auth_port="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print port)"
