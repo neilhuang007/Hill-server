@@ -1,9 +1,8 @@
 # Campus template operation
 
-The People category copies whichever campus is installed in
-`world-templates/hill_people_template/` under the Paper server directory. The
-current handoff is the V29 exterior draft. A campus revision is an asset choice,
-not a code version pin.
+On first installation the server seeds the approved blueprint from the campus
+folder under `world-templates/hill_people_template/`. New personal campuses copy
+the current approved blueprint. Staff approve later changes through review.
 
 Follow the [Windows asset instructions](operations/windows-assets.md) or
 [Linux deployment guide](operations/deployment.md). Stop Paper, preserve the
@@ -16,10 +15,9 @@ bounds and spawn copied into each new participant world. Optional POI files are
 supported. No particular revision, region-file count or archive filename is
 required. The updated plugin ignores the old file-count settings.
 
-New People entries and explicit owner-confirmed resets use the installed folder.
-Existing participant worlds are preserved; changing the template is not a
-migration. A reset deliberately replaces the selected entry's build, so it
-remains an owner-confirmed game operation.
+In legacy competition mode, new People entries and confirmed resets use the
+installed folder. In personal campus mode, students receive approved blueprint
+updates through [campus sync](operations/blueprint-review.md).
 
 Keep `people.require-template: true` and `people.structure-file: ""` for this
 folder-based deployment. Missing or invalid templates block creation/reset

@@ -5,6 +5,8 @@
 - [Microsoft SSO setup for Hill IT](operations/microsoft-sso-setup.md)
 - [Authentication architecture and limits](architecture/microsoft-sso.md)
 - [Player workflow and commands](operations/player-guide.md)
+* [Blueprint requests and campus sync](operations/blueprint-review.md)
+* [Staff incident timeline and visual recordings](operations/incident-replay.md)
 - [Local Stoneborn build gallery](operations/build-gallery.md)
 - [Player action map and smoke evidence](operations/player-experience-review.md)
 - [Campus template operation](CAMPUS_TEMPLATE.md)

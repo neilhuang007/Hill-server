@@ -16,6 +16,7 @@ import java.net.URI;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import org.thehill.hill175.access.ServerRole;
 
 final class MicrosoftTokenVerifier {
     private final SsoConfig config;
@@ -62,13 +63,19 @@ final class MicrosoftTokenVerifier {
                 throw new IllegalArgumentException();
             }
             List<String> roles = claims.getStringListClaim("roles");
-            if (roles == null || !roles.contains(config.requiredRole())) throw new IllegalArgumentException();
+            if (roles == null) throw new IllegalArgumentException();
+            ServerRole role;
+            if (roles.contains(config.administratorRole())) role = ServerRole.ADMINISTRATOR;
+            else if (roles.contains(config.moderatorRole())) role = ServerRole.MODERATOR;
+            else if (roles.contains(config.staffRole())) role = ServerRole.STAFF;
+            else if (roles.contains(config.requiredRole())) role = ServerRole.PLAYER;
+            else throw new IllegalArgumentException();
             String objectId = SsoConfig.uuid(claims.getStringClaim("oid")).toString();
             String name = sanitizeName(claims.getStringClaim("name"));
             return new SchoolIdentity("entra:" + config.tenantId() + ":" + objectId, name,
-                    claims.getExpirationTime().toInstant());
+                    claims.getExpirationTime().toInstant(), role);
         } catch (Exception exception) {
-            throw new SsoException("Microsoft could not verify an eligible Hill student account. Check the account and contact Hill IT.");
+            throw new SsoException("Microsoft could not verify an eligible Hill account. Check the account and contact Hill IT.");
         }
     }
 

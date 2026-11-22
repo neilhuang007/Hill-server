@@ -253,6 +253,11 @@ verify_supplied_maps
 verify_worldgen_datapacks
 verify_primary_trio_seed_and_config
 python3 "${REPO_DIR}/ops/install-campus-recovery.py" verify --runtime "${RUNTIME_DIR}"
+if [[ "$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print packet-replay-enabled)" == true ]]; then
+  bash "${REPO_DIR}/ops/install-packet-replay.sh" verify --runtime "${RUNTIME_DIR}"
+  grep -Fq 'Private packet replay enabled:' "${RUNTIME_DIR}/logs/latest.log" \
+    || fail "Private packet recorder did not initialize"
+fi
 grep -Fq 'Campus recovery: Restic every 300 seconds' "${RUNTIME_DIR}/logs/latest.log" \
   || fail "Campus recovery did not initialize"
 if [[ "${AUTH_MODE}" == microsoft ]]; then

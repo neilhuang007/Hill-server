@@ -69,6 +69,24 @@ server {{
 '''
         if signaling:
             content += '    location / { return 404; }\n'
+        elif 'HILL175_STUDENT_DOWNLOAD_URL' in values:
+            download_port = int(values.get('HILL175_STUDENT_DOWNLOAD_PORT', '8791'))
+            content += f'''
+    location ^~ /student-map/ {{
+        proxy_pass http://127.0.0.1:{download_port};
+        proxy_http_version 1.1;
+        proxy_set_header Host {host};
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_connect_timeout 3s;
+        proxy_read_timeout 45s;
+        add_header Cache-Control "no-store" always;
+        add_header Referrer-Policy "no-referrer" always;
+        access_log off;
+    }}
+    location = /downloads/hill-campus.zip {{ return 404; }}
+'''
         content += '}\n'
     return content
 

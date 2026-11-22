@@ -30,6 +30,16 @@ class AuthEnvironmentTest(unittest.TestCase):
         self.assertEqual(("microsoft", 8087), auth_config.validate(self.config()))
         self.assertEqual(("development", 8087), auth_config.validate({"HILL175_AUTH_MODE": "development"}))
 
+    def test_microsoft_role_values_are_distinct_and_supported(self):
+        for value in ["Hill175.Student", "", "Invalid Role"]:
+            with self.assertRaises(ValueError):
+                auth_config.validate(self.config() | {"HILL175_ENTRA_STAFF_ROLE": value})
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "hill175.env"
+            path.write_text("HILL175_ENTRA_STAFF_ROLE=School.Staff\nHILL175_ENTRA_MODERATOR_ROLE=School.Moderator\nHILL175_ENTRA_ADMINISTRATOR_ROLE=School.Administrator\n", encoding="utf-8")
+            values = auth_config.read_environment(path, check_permissions=False)
+            self.assertEqual("School.Staff", values["HILL175_ENTRA_STAFF_ROLE"])
+
     def test_explicit_bedrock_enable_is_honored_in_development(self):
         for values, expected in [({'HILL175_AUTH_MODE': 'development'}, 'false'),
                                  ({'HILL175_AUTH_MODE': 'development', 'HILL175_BEDROCK_ENABLED': 'true'}, 'true')]:
@@ -52,13 +62,48 @@ class AuthEnvironmentTest(unittest.TestCase):
             "HILL175_AUTH_PORT": ["0", "65536", "bad"],
             "HILL175_MAX_LINKED_ACCOUNTS": ["1", "21"],
             "HILL175_BEDROCK_ENABLED": ["yes", "1", "TRUE"],
+            "HILL175_PACKET_REPLAY_ENABLED": ["yes", "1", "TRUE"],
             "HILL175_BEDROCK_PORT": ["0", "65535", "65536", "bad"],
             "HILL175_NGINX_PROXY_PROTOCOL_PORT": ["0", "1023", "65536", "bad", "8444;"],
+            "HILL175_ADMIN_UNLOCK_SHA256": ["", "bad", "a" * 63],
         }
         for key, values in invalid.items():
             for value in values:
                 with self.subTest(key=key), self.assertRaises(ValueError):
                     auth_config.validate(self.config() | {key: value})
+
+    def test_student_downloads_require_safe_export_and_gallery_route(self):
+        values = self.config() | {
+            "HILL175_GALLERY_PUBLIC_URL": "https://builds.example.org",
+            "HILL175_STUDENT_DOWNLOAD_EXPORT": "/opt/hill175/exports/student-campus",
+            "HILL175_STUDENT_DOWNLOAD_URL": "https://builds.example.org/student-map/",
+        }
+        self.assertEqual(("microsoft", 8087), auth_config.validate(values))
+        for key, value in [
+            ("HILL175_STUDENT_DOWNLOAD_EXPORT", "relative/world"),
+            ("HILL175_STUDENT_DOWNLOAD_URL", "https://other.example.org/student-map/"),
+            ("HILL175_STUDENT_DOWNLOAD_URL", "https://builds.example.org/student-map/?token=x"),
+            ("HILL175_STUDENT_DOWNLOAD_PORT", "8788"),
+            ("HILL175_STUDENT_DOWNLOAD_PORT", "0"),
+        ]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                auth_config.validate(values | {key: value})
+        with self.assertRaises(ValueError):
+            auth_config.validate(self.config() | {"HILL175_STUDENT_DOWNLOAD_PORT": "8791"})
+
+    def test_survival_transfer_requires_independent_admission_and_online_mode(self):
+        settings = {
+            "HILL175_SURVIVAL_MODE": "transfer",
+            "HILL175_SURVIVAL_JAVA_HOST": "survival.example.org",
+            "HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED": "true",
+        }
+        self.assertEqual(("microsoft", 8087), auth_config.validate(self.config() | settings))
+        with self.assertRaises(ValueError):
+            auth_config.validate(self.config() | settings | {"HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED": "false"})
+        with self.assertRaises(ValueError):
+            auth_config.validate({"HILL175_AUTH_MODE": "development"} | settings)
+        with self.assertRaises(ValueError):
+            auth_config.validate(self.config() | settings | {"HILL175_SURVIVAL_JAVA_HOST": "https://bad.example.org"})
 
     def test_reads_literals_without_shell_expansion(self):
         with tempfile.TemporaryDirectory() as directory:

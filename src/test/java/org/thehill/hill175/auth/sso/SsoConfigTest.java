@@ -48,4 +48,14 @@ class SsoConfigTest {
             assertThrows(IllegalArgumentException.class, () -> SsoConfig.fromEnvironment(env));
         }
     }
+
+    @Test void roleValuesMustBeDistinctAndCanBeConfigured() {
+        var env = new HashMap<>(environment());
+        env.put("HILL175_ENTRA_STAFF_ROLE", "Hill175.Student");
+        assertThrows(IllegalArgumentException.class, () -> SsoConfig.fromEnvironment(env));
+        env.put("HILL175_ENTRA_STAFF_ROLE", "School.Staff");
+        assertEquals("School.Staff", SsoConfig.fromEnvironment(env).orElseThrow().staffRole());
+        env.put("HILL175_ENTRA_MODERATOR_ROLE", "");
+        assertThrows(IllegalArgumentException.class, () -> SsoConfig.fromEnvironment(env));
+    }
 }

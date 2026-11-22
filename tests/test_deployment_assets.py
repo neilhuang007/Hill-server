@@ -45,13 +45,18 @@ class DeploymentAssetsTest(unittest.TestCase):
         (self.campus / 'playerdata/private.dat').write_text('PRIVATE SENTINEL')
 
     def test_packet_is_allowlisted_and_checksums_verify_every_payload(self):
+        (self.campus / 'region/r.1.0.mca').write_bytes(bytes(8192))
+        (self.campus / 'poi').mkdir()
+        (self.campus / 'poi/r.0.0.mca').write_bytes(bytes(8192))
         ASSETS.package(self.root, self.output, self.campus, self.hub)
         with zipfile.ZipFile(self.output) as archive:
             self.assertEqual({'README.txt', 'SHA256SUMS',
                               f'{HUB}/level.dat', f'{HUB}/hill-world.yml',
                               f'{HUB}/dimensions/minecraft/overworld/region/r.0.0.mca',
                               'world-templates/hill_people_template/region/r.0.0.mca',
-                              'world-templates/hill_people_template/hill-campus-template.yml'},
+                              'world-templates/hill_people_template/hill-campus-template.yml',
+                              'world-templates/hill_people_template/region/r.1.0.mca',
+                              'world-templates/hill_people_template/poi/r.0.0.mca'},
                              set(archive.namelist()))
             for line in archive.read('SHA256SUMS').decode().splitlines():
                 digest, name = line.split('  ', 1)
@@ -88,15 +93,6 @@ class DeploymentAssetsTest(unittest.TestCase):
     def test_output_must_stay_in_ignored_handoff_directory(self):
         with self.assertRaisesRegex(ValueError, 'runtime/handoff'):
             ASSETS.package(self.root, self.root / 'publish.zip', self.campus, self.hub)
-
-    def test_next_revision_can_have_more_regions_and_optional_poi(self):
-        (self.campus / 'region/r.1.0.mca').write_bytes(bytes(8192))
-        (self.campus / 'poi').mkdir()
-        (self.campus / 'poi/r.0.0.mca').write_bytes(bytes(8192))
-        ASSETS.package(self.root, self.output, self.campus, self.hub)
-        with zipfile.ZipFile(self.output) as archive:
-            self.assertIn('world-templates/hill_people_template/region/r.1.0.mca', archive.namelist())
-            self.assertIn('world-templates/hill_people_template/poi/r.0.0.mca', archive.namelist())
 
     def test_truncated_and_nested_templates_are_rejected(self):
         (self.campus / 'region/r.0.0.mca').write_bytes(b'x')

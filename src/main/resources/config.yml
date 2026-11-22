@@ -9,6 +9,20 @@ authentication:
   stub-link-delay-ticks: 20
   password-min-length: 8
 
+packet-replay:
+  enabled: false
+  max-recorders: 32
+
+incident-replay:
+  enabled: true
+
+survival-navigation:
+  mode: local
+  java-host: ""
+  java-port: 25567
+  destination-access-configured: false
+  bedrock-local: true
+
 worlds:
   authentication: hill_auth
   # Designated map folders, relative to the server folder. Put a world save
@@ -65,8 +79,29 @@ people:
 build-rules:
   max-non-player-entities-per-entry: 128
 
-shared-campus:
+personal-campus:
   enabled: true
+
+parties:
+  max-guests: 12
+  invite-expiry-seconds: 600
+  invite-cooldown-seconds: 10
+
+blueprint:
+  maximum-changed-blocks: 4096
+  maximum-snapshot-chunks: 512
+  review-permission: hill175.blueprint.review
+  backup-permission: hill175.blueprint.backup
+
+moderation:
+  enabled: true
+  minimum-rating: 2
+  max-text-length: 65536
+  additions: []
+  allowlist: []
+
+shared-campus:
+  enabled: false
   # The selected People template seeds hill_campus once. Later restarts preserve
   # the shared world. A changed source never overwrites student work.
 

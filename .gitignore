@@ -48,6 +48,9 @@ world-templates/
 competition-data.yml
 school-identities.json
 school-identities.json.*
+moderation.json
+moderation.json.*
+admin-unlock-key.txt
 download-password.properties
 hill175.env
 *.log

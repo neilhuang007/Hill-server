@@ -29,8 +29,12 @@ import org.thehill.hill175.world.WorldModule;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.function.Consumer;
 import java.util.Locale;
 import java.util.Map;
 import java.util.HashSet;
@@ -44,6 +48,8 @@ public final class HubNpcModule implements Listener {
     private static final String NPC_PART_TAG = "hill175_category_npc_part";
     private static final String NPC_TEAM_NAME = "hill175_npcs";
     private static final String SURVIVAL_TAG = "hill175_survival_guide";
+    private static final String CAMPUS_TAG = "hill175_campus_guide";
+    private static final String BLUEPRINT_TAG = "hill175_blueprint_guide";
     private static final Duration INTERACTION_DEBOUNCE = Duration.ofMillis(350);
     private static final Pattern PROFILE_NAME_PATTERN = Pattern.compile("^[A-Za-z0-9_]{3,16}$");
     private static final Pattern TEXTURE_HASH_PATTERN = Pattern.compile("^[0-9a-f]{64}$");
@@ -55,8 +61,10 @@ public final class HubNpcModule implements Listener {
     private final Map<Category, SyntheticPlayerNpc> categoryNpcs = new EnumMap<>(Category.class);
     private final Map<Category, TextDisplay> categoryNameplates = new EnumMap<>(Category.class);
     private final Map<UUID, RecentInteraction> recentInteractions = new HashMap<>();
-    private SyntheticPlayerNpc survivalNpc;
-    private TextDisplay survivalNameplate;
+    private final Map<String, SyntheticPlayerNpc> guideNpcs = new LinkedHashMap<>();
+    private final List<TextDisplay> guideNameplates = new ArrayList<>();
+    private Consumer<Player> openCampus;
+    private Consumer<Player> openBlueprint;
 
     public HubNpcModule(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, WorldModule worlds) {
         this.plugin = plugin;
@@ -65,8 +73,15 @@ public final class HubNpcModule implements Listener {
         this.worlds = worlds;
     }
 
+    /** Personal-campus servers show My Campus and Blueprint guides instead of the three competition categories. */
+    public void campusGuides(Consumer<Player> openCampus, Consumer<Player> openBlueprint) {
+        this.openCampus = java.util.Objects.requireNonNull(openCampus);
+        this.openBlueprint = java.util.Objects.requireNonNull(openBlueprint);
+    }
+
     public void spawnCategoryNpcs() {
         removeCategoryNpcs();
+        boolean campusMode = openCampus != null;
         for (Category category : Category.values()) {
             worlds.hubNpcLocation(category).getChunk().load();
         }
@@ -88,20 +103,28 @@ public final class HubNpcModule implements Listener {
             }
             styles.put(category, style);
         }
-        SurvivalStyle survivalStyle = configuredSurvivalStyle();
+        GuideStyle survivalStyle = configuredSurvivalStyle();
         if (!profileNames.add(survivalStyle.profileName().toLowerCase(Locale.ROOT))) {
             throw new IllegalStateException("Hub NPC profile names must be unique");
         }
+        int expected;
         try {
-            spawn(worlds.hubNpcLocation(Category.JOURNEY), Category.JOURNEY, styles.get(Category.JOURNEY));
-            spawn(worlds.hubNpcLocation(Category.PLACE), Category.PLACE, styles.get(Category.PLACE));
-            spawn(worlds.hubNpcLocation(Category.PEOPLE), Category.PEOPLE, styles.get(Category.PEOPLE));
-            spawnSurvival(worlds.survivalNpcLocation(), survivalStyle);
+            if (campusMode) {
+                spawnGuide(worlds.hubNpcLocation(Category.PLACE), GuideStyle.campus(), CAMPUS_TAG);
+                spawnGuide(worlds.hubNpcLocation(Category.JOURNEY), GuideStyle.blueprint(), BLUEPRINT_TAG);
+                expected = 3;
+            } else {
+                spawn(worlds.hubNpcLocation(Category.JOURNEY), Category.JOURNEY, styles.get(Category.JOURNEY));
+                spawn(worlds.hubNpcLocation(Category.PLACE), Category.PLACE, styles.get(Category.PLACE));
+                spawn(worlds.hubNpcLocation(Category.PEOPLE), Category.PEOPLE, styles.get(Category.PEOPLE));
+                expected = 4;
+            }
+            spawnGuide(worlds.survivalNpcLocation(), survivalStyle, SURVIVAL_TAG);
         } catch (RuntimeException exception) {
             removeCategoryNpcs();
             throw exception;
         }
-        plugin.getLogger().info("Hill 175 player hub guides ready: " + (categoryNpcs.size() + (survivalNpc == null ? 0 : 1)) + "/4.");
+        plugin.getLogger().info("Hill 175 player hub guides ready: " + (categoryNpcs.size() + guideNpcs.size()) + "/" + expected + ".");
     }
 
     public void shutdown() {
@@ -173,12 +196,15 @@ public final class HubNpcModule implements Listener {
             return;
         }
         recentInteractions.put(player.getUniqueId(), new RecentInteraction(entity.getUniqueId(), now));
-        if (entity.getScoreboardTags().contains(SURVIVAL_TAG)) {
+        for (String guide : List.of(SURVIVAL_TAG, CAMPUS_TAG, BLUEPRINT_TAG)) {
+            if (!entity.getScoreboardTags().contains(guide)) continue;
             if (!competition.isAuthenticated(player)) {
                 competition.sendAuthenticationInstructions(player);
                 return;
             }
-            menus.openSurvival(player);
+            if (guide.equals(SURVIVAL_TAG)) menus.openSurvival(player);
+            else if (guide.equals(CAMPUS_TAG) && openCampus != null) openCampus.accept(player);
+            else if (guide.equals(BLUEPRINT_TAG) && openBlueprint != null) openBlueprint.accept(player);
             return;
         }
         for (Category category : Category.values()) {
@@ -219,7 +245,7 @@ public final class HubNpcModule implements Listener {
         plugin.getLogger().fine("Spawned player category NPC " + category.name() + " at " + location);
     }
 
-    private void spawnSurvival(Location location, SurvivalStyle style) {
+    private void spawnGuide(Location location, GuideStyle style, String tag) {
         location.getChunk().load();
         npcTeam().addEntry(style.profileName());
         SyntheticPlayerNpc synthetic = SyntheticPlayerNpc.spawn(
@@ -230,17 +256,17 @@ public final class HubNpcModule implements Listener {
         );
         Player npc = synthetic.player();
         npc.addScoreboardTag(NPC_TAG);
-        npc.addScoreboardTag(SURVIVAL_TAG);
+        npc.addScoreboardTag(tag);
         npc.setCanPickupItems(false);
         npc.setRotation(location.getYaw(), location.getPitch());
         PlayerInventory inventory = npc.getInventory();
         inventory.setHeldItemSlot(0);
         inventory.setItemInMainHand(new ItemStack(style.heldItem()));
         inventory.setItemInOffHand(new ItemStack(style.offhandItem()));
-        survivalNpc = synthetic;
-        survivalNameplate = spawnNameplate(location, style.title(), style.titleColor(), Set.of(SURVIVAL_TAG));
+        guideNpcs.put(tag, synthetic);
+        guideNameplates.add(spawnNameplate(location, style.title(), style.titleColor(), Set.of(tag)));
         synthetic.activate();
-        plugin.getLogger().fine("Spawned player survival NPC at " + location);
+        plugin.getLogger().fine("Spawned hub guide " + tag + " at " + location);
     }
 
     private TextDisplay spawnNameplate(Location location, String title, NamedTextColor titleColor, Set<String> tags) {
@@ -292,17 +318,15 @@ public final class HubNpcModule implements Listener {
         for (TextDisplay nameplate : categoryNameplates.values()) {
             nameplate.remove();
         }
-        if (survivalNpc != null) {
-            team.removeEntry(survivalNpc.player().getName());
-            survivalNpc.remove();
+        for (SyntheticPlayerNpc npc : guideNpcs.values()) {
+            team.removeEntry(npc.player().getName());
+            npc.remove();
         }
-        if (survivalNameplate != null) {
-            survivalNameplate.remove();
-        }
+        guideNameplates.forEach(TextDisplay::remove);
         categoryNpcs.clear();
         categoryNameplates.clear();
-        survivalNpc = null;
-        survivalNameplate = null;
+        guideNpcs.clear();
+        guideNameplates.clear();
         recentInteractions.clear();
     }
 
@@ -310,8 +334,8 @@ public final class HubNpcModule implements Listener {
         for (SyntheticPlayerNpc npc : categoryNpcs.values()) {
             npc.sendTo(player);
         }
-        if (survivalNpc != null) {
-            survivalNpc.sendTo(player);
+        for (SyntheticPlayerNpc npc : guideNpcs.values()) {
+            npc.sendTo(player);
         }
     }
 
@@ -355,8 +379,8 @@ public final class HubNpcModule implements Listener {
         );
     }
 
-    private SurvivalStyle configuredSurvivalStyle() {
-        SurvivalStyle defaults = SurvivalStyle.defaults();
+    private GuideStyle configuredSurvivalStyle() {
+        GuideStyle defaults = GuideStyle.survival();
         String path = "worlds.hub-npcs.survival";
         String profileName = plugin.getConfig().getString(path + ".profile-name", defaults.profileName()).trim();
         String skinTexture = plugin.getConfig().getString(path + ".skin-texture", defaults.skinTexture())
@@ -367,7 +391,7 @@ public final class HubNpcModule implements Listener {
         if (!TEXTURE_HASH_PATTERN.matcher(skinTexture).matches()) {
             throw new IllegalStateException("Invalid survival NPC texture hash at " + path + ".skin-texture");
         }
-        return new SurvivalStyle(
+        return new GuideStyle(
                 defaults.title(),
                 profileName,
                 defaults.titleColor(),
@@ -421,7 +445,7 @@ public final class HubNpcModule implements Listener {
     private record RecentInteraction(UUID entityId, Instant when) {
     }
 
-    private record SurvivalStyle(
+    private record GuideStyle(
             String title,
             String profileName,
             NamedTextColor titleColor,
@@ -429,8 +453,20 @@ public final class HubNpcModule implements Listener {
             Material offhandItem,
             String skinTexture
     ) {
-        private static SurvivalStyle defaults() {
-            return new SurvivalStyle(
+        private static GuideStyle campus() {
+            return new GuideStyle("MY CAMPUS", "HillCampus", NamedTextColor.GREEN, Material.GRASS_BLOCK, Material.OAK_SAPLING,
+                    // Same planner skin as the former People guide.
+                    "9658c5ac64cdd7189e8db50393f27439fc9ce9177c9c5285d6f1f7b4eda9d7ec");
+        }
+
+        private static GuideStyle blueprint() {
+            return new GuideStyle("BLUEPRINT", "HillBlueprint", NamedTextColor.AQUA, Material.FILLED_MAP, Material.WRITABLE_BOOK,
+                    // Same designer skin as the former Place guide.
+                    "6ac6ca262d67bcfb3dbc924ba8215a18195497c780058a5749de674217721892");
+        }
+
+        private static GuideStyle survival() {
+            return new GuideStyle(
                     "Survival Guide",
                     "HillSurvival",
                     NamedTextColor.GREEN,

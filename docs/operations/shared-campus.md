@@ -84,6 +84,9 @@ These campus protections do not change the separate survival worlds.
 
 ## Staff recovery
 
+The Staff, Moderator and Administrator roles include recovery access. The
+[staff guide](staff-roles.md) explains appointments, moderation and Microsoft roles.
+
 The server saves an initial recovery point and another every five minutes using
 [Restic](https://restic.readthedocs.io/en/stable/040_backup.html). Its compressed,
 encrypted repository deduplicates data across recovery points. Unchanged campus

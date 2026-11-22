@@ -5,6 +5,39 @@ or explicitly acknowledged development authentication. The existing demo remains
 in development mode. For school mode, complete the [Hill IT setup](microsoft-sso-setup.md)
 and pilot through the real tenant, proxy and supported game clients.
 
+## Routine deployment: start here
+
+1. Confirm you have permission to restart the game and have scheduled a player
+   outage. **Do not deploy an unreviewed working tree.** First check `git status
+   --short`; commit the reviewed changes on `main`, with no remaining output.
+2. For a *first* installation, complete [staged assets](#2-stage-separately-supplied-assets),
+   [host setup](#3-push-source-then-pull-on-the-server),
+   [Borg backups](#backups-and-recovery), and either the [IT Microsoft setup](microsoft-sso-setup.md)
+   or an explicitly permitted development-only environment. Existing player data
+   belongs to `/opt/hill175`, **not** Git.
+3. On your computer, select JDK 25 and run `./gradlew.bat clean test jar`
+   (Linux/macOS: `bash ./gradlew clean test jar`). Optionally run the
+   [isolated Docker smoke](#optional-isolated-deployment-smoke) before committing.
+4. Run **one** command on the local clean, committed `main` checkout:
+
+   ```powershell
+   ./ops/deploy.ps1 -Mode Development  # current controlled demo only
+   # OR ./ops/deploy.ps1 -Mode Microsoft  # only after the real IT pilot is ready
+   ```
+
+   This wrapper pushes to GitHub, pulls the *same commit* over PuTTY, builds/tests,
+   takes a cold backup, installs and verifies the systemd service. Never copy edited
+   sources/JARs directly onto the server or treat a failed run as success.
+5. Run the [service and player checks](#5-verify-the-deployed-service). For errors,
+   read the retained root-only deployment log path printed by the wrapper; see
+   [failure recovery](#if-deployment-fails). Stop rather than retrying into a
+   partially restored world or bypassing a failed backup/security check.
+
+`deploy.ps1` requires `git` and PuTTY `plink.exe` on PATH, the configured private
+key and a verified/cached server host key. It rejects dirty or diverged local and
+server checkouts. First use requires root SSH access, JDK 25 for local build,
+adequate free disk/RAM and the operator-provided maps; see the details below.
+
 ## Versions and locations
 
 | Item | Value |
@@ -48,6 +81,34 @@ helper uses development authentication. Never point it at a personal Minecraft s
 
 ## 2. Stage separately supplied assets
 
+### Personal campus mode
+
+`personal-campus.enabled` defaults to `true`. The first startup seeds a protected
+`hill_blueprint` world and immutable revision-0 export from the installed People
+template. Set `blueprint.source-folder` explicitly before that first startup to
+use a different approved, stopped-world copy, such as the existing shared campus.
+The source needs prepared region files and `hill-campus-template.yml` with campus
+bounds and spawn. Legacy structure imports are disabled in personal mode.
+
+Each student's first sign-in copies the approved export into a new personal world
+and records a separate baseline. Allow disk space for these full copies, proposal
+snapshots, approved exports, updated personal baselines and recovery copies. Copying and saving
+world folders can pause the server, so pilot with the real campus size before
+opening student admission. Keep these records and worlds together in operational
+backups. Existing shared worlds and competition entries are preserved, not
+silently adopted or overwritten. Replacing the staging template after blueprint
+initialization does not replace the approved revision.
+
+See [campus parties](campus-parties.md), [blueprint review](blueprint-review.md)
+and [chat safety](chat-safety.md). The filter and its licensed vocabulary are
+bundled in the plugin JAR, with no extra mod or external chat API. A separate
+survival server needs its own moderation policy before transfers are opened.
+To keep the optional legacy shared workflow instead, explicitly set
+`personal-campus.enabled: false` and `shared-campus.enabled: true`; this does not
+convert, delete or make personal-world ownership transferable.
+
+### Template folders
+
 The campus is selected by the contents of the server's
 `world-templates/hill_people_template/` directory. The code does not pin a campus
 revision, archive name or region-file count. A prepared folder contains `region/`
@@ -56,9 +117,8 @@ folder while Paper is stopped, preserving the old folder separately. New entries
 and explicit owner resets use it; existing participant worlds remain unchanged.
 Do not merge region files from different revisions.
 
-The current requested IT handoff is **V29**, an unfinished floating exterior draft
-packaged from its preserved native Minecraft 26.1.2 conversion. This does not
-claim that the existing deployed server was updated.
+Stage the approved campus folder for this server. The folder contents select the
+initial template. The local inspection world has its own selection.
 
 Every map is read from a designated folder under the server folder
 (`/opt/hill175/` on Linux, the folder containing `paper.jar` on Windows). The code
@@ -101,10 +161,10 @@ credentials and runtime account files. Deployment/SSO docs remain in GitHub.
 The optional Java resource-pack ZIP requires client installation or separate
 hosting; it does not install itself or provide Bedrock textures.
 
-To package an explicitly selected prepared folder from the owner workspace:
+Package the campus and hub folders selected for this installation. For example:
 
 ```powershell
-uv run --python 3.13 python ops/package-deployment-assets.py --campus-folder runtime/assets/campus-v29 --hub-folder runtime/server/world-templates/hill_hub --resource-pack server-assets/hill-exterior-asphalt-v1 --output runtime/handoff/Hill175-deployment-assets-v29-folders.zip
+uv run --python 3.13 python ops/package-deployment-assets.py --campus-folder runtime/server/world-templates/hill_people_template --hub-folder runtime/server/world-templates/hill_hub --output runtime/handoff/Hill175-deployment-assets.zip
 ```
 
 Use a new output filename for each handoff. The script preserves previous packets.
@@ -154,9 +214,9 @@ Then copy the packet's `world-templates` folder to `/opt/hill175/world-templates
 With the packet ZIP transferred to the host (no `unzip` package is needed):
 
 ```bash
-python3 -m zipfile -e Hill175-deployment-assets-v29-folders.zip /root/hill175-assets
+python3 -m zipfile -e Hill175-deployment-assets.zip /root/hill175-assets
 (cd /root/hill175-assets && sha256sum --check --quiet SHA256SUMS)
-cp -a /root/hill175-assets/world-templates /opt/hill175/world-templates
+cp -a /root/hill175-assets/world-templates/. /opt/hill175/world-templates/
 ```
 
 The installer names the missing folder and changes nothing if a required map is absent.
@@ -252,7 +312,8 @@ required by the installed unit and must be backed up separately from server data
 
 The new campus is a template for newly created People worlds. Existing entries
 are preserved; an owner-requested reset recreates an entry using the current template.
-The V29 packet contains Minecraft 26.1.2 region data for import by Paper 26.2; clients still use the server's version.
+Players must use a client compatible with the installed Paper version. Do not replace or downgrade
+an active player's world to choose a different campus template.
 
 ## 5. Verify the deployed service
 
@@ -284,6 +345,60 @@ For bot checks, prepare `ops/prepare-smoke-bot.ps1` locally, set
 `node ops/smoke-player.mjs camera-view` or `people-campus-template`.
 Bots create test accounts/entries: use a controlled runtime and do not treat their
 success as real Java/Bedrock client or Microsoft SSO acceptance.
+
+## Optional isolated deployment smoke
+
+After `clean test jar`, with Docker Engine/Desktop running, run:
+
+```powershell
+uv run --python 3.13 python ops/smoke-deployment-sandbox.py
+```
+
+The helper checks the exact pinned Paper/WorldEdit/LuckPerms/Restic checksums,
+boots Paper 26.2 with Temurin 25, generates a new **synthetic** hub and campus
+region, initializes its own Restic repository, then starts the built Hill175 JAR
+and checks for Paper readiness, Hill175 enablement and startup errors. It uses a
+random disposable container with no published ports, host mounts, personal map,
+production secrets or real student data, and removes the container afterward.
+Network access is needed to fetch verified dependencies and Paper's vanilla
+server on its first start. On Windows it finds the standard Docker Desktop CLI;
+elsewhere it uses `docker` on PATH. If Docker is unavailable, do **not** claim
+this check passed: rely on `clean test jar`, static validation and a separately
+approved isolated in-game smoke. This test cannot prove the Linux systemd/Borg/
+nginx installer, external Cloudflare/Entra/Bedrock access or player gameplay;
+the real deployment's verify step and real-client checks remain mandatory.
+
+Student map downloads require an explicitly prepared, sanitised export and a
+protected web hostname; see [map download operations](student-map-downloads.md)
+before enabling the `/download` command. Staff incident review is described in
+[incident replay operations](incident-replay.md); only authorized staff may
+inspect recordings. Java-only separate survival is a distinct service and
+approval step, not silently installed by `deploy.ps1`: see
+[separate survival](separate-survival.md) and
+[profile worldgen compatibility](survival-generation-profile.md). Each feature
+has its own operational prerequisites; do not mistake a plugin JAR build for a
+completed server/web/firewall setup.
+
+## If deployment fails
+
+1. Stop and read the root-only `/opt/hill175-deploy-<UTC>.log` path printed by
+   the wrapper. To inspect from your machine, use **PuTTY** `plink.exe -i
+   "C:/Users/neil_/.ssh/hetzner.ppk" root@135.181.78.188`, then
+   `journalctl -u hill175.service -n 100 --no-pager` and
+   `systemctl status hill175.service --no-pager` on the host. Never paste secrets
+   from `/etc/hill175/hill175.env` into issue reports.
+2. A local dirty tree, wrong Git branch/remote, unrecognized SSH host key or
+   non-fast-forward server checkout is a deliberate *preflight refusal*. Review
+   and preserve changes; do not `git reset --hard`, force-push or copy a JAR.
+3. Missing/invalid map packets, bad checksums, invalid Microsoft/Cloudflare
+   configuration or missing Borg repository must be corrected at the documented
+   source **before** rerunning. Never disable a safety check to get the server up.
+4. If Paper failed during startup after an outage, consult the
+   [rollback procedure](#backups-and-recovery) and inspect the preserved
+   `assets/install-rollback.*` / `replaced-worlds/` folders. A Microsoft-mode
+   failure intentionally leaves the service **stopped** until school admission
+   safety has been reviewed. Confirm an actual cold backup exists before any
+   manual world restoration; preserve the failed runtime for diagnosis.
 
 ## Backups and recovery
 

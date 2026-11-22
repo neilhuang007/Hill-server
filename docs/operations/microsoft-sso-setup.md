@@ -1,4 +1,4 @@
-# Hill IT setup: Microsoft sign-in and Java/Bedrock accounts
+
 
 The plugin includes a Microsoft authentication service. IT supplies the values in
 [.env.example](../../.env.example); no source changes are needed. The current public
@@ -174,7 +174,7 @@ not merged across editions.
 1. Join the server and remain in the restricted authentication lobby.
 2. Open the supplied HTTPS link and select the Hill Microsoft account.
 3. Check the name and game account on the browser page, then enter its one-time
-   code in that same live game connection with `/verify <code>`.
+   code in **Sign In Menu** under **Enter Browser Code** on that same connection.
 4. Enter the hub with the school display name in chat, tab list and competition
    menus. The overhead label includes the school name and Minecraft handle.
 
@@ -186,9 +186,7 @@ not through immediate Microsoft push notifications.
 Before opening admission, test an assigned student in both editions, an unassigned
 school account, an external/personal account, missing role, expired link, wrong
 confirmation code, disconnect/rejoin, and switching linked devices. Confirm both
-aliases see the same entries and cannot occupy both team slots. Check name display
-and link/code entry on actual Bedrock devices: this release does not supply a
-native Bedrock sign-in form. Repeat the camera exit and campus smoke tests.
+aliases see the same entries and cannot occupy both team slots. Check name display, browser links and the code entry form on actual Bedrock devices. Repeat the camera exit and campus smoke tests.
 
 Check that direct-origin web requests, wrong Host/SNI, missing AOP certificates and
 public access to the loopback service fail. Test real Microsoft callbacks through
@@ -209,6 +207,5 @@ Do not edit identity mappings while Paper is running. A corrupt identity store
 must prevent Microsoft-mode startup.
 
 Before the event, Hill must set its real-name disclosure policy, help contact,
-event-end data/backup retention date and operator recovery procedure. Automatic
-purging, a staff suspension console and anonymous voting are separate future work.
+event-end data/backup retention date and operator recovery procedure. Configure staff moderation in the [staff guide](staff-roles.md).
 See [implementation architecture and limits](../architecture/microsoft-sso.md).

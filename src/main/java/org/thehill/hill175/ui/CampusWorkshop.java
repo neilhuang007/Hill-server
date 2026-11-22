@@ -33,11 +33,16 @@ public final class CampusWorkshop implements CommandExecutor, TabCompleter {
 
     public void select(Player player, CampusMapMenu.Selection selection) {
         if (!competition.isAuthenticated(player)) return;
-        if (!competition.enterSharedCampus(player)) return;
+        if (competition.personalCampusesEnabled()) {
+            if (competition.currentEntry(player).filter(competition::isPersonalCampus).isEmpty()
+                    && !competition.home(player)) return;
+        } else if (!competition.enterSharedCampus(player)) return;
         player.closeInventory();
         if (selection.building() != null) competition.travelToBuilding(player, selection.building().id());
         else if (!selection.entireCampus()) competition.travelToCampusPoint(player, selection.x(), selection.z());
-        player.sendMessage(Component.text("Build together anywhere inside the campus boundary. Staff can restore saved backups.", NamedTextColor.GREEN));
+        player.sendMessage(Component.text(competition.personalCampusesEnabled()
+                ? "Explore this campus. Building requires an invitation and pauses during review."
+                : "Build together anywhere inside the campus boundary. Staff can restore saved backups.", NamedTextColor.GREEN));
     }
 
     @Override public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -46,7 +51,7 @@ public final class CampusWorkshop implements CommandExecutor, TabCompleter {
         String action = args.length == 0 ? "map" : args[0].toLowerCase(Locale.ROOT);
         switch (action) {
             case "map", "start" -> open(player);
-            case "home" -> competition.enterSharedCampus(player);
+            case "home" -> competition.home(player);
             case "undo" -> competition.undoRecentBuild(player);
             case "go" -> {
                 if (args.length == 2) competition.travelToBuilding(player, args[1]);

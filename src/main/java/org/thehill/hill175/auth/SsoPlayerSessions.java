@@ -131,7 +131,7 @@ public final class SsoPlayerSessions implements AutoCloseable {
             String url = service.begin(connection.id, connection.gameIdentity, player.getName());
             player.sendMessage(Component.text("Sign in with your Hill Microsoft account: ", NamedTextColor.GOLD)
                     .append(Component.text(url, NamedTextColor.AQUA).clickEvent(ClickEvent.openUrl(url))));
-            player.sendMessage(Component.text("After signing in, type /verify followed by the code shown only in your browser.", NamedTextColor.WHITE));
+            player.sendMessage(Component.text("After signing in, open the Sign In Menu and choose Enter Browser Code.", NamedTextColor.WHITE));
             player.sendMessage(Component.text("Your school name will be visible to other verified participants. Never enter a code supplied by someone else.", NamedTextColor.GRAY));
         } catch (SsoException exception) {
             player.sendMessage(Component.text(exception.getMessage(), NamedTextColor.RED));

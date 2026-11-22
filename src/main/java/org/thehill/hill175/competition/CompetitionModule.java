@@ -69,8 +69,41 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public final class CompetitionModule {
+    private org.thehill.hill175.party.PartyService parties;
+    private org.thehill.hill175.blueprint.BlueprintService blueprint;
+    private java.util.function.Predicate<String> textAllowed = text -> true;
+
+    public void personalCampuses(org.thehill.hill175.party.PartyService parties,
+                                 org.thehill.hill175.blueprint.BlueprintService blueprint) {
+        this.parties = Objects.requireNonNull(parties);
+        this.blueprint = Objects.requireNonNull(blueprint);
+    }
+
+    public void textAllowed(java.util.function.Predicate<String> predicate) { textAllowed = Objects.requireNonNull(predicate); }
+    public boolean personalCampusesEnabled() { return parties != null; }
+    public boolean isPersonalCampus(Entry entry) {
+        return entry != null && (entry.selectedBuildingId().equals("personal-campus") || (parties != null && parties.owns(entry)));
+    }
+    public boolean mayVisitEntry(Player player, Entry entry) {
+        return isAuthenticated(player) && (!isPersonalCampus(entry) || (parties != null && parties.canVisit(player, entry)));
+    }
+    public void openParty(Player player) { if (parties != null) parties.open(player); }
+    private java.util.function.Consumer<Player> hillMenu = player -> { };
+    /** The one central menu; every compass and menu entry point opens it. */
+    public void hillMenu(java.util.function.Consumer<Player> action) { hillMenu = Objects.requireNonNull(action); }
+    public void openHillMenu(Player player) { hillMenu.accept(player); }
+
+    private boolean preservePersonalCampus(Player player, Entry entry) {
+        if (!isPersonalCampus(entry)) return false;
+        message(player, NamedTextColor.YELLOW, "Your personal campus stays yours. Use /party for guests and /blueprint to send your build for approval.");
+        return true;
+    }
+
     private java.util.function.Predicate<Player> recoveryPreview = player -> false;
     public void recoveryPreview(java.util.function.Predicate<Player> predicate) { recoveryPreview = java.util.Objects.requireNonNull(predicate); }
+    private java.util.function.Predicate<Player> sendingBuild = player -> false;
+    /** Players choosing what to send keep their temporary flying mode and tools until they finish. */
+    public void sendingBuild(java.util.function.Predicate<Player> predicate) { sendingBuild = java.util.Objects.requireNonNull(predicate); }
     public static final String COMPASS_ITEM_ID = "competition-compass";
     public static final String CAMERA_ITEM_ID = "submission-camera";
     public static final String ENTRY_MENU_ITEM_ID = "entry-controls";
@@ -82,6 +115,7 @@ public final class CompetitionModule {
     public static final String LOBBY_ITEM_ID = "return-lobby";
     public static final String CAMPUS_CHART_ITEM_ID = "campus-chart";
     public static final String CAMPUS_UNDO_ITEM_ID = "campus-undo";
+    public static final String BLUEPRINT_SEND_ITEM_ID = "blueprint-send";
     private static final Set<String> RESERVED_NICKNAMES = Set.of("hilljourney", "hillplace", "hillpeople", "hillsurvival");
     private static final int CAMPUS_CHART_SLOT = 8;
     private static final long CAMERA_CAPTURE_SILENCE_NANOS = 750_000_000L;
@@ -101,6 +135,11 @@ public final class CompetitionModule {
     private final PasswordHasher passwordHasher;
     private final IdentityLinker identityLinker;
     private final SsoPlayerSessions schoolSessions;
+    private java.util.function.BiConsumer<Player, VerifiedSession> admission = (player, session) -> { };
+    private java.util.function.Predicate<Player> accessAllowed = player -> true;
+
+    public void admission(java.util.function.BiConsumer<Player, VerifiedSession> action) { admission = action; }
+    public void accessAllowed(java.util.function.Predicate<Player> check) { accessAllowed = check; }
     private final SurvivalInventoryStore survivalInventories;
     private final ClientCameraBridge cameraBridge;
     private final EntryGalleryPublisher galleryPublisher;
@@ -120,6 +159,7 @@ public final class CompetitionModule {
     private CampusChartMap campusSelectionChart;
     private java.util.function.Supplier<MapRenderer> officialMapRenderer;
     private java.util.function.Consumer<Player> campusUndo;
+    private java.util.function.Consumer<Player> survivalNavigation;
     private final Map<UUID, PreviewState> activePreviewsByPlayer = new HashMap<>();
     private final Map<UUID, BossBar> previewBossBarsByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastCameraItemUseAtNanosByPlayer = new HashMap<>();
@@ -175,15 +215,20 @@ public final class CompetitionModule {
 
     public void undoRecentBuild(Player player) {
         if (!isAuthenticated(player)) { sendAuthenticationInstructions(player); return; }
-        if (!worlds.isSharedCampus(player.getWorld()) || campusUndo == null) {
-            message(player, NamedTextColor.YELLOW, "Use Undo while building in the shared campus.");
+        boolean campus = worlds.isSharedCampus(player.getWorld()) || blueprint != null && blueprint.isCampus(player.getWorld());
+        if (!campus || campusUndo == null) {
+            message(player, NamedTextColor.YELLOW, "Use Undo while building in a campus.");
             return;
         }
         campusUndo.accept(player);
     }
 
     public boolean isPreparingSubmission(Entry entry) {
-        return preparingSubmissions.containsKey(entry.id());
+        return preparingSubmissions.containsKey(entry.id())
+                || (parties == null && isPersonalCampus(entry))
+                || (parties != null && worlds.isSharedCampus(entry))
+                || (blueprint != null && (blueprint.isFrozen(entry)
+                || (isPersonalCampus(entry) && !blueprint.isRegistered(entry))));
     }
 
     public CameraCaptureService.Status captureStatus(Entry entry, int slot) {
@@ -239,6 +284,7 @@ public final class CompetitionModule {
         player.teleport(worlds.authenticationSpawn());
         showAuthenticationTitle(player);
         sendAuthenticationInstructions(player);
+        if (parties == null) sendNavigationTip(player);
         if (schoolSessions != null) {
             schoolSessions.requestLink(player);
         }
@@ -267,7 +313,7 @@ public final class CompetitionModule {
     }
 
     public boolean isAuthenticated(Player player) {
-        return schoolSessions == null ? authenticatedSessions.contains(player.getUniqueId()) : schoolSessions.session(player).isPresent();
+        return accessAllowed.test(player) && (schoolSessions == null ? authenticatedSessions.contains(player.getUniqueId()) : schoolSessions.session(player).isPresent());
     }
 
     public boolean usesMicrosoftAuthentication() {
@@ -434,6 +480,7 @@ public final class CompetitionModule {
     }
 
     public void sendAuthenticationInstructions(Player player) {
+        player.sendMessage(Component.text("[Open Sign In Menu]  You can also use an empty hand on the lobby floor.", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/hillmenu")));
         if (schoolSessions != null) {
             message(player, NamedTextColor.GOLD, "Use /verify to open Hill Microsoft sign-in, then /verify <browser-code>.");
             message(player, NamedTextColor.GRAY, "Never enter a code supplied by someone else. School passwords belong only on Microsoft's sign-in page.");
@@ -521,6 +568,14 @@ public final class CompetitionModule {
     }
 
     public void sendRules(Player player) {
+        if (parties != null) {
+            message(player, NamedTextColor.GOLD, "Hill Campus Rules");
+            message(player, NamedTextColor.WHITE, "Build in your own campus or with an invitation. Respect the owner's work.");
+            message(player, NamedTextColor.WHITE, "Public chat is filtered. Private messaging and party chat are disabled.");
+            message(player, NamedTextColor.WHITE, "The shared blueprint is look-only. A moderator approves builds before they join it.");
+            message(player, NamedTextColor.WHITE, "Use /party to manage guests and /blueprint to send your build for approval.");
+            return;
+        }
         if (worlds.sharedCampusEntry().isPresent()) {
             message(player, NamedTextColor.GOLD, "Shared Hill Campus");
             message(player, NamedTextColor.WHITE, "Everyone signed in can build across the campus. Respect other students' work.");
@@ -549,6 +604,21 @@ public final class CompetitionModule {
             }
             message(player, NamedTextColor.WHITE, "/help and /rules");
             return;
+        }
+        sendNavigationTip(player);
+        if (parties != null) {
+            message(player, NamedTextColor.WHITE, "/campus opens the map of the campus you are building in. /campus home returns to yours.");
+            message(player, NamedTextColor.WHITE, "/party manages invitations and guests. /invite <player> invites an online friend.");
+            message(player, NamedTextColor.WHITE, "Click Accept & Join in chat to join a friend's campus. /party opens invitations and guest controls.");
+            message(player, NamedTextColor.WHITE, "/blueprint opens the Blueprint menu: Send My Build takes a snapshot for approval while you keep building.");
+            message(player, NamedTextColor.WHITE, "Approved builds reach your campus automatically. If both sides changed a block, Choose What to Keep.");
+            if (player.hasPermission("hill175.blueprint.review")) {
+                message(player, NamedTextColor.GOLD, "Staff: /review shows each request on the blueprint with boxes around changed areas and conflicts.");
+            }
+            return;
+        }
+        if (player.hasPermission("hill175.replay")) {
+            message(player, NamedTextColor.WHITE, "/hillreplay: staff incident history and playback");
         }
         if (worlds.sharedCampusEntry().isPresent()) {
             message(player, NamedTextColor.WHITE, "/campus: open the campus image and choose a building or location");
@@ -580,6 +650,10 @@ public final class CompetitionModule {
     }
 
     public Optional<Entry> createEntry(Player player, Category category, String buildingId) {
+        if (parties != null && category == Category.PEOPLE) {
+            parties.home(player);
+            return parties.personalEntry(player);
+        }
         String memberKey = requireMemberKey(player);
         if (memberKey == null) {
             return Optional.empty();
@@ -625,6 +699,10 @@ public final class CompetitionModule {
 
     public void teleportToEntry(Player player, Entry entry, boolean visiting) {
         if (!isAuthenticated(player)) {
+            return;
+        }
+        if (!mayVisitEntry(player, entry)) {
+            message(player, NamedTextColor.RED, "You need an accepted invitation to enter this personal campus.");
             return;
         }
         boolean fromSurvival = worlds.isSurvivalWorld(player.getWorld());
@@ -696,6 +774,16 @@ public final class CompetitionModule {
         pendingPeopleEntryByPlayer.remove(player.getUniqueId());
         refreshCameraMarkers(entry);
         recoverSubmittedImages(entry);
+        if (isPersonalCampus(entry)) {
+            boolean editable = !visiting && canEditEntry(player, entry);
+            if (editable) setOwnerMode(player);
+            else setVisitorMode(player);
+            givePersonalCampusItems(player, entry, editable);
+            message(player, editable ? NamedTextColor.GREEN : NamedTextColor.AQUA,
+                    editable ? "Campus ready. Build together, or use /party to manage guests."
+                            : "This campus is read-only while visiting or awaiting review. /campus home returns to yours.");
+            return;
+        }
         if (entry.category() == Category.PEOPLE) {
             message(player, NamedTextColor.AQUA,
                     "This People build was spawned from the server's Hill School campus template.");
@@ -712,6 +800,23 @@ public final class CompetitionModule {
             message(player, NamedTextColor.AQUA, "Visitor Mode: fly and observe; editing is disabled.");
             sendVisitorEntryTip(player);
         }
+    }
+
+    public boolean teleportReadOnly(Player player, World world, Location destination) {
+        if (!isAuthenticated(player)) { sendAuthenticationInstructions(player); return false; }
+        if (world == null || destination == null || !world.equals(destination.getWorld())) return false;
+        boolean fromSurvival = worlds.isSurvivalWorld(player.getWorld());
+        if (fromSurvival) saveSurvivalState(player);
+        if (!teleportEndingCameraPreview(player, destination)) {
+            message(player, NamedTextColor.RED, "The review teleport was interrupted. Please try again.");
+            return false;
+        }
+        if (fromSurvival) { clearSurvivalState(player); survivalInventories.markInactive(player.getUniqueId()); }
+        currentEntryByPlayer.remove(player.getUniqueId());
+        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+        setVisitorMode(player);
+        giveHubItems(player);
+        return true;
     }
 
     public void teleportHub(Player player) {
@@ -740,7 +845,16 @@ public final class CompetitionModule {
         sendHubTip(player);
     }
 
+    public void survivalNavigation(java.util.function.Consumer<Player> action) {
+        survivalNavigation = Objects.requireNonNull(action);
+    }
+
     public void teleportSurvival(Player player) {
+        if (survivalNavigation != null) survivalNavigation.accept(player);
+        else teleportLocalSurvival(player);
+    }
+
+    public void teleportLocalSurvival(Player player) {
         if (!isAuthenticated(player)) {
             return;
         }
@@ -790,6 +904,7 @@ public final class CompetitionModule {
     }
 
     public boolean home(Player player) {
+        if (parties != null) return parties.home(player);
         if (worlds.sharedCampusEntry().isPresent()) return enterSharedCampus(player);
         List<Entry> ownedEntries = entriesFor(participantKey(player));
         Optional<Entry> currentOwned = currentEntry(player)
@@ -825,6 +940,23 @@ public final class CompetitionModule {
         currentEntryByPlayer.put(player.getUniqueId(), entry.id());
         refreshMovementMode(player, destination.get());
         return true;
+    }
+
+    public void sendBuild(Player player) {
+        if (blueprint == null || !isAuthenticated(player)) return;
+        try { blueprint.screens().send(player); }
+        catch (IllegalStateException exception) { message(player, NamedTextColor.RED, exception.getMessage()); }
+    }
+
+    public void visitChangedBlock(Player player, org.thehill.hill175.blueprint.BlockPosition pos) {
+        if (!isAuthenticated(player)) return;
+        currentEntry(player).filter(entry -> entry.worldName().equals(player.getWorld().getName()))
+                .flatMap(entry -> worlds.campusDestination(entry, pos.blockX(), pos.blockZ(), pos.blockY() + 1))
+                .ifPresentOrElse(destination -> {
+                    var center = new org.bukkit.util.Vector(pos.blockX() + 0.5, pos.blockY() + 0.5, pos.blockZ() + 0.5);
+                    destination.setDirection(center.subtract(destination.toVector().add(new org.bukkit.util.Vector(0, 1.62, 0))));
+                    if (teleportEndingCameraPreview(player, destination)) refreshMovementMode(player, destination);
+                }, () -> player.sendMessage("No safe standing place was found near that block."));
     }
 
     public boolean travelToCampusPoint(Player player, int x, int z) {
@@ -863,7 +995,9 @@ public final class CompetitionModule {
     }
 
     public boolean mayBuild(Player player, Location location) {
-        if (recoveryPreview.test(player)) return false;
+        if (recoveryPreview.test(player) || sendingBuild.test(player)) return false;
+        if (blueprint != null && blueprint.isBlueprint(location.getWorld())) return isAuthenticated(player) && blueprint.mayChange(player, location.getWorld());
+        if (blueprint != null && blueprint.protects(location.getWorld())) return false;
         if (!isAuthenticated(player)) {
             return false;
         }
@@ -871,7 +1005,7 @@ public final class CompetitionModule {
             return true;
         }
         if (worlds.isSharedCampus(location.getWorld())) {
-            return worlds.sharedCampusEntry().orElseThrow().containsEditable(location);
+            return parties == null && worlds.sharedCampusEntry().orElseThrow().containsEditable(location);
         }
         return entryAt(location)
                 .filter(entry -> canEditEntry(player, entry))
@@ -879,17 +1013,26 @@ public final class CompetitionModule {
     }
 
     public void refreshMovementMode(Player player, Location location) {
-        if (recoveryPreview.test(player)) return;
+        if (recoveryPreview.test(player) || sendingBuild.test(player)) return;
         if (!isAuthenticated(player)) {
             return;
         }
         if (isCameraPreviewing(player)) {
             return;
         }
+        if (location.getWorld() != null && (location.getWorld().getName().equals("hill_blueprint")
+                || location.getWorld().getName().startsWith("hill_bp_"))) {
+            currentEntryByPlayer.remove(player.getUniqueId());
+            pendingPeopleEntryByPlayer.remove(player.getUniqueId());
+            if (blueprint != null && blueprint.editor(player)) setOwnerMode(player);
+            else setVisitorMode(player);
+            return;
+        }
         if (worlds.isSharedCampus(location.getWorld())) {
             currentEntryByPlayer.remove(player.getUniqueId());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-            if (worlds.sharedCampusEntry().orElseThrow().containsEditable(location)) setOwnerMode(player);
+            if (parties != null) setVisitorMode(player);
+            else if (worlds.sharedCampusEntry().orElseThrow().containsEditable(location)) setOwnerMode(player);
             else setExteriorCameraMode(player);
             if (!"shared-campus".equals(activeKitByPlayer.get(player.getUniqueId()))) giveSharedCampusItems(player);
             return;
@@ -971,6 +1114,7 @@ public final class CompetitionModule {
     }
 
     public void switchEntry(Player player, Entry entry, Category newCategory, String buildingId) {
+        if (preservePersonalCampus(player, entry)) return;
         if (!ensureEditableEntryAccess(player, entry)) {
             return;
         }
@@ -1149,6 +1293,11 @@ public final class CompetitionModule {
     }
 
     public boolean canEditEntry(Player player, Entry entry) {
+        if (entry != null && isPreparingSubmission(entry)) return false;
+        if (isPersonalCampus(entry)) {
+            return parties != null && store.entry(entry.id()).orElse(null) == entry && !worlds.isResetting(entry.id())
+                    && parties.canBuild(player, entry);
+        }
         return editableEntryAccess(player, entry) == EntryAccess.ALLOWED;
     }
 
@@ -1358,6 +1507,7 @@ public final class CompetitionModule {
     }
 
     public void invite(Player inviter, Entry entry, String targetNickname) {
+        if (preservePersonalCampus(inviter, entry)) return;
         if (!ensureEditableEntryAccess(inviter, entry)) return;
         if (entry.members().size() >= 2) {
             message(inviter, NamedTextColor.RED, "This entry already has two team members.");
@@ -1409,6 +1559,7 @@ public final class CompetitionModule {
             return;
         }
         Entry entry = entryOptional.get();
+        if (preservePersonalCampus(target, entry)) return;
         if (!entry.isMember(invite.inviterKey())) {
             invitesByTarget.remove(targetKey);
             message(target, NamedTextColor.RED, "The inviter is no longer a member of that entry.");
@@ -1441,6 +1592,7 @@ public final class CompetitionModule {
     }
 
     public void leaveTeam(Player player, Entry entry) {
+        if (preservePersonalCampus(player, entry)) return;
         if (!ensureEditableEntryAccess(player, entry)) {
             return;
         }
@@ -1459,6 +1611,7 @@ public final class CompetitionModule {
 
     public List<Entry> entriesFor(String participantKey) {
         return store.entries().stream()
+                .filter(entry -> !isPersonalCampus(entry))
                 .filter(entry -> entry.isMember(participantKey))
                 .sorted(Comparator.comparing(Entry::category))
                 .toList();
@@ -1500,28 +1653,54 @@ public final class CompetitionModule {
     }
 
     private void authenticate(Player player, String participantKey, String displayName, String successMessage) {
+        authenticate(player, participantKey, displayName, successMessage, org.thehill.hill175.access.ServerRole.PLAYER);
+    }
+
+    private void authenticate(Player player, String participantKey, String displayName, String successMessage,
+                              org.thehill.hill175.access.ServerRole role) {
+        try {
+            admission.accept(player, new VerifiedSession(participantKey, displayName, Instant.MAX, role));
+        } catch (SecurityException denied) {
+            authenticatedSessions.remove(player.getUniqueId());
+            if (schoolSessions != null) schoolSessions.disconnect(player);
+            player.kick(Component.text(denied.getMessage()));
+            return;
+        }
         lastAuthenticationReminderAtNanosByPlayer.remove(player.getUniqueId());
         store.recordConnection(participantKey, connectionAddress(player), "authenticated");
         player.displayName(Component.text(displayName));
         player.playerListName(Component.text(displayName, NamedTextColor.GOLD));
-        if (survivalInventories.isActive(player.getUniqueId())) {
-            teleportSurvival(player);
+        if (parties != null) {
+            survivalInventories.markInactive(player.getUniqueId());
+            if (survivalInventories.isActive(player.getUniqueId())) {
+                authenticatedSessions.remove(player.getUniqueId());
+                if (schoolSessions != null) schoolSessions.disconnect(player);
+                player.kick(Component.text("Your saved survival state could not be secured. Please contact staff."));
+                return;
+            }
+            if (!parties.home(player)) teleportHub(player);
+        } else if (survivalInventories.isActive(player.getUniqueId())) {
+            teleportLocalSurvival(player);
         } else if (worlds.sharedCampusEntry().isPresent()) {
             enterSharedCampus(player);
         } else {
             teleportHub(player);
         }
+        if (blueprint != null) blueprint.onAdmission(player);
         showWelcomeTitle(player, displayName);
+        player.sendMessage(Component.text("[Open Hill Menu]  You can also sneak and use an empty hand.", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/hillmenu")));
+        sendNavigationTip(player);
         message(player, NamedTextColor.GREEN, successMessage);
-        sendRules(player);
+        if (parties == null) sendRules(player);
     }
 
     private void authenticateSchool(Player player, VerifiedSession session) {
         authenticate(player, session.participantKey(), session.displayName(),
-                "Hill Microsoft identity verified. Your linked Minecraft accounts share competition entries.");
+                "Hill Microsoft identity verified. Your linked Minecraft accounts share competition entries.", session.role());
     }
 
     public void resetEntry(Player player, Entry entry) {
+        if (preservePersonalCampus(player, entry)) return;
         if (!ensureEditableEntryAccess(player, entry)) {
             return;
         }
@@ -1553,6 +1732,7 @@ public final class CompetitionModule {
     }
 
     public void deleteEntry(Player player, Entry entry) {
+        if (preservePersonalCampus(player, entry)) return;
         if (!ensureEditableEntryAccess(player, entry)) {
             return;
         }
@@ -1643,6 +1823,10 @@ public final class CompetitionModule {
     }
 
     private boolean validateSubmissionText(Player player, String label, String text, int maximumLength) {
+        if (!textAllowed.test(text)) {
+            message(player, NamedTextColor.RED, "Please use school-appropriate language in project details.");
+            return false;
+        }
         if (text.length() > maximumLength) {
             message(player, NamedTextColor.RED, label + " must contain at most " + maximumLength + " characters.");
             return false;
@@ -1651,6 +1835,12 @@ public final class CompetitionModule {
     }
 
     public void submitEntry(Player player, Entry entry) {
+        if (isPersonalCampus(entry)) {
+            if (blueprint == null) { message(player, NamedTextColor.YELLOW, "Personal campuses are disabled."); return; }
+            try { blueprint.screens().send(player); }
+            catch (IllegalStateException exception) { message(player, NamedTextColor.RED, exception.getMessage()); }
+            return;
+        }
         if (!ensureEditableEntryAccess(player, entry)) {
             return;
         }
@@ -1695,6 +1885,16 @@ public final class CompetitionModule {
     }
 
     public void unlockEntry(Player player, Entry entry) {
+        if (isPersonalCampus(entry)) {
+            if (blueprint == null) { message(player, NamedTextColor.YELLOW, "Personal campuses are disabled."); return; }
+            try {
+                message(player, NamedTextColor.AQUA, blueprint.withdraw(player, entry)
+                        ? "Your waiting request was cancelled. Your campus is unchanged." : "You have no request waiting for approval. Keep building!");
+            } catch (IOException | IllegalArgumentException | IllegalStateException | SecurityException exception) {
+                message(player, NamedTextColor.RED, "Cannot cancel this request: " + exception.getMessage());
+            }
+            return;
+        }
         if (!ensureOwnedEntryAccess(player, entry)) {
             return;
         }
@@ -1769,6 +1969,14 @@ public final class CompetitionModule {
     }
 
     private void giveHubItems(Player player) {
+        if (parties != null) {
+            clearCompetitionItems(player);
+            placeCampusTool(player, 6, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Hill Menu",
+                    "Your campus, the blueprint, friends, the map and more."));
+            giveCampusSelectionMap(player);
+            activeKitByPlayer.put(player.getUniqueId(), HUB_KIT);
+            return;
+        }
         if (worlds.sharedCampusEntry().isPresent()) {
             giveSharedCampusItems(player);
             activeKitByPlayer.put(player.getUniqueId(), HUB_KIT);
@@ -1784,6 +1992,7 @@ public final class CompetitionModule {
     }
 
     public boolean enterSharedCampus(Player player) {
+        if (parties != null) return parties.home(player);
         if (!isAuthenticated(player)) { sendAuthenticationInstructions(player); return false; }
         Entry campus = worlds.sharedCampusEntry().orElse(null);
         if (campus == null) { message(player, NamedTextColor.YELLOW, "The shared campus is not enabled."); return false; }
@@ -1836,6 +2045,7 @@ public final class CompetitionModule {
     }
 
     private void giveEntryOwnerItems(Player player, Entry entry) {
+        if (isPersonalCampus(entry)) { givePersonalCampusItems(player, entry, true); return; }
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
@@ -1849,7 +2059,22 @@ public final class CompetitionModule {
         activeKitByPlayer.put(player.getUniqueId(), ownerKit(entry));
     }
 
+    private void givePersonalCampusItems(Player player, Entry entry, boolean editable) {
+        clearCompetitionItems(player);
+        placeCampusTool(player, 6, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Hill Menu",
+                "Your campus, the blueprint, friends, the map and more."));
+        if (editable) placeCampusTool(player, 5, competitionItem(Material.CLOCK, CAMPUS_UNDO_ITEM_ID, "Undo Last 15 Seconds",
+                "Right-click to undo your block edits from the last 15 seconds."));
+        if (editable && blueprint != null && entry.isMember(participantKey(player))) {
+            placeCampusTool(player, 7, competitionItem(Material.EMERALD, BLUEPRINT_SEND_ITEM_ID, "Send My Build",
+                    "Right-click: fly to your changes and pick what to send for approval."));
+        }
+        givePeopleCampusChart(player, entry);
+        activeKitByPlayer.put(player.getUniqueId(), editable ? ownerKit(entry) : visitorKit(entry, entry.isMember(participantKey(player))));
+    }
+
     private void giveEntryVisitorItems(Player player, Entry entry, boolean owner) {
+        if (isPersonalCampus(entry)) { givePersonalCampusItems(player, entry, false); return; }
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
@@ -2426,13 +2651,27 @@ public final class CompetitionModule {
         player.clearTitle();
         player.showTitle(net.kyori.adventure.title.Title.title(
                 Component.text("Welcome, " + displayName, NamedTextColor.GOLD),
-                Component.text("Hill 175 Minecraft Competition", NamedTextColor.WHITE)
+                Component.text(parties == null ? "Hill 175 Minecraft Competition" : "Your Hill Campus", NamedTextColor.WHITE)
         ));
     }
 
+    private void sendNavigationTip(Player player) {
+        if (parties != null) {
+            message(player, NamedTextColor.GRAY, "The compass in your hotbar opens the Hill Menu anytime.");
+            message(player, NamedTextColor.GRAY, "Use public chat to talk with other builders.");
+        } else {
+            player.sendMessage(Component.text("[Open Hill Menu]", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/hillmenu")));
+        }
+        if (plugin.getConfig().getBoolean("incident-replay.enabled", true)
+                || plugin.getConfig().getBoolean("packet-replay.enabled", false)) {
+            message(player, NamedTextColor.GRAY, "Gameplay actions and positions are recorded for staff safety review.");
+        }
+    }
+
     private void sendHubTip(Player player) {
-        message(player, NamedTextColor.GRAY,
-                "Tip: right-click the Compass, a category guide, or the Survival guide; /entry home returns to your build.");
+        message(player, NamedTextColor.GRAY, parties != null
+                ? "Tip: click the My Campus guide to build, or the Blueprint guide to send your build and see updates."
+                : "Tip: right-click the Compass, a category guide, or the Survival guide; /entry home returns to your build.");
     }
 
     private void sendOwnerEntryTip(Player player) {

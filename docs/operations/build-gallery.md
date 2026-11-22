@@ -1,6 +1,7 @@
 # Local build gallery
 
-The plugin serves the build gallery at `http://localhost:8788`. It binds only to
+The plugin serves the build gallery at `http://localhost:8788/gallery`. The root
+page is now the [campus website](campus-website.md). It binds only to
 IPv4 loopback (`127.0.0.1`); this work does not publish a website or configure DNS.
 The gallery and Microsoft sign-in use separate HTTP services.
 
@@ -34,7 +35,7 @@ With Python 3.11 or newer, Pillow and `fonttools[woff]` installed, from the chec
 py ops/prepare-gallery-assets.py reference/Stoneborn-1.20.2-1.21.11-V3.3.1.zip --output runtime/server/plugins/Hill175/gallery-assets
 ```
 
-The script prepares 20 fixed PNGs and a local Minecraft WOFF2 font. Uncropped PNGs are byte-identical to the ZIP;
+The script prepares 30 fixed PNGs and a local Minecraft WOFF2 font. Uncropped PNGs are byte-identical to the ZIP;
 cropped files preserve its original pixels. `asset-source.json` records the exact
 source paths, crop bounds and resource-pack checksum. The HTTP service serves
 only these named PNGs and `minecraft.woff2`; the source manifest and arbitrary files are unreachable.
@@ -49,6 +50,7 @@ All paths below are under `assets/minecraft/textures/`, except `pack.png`:
 | Dividers | `gui/container/inventory.png`; top strip `(0,0,176,6)` and bottom `(0,162,176,166)` exclude inventory contents |
 | Divider corners and center | X 0/12/72/104/164/176; original 8px corner caps and central ornament stay at 2×, plain fill stretches between them |
 | Card and camera frames | `gui/sprites/widget/slot_frame.png`; nine-slice original border |
+| Campus photograph frames | `gui/demo_background.png`; fixed corner and center crops at 2×, with only plain edge strips stretched |
 | Crest | Original root `pack.png` |
 | Forward and back arrows | `gui/sprites/widget/page_forward.png` and `page_backward.png` |
 | Stone, wood and parchment | `gui/options_background.png`, `gui/hanging_signs/oak.png` crop `(1,6,15,15)`, `gui/book.png` crop `(40,20,145,160)` |
@@ -72,7 +74,7 @@ are recorded in `asset-source.json`. Labels remain ordinary accessible text.
 
 | Route | Content |
 | --- | --- |
-| `/` | Submitted builds, filtered by Journey, Place or People |
+| `/gallery` | Submitted builds, filtered by Journey, Place or People |
 | `/entries/<entry-id>` | One submitted build and its saved camera views |
 | `/preview/<private-token>` | An unlisted entry preview, including drafts |
 | `/api/entries` | Anonymous submitted-entry metadata |

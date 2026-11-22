@@ -73,7 +73,7 @@ class SchoolPrivacyTest {
     }
 
     @Test
-    void survivalCommandsCannotBypassSchoolChatVisibility() {
+    void survivalMessagingIsBlockedInSchoolAndDevelopmentModes() {
         for (boolean microsoft : new boolean[]{true, false}) {
             CompetitionModule competition = mock(CompetitionModule.class);
             WorldModule worlds = mock(WorldModule.class);
@@ -88,11 +88,7 @@ class SchoolPrivacyTest {
                 when(event.getPlayer()).thenReturn(player);
                 when(event.getMessage()).thenReturn(command);
                 listener.onCommand(event);
-                if (microsoft) {
-                    verify(event).setCancelled(true);
-                } else {
-                    verify(event, never()).setCancelled(true);
-                }
+                verify(event).setCancelled(true);
             }
         }
     }

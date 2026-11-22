@@ -92,9 +92,9 @@ import java.util.UUID;
 
 public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
-    private static final Set<String> AUTH_COMMANDS = Set.of("login", "register", "verify", "rules", "help");
+    private static final Set<String> AUTH_COMMANDS = Set.of("hillmenu", "login", "register", "verify", "rules", "help");
     private static final Set<String> COMPETITION_COMMANDS = Set.of(
-            "hill175", "h175", "competition", "entry", "team", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help", "campus", "campusbackup"
+            "hillmenu", "hill175", "h175", "competition", "entry", "team", "party", "invite", "blueprint", "review", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help", "campus", "campusbackup", "hillstaff", "survival", "download", "hillreplay"
     );
     private static final Set<Material> TNT_IGNITERS = Set.of(Material.FLINT_AND_STEEL, Material.FIRE_CHARGE);
 
@@ -201,10 +201,6 @@ public final class ServerListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (!competition.usesMicrosoftAuthentication() && competition.isAuthenticated(event.getPlayer())
-                && worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
-            return;
-        }
         if (isNamespacedCommand(event.getMessage())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "Use the Hill commands shown in /help.");
@@ -357,6 +353,11 @@ public final class ServerListener implements Listener {
             if (competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID)) {
                 event.setCancelled(true);
                 competition.sendRules(player);
+                return;
+            }
+            if (competition.isCompetitionItem(item, CompetitionModule.BLUEPRINT_SEND_ITEM_ID)) {
+                event.setCancelled(true);
+                if (event.getAction().isRightClick()) competition.sendBuild(player);
                 return;
             }
             if (competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)) {
@@ -680,6 +681,7 @@ public final class ServerListener implements Listener {
         Optional<Entry> entry = competition.entryAt(event.getEntity().getLocation());
         if (entry.isPresent()) {
             long entityCount = event.getEntity().getWorld().getEntities().stream()
+                    .filter(entity -> !entity.getScoreboardTags().contains(org.thehill.hill175.blueprint.BlueprintOutlines.TAG))
                     .filter(entity -> entry.get().containsEditable(entity.getLocation()))
                     .count();
             int limit = plugin.getConfig().getInt("build-rules.max-non-player-entities-per-entry", 128);
@@ -850,6 +852,7 @@ public final class ServerListener implements Listener {
                 || competition.isCompetitionItem(item, CompetitionModule.LOBBY_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.CAMPUS_CHART_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.CAMPUS_UNDO_ITEM_ID)
+                || competition.isCompetitionItem(item, CompetitionModule.BLUEPRINT_SEND_ITEM_ID)
                 || competition.isCompetitionItem(item, CompetitionModule.RULES_ITEM_ID);
     }
 

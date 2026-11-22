@@ -260,6 +260,10 @@ public final class WorldModule {
     }
 
     public Optional<Location> campusDestination(Entry entry, int x, int z) {
+        return campusDestination(entry, x, z, null);
+    }
+
+    public Optional<Location> campusDestination(Entry entry, int x, int z, Integer preferredY) {
         if (entry.category() != Category.PEOPLE && !isPrivatePlace(entry)) return Optional.empty();
         BuildRegion region = entry.region();
         if (x < region.minX() || x > region.maxX() || z < region.minZ() || z > region.maxZ()) {
@@ -268,7 +272,7 @@ public final class WorldModule {
         ensureEntryWorld(entry);
         World world = Bukkit.getWorld(entry.worldName());
         if (world == null) return Optional.empty();
-        int y = Math.clamp(world.getHighestBlockYAt(x, z) + 1, region.minY() + 1, region.maxY() - 1);
+        int y = Math.clamp(preferredY == null ? world.getHighestBlockYAt(x, z) + 1 : preferredY, region.minY() + 1, region.maxY() - 1);
         return safeStandingLocation(world, region, new Location(world, x + 0.5, y, z + 0.5));
     }
 
@@ -305,7 +309,17 @@ public final class WorldModule {
     public void ensureEntryWorld(Entry entry) {
         World world = Bukkit.getWorld(entry.worldName());
         if (world == null && entry.category() == Category.PEOPLE) {
-            world = createPeopleWorld(entry.worldName());
+            if (entry.selectedBuildingId().equals("personal-campus")) {
+                Path original = new File(Bukkit.getWorldContainer(), entry.worldName()).toPath();
+                Path migrated = migratedWorldFolder(entry.worldName()).toPath();
+                Path saved = Files.isDirectory(migrated) ? migrated : original;
+                if (!Files.isDirectory(saved.resolve("region")) || CampusTemplateMetadata.read(saved).isEmpty()) {
+                    throw new IllegalStateException("Your saved campus is unavailable. Staff must recover it; no replacement was created.");
+                }
+                world = peopleWorldCreator(entry.worldName(), saved).createWorld();
+                if (world == null) throw new IllegalStateException("Your saved campus could not be opened.");
+                readyPeopleWorlds.add(entry.worldName());
+            } else world = createPeopleWorld(entry.worldName());
         }
         if (world == null && isPrivatePlace(entry)) {
             world = loadBuildingWorld(entry.worldName(), entry.region(), false);
@@ -326,7 +340,7 @@ public final class WorldModule {
 
     /** Updates older People entries to the current structure/world-height build bounds. */
     public boolean synchronizePeopleRegion(Entry entry) {
-        if (entry.category() != Category.PEOPLE) {
+        if (entry.category() != Category.PEOPLE || entry.selectedBuildingId().equals("personal-campus")) {
             return false;
         }
         World world = Bukkit.getWorld(entry.worldName());

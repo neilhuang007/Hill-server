@@ -2,8 +2,7 @@
 
 Use the **asset handoff ZIP** supplied by the project owner. It contains the
 campus and the exhibition hub as folders ready for the plugin, an optional Java
-resource pack and checksums. The current campus is **V29**, an unfinished
-exterior draft. Construction research and internal notes are not in the packet.
+resource pack and checksums. Confirm the selected campus with the operator before staging it.
 
 Every map is read from a designated folder beside `paper.jar`. Nothing in the
 code names a map, a version or an archive: the folder's contents are the selection.

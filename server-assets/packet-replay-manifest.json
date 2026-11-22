@@ -1,0 +1,16 @@
+{
+  "upstream_project": "https://github.com/Zeffut/FlashbackServer",
+  "upstream_license": "MIT",
+  "version": "1.2.4",
+  "minecraft": "26.2",
+  "modrinth_version": "HIVyCK8p",
+  "jar_url": "https://cdn.modrinth.com/data/VjvpZ4XD/versions/HIVyCK8p/FlashbackServer-1.2.4.jar",
+  "jar_sha512": "a5fac4f37fc9897485e6969fcd21f287e6ff271b935d027103ee20b47bdb017b4384b44f4f11fddfbb0d878dd8af523eb8304809d5c6e6c12a9565879aa334e6",
+  "source_commit": "4468bddc7ddf2b2691fca70bc46cac6a0a8e88f7",
+  "source_url": "https://codeload.github.com/Zeffut/FlashbackServer/tar.gz/4468bddc7ddf2b2691fca70bc46cac6a0a8e88f7",
+  "source_sha512": "755afd8707b8c0e26ed3570939609f1bad3d8ea67e8eea2eea0c09fdd1bb29bb0d8f2e920d41b76e42ad0c7c14a535827c68f10b57cd667837fab9adcce86282",
+  "hill_patch_version": 1,
+  "retained_bytes_per_recording": 16777216,
+  "retained_actions_per_recording": 100000,
+  "notes": "Official NMS adapters are copied unchanged; only bounded recorder, packet denylist and resources are overlaid. No built JAR belongs in Git."
+}

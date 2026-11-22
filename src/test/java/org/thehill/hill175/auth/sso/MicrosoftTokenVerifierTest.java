@@ -65,6 +65,18 @@ class MicrosoftTokenVerifierTest {
         assertEquals("Alex O’Neill 李", identity.displayName());
     }
 
+    @Test void signedAppRolesAdmitStaffAndSelectHighestRoleWithoutRequiringStudentRole() throws Exception {
+        var roles = java.util.Map.of(config.staffRole(), org.thehill.hill175.access.ServerRole.STAFF,
+                config.moderatorRole(), org.thehill.hill175.access.ServerRole.MODERATOR,
+                config.administratorRole(), org.thehill.hill175.access.ServerRole.ADMINISTRATOR);
+        for (var entry : roles.entrySet()) {
+            var identity = verifier().verify(sign(claims().claim("roles", List.of(entry.getKey())).build(), key, "first"), NONCE);
+            assertEquals(entry.getValue(), identity.role());
+        }
+        var identity = verifier().verify(sign(claims().claim("roles", List.of(config.requiredRole(), config.staffRole(), config.moderatorRole())).build(), key, "first"), NONCE);
+        assertEquals(org.thehill.hill175.access.ServerRole.MODERATOR, identity.role());
+    }
+
     @Test void rejectsWrongClaimsAndMissingEntitlements() throws Exception {
         List<Consumer<JWTClaimsSet.Builder>> mutations = List.of(
                 b -> b.issuer("https://evil.test"), b -> b.audience(UUID.randomUUID().toString()),

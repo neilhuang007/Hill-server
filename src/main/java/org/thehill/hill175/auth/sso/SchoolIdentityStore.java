@@ -21,7 +21,7 @@ final class SchoolIdentityStore implements AutoCloseable {
     private final FileChannel lockChannel;
     private final FileLock lock;
     private volatile Map<String, String> names = Map.of();
-    private Map<String, String> links = Map.of();
+    private volatile Map<String, String> links = Map.of();
     private boolean closed;
     private boolean writeFailed;
 
@@ -98,6 +98,7 @@ final class SchoolIdentityStore implements AutoCloseable {
     }
 
     Optional<String> nameLookup(String participantKey) { return Optional.ofNullable(names.get(participantKey)); }
+    Optional<String> participantLookup(String gameIdentity) { return Optional.ofNullable(links.get(gameIdentity)); }
 
     private void persist(Map<String, String> updatedNames, Map<String, String> updatedLinks) throws IOException {
         String json = JSONObjectUtils.toJSONString(Map.of("version", 1, "participants", updatedNames, "gameAccounts", updatedLinks));

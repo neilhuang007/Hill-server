@@ -1,16 +1,29 @@
 # Hill School 175th Anniversary Server
 
-The active local mode is one shared Hill campus. Every signed in student can
-build in Creative mode, use the campus image to travel, and see nearby building
-names. Staff can preview saved versions in temporary worlds and restore
-individual campus areas from compressed, deduplicated
-Restic recovery points saved every five minutes, using WorldEdit and LuckPerms.
-Neil selected V60 from `../Hill-campus-work` on November 3, 2026.
+Every student builds in a personal copy of campus. To send a build, the student
+right-clicks the **Send My Build** emerald in the hotbar, clicks the **Box Corner**
+on two opposite corners while flying through walls, and right-clicks **Send**. The
+student keeps building while a moderator reviews it. Approved builds merge into
+every personal campus automatically, including for offline owners. Blocks changed
+on both sides are boxed in pink, and the owner picks **Keep Mine** or **Use
+Blueprint's** from the hotbar. Staff choose **Review Builds** (or `/review`) and
+decide each build on the shared blueprint with two hotbar items: **Accept** and
+**Reject**.
 
-See the [shared campus guide](docs/operations/shared-campus.md) for joining,
-map controls, backup commands and recovery behavior. Earlier competition projects
-and submission features remain available in the code and existing saves.
-This update is local; remote deployment remains separate.
+Public chat uses a bundled open-source profanity vocabulary with school-specific
+rules. Private-message commands and party chat are disabled.
+
+See [campus parties](docs/operations/campus-parties.md),
+[blueprint review](docs/operations/blueprint-review.md), and
+[chat safety](docs/operations/chat-safety.md) for player and operator workflows.
+Existing shared campus saves and competition projects are preserved. The
+[shared campus guide](docs/operations/shared-campus.md) documents the optional
+legacy shared mode and its Restic area recovery. New personal copies start from
+the approved blueprint, initially seeded from the explicitly installed campus
+template.
+
+[Staff roles and moderation](docs/operations/staff-roles.md) describes staff,
+moderator and administrator access, account bans, chat mutes and Microsoft names.
 
 **Status: logistics and controlled testing.** The plugin implements Microsoft
 school verification and shared participant ownership across Java/Floodgate accounts.
@@ -52,7 +65,7 @@ Maps are supplied separately from GitHub.
 For school sign-in, copy [.env.example](.env.example) to the protected server
 environment file, configure the Entra application and HTTPS proxy, then install
 with `--microsoft`. A student opens the in-game link, signs into their Hill account,
-and enters the browser's code with `/verify`. The same school account links their
+and enters the browser code in the game menu. The same school account links their
 Java and Bedrock identities. The [IT guide](docs/operations/microsoft-sso-setup.md)
 includes the exact configuration, rollout checks and recovery limits.
 
@@ -64,14 +77,12 @@ The server reads every map from a designated folder under
 name, version or checksum is written into the code, and each hub or lobby map
 carries its own arrival point in `hill-world.yml`.
 
-People entries copy the campus installed in
-`world-templates/hill_people_template/`. Replace that
-folder while Paper is stopped to choose another revision; no version pin or
-file-count change is required. Existing participant worlds are preserved.
-The requested IT handoff contains **V29** and the exhibition hub; follow the
-[Windows asset instructions](docs/operations/windows-assets.md). V29 is an
-unfinished exterior draft. Installing the code does not replace an existing
-campus folder or participant worlds.
+The first blueprint is seeded from `world-templates/hill_people_template/`
+(or an explicitly configured `blueprint.source-folder`). Later personal campuses
+copy the approved blueprint revision, not a newly replaced staging folder.
+Staff-approved proposals update that blueprint. Existing participant worlds
+and their recorded baselines are preserved. In legacy competition mode, new
+People entries continue to use the installed template folder.
 
 ## Layout
 

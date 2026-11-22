@@ -76,7 +76,7 @@ public final class CampusUndoService implements Listener, AutoCloseable {
     public void undo(Player player) {
         requireMainThread();
         if (closed || !eligible(player, player.getLocation())) {
-            tell(player, "Undo is available while building in the shared campus in Creative mode.");
+            tell(player, "Undo works while you build in a campus.");
             return;
         }
         UUID actor = player.getUniqueId();

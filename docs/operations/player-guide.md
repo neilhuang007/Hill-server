@@ -1,15 +1,58 @@
 # Player workflow
 
-The active local server is the [shared V60 campus](shared-campus.md). After
-signing in, everyone builds in the same campus. Open `/campus` or use the
-map in hotbar slot 9 to choose a location. Holding it shows the official school
-illustration; right clicking opens the larger map. Accept its artwork pack,
-hover a printed number to see the location name, then click the number to
-teleport directly. The Buildings list also provides direct travel.
-Slot 8 provides Undo for
-your previous 15 seconds of supported block edits. No submission or merge is required.
-Staff can restore a saved recovery point. The entry and camera instructions
-below document the preserved competition features.
+Your campus hotbar holds the everyday tools: the **Undo** clock (slot 6), the **Hill
+Menu** compass (slot 7), the **Send My Build** emerald (slot 8) and the campus **map**
+(slot 9). The menu does not repeat them.
+
+The **Hill Menu** is a Hypixel-style chest. Open it with the compass, `/hillmenu`, or by
+sneaking and using an empty hand on a block. In the sign in lobby, use an empty hand on
+the floor. Your head at the top shows your build status. Bedrock players get the same
+choices as a form.
+
+| Item | Opens |
+| --- | --- |
+| **My Campus** (grass) | Takes you to your own campus. |
+| **Shared Blueprint** (beacon) | Fly through the shared Hill campus that every campus copies. Look only; the barrier takes you back. |
+| **Friends** (head) | Invite friends, answer invitations, manage guests, visit friends' campuses. |
+| **Reset My Campus** (TNT) | After an "Are you sure?" check, your campus matches the newest shared blueprint again. |
+| **Help** (book) | Rules, how to play, and the campus map download. |
+| **Staff** (spyglass) | **Review Builds**, **Edit Blueprint**, **Roll Back Blueprint** and other staff tools (staff only). |
+
+Every page has **Go Back** and **Close** in the bottom row and only shows items that
+apply right now. Removing a guest or leaving a campus asks "Are you sure?" first.
+`/party` opens the Friends page directly.
+
+1. Choose **My Campus** to build in your own copy. **Friends** → **Invite a Friend**
+   lets another student help there. You own the review request, including your
+   guests' edits.
+   The **clock** in your hotbar undoes your block edits from the last 15 seconds.
+2. Right-click the **Send My Build** emerald in your hotbar. Gray boxes show what
+   you changed, and you can fly through walls. Fly to one corner of your build and
+   right-click the **Box Corner**, then fly to the opposite corner and right-click
+   again. A green box appears. Right-click **Send**, or **Cancel** to stop. Your
+   hotbar comes back afterwards.
+3. Keep building while a moderator looks. Only the snapshot is sent, and sending
+   again replaces the waiting request.
+4. Approved builds join the shared blueprint and reach every campus automatically,
+   including while you are offline. Click **Show Me** in the chat notice to see blue
+   boxes around the update.
+5. If the blueprint changed a block that you also changed, you fly to each pink box
+   and right-click **Keep Mine** or **Use Blueprint's**.
+
+Staff choose Hill Menu → **Staff** → **Review Builds**, or type `/review`. Each waiting
+build opens on the shared blueprint, visible only to the reviewer, with green boxes
+around it and pink boxes at conflicts. The hotbar holds **Accept** and **Reject**,
+and the next build opens after each decision.
+
+Right-click the campus map in your hotbar to see the illustrated school map, and
+click a number on it to go there. The map image downloads once after you join. If
+you turn it off, a list of buildings appears instead.
+
+Public chat is filtered, and private-message and party-chat commands are disabled.
+See [campus parties](campus-parties.md), [blueprint review](blueprint-review.md)
+and [chat safety](chat-safety.md) for details. Existing shared campus saves and
+competition entries are preserved. The entry/camera sections below describe the
+legacy competition workflow rather than personal-campus guest permissions.
 
 The deployed demo remains in development mode until Hill IT configures Microsoft
 sign-in. The server tells you which authentication flow to use.
@@ -17,14 +60,13 @@ sign-in. The server tells you which authentication flow to use.
 ## School sign-in
 
 Join from a supported Java or Bedrock client. Open the link supplied in the lobby,
-sign into your Hill Microsoft account, then type `/verify <code>` using the one-time
-code shown in that browser. Never enter a code someone else sends you. Use `/verify`
-without a code to request a new link. Your school name is shown to other verified
+sign into your Hill Microsoft account, then choose **Enter Browser Code** and enter the
+code shown in that browser. Never enter a code someone else sends you. Choose **Get Sign In Link** to request a fresh link. Your school name is shown to other verified
 participants. Every connection requires verification; after at most 30 minutes,
 reconnect and sign in again.
 
 Authenticate your Java and Bedrock accounts using the same Hill account to share
-entries and team membership. Only one linked account may play at a time. Survival
+your personal campus, guest invitations and legacy competition ownership. Only one linked account may play at a time. Survival
 inventories remain separate for each game account. Bedrock requires operators to
 install Geyser/Floodgate; see the [IT guide](microsoft-sso-setup.md).
 
@@ -38,7 +80,7 @@ automatically, including Bedrock's account prefix. Returning players use
 are not broadcast; the deployed Spigot configuration disables console command
 logging, but the player's own command history can retain them.
 
-## Building and entries
+## Legacy competition entries
 
 After authentication, use the Competition Compass or the category guides.
 Bedrock opens native buttons sized for touch and controllers; Java uses inventory
@@ -69,10 +111,14 @@ Survival is a separate world/inventory flow.
 Use **Build Options → Team** to invite an online student. The invited student
 opens the Competition Compass and chooses **Accept Team Invite**. Team members
 share the same private build and submission. Leaving a team asks for confirmation.
-In school mode, the approved Hill commands apply in survival too; vanilla private
-messages and emotes are blocked so they cannot bypass school-chat visibility.
+The approved Hill command policy also applies in local survival, in both school
+and development modes. Private messages and emotes are blocked.
 
-## Commands
+## Legacy and utility commands
+
+The personal-campus commands are listed above. These utility and legacy project
+commands remain available, with personal campus reset/delete/team conversion
+blocked to preserve permanent ownership.
 
 | Command | Purpose |
 | --- | --- |
@@ -86,7 +132,7 @@ messages and emotes are blocked so they cannot bypass school-chat visibility.
 | `/entry website` | Open your private draft or published entry on the local gallery |
 | `/entry reset`, `/entry delete`, `/entry switch <category>` | Manage build space |
 | `/entry title <text>`, `/entry description <text>` | Edit submission information |
-| `/entry submit`, `/entry unlock` | Automatically capture/publish/lock, or withdraw and reopen |
+| `/entry submit`, `/entry unlock` | Competition entries: capture/publish/lock or reopen. In a personal campus: Send My Build, or cancel the waiting request |
 | `/team invite <nickname>`, `/team accept <nickname>`, `/team leave` | Manage teammates |
 | `/camera save <1-3>`, `/camera list`, `/camera remove <1-3>` | Manage saved views |
 | `/camera preview [1-3]`, `/camera exit` | Preview or leave a saved view |

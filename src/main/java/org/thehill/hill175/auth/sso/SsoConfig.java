@@ -7,13 +7,25 @@ import java.util.UUID;
 
 /** Operator configuration. Credentials are deliberately excluded from diagnostics. */
 public record SsoConfig(UUID tenantId, UUID clientId, String clientSecret, String requiredRole,
-                        URI publicUrl, int port, int maxLinkedAccounts) {
+                        URI publicUrl, int port, int maxLinkedAccounts,
+                        String staffRole, String moderatorRole, String administratorRole) {
+    public SsoConfig(UUID tenantId, UUID clientId, String clientSecret, String requiredRole,
+                     URI publicUrl, int port, int maxLinkedAccounts) {
+        this(tenantId, clientId, clientSecret, requiredRole, publicUrl, port, maxLinkedAccounts,
+                "Hill175.Staff", "Hill175.Moderator", "Hill175.Administrator");
+    }
+
     public SsoConfig {
         if (tenantId == null || clientId == null || clientSecret == null || clientSecret.isBlank()) {
             throw new IllegalArgumentException("Microsoft SSO requires tenant, client and client secret.");
         }
         if (requiredRole == null || !requiredRole.matches("[A-Za-z0-9._-]{1,100}")) {
             throw new IllegalArgumentException("HILL175_ENTRA_REQUIRED_ROLE must be an app role value.");
+        }
+        var roles = java.util.List.of(requiredRole, staffRole, moderatorRole, administratorRole);
+        if (roles.stream().anyMatch(role -> !role.matches("[A-Za-z0-9._-]{1,100}"))
+                || new java.util.HashSet<>(roles).size() != 4) {
+            throw new IllegalArgumentException("Microsoft app role values must be valid and distinct.");
         }
         if (publicUrl == null || !"https".equals(publicUrl.getScheme()) || publicUrl.getHost() == null
                 || publicUrl.getUserInfo() != null || publicUrl.getQuery() != null || publicUrl.getFragment() != null
@@ -42,7 +54,10 @@ public record SsoConfig(UUID tenantId, UUID clientId, String clientSecret, Strin
                     env.getOrDefault("HILL175_ENTRA_REQUIRED_ROLE", "Hill175.Student"),
                     URI.create(required(env, "HILL175_AUTH_PUBLIC_URL")),
                     Integer.parseInt(env.getOrDefault("HILL175_AUTH_PORT", "8087")),
-                    Integer.parseInt(env.getOrDefault("HILL175_MAX_LINKED_ACCOUNTS", "4"))));
+                    Integer.parseInt(env.getOrDefault("HILL175_MAX_LINKED_ACCOUNTS", "4")),
+                    env.getOrDefault("HILL175_ENTRA_STAFF_ROLE", "Hill175.Staff"),
+                    env.getOrDefault("HILL175_ENTRA_MODERATOR_ROLE", "Hill175.Moderator"),
+                    env.getOrDefault("HILL175_ENTRA_ADMINISTRATOR_ROLE", "Hill175.Administrator")));
         } catch (IllegalArgumentException exception) {
             // Do not include supplied values: URI/parser messages can contain credentials.
             throw new IllegalArgumentException("Invalid Microsoft SSO environment configuration. Check the deployment guide.");

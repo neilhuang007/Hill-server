@@ -75,10 +75,16 @@ public final class MenuModule implements Listener {
     }
 
     public void openMain(Player player) {
+        if (competition.personalCampusesEnabled()) { competition.openHillMenu(player); return; }
         if (campusWorkshop != null && worlds.sharedCampusEntry().isPresent()) {
             campusWorkshop.accept(player);
             return;
         }
+        openCompetition(player);
+    }
+
+    public void openCompetition(Player player) {
+        if (!competition.isAuthenticated(player)) return;
         HillMenuHolder holder = new HillMenuHolder();
         Inventory inventory = createInventory(holder, 27, Component.text("Hill 175 Competition", NamedTextColor.GOLD));
         holder.inventory = inventory;
@@ -130,6 +136,10 @@ public final class MenuModule implements Listener {
     }
 
     public void openCurrentEntry(Player player) {
+        if (competition.currentEntry(player).filter(competition::isPersonalCampus).isPresent()) {
+            competition.openHillMenu(player);
+            return;
+        }
         competition.currentEntry(player)
                 .filter(entry -> entry.isMember(competition.participantKey(player)))
                 .ifPresentOrElse(
@@ -146,6 +156,7 @@ public final class MenuModule implements Listener {
     }
 
     public void openEntryDetails(Player player, Entry entry) {
+        if (competition.isPersonalCampus(entry)) { competition.openHillMenu(player); return; }
         boolean preparing = competition.isPreparingSubmission(entry);
         HillMenuHolder holder = new HillMenuHolder();
         Inventory inventory = createInventory(holder, 27,
@@ -312,6 +323,7 @@ public final class MenuModule implements Listener {
     }
 
     public void openCategory(Player player, Category category) {
+        if (competition.personalCampusesEnabled() && category == Category.PEOPLE) { competition.openHillMenu(player); return; }
         competition.entriesFor(competition.participantKey(player)).stream()
                 .filter(entry -> entry.category() == category)
                 .findFirst()
@@ -434,7 +446,7 @@ public final class MenuModule implements Listener {
     }
 
     public void openCampusMap(Player player) {
-        if (campusWorkshop != null && worlds.sharedCampusEntry().isPresent()) {
+        if (campusWorkshop != null && (competition.personalCampusesEnabled() || worlds.sharedCampusEntry().isPresent())) {
             campusWorkshop.accept(player);
             return;
         }
@@ -744,6 +756,7 @@ public final class MenuModule implements Listener {
 
     public void openVisits(Player player, int page) {
         List<Entry> entries = competition.allEntries().stream()
+                .filter(entry -> competition.mayVisitEntry(player, entry))
                 .sorted(Comparator.comparing((Entry entry) -> entry.category().displayName())
                         .thenComparing(entry -> entry.title().toLowerCase()))
                 .toList();
@@ -817,6 +830,12 @@ public final class MenuModule implements Listener {
     }
 
     public void openSubmitConfirmation(Player player, Entry entry) {
+        if (competition.isPersonalCampus(entry)) {
+            openEntryConfirmation(player, entry, "Propose campus changes?", Material.WRITABLE_BOOK,
+                    "Send changes for staff review", List.of("Your campus becomes read-only until review or withdrawal.",
+                            "The blueprint changes only after staff approval."), "Submit Proposal", ActionType.SUBMIT_ENTRY);
+            return;
+        }
         if (entry.cameraPoses().isEmpty()) {
             player.sendMessage(Component.text("Save a camera view, then choose Submit Entry in Build Options.", NamedTextColor.YELLOW));
             openCameraControls(player, entry);

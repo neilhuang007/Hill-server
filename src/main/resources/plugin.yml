@@ -3,10 +3,34 @@ version: '${version}'
 main: org.thehill.hill175.Hill175Plugin
 api-version: '26.2'
 load: POSTWORLD
-softdepend: [floodgate, WorldEdit, LuckPerms]
+softdepend: [floodgate, WorldEdit, LuckPerms, FlashbackServer]
 authors: [The Hill School]
 description: Hill School 175th Anniversary Minecraft competition server
 commands:
+  hillmenu:
+    description: Open player actions or sign in
+  review:
+    description: Review student build requests on the blueprint with boxes around changes and conflicts
+    usage: /review
+  party:
+    description: Open personal campus invitations and guest controls
+    usage: /party [home|invite|accept|decline|join|visit|leave|remove|revoke]
+  invite:
+    description: Invite a friend to build in your campus
+    usage: /invite <player>
+  blueprint:
+    description: Open the Blueprint menu to send your build for approval, see updates and choose what to keep
+    usage: /blueprint [send|fix|cancel|news|visit|history|help]
+  download:
+    description: Get a private 15-minute link to a fingerprinted campus map copy
+    usage: /download
+  survival:
+    description: Travel to your configured survival server or world
+    usage: /survival
+  hillreplay:
+    description: Staff-only incident history and playback
+    usage: /hillreplay
+    permission: hill175.replay
   verify:
     description: Sign in with your Hill Microsoft account and confirm the browser code
     usage: /verify [browser-code]
@@ -39,7 +63,25 @@ commands:
     description: Open your campus map and building controls
   campusbackup:
     description: Save recovery points and restore individual campus areas
+  hillstaff:
+    description: View roles and manage account moderation
+    usage: /hillstaff
 permissions:
+  hill175.blueprint.backup:
+    description: Create and list blueprint-only recovery snapshots
+    default: false
+  hill175.blueprint.review:
+    description: Review and merge campus proposals as authenticated Hill staff
+    default: false
+  hill175.replay:
+    description: Review recorded gameplay incidents as authenticated staff
+    default: false
+  hill175.moderation:
+    description: Moderation capability assigned by the Hill role system
+    default: false
+  hill175.roles.manage:
+    description: Role management capability assigned by the Hill role system
+    default: false
   hill175.campus.rollback:
     description: Save snapshots and restore any campus area
     default: op

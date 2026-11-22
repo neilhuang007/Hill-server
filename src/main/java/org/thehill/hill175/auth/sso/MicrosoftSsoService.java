@@ -44,6 +44,7 @@ public final class MicrosoftSsoService implements AutoCloseable {
     private final ScheduledExecutorService housekeeping;
     private HttpServer server;
     private boolean closed;
+    private volatile java.util.function.Consumer<String> admissionGuard = participant -> { };
 
     public MicrosoftSsoService(SsoConfig config, Path identityStore) throws IOException {
         this(config, identityStore, Clock.systemUTC(), new MicrosoftOidcClient(config, Clock.systemUTC()));
@@ -82,6 +83,7 @@ public final class MicrosoftSsoService implements AutoCloseable {
         ensureOpen();
         if (connectionId == null) throw new IllegalArgumentException("Connection identifier is required.");
         GameIdentity.validate(gameIdentity);
+        identities.participantLookup(gameIdentity).ifPresent(admissionGuard);
         if (gameLabel == null || gameLabel.isBlank() || gameLabel.length() > 64) throw new IllegalArgumentException("Invalid game account label.");
         purgeExpired();
         Instant now = clock.instant();
@@ -125,13 +127,15 @@ public final class MicrosoftSsoService implements AutoCloseable {
         challenges.remove(connectionId);
         if (!expiry.isAfter(clock.instant())) throw new SsoException("School authorization expired. Request a new sign-in link.");
         }
+        admissionGuard.accept(challenge.identity.participantKey());
         identities.link(challenge.gameIdentity, challenge.identity, config.maxLinkedAccounts());
-        return new VerifiedSession(challenge.identity.participantKey(), challenge.identity.displayName(), expiry);
+        return new VerifiedSession(challenge.identity.participantKey(), challenge.identity.displayName(), expiry, challenge.identity.role());
     }
 
     public synchronized void cancel(UUID connectionId) { challenges.remove(connectionId); }
 
     public Optional<String> nameLookup(String participantKey) { return identities.nameLookup(participantKey); }
+    public void admissionGuard(java.util.function.Consumer<String> guard) { admissionGuard = java.util.Objects.requireNonNull(guard); }
 
     private void handle(HttpExchange exchange) throws IOException {
         try (exchange) {

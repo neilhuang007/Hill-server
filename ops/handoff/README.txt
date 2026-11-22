@@ -10,9 +10,7 @@ whatever is in these folders is what the server uses.
   world-templates/hill_auth/              sign-in lobby world (only if included)
 
 The campus revision and bounds are recorded in
-world-templates/hill_people_template/hill-campus-template.yml. V29 is an
-unfinished floating exterior draft. It has newer buildings and grounds than the
-previous V19 server input; it is not a finished reconstruction.
+world-templates/hill_people_template/hill-campus-template.yml.
 
 Installation
 ------------
@@ -35,12 +33,9 @@ Installation
      Linux:   bash ops/install-server.sh --microsoft   (or --allow-development-auth)
    Both check these folders first and say which one is missing or incomplete.
 5. Start Paper. It imports the hub (and lobby, if supplied) on that start and
-   keeps the world it replaces under <server>/replaced-worlds/. New People
-   entries and explicit owner resets copy the campus folder. Existing participant
-   worlds remain unchanged.
-
-For the next revision of any map, stop Paper and replace the same folder; no
-version pin, configuration or code change is needed.
+   keeps the world it replaces under <server>/replaced-worlds/. On a first personal campus installation the template seeds
+   the approved blueprint. Later personal campuses start at the approved revision.
+   Staff publish updates through blueprint review.
 
 Map coordinates
 ---------------
@@ -63,16 +58,14 @@ No lobby map is required. Without world-templates/hill_auth the server keeps the
 lobby it already has, or builds its own plain one. To use a different lobby, put
 an approved Minecraft Java world save (level.dat directly inside) in that folder.
 
-The prepared campus uses standard Anvil region files from the native Java 26.1.2
-conversion. The project server targets Paper 26.2. An empty, truncated or wrongly
+The prepared campus uses standard Anvil region files. The project server targets Paper 26.2. An empty, truncated or wrongly
 nested folder is rejected. The server does not extract archives: the files must
 be directly inside the folders above.
 
 Optional campus resource pack
 -----------------------------
 If resourcepacks/Hill175-campus-resources.zip is present, Java players can place
-it in their Minecraft resourcepacks folder and enable it. It contains the asphalt
-slab/stair appearance used in the V29 review. It does not install automatically or
+it in their Minecraft resourcepacks folder and enable it. The included pack supplies the campus block textures. It does not install automatically or
 supply a Bedrock resource pack; automatic delivery requires a separately hosted
 resource-pack URL. The world can load without it using vanilla block appearances.
 

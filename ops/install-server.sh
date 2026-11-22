@@ -59,6 +59,12 @@ paper_start_attempted=false
 replaced_worlds_before=""
 BEDROCK_ENABLED="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-enabled)"
 BEDROCK_PORT="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-port)"
+PACKET_REPLAY_ENABLED="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print packet-replay-enabled)"
+packet_replay_paths=()
+if [[ "${PACKET_REPLAY_ENABLED}" == true ]]; then
+  packet_replay_file_list="$(bash "${REPO_DIR}/ops/install-packet-replay.sh" files)"
+  mapfile -t packet_replay_paths <<< "${packet_replay_file_list}"
+fi
 bedrock_paths=()
 if [[ "${BEDROCK_ENABLED}" == true ]]; then
   bedrock_file_list="$(python3 "${REPO_DIR}/ops/install-bedrock.py" files)"
@@ -109,6 +115,9 @@ restore_runtime_files() {
   restore_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" imported-worlds.yml
   for index in "${!bedrock_paths[@]}"; do
     restore_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
+  done
+  for index in "${!packet_replay_paths[@]}"; do
+    restore_runtime_file "${RUNTIME_DIR}/${packet_replay_paths[index]}" "packet-replay-${index}"
   done
 }
 
@@ -395,6 +404,9 @@ fi
 
 cd "${REPO_DIR}"
 JAVA_HOME="${JAVA_HOME}" PATH="${JAVA_HOME}/bin:${PATH}" bash ./gradlew clean test jar --no-daemon
+if [[ "${PACKET_REPLAY_ENABLED}" == true ]]; then
+  bash "${REPO_DIR}/ops/install-packet-replay.sh" prepare --runtime "${RUNTIME_DIR}" --java-home "${JAVA_HOME}"
+fi
 
 paper_target="${RUNTIME_DIR}/assets/paper-pinned.jar"
 if [[ ! -f "${paper_target}" ]] || ! verify_sha256 "${paper_target}" "${PAPER_SHA256}"; then
@@ -460,8 +472,14 @@ backup_runtime_file "${RUNTIME_DIR}/plugins/Hill175/imported-worlds.yml" importe
 for index in "${!bedrock_paths[@]}"; do
   backup_runtime_file "${RUNTIME_DIR}/${bedrock_paths[index]}" "bedrock-${index}"
 done
+for index in "${!packet_replay_paths[@]}"; do
+  backup_runtime_file "${RUNTIME_DIR}/${packet_replay_paths[index]}" "packet-replay-${index}"
+done
 install -m 0640 -o "${SERVICE_USER}" -g "${SERVICE_USER}" "${paper_target}" "${RUNTIME_DIR}/paper.jar"
 python3 "${REPO_DIR}/ops/install-campus-recovery.py" install --runtime "${RUNTIME_DIR}"
+if [[ "${PACKET_REPLAY_ENABLED}" == true ]]; then
+  bash "${REPO_DIR}/ops/install-packet-replay.sh" install --runtime "${RUNTIME_DIR}"
+fi
 if [[ "${BEDROCK_ENABLED}" == true ]]; then
   python3 "${REPO_DIR}/ops/install-bedrock.py" install --runtime "${RUNTIME_DIR}" --port "${BEDROCK_PORT}"
 fi

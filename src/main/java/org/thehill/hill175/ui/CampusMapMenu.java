@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -56,6 +57,7 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
     private final Map<UUID, Session> sessions = new HashMap<>();
     private final Set<UUID> offeredPack = new HashSet<>();
     private final Set<UUID> loadedPack = new HashSet<>();
+    private final Set<UUID> unavailablePack = new HashSet<>();
     private Consumer<Player> undoAction;
     private Predicate<Player> canRecover = player -> false;
     private Consumer<Player> recoveryAction;
@@ -87,38 +89,48 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
 
     public void open(Player player) {
         if (!isAvailable(player)) return;
-        if (undoAction == null) throw new IllegalStateException("Configure the campus undo action before opening the map.");
         player.closeInventory();
-        openMap(player, false);
-        if (!bedrock.isBedrock(player) && pack != null && offeredPack.add(player.getUniqueId())) pack.offer(player);
+        offerPack(player);
+        openMap(player);
     }
 
-    private void openMap(Player player, boolean isZoomed) {
+    private void offerPack(Player player) {
+        if (pack != null && !bedrock.isBedrock(player) && offeredPack.add(player.getUniqueId())) pack.offer(player);
+    }
+
+    /**
+     * Java players see only the school map image; clicking a number on it travels there. The building list
+     * is the fallback when the image pack is unavailable, and Bedrock players use a native form.
+     */
+    private void openMap(Player player) {
         if (!isAvailable(player)) return;
-        Session session = begin(player, isZoomed ? View.core : View.main, 0);
-        var choices = new ArrayList<Choice>();
-        choices.add(new Choice("Buildings", next -> openBuildings(next, 0)));
-        if (!bedrock.isBedrock(player)) {
-            choices.add(new Choice(isZoomed ? "Whole Campus" : "Zoom Buildings", next -> openMap(next, !isZoomed)));
+        UUID id = player.getUniqueId();
+        if (bedrock.isBedrock(player)) {
+            Session session = begin(player, View.main, 0);
+            var choices = new ArrayList<Choice>();
+            choices.add(new Choice("Buildings", next -> openBuildings(next, 0)));
+            if (undoAction != null) choices.add(new Choice("Undo Last 15 Seconds", next -> undoAction.accept(next)));
+            if (recoveryAction != null && canRecover.test(player)) choices.add(new Choice("Staff Recovery", next -> recoveryAction.accept(next)));
+            // Older Bedrock map packs have fixed button indices. Staff tools use a native form.
+            String title = undoAction == null ? "Campus Navigation" : canRecover.test(player) ? "Campus Map and Staff Tools" : "Hill Campus Map";
+            showBedrock(player, session, title, "Choose Buildings, then a numbered destination.", choices);
+            return;
         }
-        choices.add(new Choice("Undo Last 15 Seconds", next -> undoAction.accept(next)));
-        if (recoveryAction != null && canRecover.test(player)) choices.add(new Choice("Staff Recovery", next -> recoveryAction.accept(next)));
-        addPackChoice(player, choices, isZoomed);
-        // Older Bedrock map packs have fixed button indices. Staff tools use a native form.
-        String title = bedrock.isBedrock(player) && canRecover.test(player) ? "Campus Map and Staff Tools" : isZoomed ? "Campus Buildings" : "Hill Campus Map";
-        show(player, session, title, mapBody(player, session, isZoomed),
-                "Choose Buildings, then a numbered destination. Everyone builds together in the shared campus.", choices);
+        if (loadedPack.contains(id)) {
+            Session session = begin(player, View.main, 0);
+            boolean hasLabels = labels != null && pack != null && labels.matchesPack(pack.sha1Hex());
+            showImage(player, session, hasLabels ? labelArtwork(session, false) : mapArtwork(false));
+        } else if (pack != null && offeredPack.contains(id) && !unavailablePack.contains(id)) {
+            showImage(player, begin(player, View.main, 0), message("Loading the school map..."));
+        } else openBuildings(player, 0);
     }
 
-    private List<DialogBody> mapBody(Player player, Session session, boolean isZoomed) {
-        var body = new ArrayList<DialogBody>();
-        boolean hasArtwork = loadedPack.contains(player.getUniqueId());
-        boolean hasLabels = hasArtwork && labels != null && pack != null && labels.matchesPack(pack.sha1Hex());
-        if (hasLabels) body.add(labelArtwork(session, isZoomed));
-        else if (hasArtwork) body.add(mapArtwork(isZoomed));
-        body.add(message(hasLabels ? "Click a map number to go there." : hasArtwork ? "Choose Buildings to go to a numbered destination."
-                : "Choose Buildings to go to a numbered destination. Optional map artwork is not loaded."));
-        return body;
+    /** A dialog holding only the map image. Vanilla dialogs need one action, so it is an empty, one-pixel button; Escape closes. */
+    private void showImage(Player player, Session session, DialogBody image) {
+        DialogBase base = DialogBase.builder(Component.empty()).canCloseWithEscape(true).pause(false)
+                .afterAction(DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE).body(List.of(image)).build();
+        ActionButton hidden = ActionButton.builder(Component.empty()).width(1).action(callback(session, next -> { })).build();
+        player.showDialog(Dialog.create(builder -> builder.empty().base(base).type(DialogType.notice(hidden))));
     }
 
     private DialogBody labelArtwork(Session session, boolean isZoomed) {
@@ -138,15 +150,6 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         return DialogBody.item(image).width(256).height(256).showDecorations(false).showTooltip(false).build();
     }
 
-    private void addPackChoice(Player player, List<Choice> choices, boolean isZoomed) {
-        if (pack == null || bedrock.isBedrock(player) || loadedPack.contains(player.getUniqueId())) return;
-        choices.add(new Choice("Load School Map", next -> {
-            openMap(next, isZoomed);
-            offeredPack.add(next.getUniqueId());
-            pack.offer(next);
-        }));
-    }
-
     private void openBuildings(Player player, int page) {
         if (!isAvailable(player)) return;
         int lastPage = Math.max(0, (destinations.size() - 1) / pageSize);
@@ -158,7 +161,7 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         }
         if (currentPage > 0) choices.add(new Choice("Previous Buildings", next -> openBuildings(next, currentPage - 1)));
         if (currentPage < lastPage) choices.add(new Choice("More Buildings", next -> openBuildings(next, currentPage + 1)));
-        choices.add(new Choice("Back to Map", next -> openMap(next, false)));
+        if (bedrock.isBedrock(player)) choices.add(new Choice("Back to Map", this::openMap));
         String instructions = "Choose a building number from the school map. Page " + (currentPage + 1) + " of " + (lastPage + 1) + ".";
         show(player, session, "Choose a Building", List.of(message(instructions)), instructions, choices);
     }
@@ -188,8 +191,9 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         }
         DialogBase base = DialogBase.builder(text(title)).canCloseWithEscape(true).pause(false)
                 .afterAction(DialogBase.DialogAfterAction.WAIT_FOR_RESPONSE).body(body).build();
-        List<ActionButton> buttons = choices.stream().map(choice -> button(session, choice)).toList();
-        var type = DialogType.multiAction(buttons).columns(2).exitAction(button(session, closeChoice())).build();
+        List<ActionButton> buttons = new ArrayList<>(choices.stream().map(choice -> button(session, choice)).toList());
+        buttons.add(button(session, closeChoice()));
+        var type = DialogType.multiAction(buttons).columns(2).build();
         player.showDialog(Dialog.create(builder -> builder.empty().base(base).type(type)));
     }
 
@@ -248,7 +252,14 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         sessions.remove(id);
         offeredPack.remove(id);
         loadedPack.remove(id);
+        unavailablePack.remove(id);
         bedrock.clear(event.getPlayer());
+    }
+
+    /** Offer the map image soon after joining so it is ready the first time the map is opened. */
+    @EventHandler public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTaskLater(plugin, () -> { if (!isClosed && player.isOnline()) offerPack(player); }, 40L);
     }
 
     private void invalidate(Player player) {
@@ -268,11 +279,16 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         if (pack == null || !pack.id().equals(event.getID()) || !offeredPack.contains(player.getUniqueId())) return;
         var status = event.getStatus();
         if (status == PlayerResourcePackStatusEvent.Status.ACCEPTED || status == PlayerResourcePackStatusEvent.Status.DOWNLOADED) return;
-        if (status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) loadedPack.add(player.getUniqueId());
-        else loadedPack.remove(player.getUniqueId());
+        if (status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
+            loadedPack.add(player.getUniqueId());
+            unavailablePack.remove(player.getUniqueId());
+        } else {
+            loadedPack.remove(player.getUniqueId());
+            unavailablePack.add(player.getUniqueId());
+        }
         Session current = sessions.get(player.getUniqueId());
         if (current == null || !current.canRefresh(System.nanoTime()) || !isAvailable(player)) return;
-        openMap(player, current.view == View.core);
+        openMap(player);
     }
 
     @Override public void close() {
@@ -284,6 +300,7 @@ public final class CampusMapMenu implements Listener, AutoCloseable {
         sessions.clear();
         offeredPack.clear();
         loadedPack.clear();
+        unavailablePack.clear();
         bedrock.close();
     }
 

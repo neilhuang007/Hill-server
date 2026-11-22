@@ -11,7 +11,7 @@ Java/Bedrock pilot acceptance are separate from automated source tests.
 | Concept | Authority |
 | --- | --- |
 | School participant | Immutable Entra `(tid, oid)`, stored as `entra:<tenant>:<object>` |
-| Student eligibility | Exact configured Hill tenant and `Hill175.Student` app role |
+| School eligibility | Exact configured Hill tenant and an explicitly configured player, staff, moderator or administrator app role |
 | Java account | UUID authenticated by an online-mode Paper server |
 | Bedrock account | XUID returned by the trusted Floodgate API |
 | Account link | One game identity belongs to one school participant; multiple game identities may link to that participant |
@@ -21,8 +21,10 @@ Java/Bedrock pilot acceptance are separate from automated source tests.
 
 Email addresses, Minecraft names and display names never establish school
 eligibility or account ownership. The exact tenant alone is insufficient: guests,
-staff and students can coexist in a tenant, so the application also requires the
-role assigned by IT. A recreated directory object has a new identity and needs
+staff and students can coexist in a tenant, so the application also requires an
+eligible role assigned by IT. Staff roles and participant based moderation are
+described in the [staff guide](../operations/staff-roles.md).
+A recreated directory object has a new identity and needs
 operator-reviewed recovery. [Microsoft claims reference](https://learn.microsoft.com/en-us/entra/identity-platform/id-token-claims-reference).
 
 ## Flow and trust boundaries
@@ -45,7 +47,7 @@ sequenceDiagram
     Web->>Entra: Redeem code with client credential and PKCE
     Web->>Web: Validate token and required Hill role
     Web-->>Browser: School name, game label, one-time confirmation code
-    Game->>Paper: /verify browser-only-code
+    Game->>Paper: Confirm browser code in the game menu
     Paper->>Web: Confirm exact live connection
     Web->>Web: Atomically persist participant and game link
     Web-->>Paper: Participant, display name, expiry
@@ -118,8 +120,7 @@ not MiniMessage or command input.
 
 Do not publish real student account files or screenshots in GitHub. Third-party
 maps, chat bridges and telemetry need their own access review. Actual Geyser
-rendering and console/mobile link handling still require device testing. Native
-Bedrock sign-in forms, anonymous voting/name capture, duplicate-name UI badges,
+rendering and console/mobile link handling still require device testing. Anonymous voting/name capture, duplicate-name UI badges,
 and a broader privacy review of third-party plugins are not implemented here.
 
 ## Deployment and failure behavior
@@ -147,8 +148,8 @@ real proxy on both editions. Confirm name disclosure, recovery owners and a date
 retention policy. Automated tests use synthetic tokens and identities; they do
 not prove the external configuration or real student eligibility.
 
-There is no automated legacy migration, account unlink/reassignment UI, local
-suspension console, Graph entitlement polling, multi-server database, automatic
+There is no automated legacy migration, account unlink/reassignment UI,
+Graph entitlement polling, multi-server database, automatic
 retention purge or certificate client-credential flow. Preserve development
 projects and perform any transfer only after a reviewed proof of both identities,
 quota reconciliation and a coherent backup. Never infer ownership from matching

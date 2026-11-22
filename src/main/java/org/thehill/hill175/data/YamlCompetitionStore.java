@@ -139,8 +139,7 @@ public final class YamlCompetitionStore implements CompetitionStore {
 
         File parent = file.getParentFile();
         if (!parent.exists() && !parent.mkdirs()) {
-            logger.severe("Could not create plugin data directory: " + parent);
-            return;
+            throw new java.io.UncheckedIOException(new IOException("Could not create plugin data directory: " + parent));
         }
         File temporary = new File(parent, file.getName() + ".tmp");
         try {
@@ -157,6 +156,7 @@ public final class YamlCompetitionStore implements CompetitionStore {
             }
         } catch (IOException exception) {
             logger.log(Level.SEVERE, "Could not persist competition data", exception);
+            throw new java.io.UncheckedIOException("Competition data could not be saved.", exception);
         }
     }
 

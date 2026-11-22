@@ -61,6 +61,22 @@ class MicrosoftSsoServiceTest {
         }
     }
 
+    @Test void bannedSchoolIdentityCannotUseExistingLinksOrAddANewGameAlias() throws Exception {
+        try (var service = service()) {
+            UUID connection = UUID.randomUUID();
+            String linked = "java:" + UUID.randomUUID();
+            var proof = authorize(service, connection, linked);
+            service.confirm(connection, proof.code());
+            UUID fresh = UUID.randomUUID();
+            var freshProof = authorize(service, fresh, "bedrock:12345");
+            service.admissionGuard(subject -> {
+                if (subject.equals(person.participantKey())) throw new SsoException("Banned school account");
+            });
+            assertThrows(SsoException.class, () -> service.begin(UUID.randomUUID(), linked, "RenamedPlayer"));
+            assertThrows(SsoException.class, () -> service.confirm(fresh, freshProof.code()));
+        }
+    }
+
     @Test void stateCookieAndReplayAreCheckedAndPkceMatchesExchange() throws Exception {
         String[] usedVerifier = {null}; String[] usedNonce = {null};
         try (var service = new MicrosoftSsoService(SsoConfigTest.config(), directory.resolve("identities.json"), clock,
