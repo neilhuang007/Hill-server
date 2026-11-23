@@ -81,7 +81,7 @@ permissions:
     default: false
   hill175.campus.rollback:
     description: Save snapshots and restore any campus area
-    default: op
+    default: false
   hill175.staff:
     description: Faculty moderation tools
-    default: op
+    default: false

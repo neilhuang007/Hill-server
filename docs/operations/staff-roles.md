@@ -2,7 +2,8 @@
 
 The plugin separates ordinary players, staff, moderators and administrators.
 These capabilities are server roles and do not require Minecraft operator status.
-They are available after sign in. The existing development preview still does
+They are available after sign in. Every Hill permission defaults to off, so
+Minecraft operator status grants no Hill staff tools; only the roles below do. The existing development preview still does
 not verify school membership. Microsoft admission requires Hill IT configuration
 and a real tenant pilot.
 
