@@ -440,12 +440,13 @@ the pinned Geyser/Floodgate stack when Bedrock is enabled; IT supplies the UDP
 firewall rule and real-client pilot described in the [IT guide](microsoft-sso-setup.md).
 Do not put Minecraft ports behind the ordinary Cloudflare HTTP proxy.
 
-Browser authentication must follow browser → Cloudflare → nginx → loopback
-identity service. Use Cloudflare Full (strict), a valid Origin CA certificate,
-Authenticated Origin Pulls, and firewall ingress restricted to Cloudflare networks;
-Origin CA by itself does not prevent direct-origin requests. Keep database/internal
-plugin endpoints private. The [SSO architecture](../architecture/microsoft-sso.md)
-describes claims, account-linking rules and implementation limits.
+Browser authentication must go through a trusted HTTPS proxy to nginx and then
+reach the identity service over loopback. Restrict origin firewall ingress to the
+trusted proxy's addresses. Cloudflare uses Full (strict) and Authenticated Origin
+Pulls. An edge such as FortiGate can opt out of proxy client certificates only
+with an explicit CIDR allowlist and no Cloudflare ranges. See the
+[IT guide](microsoft-sso-setup.md#3-protect-the-browser-endpoint) for both setups
+and the [SSO architecture](../architecture/microsoft-sso.md) for application details.
 
 ## Optional automatic updates
 

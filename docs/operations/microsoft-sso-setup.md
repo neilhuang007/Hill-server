@@ -82,9 +82,11 @@ mode `0600`; systemd passes the variables to the `hill175` service account.
 | `HILL175_MAX_LINKED_ACCOUNTS` | `4` game accounts per student; allowed range 2–20 |
 | `HILL175_ORIGIN_CERT` | `/etc/hill175/tls/origin.pem` |
 | `HILL175_ORIGIN_KEY` | `/etc/hill175/tls/origin.key`, root-owned mode `0600` |
-| `HILL175_AOP_CA` | `/etc/hill175/tls/aop-ca.pem`, CA that signed the Cloudflare client certificate |
+| `HILL175_AOP_CA` | `/etc/hill175/tls/aop-ca.pem`, CA that signed the proxy client certificate; unused when verification is disabled |
+| `HILL175_TRUSTED_PROXY_RANGES` | `cloudflare` by default, or a comma-separated list of trusted proxy CIDRs |
+| `HILL175_REQUIRE_PROXY_CLIENT_CERT` | `true` by default; `false` is only allowed with explicit CIDRs and no `cloudflare` keyword |
 | `HILL175_BEDROCK_ENABLED` | `true` in Microsoft mode; development deployment skips Bedrock |
-| `HILL175_BEDROCK_PORT` | `19132` UDP; allowed range 1024–65535 |
+| `HILL175_BEDROCK_PORT` | Base port `19132`; allowed range 1024–65534. WebRTC uses the next UDP port. |
 
 The Java process reads environment variables at startup. Editing the file requires
 a service restart. A `.env` file in the checkout is not automatically loaded.
@@ -95,33 +97,46 @@ fallback to development approval.
 
 ## 3. Protect the browser endpoint
 
-Create a proxied Cloudflare DNS record for the approved hostname. Configure
-**Full (strict)** with a matching Origin CA certificate/key on nginx, then configure
-Authenticated Origin Pulls. Prefer a certificate specific to the zone/hostname.
-Allow web ingress only from Cloudflare's current IPv4 and IPv6 ranges. Origin CA
-alone does not restrict who can reach the origin. Keep public port 80 closed and
-perform HTTPS redirects at Cloudflare. [Origin CA](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/),
-[Authenticated Origin Pulls](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/).
+Choose the web ingress that Hill IT operates. In both cases, restrict origin TCP
+443 at the firewall to the actual proxy peers and keep public origin port 80
+closed. A server certificate alone does not restrict who can reach the origin.
 
-Place those three certificate files at the paths in the environment file. Install
-`nginx` and `openssl` as part of initial host setup. The installer checks the
-certificate hostname, expiry and key match before stopping Paper. It fetches the
-official Cloudflare IPv4/IPv6 ranges and generates
-`/etc/nginx/conf.d/hill175-auth.conf` with the canonical hostname, loopback port,
-Cloudflare peer restriction and mandatory AOP certificate. It tests and reloads
-nginx automatically; a failed update restores the previous managed site. Existing
-manual files at that path are preserved and must be reviewed before adoption.
-To accept a different or additional upstream proxy, set
-`HILL175_TRUSTED_PROXY_RANGES` to comma-separated CIDRs, for example
-`cloudflare,203.0.113.0/24`. The keyword `cloudflare` adds Cloudflare's published
-ranges; without it only the listed ranges are allowed. Unset means Cloudflare only.
-Ranges broader than IPv4 /8 or IPv6 /16 are rejected. The AOP client certificate
-check still applies, so a non-Cloudflare proxy must present a certificate signed
-by `HILL175_AOP_CA`.
-The generated site disables caching and authentication query logging. Bypass
-Cloudflare caching for the entire auth hostname and do not add analytics to pages.
-The nginx rule restricts this hostname even when another site shares port 443;
-keep the host/provider Cloudflare ingress restrictions as well.
+- **Cloudflare:** Create a proxied DNS record, use **Full (strict)** with a matching
+  origin certificate and key, and enable Authenticated Origin Pulls. Prefer a
+  zone- or hostname-specific AOP certificate. Allow Cloudflare's published IPv4
+  and IPv6 ranges. [Origin CA](https://developers.cloudflare.com/ssl/origin-configuration/origin-ca/),
+  [Authenticated Origin Pulls](https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/).
+- **FortiGate or another explicit proxy:** Point public DNS at the edge and
+  re-encrypt to nginx over HTTPS. Configure the edge to validate the origin
+  certificate and send the public hostname as both TLS SNI and HTTP Host. Set
+  `HILL175_TRUSTED_PROXY_RANGES` to the proxy's source CIDRs as nginx sees them,
+  including any source NAT. Use the narrowest ranges possible (for example, a
+  `/32` for each fixed IPv4 proxy address), not client networks. If the edge
+  cannot present a client certificate, set `HILL175_REQUIRE_PROXY_CLIENT_CERT=false`
+  and leave `HILL175_AOP_CA` unset. Do not allow general client traffic to originate
+  from the same trusted addresses. For example, replace this sample `/32` with
+  the FortiGate source address seen by nginx:
+
+  ```dotenv
+  HILL175_TRUSTED_PROXY_RANGES=192.0.2.10/32
+  HILL175_REQUIRE_PROXY_CLIENT_CERT=false
+  ```
+
+The `cloudflare` keyword adds Cloudflare's published ranges and can be combined
+with explicit CIDRs. It always requires client certificate verification, including
+when the range setting is left unset. Ranges broader than IPv4 `/8` or IPv6 `/16`
+are rejected. The same proxy policy applies to the optional gallery and Bedrock
+signaling sites, which must use distinct hostnames covered by the origin certificate.
+
+Install `nginx` and `openssl` and place the origin certificate and private key at
+the configured paths. Add the proxy client CA only when verification is enabled.
+Before stopping Paper, the installer checks the certificate hostname, expiry and
+key match. It generates `/etc/nginx/conf.d/hill175-auth.conf` with canonical Host
+and SNI checks, the proxy peer allowlist and a loopback upstream, then tests and
+reloads nginx during deployment. A failed site update restores the previous
+managed configuration. Existing manual files at that path are preserved and must
+be reviewed before adoption. Bypass edge caching and query-string logging on the
+entire auth hostname and do not add analytics to the pages.
 
 Never expose port 8087 publicly. The plugin has no public endpoint that can mark a
 UUID authenticated. No database or separate identity daemon is required: the
@@ -163,12 +178,14 @@ in the environment file rather than editing plugin configuration. Setting enable
 to `false` skips initial installation; disabling an existing installation requires
 an explicit maintenance removal/archive of its managed files.
 
-Allow Java TCP `25566` and Bedrock UDP `19132` (or the configured port) in host and
-provider firewalls. Use a separate DNS-only game hostname: ordinary Cloudflare web
-proxying does not carry these game ports. Keep Floodgate's private key out of Git
-and restrict access to it. Hill175 reads Floodgate's authenticated XUID; it
-does not infer Bedrock identity from a username prefix. Java TCP and Bedrock UDP
-are game traffic, separate from the Cloudflare-protected web endpoint.
+Allow Java TCP `25566` and, when Bedrock is enabled, UDP `19132` for legacy RakNet
+and UDP `19133` for WebRTC (or the configured base port and the next port). Route
+these directly as game traffic rather than through the HTTPS proxy. Current
+Bedrock clients also need a distinct `HILL175_BEDROCK_PUBLIC_URL` for HTTPS
+signaling through the trusted proxy. Keep direct public TCP access to the Bedrock
+base port blocked. Keep Floodgate's private key out of Git and restrict access to
+it. Hill175 reads Floodgate's authenticated XUID rather than inferring Bedrock
+identity from a username prefix.
 
 Join with each edition and authenticate using the **same Hill school account**.
 Both game identities then resolve to one participant with the same entries,
@@ -195,10 +212,10 @@ school account, an external/personal account, missing role, expired link, wrong
 confirmation code, disconnect/rejoin, and switching linked devices. Confirm both
 aliases see the same entries and cannot occupy both team slots. Check name display, browser links and the code entry form on actual Bedrock devices. Repeat the camera exit and campus smoke tests.
 
-Check that direct-origin web requests, wrong Host/SNI, missing AOP certificates and
-public access to the loopback service fail. Test real Microsoft callbacks through
-Cloudflare. Local automated tests cannot establish tenant configuration, external
-firewall behavior, directory name policy or real-client presentation.
+Use the deployed Hill hostname for the live Microsoft pilot. Hill IT should review
+origin access against the actual firewall and proxy configuration, including the
+client certificate requirement if enabled. Deployment checks local configuration
+and service health without probing the public edge or attempting a tenant sign-in.
 
 ## Operations and recovery
 

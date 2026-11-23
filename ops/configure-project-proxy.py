@@ -1,4 +1,4 @@
-"""Publish the gallery and Bedrock signaling through Cloudflare and nginx."""
+"""Publish the gallery and Bedrock signaling through trusted proxies and nginx."""
 import argparse
 import importlib.util
 import os
@@ -24,8 +24,6 @@ def sites(values):
     ):
         if key in values:
             result.append((urlsplit(values[key]).hostname.lower(), port, signaling))
-    if len({site[0] for site in result}) != len(result):
-        raise ValueError('Use different hostnames for gallery and Bedrock signaling')
     return result
 
 
@@ -45,9 +43,7 @@ server {{
     server_name {host};
     ssl_certificate {cert};
     ssl_certificate_key {key};
-    ssl_client_certificate {ca};
-    ssl_verify_client on;
-    ssl_protocols TLSv1.2 TLSv1.3;
+{auth.nginx_client_tls(ca)}    ssl_protocols TLSv1.2 TLSv1.3;
     access_log off;
     error_log /var/log/nginx/hill175-projects-error.log crit;
     client_max_body_size 64k;
@@ -120,14 +116,17 @@ def configure(values, install):
             TARGET.write_text(content)
             TARGET.chmod(0o644)
             auth.run('nginx', '-t', conflict_hosts=managed_hosts)
-            auth.run('systemctl', 'reload', 'nginx.service')
+            auth.run('systemctl', 'reload-or-restart', 'nginx.service')
         except Exception:
             if previous is None:
                 TARGET.unlink(missing_ok=True)
             else:
                 TARGET.write_bytes(previous)
-            auth.run('nginx', '-t', conflict_hosts=managed_hosts)
-            auth.run('systemctl', 'reload', 'nginx.service')
+            try:
+                auth.run('nginx', '-t', conflict_hosts=managed_hosts)
+                auth.run('systemctl', 'reload-or-restart', 'nginx.service')
+            except (OSError, RuntimeError, subprocess.SubprocessError):
+                pass
             raise
 
 

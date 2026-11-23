@@ -22,15 +22,22 @@ TARGET = Path("/etc/nginx/conf.d/hill175-auth.conf")
 
 
 def certificate_paths(values):
-    paths = [PurePosixPath(values.get(key, default)) for key, default in (
-        ("HILL175_ORIGIN_CERT", "/etc/hill175/tls/origin.pem"),
-        ("HILL175_ORIGIN_KEY", "/etc/hill175/tls/origin.key"),
-        ("HILL175_AOP_CA", "/etc/hill175/tls/aop-ca.pem"),
-    )]
-    for path in paths:
+    cert = PurePosixPath(values.get("HILL175_ORIGIN_CERT", "/etc/hill175/tls/origin.pem"))
+    key = PurePosixPath(values.get("HILL175_ORIGIN_KEY", "/etc/hill175/tls/origin.key"))
+    ca = (PurePosixPath(values.get("HILL175_AOP_CA", "/etc/hill175/tls/aop-ca.pem"))
+          if CONFIG.require_proxy_client_cert(values) else None)
+    for path in (cert, key, ca):
+        if path is None:
+            continue
         if not path.is_absolute() or not re.fullmatch(r"/[A-Za-z0-9_./-]+", str(path)) or ".." in path.parts:
             raise ValueError("Certificate paths must be absolute Linux paths without spaces or nginx syntax")
-    return paths
+    return cert, key, ca
+
+
+def nginx_client_tls(ca):
+    if ca is None:
+        return "    ssl_verify_client off;\n"
+    return f"    ssl_client_certificate {ca};\n    ssl_verify_client on;\n"
 
 
 def check_ranges(ranges):
@@ -46,16 +53,8 @@ def parse_ranges(text, version):
     return check_ranges(ranges)
 
 
-def custom_ranges(values):
-    entries = [entry.strip() for entry in values.get("HILL175_TRUSTED_PROXY_RANGES", "cloudflare").split(",")]
-    if any(not entry for entry in entries):
-        raise ValueError("HILL175_TRUSTED_PROXY_RANGES contains an empty entry")
-    networks = [ipaddress.ip_network(entry, strict=True) for entry in entries if entry.lower() != "cloudflare"]
-    return networks, len(networks) != len(entries)
-
-
 def trusted_ranges(values):
-    networks, include_cloudflare = custom_ranges(values)
+    networks, include_cloudflare = CONFIG.custom_proxy_ranges(values)
     if include_cloudflare:
         networks = cloudflare_ranges() + networks
     return check_ranges(list(dict.fromkeys(networks)))
@@ -93,9 +92,9 @@ def render(values, ranges):
     template = template.replace("listen 443 ssl;\n    listen [::]:443 ssl;", listeners)
     template = template.replace("auth.example.org", host).replace("127.0.0.1:8087", f"127.0.0.1:{port}")
     for old, new in (("/etc/nginx/certs/hill175-origin.pem", cert),
-                     ("/etc/nginx/certs/hill175-origin.key", key),
-                     ("/etc/nginx/certs/hill175-aop-ca.pem", ca)):
+                     ("/etc/nginx/certs/hill175-origin.key", key)):
         template = template.replace(old, str(new))
+    template = template.replace(nginx_client_tls("/etc/nginx/certs/hill175-aop-ca.pem"), nginx_client_tls(ca))
     # realip_remote_addr retains the TCP peer even if a global real-IP rule rewrites remote_addr.
     peers = f"geo {peer} $hill175_cloudflare_peer {{\n    default 0;\n"
     peers += "".join(f"    {network} 1;\n" for network in ranges)
@@ -120,10 +119,12 @@ def run(*args, conflict_hosts=None):
 
 
 def validate_certificates(values):
-    cert, key, ca = map(Path, certificate_paths(values))
-    for path in (cert, key, ca):
-        if not path.is_file():
-            raise ValueError("Place the Origin certificate, private key and AOP CA at the configured paths first")
+    cert_path, key_path, ca = certificate_paths(values)
+    cert, key = Path(cert_path), Path(key_path)
+    if not cert.is_file() or not key.is_file():
+        raise ValueError("Place the origin certificate and private key at the configured paths first")
+    if ca is not None and not Path(ca).is_file():
+        raise ValueError("Place the proxy client CA at HILL175_AOP_CA when client certificates are required")
     if key.stat().st_uid != 0 or key.stat().st_mode & 0o077:
         raise ValueError("Origin private key must be root-owned with mode 0600")
     host = urlsplit(values["HILL175_AUTH_PUBLIC_URL"]).hostname
@@ -132,7 +133,8 @@ def validate_certificates(values):
     if b"does match certificate" not in match:
         raise ValueError("Origin certificate does not cover the authentication hostname")
     run("openssl", "x509", "-in", str(cert), "-noout", "-checkend", "86400")
-    run("openssl", "x509", "-in", str(ca), "-noout", "-checkend", "86400")
+    if ca is not None:
+        run("openssl", "x509", "-in", str(ca), "-noout", "-checkend", "86400")
     public_cert = run("openssl", "x509", "-in", str(cert), "-pubkey", "-noout")
     public_key = run("openssl", "pkey", "-in", str(key), "-passin", "pass:", "-pubout")
     if public_cert.strip() != public_key.strip():
@@ -162,7 +164,7 @@ def validate_prepared(values, staged):
     peers = content.split("}\n", 1)[0]
     networks = re.findall(r"^    ([0-9a-fA-F:./]+) 1;$", peers, re.MULTILINE)
     ranges = check_ranges([ipaddress.ip_network(network, strict=True) for network in networks])
-    custom, include_cloudflare = custom_ranges(values)
+    custom, include_cloudflare = CONFIG.custom_proxy_ranges(values)
     if not include_cloudflare and ranges != list(dict.fromkeys(custom)):
         raise ValueError("Prepared trusted proxy ranges differ from the environment; run prepare again")
     if include_cloudflare and not set(custom) <= set(ranges):
@@ -172,7 +174,7 @@ def validate_prepared(values, staged):
     validate_certificates(values)
 
 
-def install_site(staged, target=TARGET):
+def install_site(staged, target=TARGET, *, conflict_hosts=None):
     require_managed(target)
     content = staged.read_bytes()
     if not content.startswith(MARKER.encode()):
@@ -180,7 +182,7 @@ def install_site(staged, target=TARGET):
     previous = target.read_bytes() if target.exists() else None
     target.parent.mkdir(parents=True, exist_ok=True)
     if previous == content:
-        run("nginx", "-t")
+        run("nginx", "-t", conflict_hosts=conflict_hosts)
         run("systemctl", "reload-or-restart", "nginx.service")
         return
     backup = Path(tempfile.mkdtemp(prefix="previous-site-", dir=staged.parent))
@@ -191,7 +193,7 @@ def install_site(staged, target=TARGET):
         temporary.write_bytes(content)
         temporary.chmod(0o644)
         os.replace(temporary, target)
-        run("nginx", "-t")
+        run("nginx", "-t", conflict_hosts=conflict_hosts)
         run("systemctl", "reload-or-restart", "nginx.service")
     except Exception:
         if previous is None:
@@ -202,7 +204,7 @@ def install_site(staged, target=TARGET):
         # Restore the last on-disk configuration even when a service action fails.
         # A successful validation followed by failed reload may have changed service state.
         try:
-            run("nginx", "-t")
+            run("nginx", "-t", conflict_hosts=conflict_hosts)
             run("systemctl", "reload-or-restart", "nginx.service")
         except (OSError, RuntimeError, subprocess.SubprocessError):
             pass
@@ -227,10 +229,11 @@ def main():
             prepare(values, stage)
         else:
             validate_prepared(values, stage / "hill175-auth.conf")
-            install_site(stage / "hill175-auth.conf")
+            host = urlsplit(values["HILL175_AUTH_PUBLIC_URL"]).hostname
+            install_site(stage / "hill175-auth.conf", conflict_hosts={host})
         print(f"Hill authentication proxy {args.action} complete.")
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
-        parser.exit(1, f"Authentication proxy {args.action} failed: {error.__class__.__name__}. Check certificate paths/permissions, hostname, Cloudflare connectivity and nginx configuration.\n")
+        parser.exit(1, f"Authentication proxy {args.action} failed: {error.__class__.__name__}. Check trusted proxy settings, certificate paths/permissions, hostname and nginx configuration.\n")
 
 
 if __name__ == "__main__":

@@ -133,12 +133,13 @@ Game mutations happen on the server thread; Microsoft calls and identity writes
 run off it. Existing verified sessions expire under the same bounded lifetime
 during Microsoft outages.
 
-Public web access must traverse Cloudflare, nginx with Origin CA and Authenticated
-Origin Pulls, then loopback. Restrict origin web ingress to Cloudflare and reject
-unknown Host/SNI. The proxy must supply the canonical Host and HTTPS scheme,
-disable caching and avoid token-bearing query logs. An Origin CA certificate
-alone does not stop direct-origin requests. The [IT guide](../operations/microsoft-sso-setup.md)
-provides environment and nginx examples.
+Public web access goes through a trusted HTTPS proxy to nginx, then over loopback.
+Restrict origin ingress to the trusted peers and reject unknown Host/SNI. Proxy
+client certificates are required by default and always for Cloudflare. An explicit
+CIDR allowlist without Cloudflare can opt out, while origin TLS stays required.
+The proxy must preserve the canonical hostname, disable caching and avoid
+token-bearing query logs. The [IT guide](../operations/microsoft-sso-setup.md)
+provides environment and nginx setup details.
 
 ## Remaining operational work
 

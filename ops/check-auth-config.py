@@ -2,6 +2,7 @@
 """Validate the deployment environment without executing or printing credentials."""
 
 import argparse
+import ipaddress
 import os
 from pathlib import Path
 import re
@@ -20,7 +21,7 @@ SUPPORTED = {
     "HILL175_ORIGIN_CERT", "HILL175_ORIGIN_KEY", "HILL175_AOP_CA",
     "HILL175_BEDROCK_ENABLED", "HILL175_BEDROCK_PORT",
     "HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL",
-    "HILL175_NGINX_PROXY_PROTOCOL_PORT", "HILL175_TRUSTED_PROXY_RANGES",
+    "HILL175_NGINX_PROXY_PROTOCOL_PORT", "HILL175_TRUSTED_PROXY_RANGES", "HILL175_REQUIRE_PROXY_CLIENT_CERT",
     "HILL175_ADMIN_UNLOCK_SHA256", "HILL175_PACKET_REPLAY_ENABLED",
     "HILL175_STUDENT_DOWNLOAD_EXPORT", "HILL175_STUDENT_DOWNLOAD_URL", "HILL175_STUDENT_DOWNLOAD_PORT",
 }
@@ -48,12 +49,32 @@ def read_environment(path: Path, check_permissions: bool = True) -> dict[str, st
     return values
 
 
+def custom_proxy_ranges(values):
+    entries = [entry.strip() for entry in values.get("HILL175_TRUSTED_PROXY_RANGES", "cloudflare").split(",")]
+    if any(not entry for entry in entries):
+        raise ValueError("HILL175_TRUSTED_PROXY_RANGES contains an empty entry")
+    networks = [ipaddress.ip_network(entry, strict=True) for entry in entries if entry.lower() != "cloudflare"]
+    return networks, len(networks) != len(entries)
+
+
+def require_proxy_client_cert(values):
+    requirement = values.get("HILL175_REQUIRE_PROXY_CLIENT_CERT", "true")
+    if requirement not in {"true", "false"}:
+        raise ValueError("HILL175_REQUIRE_PROXY_CLIENT_CERT must be true or false")
+    if requirement == "false":
+        networks, include_cloudflare = custom_proxy_ranges(values)
+        if include_cloudflare or not networks:
+            raise ValueError("Disabling proxy client certificates requires explicit trusted CIDRs without cloudflare")
+    return requirement == "true"
+
+
 def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[str, int]:
     mode = values.get("HILL175_AUTH_MODE", "")
     if mode not in {"development", "microsoft"}:
         raise ValueError("HILL175_AUTH_MODE must explicitly be development or microsoft")
     if expected_mode and mode != expected_mode:
         raise ValueError("Installer mode differs from the environment file; no settings were changed")
+    require_proxy_client_cert(values)
     if "HILL175_ADMIN_UNLOCK_SHA256" in values and not re.fullmatch(r"[a-fA-F0-9]{64}", values["HILL175_ADMIN_UNLOCK_SHA256"]):
         raise ValueError("Invalid administrator bootstrap digest")
     if values.get("HILL175_PACKET_REPLAY_ENABLED", "false") not in {"true", "false"}:
@@ -65,6 +86,7 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
     if "HILL175_NGINX_PROXY_PROTOCOL_PORT" in values:
         if not 1024 <= int(values["HILL175_NGINX_PROXY_PROTOCOL_PORT"]) <= 65535:
             raise ValueError("HILL175_NGINX_PROXY_PROTOCOL_PORT must be between 1024 and 65535")
+    project_hosts = set()
     for key in ("HILL175_GALLERY_PUBLIC_URL", "HILL175_BEDROCK_PUBLIC_URL"):
         if key not in values:
             continue
@@ -73,6 +95,9 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
                 or url.port not in (None, 443) or url.path not in ("", "/") or url.query or url.fragment
                 or not re.fullmatch(r"(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z][a-zA-Z0-9-]{0,62}", url.hostname)):
             raise ValueError(f"{key} must be an HTTPS origin on port 443 with a DNS hostname")
+        if url.hostname in project_hosts:
+            raise ValueError("Use different hostnames for gallery and Bedrock signaling")
+        project_hosts.add(url.hostname)
     download_keys = {key for key in values if key.startswith("HILL175_STUDENT_DOWNLOAD_")}
     if download_keys:
         export = values.get("HILL175_STUDENT_DOWNLOAD_EXPORT", "")
@@ -113,6 +138,8 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
     if (url.scheme != "https" or not url.hostname or url.username or url.password
             or url.path not in {"", "/"} or url.query or url.fragment):
         raise ValueError("HILL175_AUTH_PUBLIC_URL must be an HTTPS origin without a path")
+    if url.hostname in project_hosts:
+        raise ValueError("Use a different hostname for authentication and each project site")
     try:
         port = int(values.get("HILL175_AUTH_PORT", "8087"))
         cap = int(values.get("HILL175_MAX_LINKED_ACCOUNTS", "4"))

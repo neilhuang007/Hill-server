@@ -32,6 +32,8 @@ source "${REPO_DIR}/ops/deployment-lock.sh"
 source "${REPO_DIR}/ops/load-server-binaries.sh"
 load_server_binaries "${REPO_DIR}/server-assets/server-binaries.env"
 AUTH_ENV_FILE=/etc/hill175/hill175.env
+AUTH_NGINX_SITE=/etc/nginx/conf.d/hill175-auth.conf
+PROJECT_NGINX_SITE=/etc/nginx/conf.d/hill175-projects.conf
 command -v python3 >/dev/null || { echo "Install python3 before running this installer." >&2; exit 1; }
 if [[ "${AUTH_MODE}" == development && ! -e "${AUTH_ENV_FILE}" && ! -L "${AUTH_ENV_FILE}" ]]; then
   install -d -m 0700 -o root -g root /etc/hill175
@@ -56,6 +58,7 @@ worldgen_transition_created=false
 startup_rollback_failed=false
 primary_transition_marker_existed=false
 paper_start_attempted=false
+proxy_install_attempted=false
 replaced_worlds_before=""
 BEDROCK_ENABLED="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-enabled)"
 BEDROCK_PORT="$(python3 "${REPO_DIR}/ops/check-auth-config.py" --file "${AUTH_ENV_FILE}" --print bedrock-port)"
@@ -295,6 +298,14 @@ install_people_template() {
 cleanup() {
   local status=$?
   trap - EXIT INT TERM
+  if [[ "${status}" -ne 0 && "${proxy_install_attempted}" == true ]]; then
+    if ! { restore_runtime_file "${AUTH_NGINX_SITE}" nginx-auth \
+        && restore_runtime_file "${PROJECT_NGINX_SITE}" nginx-projects \
+        && nginx -t \
+        && systemctl reload-or-restart nginx.service; }; then
+      echo "WARNING: nginx rollback needs manual recovery; backups are in ${runtime_rollback_dir}." >&2
+    fi
+  fi
   if [[ "${status}" -ne 0 && -n "${runtime_rollback_dir}" ]]; then
     systemctl stop "${SERVICE_NAME}" 2>/dev/null || true
     if [[ "${paper_start_attempted}" == true ]] && ! rollback_supplied_world_imports; then
@@ -545,11 +556,17 @@ paper_start_attempted=true
 systemctl restart "${SERVICE_NAME}"
 wait_for_server_ready "${startup_probe_marker}"
 bash "${REPO_DIR}/ops/verify-server.sh"
+if [[ "${AUTH_MODE}" == microsoft ]]; then
+  backup_runtime_file "${AUTH_NGINX_SITE}" nginx-auth
+  backup_runtime_file "${PROJECT_NGINX_SITE}" nginx-projects
+  proxy_install_attempted=true
+fi
 python3 "${REPO_DIR}/ops/configure-project-proxy.py" install --env-file "${AUTH_ENV_FILE}"
 if [[ "${AUTH_MODE}" == microsoft ]]; then
   python3 "${REPO_DIR}/ops/configure-auth-proxy.py" install --env-file "${AUTH_ENV_FILE}"
 fi
 systemctl --no-pager --full status "${SERVICE_NAME}"
+proxy_install_attempted=false
 runtime_files_committed=true
 service_was_stopped=false
 rm -rf -- "${runtime_rollback_dir}"

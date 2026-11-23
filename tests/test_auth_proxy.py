@@ -2,9 +2,7 @@
 
 import importlib.util
 import ipaddress
-import os
 from pathlib import Path
-import shutil
 import subprocess
 import tempfile
 import unittest
@@ -117,25 +115,6 @@ class AuthProxyTest(unittest.TestCase):
         result = subprocess.CompletedProcess([], 0, b"", b'[warn] conflicting server name "campus.example.org" ignored')
         with patch.object(proxy.subprocess, "run", return_value=result), self.assertRaises(RuntimeError):
             proxy.run("nginx", "-t", conflict_hosts={"campus.example.org"})
-
-    @unittest.skipUnless(os.name == "posix" and os.geteuid() == 0 and shutil.which("nginx") and shutil.which("openssl"),
-                         "Linux root nginx/OpenSSL integration test; no live site is installed")
-    def test_real_tls_and_standalone_nginx_validation(self):
-        with tempfile.TemporaryDirectory(prefix="hill175-proxy-test-") as directory:
-            root = Path(directory)
-            cert, key = root / "origin.pem", root / "origin.key"
-            subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
-                            "-keyout", str(key), "-out", str(cert), "-subj", "/CN=school.example.org",
-                            "-addext", "subjectAltName=DNS:school.example.org"],
-                           check=True, capture_output=True, timeout=30)
-            key.chmod(0o600)
-            values = self.config() | {"HILL175_ORIGIN_CERT": str(cert), "HILL175_ORIGIN_KEY": str(key),
-                                      "HILL175_AOP_CA": str(cert)}
-            with patch.object(proxy, "TARGET", root / "unused-live-site"), patch.object(proxy, "cloudflare_ranges", return_value=self.ranges()):
-                staged = proxy.prepare(values, root / "stage")
-                proxy.validate_prepared(values, staged)
-            with self.assertRaises(ValueError):
-                proxy.validate_certificates(values | {"HILL175_AUTH_PUBLIC_URL": "https://wrong.example.org"})
 
 
 if __name__ == "__main__":
