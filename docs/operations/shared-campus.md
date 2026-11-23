@@ -1,7 +1,7 @@
 # Shared Hill campus
 
-Neil selected V60 from `E:\projects\Hill-campus-work` as the starting campus
-on November 3, 2026. The selection is recorded in
+Neil selected V76 from `E:\projects\Hill-campus-work` as the server campus
+on November 23, 2026, replacing the November 3 V60 selection. The selection is recorded in
 `server-assets/shared-campus-source.json`. It is still a visual review candidate.
 The template seeds `hill_campus` once. Normal restarts preserve student work;
 changing the template does not overwrite the shared campus.
