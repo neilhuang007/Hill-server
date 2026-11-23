@@ -103,7 +103,7 @@ def configure(values, install):
         raise ValueError('Refusing to replace an unmanaged nginx site')
     for host, _, _ in selected:
         auth.validate_certificates(values | {'HILL175_AUTH_PUBLIC_URL': 'https://' + host})
-    content = render(values, auth.cloudflare_ranges())
+    content = render(values, auth.trusted_ranges(values))
     with tempfile.TemporaryDirectory(prefix='hill175-proxy-') as directory:
         staged = Path(directory) / 'projects.conf'
         staged.write_text(content)

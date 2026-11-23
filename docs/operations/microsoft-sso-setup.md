@@ -111,6 +111,13 @@ official Cloudflare IPv4/IPv6 ranges and generates
 Cloudflare peer restriction and mandatory AOP certificate. It tests and reloads
 nginx automatically; a failed update restores the previous managed site. Existing
 manual files at that path are preserved and must be reviewed before adoption.
+To accept a different or additional upstream proxy, set
+`HILL175_TRUSTED_PROXY_RANGES` to comma-separated CIDRs, for example
+`cloudflare,203.0.113.0/24`. The keyword `cloudflare` adds Cloudflare's published
+ranges; without it only the listed ranges are allowed. Unset means Cloudflare only.
+Ranges broader than IPv4 /8 or IPv6 /16 are rejected. The AOP client certificate
+check still applies, so a non-Cloudflare proxy must present a certificate signed
+by `HILL175_AOP_CA`.
 The generated site disables caching and authentication query logging. Bypass
 Cloudflare caching for the entire auth hostname and do not add analytics to pages.
 The nginx rule restricts this hostname even when another site shares port 443;

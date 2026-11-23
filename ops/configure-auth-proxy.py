@@ -33,11 +33,32 @@ def certificate_paths(values):
     return paths
 
 
+def check_ranges(ranges):
+    if not ranges or len(ranges) > 256 or any(r.prefixlen < (8 if r.version == 4 else 16) for r in ranges):
+        raise ValueError("Invalid trusted proxy address range list")
+    return ranges
+
+
 def parse_ranges(text, version):
     ranges = [ipaddress.ip_network(line.strip(), strict=True) for line in text.splitlines() if line.strip()]
-    if not ranges or len(ranges) > 256 or any(r.version != version or r.prefixlen < (8 if version == 4 else 16) for r in ranges):
+    if any(r.version != version for r in ranges):
         raise ValueError("Cloudflare returned an invalid address range list")
-    return ranges
+    return check_ranges(ranges)
+
+
+def custom_ranges(values):
+    entries = [entry.strip() for entry in values.get("HILL175_TRUSTED_PROXY_RANGES", "cloudflare").split(",")]
+    if any(not entry for entry in entries):
+        raise ValueError("HILL175_TRUSTED_PROXY_RANGES contains an empty entry")
+    networks = [ipaddress.ip_network(entry, strict=True) for entry in entries if entry.lower() != "cloudflare"]
+    return networks, len(networks) != len(entries)
+
+
+def trusted_ranges(values):
+    networks, include_cloudflare = custom_ranges(values)
+    if include_cloudflare:
+        networks = cloudflare_ranges() + networks
+    return check_ranges(list(dict.fromkeys(networks)))
 
 
 def cloudflare_ranges():
@@ -126,7 +147,7 @@ def require_managed(path):
 def prepare(values, stage):
     require_managed(TARGET)
     validate_certificates(values)
-    content = render(values, cloudflare_ranges())
+    content = render(values, trusted_ranges(values))
     stage.mkdir(parents=True, exist_ok=True)
     staged = stage / "hill175-auth.conf"
     staged.write_text(content, encoding="utf-8")
@@ -140,9 +161,12 @@ def validate_prepared(values, staged):
     content = staged.read_text(encoding="utf-8")
     peers = content.split("}\n", 1)[0]
     networks = re.findall(r"^    ([0-9a-fA-F:./]+) 1;$", peers, re.MULTILINE)
-    ranges = [ipaddress.ip_network(network, strict=True) for network in networks]
-    for version in (4, 6):
-        parse_ranges("\n".join(str(network) for network in ranges if network.version == version), version)
+    ranges = check_ranges([ipaddress.ip_network(network, strict=True) for network in networks])
+    custom, include_cloudflare = custom_ranges(values)
+    if not include_cloudflare and ranges != list(dict.fromkeys(custom)):
+        raise ValueError("Prepared trusted proxy ranges differ from the environment; run prepare again")
+    if include_cloudflare and not set(custom) <= set(ranges):
+        raise ValueError("Prepared trusted proxy ranges differ from the environment; run prepare again")
     if content != render(values, ranges):
         raise ValueError("Prepared nginx configuration differs from the environment; run prepare again")
     validate_certificates(values)
