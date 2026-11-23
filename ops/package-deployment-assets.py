@@ -68,7 +68,8 @@ def package(root: Path, destination: Path, campus: Path, hub: Path,
                 if source.is_symlink() or not source.is_file():
                     raise ValueError('Template data must be regular files')
                 files[f'world-templates/hill_people_template/{name}/{source.name}'] = source.read_bytes()
-    for name in ('.hill175-people-ready', 'hill-campus-template.yml', 'hill-campus-template.json'):
+    for name in ('.hill175-people-ready', 'hill-campus-template.yml', 'hill-campus-template.json', 'level.dat',
+                 'hill-buildings.yml', 'hill-areas.yml', 'campus-source.json'):
         source = campus / name
         if source.is_file():
             files[f'world-templates/hill_people_template/{name}'] = source.read_bytes()
@@ -79,6 +80,7 @@ def package(root: Path, destination: Path, campus: Path, hub: Path,
                 pack_files[source.relative_to(resource_pack).as_posix()] = source.read_bytes()
         files['resourcepacks/Hill175-campus-resources.zip'] = archive_bytes(pack_files)
     files['README.txt'] = (root / 'ops/handoff/README.txt').read_bytes()
+    files['AGENTS.md'] = (root / 'ops/handoff/AGENTS.md').read_bytes()
     files['SHA256SUMS'] = ''.join(
         f'{hashlib.sha256(data).hexdigest()}  {name}\n' for name, data in sorted(files.items())
     ).encode('utf-8')

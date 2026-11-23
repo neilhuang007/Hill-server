@@ -40,14 +40,14 @@ Installation
 Map coordinates
 ---------------
 hill-world.yml inside a hub or lobby folder gives the arrival point and, for the
-hub, where the category guides stand:
+hub, where the guides stand. With personal campuses on, the My Campus guide uses
+the place pose and the Blueprint guide uses the journey pose:
 
   spawn: [x, y, z, yaw, pitch]
   npcs:
     journey: [x, y, z, yaw, pitch]
     place: [x, y, z, yaw, pitch]
     people: [x, y, z, yaw, pitch]
-    survival: [x, y, z, yaw, pitch]
 
 Yaw and pitch are optional. Without the file, players arrive at the save's own
 spawn and the guides stand around it.
@@ -80,6 +80,7 @@ Compare the result to the matching entry in SHA256SUMS.
 Server source, configuration examples and deployment notes remain at:
   https://github.com/neilhuang007/Hill-server
 The Linux/systemd installer and updater are not Windows service installers.
-No internal research, construction notes, agent instructions, credentials or player
+AGENTS.md repeats the placement steps for the Linux server. No internal research,
+construction notes, credentials or player
 account files are added to this packet. Paper, Java and third-party plugin binaries
 are obtained separately through the deployment process, not redistributed here.
