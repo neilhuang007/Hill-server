@@ -155,7 +155,7 @@ fails closed rather than silently providing unprotected recording.
 - Every **authenticated** online player is considered, in every world of this
   Paper process. No authentication screen/token exchange is recorded on purpose.
   A separate survival **process** needs its own compatible recorder; this module
-  cannot record another server after `/survival` transfers a player.
+  cannot record another server.
 - The default is 32 active-or-finalizing recorder slots, configurable via
   `packet-replay.max-recorders` (1–64). **The current
   `server-config/server.properties` admits up to 120 players; neither the default

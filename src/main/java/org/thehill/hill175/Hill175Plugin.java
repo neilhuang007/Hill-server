@@ -31,7 +31,6 @@ import org.thehill.hill175.ui.CampusMapPack;
 import org.thehill.hill175.ui.CampusWorkshop;
 import org.thehill.hill175.undo.CampusUndoService;
 import org.thehill.hill175.world.OfficialCampusMapRenderer;
-import org.thehill.hill175.navigation.SurvivalNavigation;
 import org.thehill.hill175.download.StudentMapDownloadService;
 import org.thehill.hill175.replay.IncidentReplayService;
 import org.thehill.hill175.replay.PacketReplayService;
@@ -202,12 +201,6 @@ public final class Hill175Plugin extends JavaPlugin {
             reviewCommand.setExecutor(blueprintActions);
             reviewCommand.setTabCompleter(blueprintActions);
         }
-        SurvivalNavigation survivalNavigation = new SurvivalNavigation(this, competition::isAuthenticated,
-                competition::teleportLocalSurvival);
-        competition.survivalNavigation(survivalNavigation::travel);
-        var survivalCommand = Objects.requireNonNull(getCommand("survival"));
-        survivalCommand.setExecutor(survivalNavigation);
-        survivalCommand.setTabCompleter((sender, command, alias, arguments) -> List.of());
         var downloadCommand = Objects.requireNonNull(getCommand("download"));
         downloadCommand.setTabCompleter((sender, command, alias, arguments) -> List.of());
         downloadCommand.setExecutor((sender, command, label, arguments) -> {

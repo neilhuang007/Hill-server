@@ -23,8 +23,6 @@ SUPPORTED = {
     "HILL175_NGINX_PROXY_PROTOCOL_PORT", "HILL175_TRUSTED_PROXY_RANGES",
     "HILL175_ADMIN_UNLOCK_SHA256", "HILL175_PACKET_REPLAY_ENABLED",
     "HILL175_STUDENT_DOWNLOAD_EXPORT", "HILL175_STUDENT_DOWNLOAD_URL", "HILL175_STUDENT_DOWNLOAD_PORT",
-    "HILL175_SURVIVAL_MODE", "HILL175_SURVIVAL_JAVA_HOST", "HILL175_SURVIVAL_JAVA_PORT",
-    "HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED", "HILL175_SURVIVAL_BEDROCK_LOCAL",
 }
 
 
@@ -75,18 +73,6 @@ def validate(values: dict[str, str], expected_mode: str | None = None) -> tuple[
                 or url.port not in (None, 443) or url.path not in ("", "/") or url.query or url.fragment
                 or not re.fullmatch(r"(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z][a-zA-Z0-9-]{0,62}", url.hostname)):
             raise ValueError(f"{key} must be an HTTPS origin on port 443 with a DNS hostname")
-    survival_mode = values.get("HILL175_SURVIVAL_MODE", "local")
-    if survival_mode not in {"local", "transfer", "disabled"}:
-        raise ValueError("Invalid survival routing mode")
-    for key in ("HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED", "HILL175_SURVIVAL_BEDROCK_LOCAL"):
-        if key in values and values[key] not in {"true", "false"}:
-            raise ValueError("Survival routing flags must be true or false")
-    if not 1 <= int(values.get("HILL175_SURVIVAL_JAVA_PORT", "25567")) <= 65535:
-        raise ValueError("Invalid survival destination port")
-    if survival_mode == "transfer":
-        if (mode != "microsoft" or values.get("HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED") != "true"
-                or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]{0,252}", values.get("HILL175_SURVIVAL_JAVA_HOST", ""))):
-            raise ValueError("Transfer requires online Microsoft mode, a hostname and confirmed destination admission")
     download_keys = {key for key in values if key.startswith("HILL175_STUDENT_DOWNLOAD_")}
     if download_keys:
         export = values.get("HILL175_STUDENT_DOWNLOAD_EXPORT", "")

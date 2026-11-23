@@ -2,8 +2,8 @@
 
 This is an inventory and staging recommendation, **not an installed modpack or a
 successful vanilla-client join test**. No profile JARs or existing worlds were
-changed. See [separate survival](separate-survival.md) for `/survival`, Java-only
-routing, Bedrock fallback and destination admission requirements.
+changed. The player-facing `/survival` route has been removed; this inventory is
+kept for reference only.
 
 ## Decision
 
@@ -133,9 +133,8 @@ closure of generators actually chosen for the target runtime.
    Java client, no mods, resource packs disabled. Exercise all dimensions, new
    structures, loot, save/restart and return travel. Record any registry/network
    errors and generation failures. This runtime join is still outstanding.
-5. Only then provision the separate protected survival runtime and enable the
-   existing `/survival` transfer route. Preserve original worlds/profile and keep
-   Bedrock on its configured local/vanilla fallback.
+5. Only then provision a separate protected survival runtime and add a new,
+   reviewed route to it. Preserve original worlds/profile.
 
 Inspection used `uv run --python 3.13 python` with the standard-library ZIP/JSON
 readers; no bare Windows `python` command, mod execution or live-server changes

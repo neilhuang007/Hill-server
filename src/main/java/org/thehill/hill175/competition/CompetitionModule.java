@@ -159,7 +159,6 @@ public final class CompetitionModule {
     private CampusChartMap campusSelectionChart;
     private java.util.function.Supplier<MapRenderer> officialMapRenderer;
     private java.util.function.Consumer<Player> campusUndo;
-    private java.util.function.Consumer<Player> survivalNavigation;
     private final Map<UUID, PreviewState> activePreviewsByPlayer = new HashMap<>();
     private final Map<UUID, BossBar> previewBossBarsByPlayer = new HashMap<>();
     private final Map<UUID, Long> lastCameraItemUseAtNanosByPlayer = new HashMap<>();
@@ -843,42 +842,6 @@ public final class CompetitionModule {
         player.setFlying(false);
         giveHubItems(player);
         sendHubTip(player);
-    }
-
-    public void survivalNavigation(java.util.function.Consumer<Player> action) {
-        survivalNavigation = Objects.requireNonNull(action);
-    }
-
-    public void teleportSurvival(Player player) {
-        if (survivalNavigation != null) survivalNavigation.accept(player);
-        else teleportLocalSurvival(player);
-    }
-
-    public void teleportLocalSurvival(Player player) {
-        if (!isAuthenticated(player)) {
-            return;
-        }
-        boolean fromSurvival = worlds.isSurvivalWorld(player.getWorld());
-        SurvivalPlayerState survivalState = survivalInventories.load(player.getUniqueId())
-                .orElseGet(SurvivalPlayerState::firstEntryDefaults);
-        Location target = fromSurvival
-                ? player.getLocation()
-                : survivalState.location()
-                        .flatMap(location -> location.resolve(Bukkit::getWorld))
-                        .filter(location -> worlds.isSurvivalWorld(location.getWorld()))
-                        .orElseGet(worlds::survivalSpawn);
-        if (!teleportEndingCameraPreview(player, target)) {
-            message(player, NamedTextColor.RED, "The survival teleport was interrupted. Try again from the Survival guide.");
-            return;
-        }
-        currentEntryByPlayer.remove(player.getUniqueId());
-        pendingPeopleEntryByPlayer.remove(player.getUniqueId());
-        survivalState.applyTo(player);
-        survivalInventories.clearDeathPending(player.getUniqueId());
-        setSurvivalMode(player);
-        activeKitByPlayer.put(player.getUniqueId(), SURVIVAL_KIT);
-        survivalInventories.markActive(player.getUniqueId());
-        message(player, NamedTextColor.GREEN, "Survival World: normal survival gameplay is enabled here. Use /hub to return.");
     }
 
     public void handleSurvivalRespawn(Player player) {
@@ -1670,22 +1633,14 @@ public final class CompetitionModule {
         store.recordConnection(participantKey, connectionAddress(player), "authenticated");
         player.displayName(Component.text(displayName));
         player.playerListName(Component.text(displayName, NamedTextColor.GOLD));
-        if (parties != null) {
-            survivalInventories.markInactive(player.getUniqueId());
-            if (survivalInventories.isActive(player.getUniqueId())) {
-                authenticatedSessions.remove(player.getUniqueId());
-                if (schoolSessions != null) schoolSessions.disconnect(player);
-                player.kick(Component.text("Your saved survival state could not be secured. Please contact staff."));
-                return;
-            }
-            if (!parties.home(player)) teleportHub(player);
-        } else if (survivalInventories.isActive(player.getUniqueId())) {
-            teleportLocalSurvival(player);
-        } else if (worlds.sharedCampusEntry().isPresent()) {
-            enterSharedCampus(player);
-        } else {
-            teleportHub(player);
+        survivalInventories.markInactive(player.getUniqueId());
+        if (survivalInventories.isActive(player.getUniqueId())) {
+            authenticatedSessions.remove(player.getUniqueId());
+            if (schoolSessions != null) schoolSessions.disconnect(player);
+            player.kick(Component.text("Your saved survival state could not be secured. Please contact staff."));
+            return;
         }
+        teleportHub(player);
         if (blueprint != null) blueprint.onAdmission(player);
         showWelcomeTitle(player, displayName);
         player.sendMessage(Component.text("[Open Hill Menu]  You can also sneak and use an empty hand.", NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/hillmenu")));
@@ -2018,6 +1973,23 @@ public final class CompetitionModule {
                 "Right click to undo your recent block edits. Other students' changes are protected."));
         giveCampusSelectionMap(player);
         activeKitByPlayer.put(player.getUniqueId(), "shared-campus");
+    }
+
+    public void refreshPersonalCampusKit(Player player) {
+        if (parties == null || !isAuthenticated(player) || isCameraPreviewing(player)) return;
+        String world = player.getWorld().getName();
+        store.entries().stream()
+                .filter(entry -> isPersonalCampus(entry) && entry.worldName().equals(world))
+                .findFirst()
+                .ifPresent(entry -> {
+                    String kit = activeKitByPlayer.get(player.getUniqueId());
+                    if (kit != null && kit.contains(":" + entry.id())) return;
+                    boolean editable = canEditEntry(player, entry);
+                    currentEntryByPlayer.put(player.getUniqueId(), entry.id());
+                    if (editable) setOwnerMode(player);
+                    else setVisitorMode(player);
+                    givePersonalCampusItems(player, entry, editable);
+                });
     }
 
     public void refreshCampusTools(Player player) {

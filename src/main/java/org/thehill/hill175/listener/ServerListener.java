@@ -51,6 +51,7 @@ import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
@@ -94,7 +95,7 @@ public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
     private static final Set<String> AUTH_COMMANDS = Set.of("hillmenu", "login", "register", "verify", "rules", "help");
     private static final Set<String> COMPETITION_COMMANDS = Set.of(
-            "hillmenu", "hill175", "h175", "competition", "entry", "team", "party", "invite", "blueprint", "review", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help", "campus", "campusbackup", "hillstaff", "survival", "download", "hillreplay"
+            "hillmenu", "hill175", "h175", "competition", "entry", "team", "party", "invite", "blueprint", "review", "camera", "hub", "lobby", "rules", "login", "register", "verify", "help", "campus", "campusbackup", "hillstaff", "download", "hillreplay"
     );
     private static final Set<Material> TNT_IGNITERS = Set.of(Material.FLINT_AND_STEEL, Material.FIRE_CHARGE);
 
@@ -143,6 +144,14 @@ public final class ServerListener implements Listener {
         event.joinMessage(competition.usesMicrosoftAuthentication() ? null
                 : Component.text(event.getPlayer().getName() + " joined the Hill 175 server.", NamedTextColor.GRAY));
         competition.handleJoin(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onChangedWorld(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            if (player.isOnline()) competition.refreshPersonalCampusKit(player);
+        });
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

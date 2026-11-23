@@ -91,20 +91,6 @@ class AuthEnvironmentTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             auth_config.validate(self.config() | {"HILL175_STUDENT_DOWNLOAD_PORT": "8791"})
 
-    def test_survival_transfer_requires_independent_admission_and_online_mode(self):
-        settings = {
-            "HILL175_SURVIVAL_MODE": "transfer",
-            "HILL175_SURVIVAL_JAVA_HOST": "survival.example.org",
-            "HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED": "true",
-        }
-        self.assertEqual(("microsoft", 8087), auth_config.validate(self.config() | settings))
-        with self.assertRaises(ValueError):
-            auth_config.validate(self.config() | settings | {"HILL175_SURVIVAL_DESTINATION_ACCESS_CONFIGURED": "false"})
-        with self.assertRaises(ValueError):
-            auth_config.validate({"HILL175_AUTH_MODE": "development"} | settings)
-        with self.assertRaises(ValueError):
-            auth_config.validate(self.config() | settings | {"HILL175_SURVIVAL_JAVA_HOST": "https://bad.example.org"})
-
     def test_reads_literals_without_shell_expansion(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "hill175.env"

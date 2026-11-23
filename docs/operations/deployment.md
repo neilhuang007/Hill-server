@@ -372,10 +372,8 @@ Student map downloads require an explicitly prepared, sanitised export and a
 protected web hostname; see [map download operations](student-map-downloads.md)
 before enabling the `/download` command. Staff incident review is described in
 [incident replay operations](incident-replay.md); only authorized staff may
-inspect recordings. Java-only separate survival is a distinct service and
-approval step, not silently installed by `deploy.ps1`: see
-[separate survival](separate-survival.md) and
-[profile worldgen compatibility](survival-generation-profile.md). Each feature
+inspect recordings. Players have no survival route; `/survival` and the survival
+guide were removed. Each feature
 has its own operational prerequisites; do not mistake a plugin JAR build for a
 completed server/web/firewall setup.
 

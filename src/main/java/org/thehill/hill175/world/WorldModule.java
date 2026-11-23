@@ -214,17 +214,6 @@ public final class WorldModule {
         return new Location(survivalWorld, spawn.getX(), spawn.getY(), spawn.getZ(), 0.0f, 0.0f);
     }
 
-    public Location survivalNpcLocation() {
-        Location supplied = suppliedNpcLocation("survival");
-        if (supplied != null) {
-            return supplied;
-        }
-        // Behind an arriving player, facing them, when the map names no position.
-        Location behind = hubSpawn().add(0, 0, 6);
-        behind.setYaw(180.0f);
-        return behind;
-    }
-
     public Location hubNpcLocation(Category category) {
         String categoryPath = switch (category) {
             case JOURNEY -> "journey";

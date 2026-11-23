@@ -66,9 +66,12 @@ participants. Every connection requires verification; after at most 30 minutes,
 reconnect and sign in again.
 
 Authenticate your Java and Bedrock accounts using the same Hill account to share
-your personal campus, guest invitations and legacy competition ownership. Only one linked account may play at a time. Survival
-inventories remain separate for each game account. Bedrock requires operators to
+your personal campus, guest invitations and legacy competition ownership. Only one linked account may play at a time. Bedrock requires operators to
 install Geyser/Floodgate; see the [IT guide](microsoft-sso-setup.md).
+
+After sign-in every player arrives in the hub. Two guides stand there: **My Campus**
+takes you to your own campus with its building tools, and **Blueprint** opens the
+shared server blueprint. `/hub` returns to the hub at any time.
 
 ## Development demo
 
@@ -107,12 +110,10 @@ participant across all linked accounts. Demo accounts remain nickname-based.
 Owners build in Creative mode inside their entry; visits and submitted entries
 are read-only. **Build Options → Project Settings** groups reset, delete, and
 category changes, with confirmations. Submission remains a separate action.
-Survival is a separate world/inventory flow.
 Use **Build Options → Team** to invite an online student. The invited student
 opens the Competition Compass and chooses **Accept Team Invite**. Team members
 share the same private build and submission. Leaving a team asks for confirmation.
-The approved Hill command policy also applies in local survival, in both school
-and development modes. Private messages and emotes are blocked.
+The approved Hill command policy applies in both school and development modes. Private messages and emotes are blocked.
 
 ## Legacy and utility commands
 

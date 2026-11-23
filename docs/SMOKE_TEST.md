@@ -63,7 +63,7 @@ operate the Minecraft app or require manual player actions. See
 7. Try to create People as a third entry; confirm rejection.
 8. Delete or switch one entry, then create People; confirm a private `hill_people_<entry>` world.
 9. Open Visit Builds; confirm player-head entry cards and read-only visitor teleport.
-10. Confirm the three category guides and the Survival Guide are Player entities (not armor stands), have floating titles plus `CLICK TO OPEN`, and do not remain listed in the player list. Confirm the Survival Guide is at `70.5,66,31.5`.
+10. Confirm the three category guides are Player entities (not armor stands), have floating titles plus `CLICK TO OPEN`, and do not remain listed in the player list.
 11. Left-click and right-click each category guide; confirm each action opens exactly one category entry/creation GUI.
 12. In an owned entry, confirm the hotbar contains Return to Hub, Camera, Rules, and Entry Controls, but no standalone Reset or Lock item.
 13. Open Entry Controls; confirm Edit Details and submission controls are visible,
@@ -137,7 +137,7 @@ operate the Minecraft app or require manual player actions. See
 4. Confirm `plugins/Chunky-Bukkit-1.5.3.jar` is installed and that no other Chunky jar is present. Do not start pregeneration during this smoke pass.
 5. If a first primary-world transition archive exists, confirm all archived non-survival custom dimensions from every namespace were restored under `world/dimensions`, while `minecraft:hill_survival`, `minecraft:hill_survival_nether`, `minecraft:hill_survival_the_end`, `minecraft:overworld`, `minecraft:the_nether`, and `minecraft:the_end` were not copied from the archive.
 6. Confirm archived primary-root `players/`, `playerdata/`, `data/`, `stats/`, and `advancements/` were copied back into `world/` when present, while old `level.dat`, `session.lock`, and old `datapacks` were not copied.
-7. Use the Survival Guide and confirm the destination is the primary `world`.
+7. Confirm the primary `world` loads; players have no route into it.
 8. Confirm `/datapack list` shows the seven selected packs as enabled.
 9. Generate Overworld, Nether, and End chunks; then check `logs/latest.log` for datapack parse errors, registry failures, structure-set warnings, and watchdog stalls.
 10. Use `/locate structure` for at least one Structory, Structory Towers, and Towns and Towers structure.

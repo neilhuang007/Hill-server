@@ -16,13 +16,6 @@ packet-replay:
 incident-replay:
   enabled: true
 
-survival-navigation:
-  mode: local
-  java-host: ""
-  java-port: 25567
-  destination-access-configured: false
-  bedrock-local: true
-
 worlds:
   authentication: hill_auth
   # Designated map folders, relative to the server folder. Put a world save
@@ -46,10 +39,6 @@ worlds:
       profile-name: HillPeople
       # Smoke skin: scientist/community planner. Replace with a Hill-owned texture before public launch.
       skin-texture: 9658c5ac64cdd7189e8db50393f27439fc9ce9177c9c5285d6f1f7b4eda9d7ec
-    survival:
-      profile-name: HillSurvival
-      # Smoke skin: surveyor/builder. Replace with a Hill-owned survival guide texture before public launch.
-      skin-texture: af41e2561a2c959f56df5dcda564397df1971d652e1ac159d8b4c74733026077
   journey: hill_journey
   place: hill_place
   survival: world

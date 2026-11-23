@@ -43,7 +43,7 @@ public final class AccessControl implements Listener, CommandExecutor, TabComple
     private record Session(String subject, ServerRole microsoft) { }
     private static final Set<String> MUTED_COMMANDS = Set.of("hillmenu", "verify", "login", "register", "help", "rules",
             "campus", "campusbackup", "hill175", "h175", "competition", "hub", "lobby", "camera", "entry", "hillstaff",
-            "survival", "download", "hillreplay", "party", "invite", "blueprint", "review");
+            "download", "hillreplay", "party", "invite", "blueprint", "review");
     private final JavaPlugin plugin;
     private final AccessStore store;
     private final Predicate<Player> authenticated;

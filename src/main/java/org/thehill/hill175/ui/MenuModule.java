@@ -333,18 +333,6 @@ public final class MenuModule implements Listener {
                 );
     }
 
-    public void openSurvival(Player player) {
-        HillMenuHolder holder = new HillMenuHolder();
-        Inventory inventory = createInventory(holder, 9,
-                Component.text("Enter Survival", NamedTextColor.GREEN));
-        holder.inventory = inventory;
-        MenuSession session = new MenuSession(inventory);
-        inventory.setItem(4, item(Material.GRASS_BLOCK, "Enter Survival",
-                List.of("Resume your survival world."), NamedTextColor.GREEN));
-        session.actions.put(4, new MenuAction(ActionType.ENTER_SURVIVAL, null, null, 0));
-        presentMenu(player, session);
-    }
-
     public void showBuildingMap(Player player) {
         choosingSingleBuilding.remove(player.getUniqueId());
         if (worlds.isSurvivalWorld(player.getWorld())) competition.teleportHub(player);
@@ -1122,10 +1110,6 @@ public final class MenuModule implements Listener {
                 player.closeInventory();
                 competition.teleportToEntry(player, entry, true);
             });
-            case ENTER_SURVIVAL -> {
-                player.closeInventory();
-                competition.teleportSurvival(player);
-            }
             case OPEN_CAMERA_CONTROLS -> competition.entry(action.entryId).ifPresent(entry -> openCameraControls(player, entry));
             case OPEN_CAMERA_SLOT -> competition.entry(action.entryId)
                     .ifPresent(entry -> openCameraSlotControls(player, entry, action.page));
@@ -1422,7 +1406,6 @@ public final class MenuModule implements Listener {
         CREATE_ENTRY,
         ENTER_BUILD,
         VISIT_ENTRY,
-        ENTER_SURVIVAL,
         OPEN_CAMERA_CONTROLS,
         OPEN_CAMERA_SLOT,
         PREVIEW_CAMERA,

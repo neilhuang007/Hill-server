@@ -47,7 +47,6 @@ public final class HubNpcModule implements Listener {
     private static final String NPC_TAG = "hill175_category_npc";
     private static final String NPC_PART_TAG = "hill175_category_npc_part";
     private static final String NPC_TEAM_NAME = "hill175_npcs";
-    private static final String SURVIVAL_TAG = "hill175_survival_guide";
     private static final String CAMPUS_TAG = "hill175_campus_guide";
     private static final String BLUEPRINT_TAG = "hill175_blueprint_guide";
     private static final Duration INTERACTION_DEBOUNCE = Duration.ofMillis(350);
@@ -85,7 +84,6 @@ public final class HubNpcModule implements Listener {
         for (Category category : Category.values()) {
             worlds.hubNpcLocation(category).getChunk().load();
         }
-        worlds.survivalNpcLocation().getChunk().load();
         // Remove guides left by an interrupted reload or the former armor-stand implementation.
         for (Entity entity : worlds.hubWorld().getEntities()) {
             if (entity.getScoreboardTags().contains(NPC_TAG)
@@ -103,23 +101,18 @@ public final class HubNpcModule implements Listener {
             }
             styles.put(category, style);
         }
-        GuideStyle survivalStyle = configuredSurvivalStyle();
-        if (!profileNames.add(survivalStyle.profileName().toLowerCase(Locale.ROOT))) {
-            throw new IllegalStateException("Hub NPC profile names must be unique");
-        }
         int expected;
         try {
             if (campusMode) {
                 spawnGuide(worlds.hubNpcLocation(Category.PLACE), GuideStyle.campus(), CAMPUS_TAG);
                 spawnGuide(worlds.hubNpcLocation(Category.JOURNEY), GuideStyle.blueprint(), BLUEPRINT_TAG);
-                expected = 3;
+                expected = 2;
             } else {
                 spawn(worlds.hubNpcLocation(Category.JOURNEY), Category.JOURNEY, styles.get(Category.JOURNEY));
                 spawn(worlds.hubNpcLocation(Category.PLACE), Category.PLACE, styles.get(Category.PLACE));
                 spawn(worlds.hubNpcLocation(Category.PEOPLE), Category.PEOPLE, styles.get(Category.PEOPLE));
-                expected = 4;
+                expected = 3;
             }
-            spawnGuide(worlds.survivalNpcLocation(), survivalStyle, SURVIVAL_TAG);
         } catch (RuntimeException exception) {
             removeCategoryNpcs();
             throw exception;
@@ -196,14 +189,13 @@ public final class HubNpcModule implements Listener {
             return;
         }
         recentInteractions.put(player.getUniqueId(), new RecentInteraction(entity.getUniqueId(), now));
-        for (String guide : List.of(SURVIVAL_TAG, CAMPUS_TAG, BLUEPRINT_TAG)) {
+        for (String guide : List.of(CAMPUS_TAG, BLUEPRINT_TAG)) {
             if (!entity.getScoreboardTags().contains(guide)) continue;
             if (!competition.isAuthenticated(player)) {
                 competition.sendAuthenticationInstructions(player);
                 return;
             }
-            if (guide.equals(SURVIVAL_TAG)) menus.openSurvival(player);
-            else if (guide.equals(CAMPUS_TAG) && openCampus != null) openCampus.accept(player);
+            if (guide.equals(CAMPUS_TAG) && openCampus != null) openCampus.accept(player);
             else if (guide.equals(BLUEPRINT_TAG) && openBlueprint != null) openBlueprint.accept(player);
             return;
         }
@@ -379,27 +371,6 @@ public final class HubNpcModule implements Listener {
         );
     }
 
-    private GuideStyle configuredSurvivalStyle() {
-        GuideStyle defaults = GuideStyle.survival();
-        String path = "worlds.hub-npcs.survival";
-        String profileName = plugin.getConfig().getString(path + ".profile-name", defaults.profileName()).trim();
-        String skinTexture = plugin.getConfig().getString(path + ".skin-texture", defaults.skinTexture())
-                .trim().toLowerCase(Locale.ROOT);
-        if (!PROFILE_NAME_PATTERN.matcher(profileName).matches()) {
-            throw new IllegalStateException("Invalid survival NPC profile name at " + path + ".profile-name");
-        }
-        if (!TEXTURE_HASH_PATTERN.matcher(skinTexture).matches()) {
-            throw new IllegalStateException("Invalid survival NPC texture hash at " + path + ".skin-texture");
-        }
-        return new GuideStyle(
-                defaults.title(),
-                profileName,
-                defaults.titleColor(),
-                defaults.heldItem(),
-                defaults.offhandItem(),
-                skinTexture
-        );
-    }
 
     private record CategoryStyle(
             String title,
@@ -463,18 +434,6 @@ public final class HubNpcModule implements Listener {
             return new GuideStyle("BLUEPRINT", "HillBlueprint", NamedTextColor.AQUA, Material.FILLED_MAP, Material.WRITABLE_BOOK,
                     // Same designer skin as the former Place guide.
                     "6ac6ca262d67bcfb3dbc924ba8215a18195497c780058a5749de674217721892");
-        }
-
-        private static GuideStyle survival() {
-            return new GuideStyle(
-                    "Survival Guide",
-                    "HillSurvival",
-                    NamedTextColor.GREEN,
-                    Material.GRASS_BLOCK,
-                    Material.COMPASS,
-                    // Smoke skin: surveyor/builder. Replace with a Hill-owned survival guide texture before public launch.
-                    "af41e2561a2c959f56df5dcda564397df1971d652e1ac159d8b4c74733026077"
-            );
         }
     }
 }

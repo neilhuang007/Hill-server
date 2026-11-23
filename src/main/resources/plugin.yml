@@ -24,9 +24,6 @@ commands:
   download:
     description: Get a private 15-minute link to a fingerprinted campus map copy
     usage: /download
-  survival:
-    description: Travel to your configured survival server or world
-    usage: /survival
   hillreplay:
     description: Staff-only incident history and playback
     usage: /hillreplay
