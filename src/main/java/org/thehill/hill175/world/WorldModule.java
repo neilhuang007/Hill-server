@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.BoundingBox;
 import org.thehill.hill175.model.BuildRegion;
 import org.thehill.hill175.model.CameraPose;
 import org.thehill.hill175.model.Category;
@@ -374,6 +375,27 @@ public final class WorldModule {
         }
         return isPrivatePlace(entry) ? safeBuildingStandingLocation(world, entry.region(), preferred)
                 : safeStandingLocation(world, entry.region(), preferred);
+    }
+
+    public boolean isSafeCampusReturn(Entry entry, Location location) {
+        World world = location.getWorld();
+        if (world == null || !entry.region().contains(location) || !world.getWorldBorder().isInside(location)
+                || location.getY() < world.getMinHeight() || location.getY() + 1.8 > world.getMaxHeight()) return false;
+        var body = new BoundingBox(location.getX() - 0.3, location.getY(), location.getZ() - 0.3,
+                location.getX() + 0.3, location.getY() + 1.8, location.getZ() + 0.3);
+        var blockBounds = new BoundingBox(0, 0, 0, 1, 1, 1);
+        for (int x = (int) Math.floor(body.getMinX()); x <= Math.floor(body.getMaxX()); x++) {
+            for (int y = Math.max(world.getMinHeight(), location.getBlockY() - 1);
+                 y < world.getMaxHeight() && y <= Math.floor(body.getMaxY()); y++) {
+                for (int z = (int) Math.floor(body.getMinZ()); z <= Math.floor(body.getMaxZ()); z++) {
+                    Block block = world.getBlockAt(x, y, z);
+                    BoundingBox localBody = body.clone().shift(-x, -y, -z);
+                    if (block.getCollisionShape().overlaps(localBody)
+                            || (block.isLiquid() || isUnsafeBodyMaterial(block.getType())) && blockBounds.overlaps(localBody)) return false;
+                }
+            }
+        }
+        return true;
     }
 
     private Optional<Location> safeBuildingStandingLocation(World world, BuildRegion region, Location preferred) {

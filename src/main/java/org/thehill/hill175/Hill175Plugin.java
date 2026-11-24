@@ -13,6 +13,7 @@ import org.thehill.hill175.access.AccessControl;
 import org.thehill.hill175.auth.sso.MicrosoftSsoService;
 import org.thehill.hill175.auth.sso.SsoConfig;
 import org.thehill.hill175.command.CommandModule;
+import org.thehill.hill175.competition.CampusWorldEdit;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.data.CompetitionStore;
 import org.thehill.hill175.data.YamlCompetitionStore;
@@ -63,6 +64,7 @@ public final class Hill175Plugin extends JavaPlugin {
     private PacketReplayService packetReplay;
     private BlueprintService blueprint;
     private PartyService parties;
+    private CampusWorldEdit campusWorldEdit;
 
     @Override
     public void onEnable() {
@@ -176,6 +178,11 @@ public final class Hill175Plugin extends JavaPlugin {
         CommandModule commands = new CommandModule(competition, menus);
 
         PluginManager pluginManager = getServer().getPluginManager();
+        if (blueprint != null && pluginManager.isPluginEnabled("WorldEdit")) {
+            campusWorldEdit = new CampusWorldEdit(this, competition, blueprint);
+            serverListener.worldEditCommands(campusWorldEdit::handleCommand);
+            pluginManager.registerEvents(campusWorldEdit, this);
+        }
         pluginManager.registerEvents(access, this);
         pluginManager.registerEvents(chatSafety, this);
         for (String name : List.of("party", "invite", "blueprint", "review")) {
@@ -362,6 +369,7 @@ public final class Hill175Plugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (campusWorldEdit != null) campusWorldEdit.close();
         if (actions != null) actions.close();
         if (parties != null) parties.close();
         if (blueprint != null) blueprint.close();

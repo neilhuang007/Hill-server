@@ -64,6 +64,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.vehicle.VehicleMoveEvent;
@@ -72,9 +73,13 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Entry;
@@ -90,6 +95,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 public final class ServerListener implements Listener {
     private static final String CAMERA_MARKER_TAG = "hill175_camera_marker";
@@ -105,6 +111,7 @@ public final class ServerListener implements Listener {
     private final WorldModule worlds;
     private final Map<UUID, Instant> lastDenialMessage = new HashMap<>();
     private final Set<UUID> survivalDeaths = new HashSet<>();
+    private BiPredicate<Player, String> worldEditCommands = (player, command) -> false;
 
     @EventHandler
     public void onCameraChunkLoad(ChunkLoadEvent event) {
@@ -144,6 +151,11 @@ public final class ServerListener implements Listener {
         event.joinMessage(competition.usesMicrosoftAuthentication() ? null
                 : Component.text(event.getPlayer().getName() + " joined the Hill 175 server.", NamedTextColor.GRAY));
         competition.handleJoin(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCampusDeparture(PlayerTeleportEvent event) {
+        competition.rememberPersonalCampusDeparture(event.getPlayer(), event.getFrom(), event.getTo());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -208,8 +220,16 @@ public final class ServerListener implements Listener {
         }
     }
 
+    public void worldEditCommands(BiPredicate<Player, String> handler) {
+        worldEditCommands = handler;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCommand(PlayerCommandPreprocessEvent event) {
+        if (worldEditCommands.test(event.getPlayer(), event.getMessage())) {
+            event.setCancelled(true);
+            return;
+        }
         if (isNamespacedCommand(event.getMessage())) {
             event.setCancelled(true);
             deny(event.getPlayer(), "Use the Hill commands shown in /help.");
@@ -296,8 +316,13 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(player.getWorld())) {
             return;
         }
-        if (event.getHand() == EquipmentSlot.HAND) {
-            ItemStack item = event.getItem();
+        ItemStack item = event.getItem();
+        boolean offHandTool = event.getHand() == EquipmentSlot.OFF_HAND && isProtectedCompetitionItem(item);
+        if (offHandTool && isProtectedCompetitionItem(player.getInventory().getItemInMainHand())) {
+            event.setCancelled(true);
+            return;
+        }
+        if (event.getHand() == EquipmentSlot.HAND || offHandTool) {
             if (competition.isCompetitionItem(item, CompetitionModule.CAMPUS_UNDO_ITEM_ID)) {
                 event.setCancelled(true);
                 if (event.getAction().isRightClick()) competition.undoRecentBuild(player);
@@ -443,34 +468,54 @@ public final class ServerListener implements Listener {
         if (!(event.getWhoClicked() instanceof Player player) || worlds.isSurvivalWorld(player.getWorld())) {
             return;
         }
-        ItemStack hotbarItem = event.getHotbarButton() >= 0
-                ? event.getWhoClicked().getInventory().getItem(event.getHotbarButton())
-                : null;
-        if (isProtectedCompetitionItem(event.getCurrentItem())
-                || isProtectedCompetitionItem(event.getCursor())
-                || isProtectedCompetitionItem(hotbarItem)) {
+        ItemStack swapItem = event.getClick() == ClickType.SWAP_OFFHAND
+                ? player.getInventory().getItemInOffHand()
+                : event.getHotbarButton() >= 0 ? player.getInventory().getItem(event.getHotbarButton()) : null;
+        if (!isProtectedCompetitionItem(event.getCurrentItem())
+                && !isProtectedCompetitionItem(event.getCursor())
+                && !isProtectedCompetitionItem(swapItem)) {
+            return;
+        }
+        if (!canRearrangeCompetitionItems(player) || !(event.getClickedInventory() instanceof PlayerInventory)) {
+            event.setCancelled(true);
+            return;
+        }
+        InventoryType viewType = event.getView().getType();
+        boolean playerView = viewType == InventoryType.CRAFTING || viewType == InventoryType.CREATIVE;
+        if (switch (event.getAction()) {
+            case DROP_ALL_CURSOR, DROP_ONE_CURSOR, DROP_ALL_SLOT, DROP_ONE_SLOT, CLONE_STACK -> true;
+            case MOVE_TO_OTHER_INVENTORY, COLLECT_TO_CURSOR -> !playerView;
+            default -> false;
+        }) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (event.getWhoClicked() instanceof Player player && worlds.isSurvivalWorld(player.getWorld())) {
+        if (!(event.getWhoClicked() instanceof Player player) || worlds.isSurvivalWorld(player.getWorld())) {
             return;
         }
-        if (event.getNewItems().values().stream().anyMatch(this::isProtectedCompetitionItem)) {
+        if (event.getNewItems().entrySet().stream().anyMatch(change -> isProtectedCompetitionItem(change.getValue())
+                && (!canRearrangeCompetitionItems(player)
+                || !(event.getView().getInventory(change.getKey()) instanceof PlayerInventory)))) {
             event.setCancelled(true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSwapHands(PlayerSwapHandItemsEvent event) {
-        if (worlds.isSurvivalWorld(event.getPlayer().getWorld())) {
+        Player player = event.getPlayer();
+        if (worlds.isSurvivalWorld(player.getWorld()) || canRearrangeCompetitionItems(player)) {
             return;
         }
         if (isProtectedCompetitionItem(event.getMainHandItem()) || isProtectedCompetitionItem(event.getOffHandItem())) {
             event.setCancelled(true);
         }
+    }
+
+    private boolean canRearrangeCompetitionItems(Player player) {
+        return competition.isAuthenticated(player) && !competition.isCameraPreviewing(player);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

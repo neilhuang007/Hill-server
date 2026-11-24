@@ -58,6 +58,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -155,6 +156,7 @@ public final class CompetitionModule {
     private final Map<UUID, Integer> nextCameraWriteIndexByPlayer = new HashMap<>();
     private final Map<UUID, UUID> pendingPeopleEntryByPlayer = new HashMap<>();
     private final Map<UUID, String> activeKitByPlayer = new HashMap<>();
+    private final Map<UUID, CampusReturn> campusReturnByPlayer = new HashMap<>();
     private final Map<UUID, CampusChartMap> campusChartMapsByEntry = new HashMap<>();
     private CampusChartMap campusSelectionChart;
     private java.util.function.Supplier<MapRenderer> officialMapRenderer;
@@ -265,6 +267,7 @@ public final class CompetitionModule {
             saveSurvivalState(player);
         }
         store.recordConnection(participantKey(player), connectionAddress(player), "join");
+        campusReturnByPlayer.remove(player.getUniqueId());
         authenticatedSessions.remove(player.getUniqueId());
         pendingRegistrations.remove(player.getUniqueId());
         currentEntryByPlayer.remove(player.getUniqueId());
@@ -295,6 +298,7 @@ public final class CompetitionModule {
             survivalInventories.markActive(player.getUniqueId());
         }
         store.recordConnection(participantKey(player), connectionAddress(player), "quit");
+        campusReturnByPlayer.remove(player.getUniqueId());
         if (schoolSessions != null) {
             schoolSessions.disconnect(player);
         }
@@ -752,15 +756,16 @@ public final class CompetitionModule {
             sendHubTip(player);
             return;
         }
-        Optional<Location> safeSpawn = worlds.safeEntrySpawn(entry);
-        if (safeSpawn.isEmpty()) {
+        CampusReturn resume = visiting ? null : personalCampusReturn(player, entry);
+        Optional<Location> destination = resume == null ? worlds.safeEntrySpawn(entry) : Optional.of(resume.position());
+        if (destination.isEmpty()) {
             currentEntryByPlayer.remove(player.getUniqueId());
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
             message(player, NamedTextColor.RED, "No safe two-block-tall spawn is available inside this entry.");
             message(player, NamedTextColor.YELLOW, "Open Entry Controls from the lobby to reset the build, or ask staff to clear its spawn area.");
             return;
         }
-        if (!teleportEndingCameraPreview(player, safeSpawn.get())) {
+        if (!teleportEndingCameraPreview(player, destination.get())) {
             pendingPeopleEntryByPlayer.remove(player.getUniqueId());
             message(player, NamedTextColor.RED, "The entry teleport was interrupted. Try again from the Competition Compass.");
             return;
@@ -777,6 +782,7 @@ public final class CompetitionModule {
             boolean editable = !visiting && canEditEntry(player, entry);
             if (editable) setOwnerMode(player);
             else setVisitorMode(player);
+            if (resume != null) player.setFlying(resume.flying());
             givePersonalCampusItems(player, entry, editable);
             message(player, editable ? NamedTextColor.GREEN : NamedTextColor.AQUA,
                     editable ? "Campus ready. Build together, or use /party to manage guests."
@@ -799,6 +805,25 @@ public final class CompetitionModule {
             message(player, NamedTextColor.AQUA, "Visitor Mode: fly and observe; editing is disabled.");
             sendVisitorEntryTip(player);
         }
+    }
+
+    public void rememberPersonalCampusDeparture(Player player, Location from, Location to) {
+        if (parties == null || from.getWorld() == null || to == null || to.getWorld() == null
+                || from.getWorld().equals(to.getWorld())) return;
+        parties.personalEntry(player).filter(entry -> entry.region().contains(from) && parties.isOwner(player, entry))
+                .ifPresent(entry -> campusReturnByPlayer.put(player.getUniqueId(),
+                        new CampusReturn(entry.id(), from.getWorld().getUID(), from.clone(), player.isFlying())));
+    }
+
+    private CampusReturn personalCampusReturn(Player player, Entry entry) {
+        CampusReturn saved = campusReturnByPlayer.get(player.getUniqueId());
+        if (saved == null || parties == null || !saved.entryId().equals(entry.id()) || !parties.isOwner(player, entry)) return null;
+        World world = Bukkit.getWorld(entry.worldName());
+        if (world == null || !world.getUID().equals(saved.worldId()) || world.equals(player.getWorld())) return null;
+        Location position = saved.position().clone();
+        position.setWorld(world);
+        if (!worlds.isSafeCampusReturn(entry, position)) return null;
+        return new CampusReturn(saved.entryId(), saved.worldId(), position, saved.flying());
     }
 
     public boolean teleportReadOnly(Player player, World world, Location destination) {
@@ -955,6 +980,15 @@ public final class CompetitionModule {
         return store.entries().stream()
                 .filter(entry -> entry.containsEditable(location))
                 .findFirst();
+    }
+
+    Optional<Entry> worldEditEntry(Player player) {
+        if (parties == null || blueprint == null || !isAuthenticated(player) || isCameraPreviewing(player)
+                || recoveryPreview.test(player) || sendingBuild.test(player)) return Optional.empty();
+        World world = player.getWorld();
+        if (!blueprint.isCampus(world) || !blueprint.mayChange(player, world)) return Optional.empty();
+        return parties.personalEntry(player).filter(entry -> entry.worldName().equals(world.getName())
+                && parties.isOwner(player, entry) && canEditEntry(player, entry));
     }
 
     public boolean mayBuild(Player player, Location location) {
@@ -1589,10 +1623,12 @@ public final class CompetitionModule {
     }
 
     public boolean isCompetitionItem(ItemStack item, String expectedId) {
-        if (item == null || item.getType().isAir() || !item.hasItemMeta()) {
-            return false;
-        }
-        return expectedId.equals(item.getItemMeta().getPersistentDataContainer().get(itemKey, PersistentDataType.STRING));
+        return expectedId.equals(competitionItemId(item));
+    }
+
+    private String competitionItemId(ItemStack item) {
+        if (item == null || item.getType().isAir() || !item.hasItemMeta()) return null;
+        return item.getItemMeta().getPersistentDataContainer().get(itemKey, PersistentDataType.STRING);
     }
 
     public String nicknameKey(String nickname) {
@@ -1925,7 +1961,7 @@ public final class CompetitionModule {
 
     private void giveHubItems(Player player) {
         if (parties != null) {
-            clearCompetitionItems(player);
+            clearCompetitionItems(player, Set.of(COMPASS_ITEM_ID, CAMPUS_CHART_ITEM_ID));
             placeCampusTool(player, 6, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Hill Menu",
                     "Your campus, the blueprint, friends, the map and more."));
             giveCampusSelectionMap(player);
@@ -1940,9 +1976,9 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Competition Compass",
                 "Open entries, visit builds, or create a project."));
-        giveCampusSelectionMap(player);
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
+        giveCampusSelectionMap(player);
         activeKitByPlayer.put(player.getUniqueId(), HUB_KIT);
     }
 
@@ -1968,7 +2004,7 @@ public final class CompetitionModule {
     }
 
     private void giveSharedCampusItems(Player player) {
-        clearCompetitionItems(player);
+        clearCompetitionItems(player, Set.of(CAMPUS_UNDO_ITEM_ID, CAMPUS_CHART_ITEM_ID));
         placeCampusTool(player, 7, competitionItem(Material.CLOCK, CAMPUS_UNDO_ITEM_ID, "Undo Last 15 Seconds",
                 "Right click to undo your recent block edits. Other students' changes are protected."));
         giveCampusSelectionMap(player);
@@ -1996,24 +2032,22 @@ public final class CompetitionModule {
         if (isAuthenticated(player) && worlds.isSharedCampus(player.getWorld())) giveSharedCampusItems(player);
     }
 
-    private void placeCampusTool(Player player, int slot, ItemStack tool) {
+    private void placeCampusTool(Player player, int preferredSlot, ItemStack tool) {
         PlayerInventory inventory = player.getInventory();
-        ItemStack previous = inventory.getItem(slot);
-        if (previous != null && !previous.getType().isAir()
-                && !(previous.hasItemMeta() && previous.getItemMeta().getPersistentDataContainer().has(itemKey, PersistentDataType.STRING))) {
-            int available = -1;
-            for (int candidate = 0; candidate < 36; candidate++) {
-                if (candidate == 7 || candidate == CAMPUS_CHART_SLOT) continue;
-                ItemStack value = inventory.getItem(candidate);
-                if (value == null || value.getType().isAir()) { available = candidate; break; }
-            }
-            if (available < 0) {
-                message(player, NamedTextColor.YELLOW, "Make room in your inventory, then use /campus home to receive your tools.");
+        String id = competitionItemId(tool);
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            if (id.equals(competitionItemId(inventory.getItem(slot)))) {
+                inventory.setItem(slot, tool);
                 return;
             }
-            inventory.setItem(available, previous);
         }
-        inventory.setItem(slot, tool);
+        ItemStack previous = inventory.getItem(preferredSlot);
+        int target = previous == null || previous.getType().isAir() ? preferredSlot : inventory.firstEmpty();
+        if (target < 0) {
+            message(player, NamedTextColor.YELLOW, "Make room in your inventory, then use /campus home to receive your tools.");
+            return;
+        }
+        inventory.setItem(target, tool);
     }
 
     private void giveEntryOwnerItems(Player player, Entry entry) {
@@ -2021,23 +2055,28 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
-        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Capture Camera View",
                 "Right-click once to save your exact position and view."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
                 "Right-click to review competition rules."));
         player.getInventory().setItem(6, competitionItem(Material.NETHER_STAR, ENTRY_MENU_ITEM_ID, "Entry Controls",
                 "Open the menu for this entry."));
+        givePeopleCampusChart(player, entry);
         activeKitByPlayer.put(player.getUniqueId(), ownerKit(entry));
     }
 
     private void givePersonalCampusItems(Player player, Entry entry, boolean editable) {
-        clearCompetitionItems(player);
+        boolean canSend = editable && blueprint != null && entry.isMember(participantKey(player));
+        Set<String> retained = new HashSet<>(Set.of(COMPASS_ITEM_ID));
+        if (shouldGiveCampusChart(entry, player.getWorld())) retained.add(CAMPUS_CHART_ITEM_ID);
+        if (editable) retained.add(CAMPUS_UNDO_ITEM_ID);
+        if (canSend) retained.add(BLUEPRINT_SEND_ITEM_ID);
+        clearCompetitionItems(player, retained);
         placeCampusTool(player, 6, competitionItem(Material.COMPASS, COMPASS_ITEM_ID, "Hill Menu",
                 "Your campus, the blueprint, friends, the map and more."));
         if (editable) placeCampusTool(player, 5, competitionItem(Material.CLOCK, CAMPUS_UNDO_ITEM_ID, "Undo Last 15 Seconds",
                 "Right-click to undo your block edits from the last 15 seconds."));
-        if (editable && blueprint != null && entry.isMember(participantKey(player))) {
+        if (canSend) {
             placeCampusTool(player, 7, competitionItem(Material.EMERALD, BLUEPRINT_SEND_ITEM_ID, "Send My Build",
                     "Right-click: fly to your changes and pick what to send for approval."));
         }
@@ -2050,7 +2089,6 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
-        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.ENDER_EYE, CAMERA_ITEM_ID, "Next Camera View",
                 "Right-click to view the next saved camera, or click a marker."));
         player.getInventory().setItem(7, competitionItem(Material.WRITTEN_BOOK, RULES_ITEM_ID, "Hill 175 Rules",
@@ -2059,6 +2097,7 @@ public final class CompetitionModule {
                 owner ? ENTRY_MENU_ITEM_ID : COMPASS_ITEM_ID,
                 owner ? "Entry Controls" : "Competition Compass",
                 owner ? "Open the menu for this entry." : "Open entries, visit builds, or create a project."));
+        givePeopleCampusChart(player, entry);
         activeKitByPlayer.put(player.getUniqueId(), visitorKit(entry, owner));
     }
 
@@ -2066,7 +2105,6 @@ public final class CompetitionModule {
         clearCompetitionItems(player);
         player.getInventory().setItem(0, competitionItem(Material.ENDER_PEARL, LOBBY_ITEM_ID, "Return to Lobby",
                 "Right-click to return to the exhibition lobby."));
-        givePeopleCampusChart(player, entry);
         player.getInventory().setItem(3, competitionItem(Material.BARRIER, CAMERA_PREVIEW_ITEM_ID, "Exit Camera Preview",
                 "Left-click or right-click to return to your previous position."));
         // Marker/menu entry can start from any held slot. Put the exit control
@@ -2083,6 +2121,7 @@ public final class CompetitionModule {
                 owner ? ENTRY_MENU_ITEM_ID : COMPASS_ITEM_ID,
                 owner ? "Entry Controls" : "Competition Compass",
                 owner ? "Open the menu for this entry." : "Open entries, visit builds, or create a project."));
+        givePeopleCampusChart(player, entry);
         activeKitByPlayer.put(player.getUniqueId(), previewKit(entry));
     }
 
@@ -2189,13 +2228,14 @@ public final class CompetitionModule {
     }
 
     private void clearCompetitionItems(Player player) {
+        clearCompetitionItems(player, Set.of());
+    }
+
+    private void clearCompetitionItems(Player player, Set<String> retained) {
         PlayerInventory inventory = player.getInventory();
         for (int slot = 0; slot < inventory.getSize(); slot++) {
-            ItemStack item = inventory.getItem(slot);
-            if (item != null && item.hasItemMeta()
-                    && item.getItemMeta().getPersistentDataContainer().has(itemKey, PersistentDataType.STRING)) {
-                inventory.setItem(slot, null);
-            }
+            String id = competitionItemId(inventory.getItem(slot));
+            if (id != null && !retained.contains(id)) inventory.setItem(slot, null);
         }
     }
 
@@ -2938,6 +2978,8 @@ public final class CompetitionModule {
             this.remaining = remaining;
         }
     }
+
+    private record CampusReturn(UUID entryId, UUID worldId, Location position, boolean flying) { }
 
     private record CampusChartMap(BuildRegion region, World world, MapView view) {
     }

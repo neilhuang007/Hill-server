@@ -55,7 +55,8 @@ When the listener is registered:
 | Surface | Enforcement |
 | --- | --- |
 | Public Paper `AsyncChatEvent` | Cancels an inappropriate message before normal public delivery, with clean private feedback to its author. |
-| Sign edits | Cancels `SignChangeEvent` for the side being edited, joining all lines so line splitting is checked. |
+| Sign edits | Cancels `SignChangeEvent` for either the front or the back, joining all lines of the side being edited so line splitting is checked. |
+| Sign placement | Cancels `BlockPlaceEvent` for standing, wall and hanging signs when the placing item fails the shared bounded item check, including prefilled text on both sides. Other block placements do not run item inspection. |
 | Book edits/signing | Cancels `PlayerEditBookEvent`, checking the title and all page text together. |
 | Anvil rename | Removes an inappropriate prepared result and rechecks result-slot clicks, including shift/number-key clicks; checks entered rename text and runs the shared bounded item inspection on the result. |
 | Creative inventory/hotbar imports and creative drops | Cancels `InventoryCreativeEvent` when its incoming cursor item fails the shared item check. This covers normal saved-hotbar restoration transactions, not just freshly typed text. |
@@ -65,13 +66,13 @@ Adventure text is serialized to plain text for matching. Styling does not split
 a word into independently accepted fragments. Sign lines and book pages are
 joined for checks. Existing authentication listeners continue to reject
 unauthenticated public chat; this sidecar does not inspect unauthenticated chat
-for profanity, and unauthenticated sign/book/anvil/creative-item changes are
-rejected.
+for profanity, and unauthenticated sign placement and sign/book/anvil/creative-item
+changes are rejected.
 
-### Bounded imported-item inspection
+### Bounded item inspection
 
-The Creative and anvil-result checks share the same read-only inspection of the
-event-supplied item:
+The Creative, anvil-result and sign-placement checks share the same read-only
+inspection of the event-supplied item:
 
 - Item display/custom name, the separate fixed item-name component, and lore.
 - Book title, author and every page, including prewritten books.
@@ -96,9 +97,9 @@ text component, or failed metadata/snapshot inspection is **rejected**, not
 partially inspected and accepted. Large legitimate nested containers may
 therefore need to be imported in smaller pieces.
 
-For imported/anvil items, accepted rich-text content is deliberately restricted
-to **styled plain `TextComponent` trees**. Any hover event, click event or
-insertion action causes rejection, without inspecting its command/action payload.
+For items checked through these events, accepted rich-text content is deliberately
+restricted to **styled plain `TextComponent` trees**. Any hover event, click event
+or insertion action causes rejection, without inspecting its command/action payload.
 Translatable components and their arguments are rejected as unresolved metadata,
 as are keybind, selector, score, NBT, object and other non-text component types.
 Thus a benign visible label cannot conceal unfiltered profanity inside a hover
@@ -108,11 +109,11 @@ author to plain text before import; the plugin does not silently strip actions
 and accept a changed item. Colors, formatting and ordinary text children remain
 supported within the component budget.
 
-The listener cancels the Creative event or rejects the anvil result. It does not
-edit the imported stack, set a block state, update a snapshot, mutate a world,
-clear a player's inventory, or confiscate preexisting items. The inspection reads
-only event items and detached block-inventory snapshots, never live inventories
-from placed blocks. It does not read command-block commands, lock tokens,
+The listener cancels the Creative or sign-placement event or rejects the anvil
+result. It does not edit the inspected stack, set a block state, update a snapshot,
+mutate a world, clear a player's inventory, or confiscate preexisting items.
+The inspection reads only event items and detached block-inventory snapshots,
+never live inventories from placed blocks. It does not read command-block commands, lock tokens,
 authentication credentials or arbitrary NBT strings as public text.
 
 The plugin logs only a fixed startup error if rules cannot load, and a fixed
@@ -135,7 +136,10 @@ The Java matcher applies the following bounded checks locally:
 - Word boundaries against letters/digits, so ordinary words such as `class`,
   `assignment`, `Scunthorpe` or `cocktail` are not rejected merely for containing
   a shorter prohibited word. Prohibited compounds explicitly present in the
-  imported vocabulary still match.
+  imported vocabulary still match. A contiguous normalized word also matches if
+  its entire span can be split into two or more blocked entries, including repeats
+  or mixed entries (for example, `fuckfuck` or `fuckshit`). A blocked substring
+  with unmatched letters before or after it is not enough.
 - Ignoring punctuation/whitespace between the letters of a candidate, to catch
   spelling such as `f u c k` or `s.h.i.t`, and recognizing stretched letters.
   Required doubled letters remain required, so `ass` does not become `as`.
@@ -150,9 +154,10 @@ The Java matcher applies the following bounded checks locally:
 An allowlist entry exempts **only matching spans** of its word or phrase after
 normalization; it does not exempt the whole message or the player. Another
 prohibited word elsewhere still rejects the message. Allowlisting a standalone
-prohibited word deliberately permits that word everywhere. Prefer narrow
-approved phrases over broad exceptions. Matching is deterministic and uses
-immutable rules, including when public chat arrives asynchronously.
+prohibited word deliberately permits that word wherever it matches at word
+boundaries. To exempt a glued compound, the allowlist must cover the compound's
+full span. Prefer narrow approved phrases over broad exceptions. Matching is
+deterministic and uses immutable rules, including when public chat arrives asynchronously.
 
 ## Configuration
 
@@ -243,13 +248,14 @@ create private communication.
 - No retroactive scan of existing chat/history, signs, books, items, imported
   schematics or entries. Creative item metadata is checked only when it enters
   through `InventoryCreativeEvent`, and anvil results are checked at preparation
-  and take time. Already-existing items or items created by a plugin/other
+  and take time. Player placement checks the item only for signs and hanging
+  signs. Other already-existing items or items created by a plugin/other
   transport without these events are not automatically scanned on placement,
   display, inventory transfer or lectern insertion.
 - No inspection of images, map art, building shapes, voice, resource packs,
   display entities, arbitrary raw NBT or metadata components outside the
   explicitly covered Bukkit item APIs, or arbitrary third-party plugin output.
-  Imported/anvil text with click/hover/insertion actions or unresolved component
+  Checked item text with click/hover/insertion actions or unresolved component
   types is rejected rather than interpreting potentially hidden action payloads;
   already-existing interactive items are not retroactively inspected.
 - Other plugins can alter text after this listener or ignore event cancellation.
@@ -257,6 +263,7 @@ create private communication.
 
 Deploy with a real-client review of public chat, front/back signs, books, anvil
 renames, saved-hotbar restoration of named/lore items, prewritten books and signs,
-nested containers/lectern books, all metadata entry points, authentication
-commands and the command allowlist in every enabled mode/world. Automated checks
-do not establish that unseen content is safe.
+placement of prefilled standing, wall and hanging signs, nested containers/lectern
+books, all metadata entry points, authentication commands and the command allowlist
+in every enabled mode/world. Automated checks do not establish that unseen content
+is safe.

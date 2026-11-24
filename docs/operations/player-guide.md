@@ -1,8 +1,10 @@
 # Player workflow
 
-Your campus hotbar holds the everyday tools: the **Undo** clock (slot 6), the **Hill
+Your campus hotbar starts with four tools: the **Undo** clock (slot 6), the **Hill
 Menu** compass (slot 7), the **Send My Build** emerald (slot 8) and the campus **map**
-(slot 9). The menu does not repeat them.
+(slot 9). You can move them between your hotbar, inventory and offhand. These tools
+stay with you: you can't drop them or put them in containers. Temporary controls
+for selecting or reviewing a build stay in place until you finish.
 
 The **Hill Menu** is a Hypixel-style chest. Open it with the compass, `/hillmenu`, or by
 sneaking and using an empty hand on a block. In the sign in lobby, use an empty hand on
@@ -42,7 +44,8 @@ apply right now. Removing a guest or leaving a campus asks "Are you sure?" first
 Staff choose Hill Menu → **Staff** → **Review Builds**, or type `/review`. Each waiting
 build opens on the shared blueprint, visible only to the reviewer, with green boxes
 around it and pink boxes at conflicts. The hotbar holds **Accept** and **Reject**,
-and the next build opens after each decision.
+and the next build opens after each decision. When you return to **My Campus**
+after using staff tools, you resume where you left off if the spot is still safe.
 
 Right-click the campus map in your hotbar to see the illustrated school map, and
 click a number on it to go there. The map image downloads once after you join. If
@@ -56,6 +59,20 @@ legacy competition workflow rather than personal-campus guest permissions.
 
 The deployed demo remains in development mode until Hill IT configures Microsoft
 sign-in. The server tells you which authentication flow to use.
+
+## WorldEdit in your campus
+
+In **My Campus**, use `//wand` to get the WorldEdit wooden axe. Left-click one
+corner block and right-click the opposite corner. You can also stand at opposite
+corners and use `//pos1` and `//pos2`. Use `//size` to check the selection, then
+`//set <block>`, `//replace <from> <to>`,
+`//walls <block>`, or `//faces <block>`. `//copy` and `//paste` copy blocks;
+`//paste -a` skips air. Use `//undo` or `//redo` for WorldEdit changes.
+
+Each operation is limited to 16,384 blocks. WorldEdit skips protected blocks,
+including blocks with saved data such as signs and chests. Only the campus owner
+can use these commands, and only in their own campus. To share a build, use
+**Send My Build** as usual. WorldEdit must be installed on the server.
 
 ## School sign-in
 

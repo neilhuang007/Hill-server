@@ -2,6 +2,7 @@ package org.thehill.hill175.moderation;
 
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,8 @@ final class ProfanityMatcher {
             for (int index = 1; index < allowedUntil.length; index++) {
                 allowedUntil[index] = Math.max(allowedUntil[index], allowedUntil[index - 1]);
             }
-            if (scan(normalized, rules.blocked(), (start, end) -> allowedUntil[start] < end)) {
+            if (scan(normalized, rules.blocked(), (start, end) -> allowedUntil[start] < end)
+                    || hasBlockedCompound(normalized, rules.blocked(), allowedUntil)) {
                 return false;
             }
         }
@@ -109,35 +111,84 @@ final class ProfanityMatcher {
             if (!wordAt(text, start) || (start > 0 && Character.isLetterOrDigit(text.codePointBefore(start)))) {
                 continue;
             }
-            Node node = root;
-            char previous = 0;
-            int run = -1;
             int limit = Math.min(text.length(), start + MAX_MATCH_SPAN);
-            for (int position = start; position < limit; position++) {
-                char current = text.charAt(position);
-                if (current == ' ') {
-                    continue;
+            if (scanFrom(text, root, start, limit, counts, true, match)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasBlockedCompound(String text, Node root, int[] allowedUntil) {
+        if (root.children.isEmpty()) {
+            return false;
+        }
+        int[] counts = new int[MAX_RULE_LENGTH];
+        boolean[] reachable = new boolean[MAX_MATCH_SPAN];
+        for (int start = 0; start < text.length();) {
+            int separator = text.indexOf(' ', start);
+            int end = separator < 0 ? text.length() : separator;
+            int length = end - start;
+            if (length > 1 && length <= MAX_MATCH_SPAN && allowedUntil[start] < end
+                    && isBlockedCompound(text, root, start, end, counts, reachable)) {
+                return true;
+            }
+            start = end + 1;
+        }
+        return false;
+    }
+
+    private static boolean isBlockedCompound(String text, Node root, int start, int end,
+                                             int[] counts, boolean[] reachable) {
+        Arrays.fill(reachable, 0, end - start, false);
+        reachable[0] = true;
+        Match token = (tokenStart, tokenEnd) -> {
+            if (tokenEnd == end) {
+                return tokenStart > start;
+            }
+            reachable[tokenEnd - start] = true;
+            return false;
+        };
+        for (int position = start; position < end; position++) {
+            if (reachable[position - start] && scanFrom(text, root, position, end, counts, false, token)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean scanFrom(String text, Node root, int start, int limit, int[] counts,
+                                    boolean requireWordEnd, Match match) {
+        Node node = root;
+        char previous = 0;
+        int run = -1;
+        for (int position = start; position < limit; position++) {
+            char current = text.charAt(position);
+            if (current == ' ') {
+                continue;
+            }
+            if (current == previous) {
+                counts[run]++;
+            } else {
+                node = node.children.get(current);
+                if (node == null) {
+                    break;
                 }
-                if (current == previous) {
-                    counts[run]++;
-                } else {
-                    node = node.children.get(current);
-                    if (node == null) {
-                        break;
+                previous = current;
+                counts[++run] = 1;
+            }
+            int end = position + 1;
+            if (!node.minimumRuns.isEmpty() && (!requireWordEnd || !wordAt(text, end))) {
+                for (int[] required : node.minimumRuns) {
+                    boolean enough = required.length == run + 1;
+                    for (int index = 0; enough && index < required.length; index++) {
+                        enough = counts[index] >= required[index];
                     }
-                    previous = current;
-                    counts[++run] = 1;
-                }
-                int end = position + 1;
-                if (!node.minimumRuns.isEmpty() && !wordAt(text, end)) {
-                    for (int[] required : node.minimumRuns) {
-                        boolean enough = required.length == run + 1;
-                        for (int index = 0; enough && index < required.length; index++) {
-                            enough = counts[index] >= required[index];
-                        }
-                        if (enough && match.found(start, end)) {
+                    if (enough) {
+                        if (match.found(start, end)) {
                             return true;
                         }
+                        break;
                     }
                 }
             }

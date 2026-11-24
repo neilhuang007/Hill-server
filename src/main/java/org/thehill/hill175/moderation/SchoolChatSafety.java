@@ -11,6 +11,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Nameable;
+import org.bukkit.Tag;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.block.sign.Side;
@@ -19,6 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
@@ -120,6 +122,14 @@ public final class SchoolChatSafety implements Listener {
     public void onSign(SignChangeEvent event) {
         String text = event.lines().stream().map(SchoolChatSafety::plain).collect(Collectors.joining("\n"));
         if (rejectEdit(event.getPlayer(), text)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onSignPlace(BlockPlaceEvent event) {
+        if (Tag.ALL_SIGNS.isTagged(event.getBlockPlaced().getType())
+                && rejectItem(event.getPlayer(), event.getItemInHand())) {
             event.setCancelled(true);
         }
     }
