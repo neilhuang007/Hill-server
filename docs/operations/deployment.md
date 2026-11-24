@@ -433,6 +433,13 @@ restart and repeat verification. Rebuild an earlier source revision only with it
 matching program list and maps. Never downgrade converted world files without restoring their
 pre-conversion snapshot. Keep the other Minecraft service on port 25565 untouched.
 
+After an intentional personal campus reset, the operator can write the absolute
+path of its rollback archive to `/etc/hill175/retired-personal-campus-archive.txt`.
+Keep the pointer root-only and the archive intact, including `reset-manifest.json`
+and the preserved `world/dimensions/minecraft/` folders. Verification accepts
+missing old personal campuses only when their exact saved worlds are present in
+that archive. Other migrated dimensions must still be present in the live world.
+
 ## Network and Microsoft SSO
 
 Current demo game traffic uses TCP 25566. In Microsoft mode the installer installs

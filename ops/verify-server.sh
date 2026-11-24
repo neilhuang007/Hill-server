@@ -13,6 +13,7 @@ WORLDGEN_STATE_DIR="${RUNTIME_DIR}/assets/survival-worldgen"
 SURVIVAL_SEED_FILE="${WORLDGEN_STATE_DIR}/survival-seed.txt"
 PRIMARY_TRANSITION_MARKER="${WORLDGEN_STATE_DIR}/primary-trio-managed.env"
 LAST_TRANSITION_ARCHIVE_FILE="${WORLDGEN_STATE_DIR}/last-transition-archive.txt"
+RETIRED_PERSONAL_CAMPUS_ARCHIVE_FILE="/etc/hill175/retired-personal-campus-archive.txt"
 EXPECTED_HEADER=$'load_order\trole\tdimension\tproject_title\tslug\tproject_id\tversion_id\tversion_number\tgame_versions\tloader\tclient_side\tserver_side\tfilename\tsize\tsha512\tsha1\tdownload_url\tlicense_id\tlicense_url\tproject_url'
 source "${REPO_DIR}/ops/load-server-binaries.sh"
 load_server_binaries "${HILL175_SERVER_BINARIES:-${REPO_DIR}/server-assets/server-binaries.env}"
@@ -165,6 +166,7 @@ is_excluded_restored_dimension() {
 
 verify_archived_primary_world_state_restored() {
   local archive_dir
+  local retired_dir=''
   local source_root
   local destination_root
   local namespace_source
@@ -177,6 +179,11 @@ verify_archived_primary_world_state_restored() {
   archive_dir="$(tr -d '\r\n' < "${LAST_TRANSITION_ARCHIVE_FILE}")"
   [[ -n "${archive_dir}" ]] || fail "empty transition archive pointer: ${LAST_TRANSITION_ARCHIVE_FILE}"
   [[ -d "${archive_dir}" ]] || fail "missing transition archive directory: ${archive_dir}"
+  if [[ -f "${RETIRED_PERSONAL_CAMPUS_ARCHIVE_FILE}" ]]; then
+    retired_dir="$(tr -d '\r\n' < "${RETIRED_PERSONAL_CAMPUS_ARCHIVE_FILE}")"
+    [[ "${retired_dir}" = /* && -f "${retired_dir}/reset-manifest.json" ]] \
+      || fail "invalid retired personal campus archive: ${RETIRED_PERSONAL_CAMPUS_ARCHIVE_FILE}"
+  fi
 
   source_root="${archive_dir}/world/dimensions"
   destination_root="${RUNTIME_DIR}/world/dimensions"
@@ -191,7 +198,13 @@ verify_archived_primary_world_state_restored() {
         if [[ "${namespace}" == "minecraft" ]] && is_excluded_restored_dimension "${name}"; then
           continue
         fi
-        [[ -d "${destination_root}/${namespace}/${name}" ]] || fail "archived custom dimension was not restored into new primary world: ${namespace}:${name}"
+        [[ -d "${destination_root}/${namespace}/${name}" ]] && continue
+        if [[ -n "${retired_dir}" && "${namespace}" == minecraft && "${name}" =~ ^hill_people_[a-f0-9]{12}$ ]] \
+            && python3 "${REPO_DIR}/ops/check-campus-template.py" "${retired_dir}/world/dimensions/${namespace}/${name}"; then
+          echo "Retired personal campus preserved outside the live world: ${namespace}:${name}"
+          continue
+        fi
+        fail "archived custom dimension was not restored into new primary world: ${namespace}:${name}"
       done
     done
     shopt -u nullglob
