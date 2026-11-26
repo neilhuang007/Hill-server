@@ -16,6 +16,12 @@ packet-replay:
 incident-replay:
   enabled: true
 
+build-replay:
+  enabled: true
+  retention-days: 7
+  max-storage-mib: 1024
+  min-free-mib: 2048
+
 worlds:
   authentication: hill_auth
   # Designated map folders, relative to the server folder. Put a world save

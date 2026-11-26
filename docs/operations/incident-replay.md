@@ -1,15 +1,48 @@
 # Staff incident review and private visual recordings
 
-There are **two distinct layers**. Neither is a rollback system or a promise that
-literally every client action can be reconstructed.
+Choose the replay tool for the question you want to answer. Playback is separate from rollback.
 
 | Layer | What it provides | Enabled by default |
 | --- | --- | --- |
+| Hill Menu → Replays | In-game reconstruction of a player's building sessions, joined across logins | Yes |
 | Hill incident timeline, `/hillreplay` | Timestamped server events, sampled positions, staff-only text/particle playback | Yes |
 | Hill-hardened Flashback Server 1.2.4 | Private server-side visual player-POV archives for authenticated players; staff import into Flashback | No, explicitly opt in |
 
 The existing campus Restic/WorldEdit recovery tools remain the restoration layer.
 Do not restore the live world merely to view a recording.
+
+## Watch a build in Minecraft
+
+From the hub or a campus, open **Hill Menu → Replays** and choose the player. The picker lists
+saved recordings, including players who have signed out. You enter a private replay world with a
+named figure showing the player's recorded position and facing direction. Playback starts at 1× with Pause selected. You can fly around the
+build. When a recording changes worlds or the player moves far away, the view follows them.
+
+- Use the backward or forward **skip** item to jump 15 seconds. **Right-click** cycles through 5, 15, 30, 60 and 120 seconds; **left-click** jumps by the interval shown on the item.
+- Use the playback controls to run time forward, play in reverse, pause, or step the speed between 0.25× and 8×. The action bar shows your position in the stitched recording.
+- Use **Exit** to leave the replay and get your regular inventory back. Rewinding and leaving never edit the player's live world.
+
+Recordings begin after the feature is enabled. They join signed-in gameplay time, including visits to other players' campuses, without inserting time spent offline. Reopen an active player's recording to include newer activity. The sign-in world and private replay, recovery and blueprint preview worlds are excluded.
+
+The reconstruction uses local terrain around the player, sampled movement and recorded block changes, including placement, removal and supported WorldEdit operations. It is a build review, not a video: distant uncaptured terrain is empty, and chat, container contents, block-entity data, mobs, natural changes and arbitrary plugin edits are not reproduced.
+
+The server setting `build-replay.enabled` controls capture and the replay menu independently of the other tools. Up to three staff can load or watch at once. Long histories play in chronological parts so one prolific builder's entire archive does not have to fit in memory. The action bar shows the part number. The **Replay Info** clock moves to the next part on right-click or the previous one on left-click. Under write pressure capture can have gaps. Scenery is limited to 768 chunks per recorded segment.
+
+### Build replay storage
+
+Terrain and edit history share one budget under `plugins/Hill175/build-replays/`. Each new segment stores its terrain chunks together in `terrain-v1.pack`, so small snapshots share filesystem blocks. Each visited chunk is captured once. The recorder groups matching byte positions from block runs before compressing the chunk, so repeated lengths and block types compress together without dropping detail. Playback reads one chunk without unpacking the scene, and an interrupted final append leaves earlier chunks readable. Older `.bin.gz` snapshots play without conversion and expire under the same retention policy. Larger edit-history frames are also compressed when that saves space.
+
+| Setting in `config.yml` | Default | Effect |
+| --- | --- | --- |
+| `build-replay.max-storage-mib` | `1024` (1 GiB) | Combined limit for retained terrain and journal files across all players. Each file is charged in units of at least 4 KiB (larger if the filesystem reports a larger block size). |
+| `build-replay.min-free-mib` | `2048` (2 GiB) | Space that build recording must leave available on the archive volume. Increase this to leave more room for world saves and backups. |
+| `build-replay.retention-days` | `7` | Age limit for inactive recordings. Older recordings can expire sooner under storage pressure. |
+
+Both writers check space before writing. Near either limit, maintenance removes the oldest eligible segments and their terrain first. Open recordings, pending writes and profiles being watched are protected. If there is no safe way to make room, new capture pauses and logs the gap. Hitting the archive cap alone does not prevent playback. The recorder checks again each minute and begins new segments when space is available. Opening a temporary viewing world also requires at least 8 MiB above the configured reserve on the world volume. Age cleanup also runs at startup and hourly. Limits apply to the build archive, not live worlds, disposable viewing worlds, other replay tools, or separately retained backups.
+
+Displaced staff inventories have separate recovery records under `plugins/Hill175/build-replay-players/`. Leave them in place: a later login confirms that the restored inventory reached player storage. Keep both directories and temporary worlds private to the runtime account and authorized operators, outside the gallery and map exports.
+
+## Review an incident
 
 Open **Hill Menu**, choose **Staff**, then choose **Recent Incidents** or
 **Play Incident Timeline**. Enter a time window and optionally an exact player
@@ -17,7 +50,7 @@ name or game UUID. Each linked Minecraft account has its own replay attribution.
 
 ## Staff-only access
 
-`/hillreplay` requires **both** a signed-in canonical Hill `STAFF`, `MODERATOR` or `ADMINISTRATOR` role and
+The build replay picker, ongoing viewing and `/hillreplay` require **both** a signed-in canonical Hill `STAFF`, `MODERATOR` or `ADMINISTRATOR` role and
 `hill175.replay`. The normal role attachment grants the permission. Bukkit OP or
 an externally granted permission alone does **not** bypass the role check.
 The local server console is an authorized operator surface. See

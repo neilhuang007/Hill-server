@@ -24,6 +24,9 @@ template.
 
 [Staff roles and moderation](docs/operations/staff-roles.md) describes staff,
 moderator and administrator access, account bans, chat mutes and Microsoft names.
+Staff can open **Hill Menu → Replays**, choose a player (online or offline), and
+watch their recorded building sessions in a private world. The [replay guide](docs/operations/incident-replay.md)
+explains the hotbar controls, recording coverage and retention.
 
 **Status: logistics and controlled testing.** The plugin implements Microsoft
 school verification and shared participant ownership across Java/Floodgate accounts.

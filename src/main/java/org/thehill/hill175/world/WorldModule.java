@@ -378,8 +378,12 @@ public final class WorldModule {
     }
 
     public boolean isSafeCampusReturn(Entry entry, Location location) {
+        return location.getWorld() != null && entry.region().contains(location) && hasSafeBodySpace(location);
+    }
+
+    public boolean hasSafeBodySpace(Location location) {
         World world = location.getWorld();
-        if (world == null || !entry.region().contains(location) || !world.getWorldBorder().isInside(location)
+        if (world == null || !world.getWorldBorder().isInside(location)
                 || location.getY() < world.getMinHeight() || location.getY() + 1.8 > world.getMaxHeight()) return false;
         var body = new BoundingBox(location.getX() - 0.3, location.getY(), location.getZ() - 0.3,
                 location.getX() + 0.3, location.getY() + 1.8, location.getZ() + 0.3);

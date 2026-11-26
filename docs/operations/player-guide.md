@@ -18,6 +18,7 @@ choices as a form.
 | **Friends** (head) | Invite friends, answer invitations, manage guests, visit friends' campuses. |
 | **Reset My Campus** (TNT) | After an "Are you sure?" check, your campus matches the newest shared blueprint again. |
 | **Help** (book) | Rules, how to play, and the campus map download. |
+| **Replays** (clock, staff only) | Choose a player, including an offline player, to watch their recorded building sessions. |
 | **Staff** (spyglass) | **Review Builds**, **Edit Blueprint**, **Roll Back Blueprint** and other staff tools (staff only). |
 
 Every page has **Go Back** and **Close** in the bottom row and only shows items that
@@ -59,6 +60,8 @@ legacy competition workflow rather than personal-campus guest permissions.
 
 The deployed demo remains in development mode until Hill IT configures Microsoft
 sign-in. The server tells you which authentication flow to use.
+
+With build replays enabled, signed-in movement and block edits are recorded for staff review. Staff watch a separate reconstruction; they do not enter or change your live campus. Recordings normally expire after seven days.
 
 ## WorldEdit in your campus
 

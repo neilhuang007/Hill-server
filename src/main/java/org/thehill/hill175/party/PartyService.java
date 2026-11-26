@@ -971,6 +971,11 @@ public final class PartyService implements Listener, CommandExecutor, TabComplet
         });
     }
 
+    public Optional<String> campusOwnerLabel(World world) {
+        return campuses.values().stream().filter(campus -> campus.worldName().equals(world.getName()))
+                .map(Campus::ownerLabel).findFirst();
+    }
+
     private boolean mayEnterWorld(Player player, World destination) {
         if (destination == null) return true;
         try {

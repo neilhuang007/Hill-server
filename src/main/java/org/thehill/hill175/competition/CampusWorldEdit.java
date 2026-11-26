@@ -35,6 +35,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.thehill.hill175.blueprint.BlueprintService;
 import org.thehill.hill175.model.Entry;
+import org.thehill.hill175.replay.BuildRecorder;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -62,13 +63,19 @@ public final class CampusWorldEdit implements Listener, AutoCloseable {
     private final JavaPlugin plugin;
     private final CompetitionModule competition;
     private final BlueprintService blueprint;
+    private final BuildRecorder recorder;
     private final WorldEdit worldEdit = WorldEdit.getInstance();
     private EditScope active;
 
     public CampusWorldEdit(JavaPlugin plugin, CompetitionModule competition, BlueprintService blueprint) {
+        this(plugin, competition, blueprint, null);
+    }
+
+    public CampusWorldEdit(JavaPlugin plugin, CompetitionModule competition, BlueprintService blueprint, BuildRecorder recorder) {
         this.plugin = plugin;
         this.competition = competition;
         this.blueprint = blueprint;
+        this.recorder = recorder;
         worldEdit.getEventBus().register(this);
     }
 
@@ -225,7 +232,17 @@ public final class CampusWorldEdit implements Listener, AutoCloseable {
                 if (!blueprint.changed(scope.world, blockX, blockZ)) return false;
                 scope.journaled.add(chunk);
             }
-            return super.setBlock(position, state);
+            if (recorder == null) return super.setBlock(position, state);
+            if (!scope.preparedReplay) {
+                scope.replay = recorder.prepareWorldEdit(scope.player, scope.world);
+                scope.preparedReplay = true;
+            }
+            if (scope.replay == null) return super.setBlock(position, state);
+            String before = getBlock(position).getAsString();
+            scope.replay.beforeWrite(blockX, blockZ);
+            boolean changed = super.setBlock(position, state);
+            if (changed) scope.replay.successful(blockX, blockY, blockZ, before, state.toImmutableState().getAsString());
+            return changed;
         }
 
         @Override
@@ -242,6 +259,8 @@ public final class CampusWorldEdit implements Listener, AutoCloseable {
         private final Set<Long> journaled = new HashSet<>();
         private int writes;
         private boolean skipped;
+        private boolean preparedReplay;
+        private BuildRecorder.EditCapture replay;
 
         private EditScope(Player player, World world, Entry entry) {
             this.player = player;

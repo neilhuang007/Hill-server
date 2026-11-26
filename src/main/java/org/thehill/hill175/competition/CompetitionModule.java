@@ -100,6 +100,22 @@ public final class CompetitionModule {
         return true;
     }
 
+    private java.util.function.Predicate<Player> buildReplay = player -> false;
+    public void buildReplay(java.util.function.Predicate<Player> predicate) { buildReplay = Objects.requireNonNull(predicate); }
+    public boolean canStartBuildReplay(Player player) {
+        return isAuthenticated(player) && !worlds.isSurvivalWorld(player.getWorld()) && !isCameraPreviewing(player)
+                && !temporaryTools(player) && (blueprint == null || !blueprint.editor(player));
+    }
+    public String buildReplayWorldLabel(World world) {
+        if (world.equals(worlds.hubWorld())) return "Hill Hub";
+        if (worlds.isSharedCampus(world)) return "Shared Hill Campus";
+        if (blueprint != null && blueprint.isBlueprint(world)) return "Shared Blueprint";
+        if (parties != null) return parties.campusOwnerLabel(world).map(name -> name + "'s Campus").orElse(world.getName());
+        return world.getName();
+    }
+    public boolean safeBuildReplayReturn(Location location) { return worlds.hasSafeBodySpace(location); }
+    public Location buildReplayFallback(Player player) { return isAuthenticated(player) ? worlds.hubSpawn() : worlds.authenticationSpawn(); }
+    private boolean temporaryTools(Player player) { return buildReplay.test(player) || recoveryPreview.test(player) || sendingBuild.test(player); }
     private java.util.function.Predicate<Player> recoveryPreview = player -> false;
     public void recoveryPreview(java.util.function.Predicate<Player> predicate) { recoveryPreview = java.util.Objects.requireNonNull(predicate); }
     private java.util.function.Predicate<Player> sendingBuild = player -> false;
@@ -984,7 +1000,7 @@ public final class CompetitionModule {
 
     Optional<Entry> worldEditEntry(Player player) {
         if (parties == null || blueprint == null || !isAuthenticated(player) || isCameraPreviewing(player)
-                || recoveryPreview.test(player) || sendingBuild.test(player)) return Optional.empty();
+                || temporaryTools(player)) return Optional.empty();
         World world = player.getWorld();
         if (!blueprint.isCampus(world) || !blueprint.mayChange(player, world)) return Optional.empty();
         return parties.personalEntry(player).filter(entry -> entry.worldName().equals(world.getName())
@@ -992,7 +1008,7 @@ public final class CompetitionModule {
     }
 
     public boolean mayBuild(Player player, Location location) {
-        if (recoveryPreview.test(player) || sendingBuild.test(player)) return false;
+        if (temporaryTools(player)) return false;
         if (blueprint != null && blueprint.isBlueprint(location.getWorld())) return isAuthenticated(player) && blueprint.mayChange(player, location.getWorld());
         if (blueprint != null && blueprint.protects(location.getWorld())) return false;
         if (!isAuthenticated(player)) {
@@ -1010,7 +1026,7 @@ public final class CompetitionModule {
     }
 
     public void refreshMovementMode(Player player, Location location) {
-        if (recoveryPreview.test(player) || sendingBuild.test(player)) return;
+        if (temporaryTools(player)) return;
         if (!isAuthenticated(player)) {
             return;
         }
@@ -2012,7 +2028,7 @@ public final class CompetitionModule {
     }
 
     public void refreshPersonalCampusKit(Player player) {
-        if (parties == null || !isAuthenticated(player) || isCameraPreviewing(player)) return;
+        if (parties == null || !isAuthenticated(player) || isCameraPreviewing(player) || buildReplay.test(player)) return;
         String world = player.getWorld().getName();
         store.entries().stream()
                 .filter(entry -> isPersonalCampus(entry) && entry.worldName().equals(world))

@@ -12,8 +12,8 @@ import java.util.Base64;
 import java.util.Properties;
 
 /** Paper's native item codec preserves exact player contents across preview cancellation or a crash. */
-record RecoveryPlayerState(Properties values) {
-    static RecoveryPlayerState capture(Player player) {
+public record RecoveryPlayerState(Properties values) {
+    public static RecoveryPlayerState capture(Player player) {
         Properties p = new Properties();
         p.setProperty("inventory", Base64.getEncoder().encodeToString(ItemStack.serializeItemsAsBytes(player.getInventory().getContents())));
         p.setProperty("held", Integer.toString(player.getInventory().getHeldItemSlot()));
@@ -27,9 +27,9 @@ record RecoveryPlayerState(Properties values) {
         p.setProperty("yaw", Float.toString(l.getYaw())); p.setProperty("pitch", Float.toString(l.getPitch()));
         return new RecoveryPlayerState(p);
     }
-    void save(Path path) throws IOException { BackupFiles.writeProperties(path, values); }
-    static RecoveryPlayerState read(Path path) throws IOException { return new RecoveryPlayerState(BackupFiles.readProperties(path)); }
-    Location location() {
+    public void save(Path path) throws IOException { BackupFiles.writeProperties(path, values); }
+    public static RecoveryPlayerState read(Path path) throws IOException { return new RecoveryPlayerState(BackupFiles.readProperties(path)); }
+    public Location location() {
         var world = Bukkit.getWorld(values.getProperty("world"));
         if (world == null) throw new IllegalStateException("The return world is not available.");
         return new Location(world, Double.parseDouble(values.getProperty("x")), Double.parseDouble(values.getProperty("y")),
@@ -39,7 +39,7 @@ record RecoveryPlayerState(Properties values) {
         player.getInventory().setContents(ItemStack.deserializeItemsFromBytes(Base64.getDecoder().decode(values.getProperty("inventory"))));
         player.getInventory().setHeldItemSlot(Integer.parseInt(values.getProperty("held")));
     }
-    void apply(Player player) {
+    public void apply(Player player) {
         applyInventory(player);
         player.setGameMode(GameMode.valueOf(values.getProperty("mode")));
         player.setAllowFlight(Boolean.parseBoolean(values.getProperty("flight")));

@@ -10,7 +10,7 @@ and a real tenant pilot.
 | Role | Capabilities |
 | :--- | :--- |
 | Player | Build in personal/invited campuses, manage their own guests and propose blueprint changes |
-| Staff | Player tools, staff information, blueprint review and legacy campus recovery |
+| Staff | Player tools, staff information, build replays, blueprint review and legacy campus recovery |
 | Moderator | Staff tools, kick, timed or permanent mute and ban, unmute and unban |
 | Administrator | Moderator tools, blueprint recovery snapshots and assignment of lower roles |
 
@@ -21,7 +21,9 @@ blueprint, with Current/Proposed, navigation and Accept/Deny buttons. Administra
 receive `hill175.blueprint.backup` for manual blueprint-only recovery snapshots.
 Students cannot edit the accepted blueprint directly, and review permission does
 not bypass invitations into another student's personal draft. The chat filter
-and no-private-messaging policy also apply to staff.
+and no-private-messaging policy also apply to staff. **Hill Menu → Replays** uses
+`hill175.replay` and the signed-in staff role to show [recorded building sessions](incident-replay.md)
+in a separate world without admitting staff to the student's live campus.
 
 In the optional legacy shared-campus mode, staff, moderators and administrators
 receive `hill175.campus.rollback` and can use the existing Campus Map recovery

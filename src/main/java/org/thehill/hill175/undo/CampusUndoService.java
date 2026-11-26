@@ -54,6 +54,11 @@ public final class CampusUndoService implements Listener, AutoCloseable {
     private final Map<UUID, Job> jobs = new LinkedHashMap<>();
     private final Map<UUID, Long> unsupported = new HashMap<>();
     private final BukkitTask ticker;
+    @FunctionalInterface public interface AppliedChange {
+        void accept(Player actor, Block block, String before, String after);
+    }
+    private AppliedChange appliedChange;
+    public void appliedChanges(AppliedChange listener) { appliedChange = listener; }
     private boolean replaying;
     private boolean closed;
     private int ticks;
@@ -164,6 +169,12 @@ public final class CampusUndoService implements Listener, AutoCloseable {
             if (canRestore(job, batch) && restore(batch, true)) {
                 job.session.applied(batch);
                 job.restored += batch.edits().size();
+                if (appliedChange != null) {
+                    for (var edit : batch.edits()) {
+                        Location location = location(edit.point());
+                        if (location != null) appliedChange.accept(job.player, location.getBlock(), edit.after().blockData(), edit.before().blockData());
+                    }
+                }
             } else job.skipped += batch.edits().size();
         }
         if (!job.session.hasNext()) complete(job);

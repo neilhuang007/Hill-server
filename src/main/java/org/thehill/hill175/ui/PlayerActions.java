@@ -20,6 +20,8 @@ import org.thehill.hill175.blueprint.BlueprintRepository;
 import org.thehill.hill175.blueprint.BlueprintService;
 import org.thehill.hill175.competition.CompetitionModule;
 import org.thehill.hill175.model.Entry;
+import org.thehill.hill175.replay.BuildRecorder;
+import org.thehill.hill175.replay.BuildReplayViewer;
 import org.thehill.hill175.ui.IconMenu.Icon;
 
 import java.io.IOException;
@@ -49,6 +51,8 @@ public final class PlayerActions implements Listener, AutoCloseable {
     private final BedrockForms forms;
     private final IconMenu icons;
     private final BlueprintStaging staging;
+    private BuildRecorder recordings;
+    private BuildReplayViewer replayViewer;
     private static final Duration LIFETIME = Duration.ofMinutes(5);
 
     public PlayerActions(JavaPlugin plugin, CompetitionModule competition, MenuModule menus, BlueprintService blueprint, AccessControl access) {
@@ -65,6 +69,36 @@ public final class PlayerActions implements Listener, AutoCloseable {
     }
 
     public IconMenu icons() { return icons; }
+
+    public void buildReplays(BuildRecorder recordings, BuildReplayViewer viewer) {
+        this.recordings = recordings;
+        this.replayViewer = viewer;
+    }
+
+    private boolean canReviewBuilds(Player player) {
+        return replayViewer != null && access.mayReviewReplays(player) && player.hasPermission("hill175.replay");
+    }
+
+    private Icon replays(Player player) {
+        return new Icon(Material.CLOCK, "Replays", "Watch a player's building sessions, even after they sign out.", () -> recordings(player, 0))
+                .withClick("Click to choose a player!");
+    }
+
+    private void recordings(Player player, int requested) {
+        if (!canReviewBuilds(player)) return;
+        var profiles = recordings.profiles();
+        int pages = Math.max(1, Math.ceilDiv(profiles.size(), IconMenu.PAGE_SIZE));
+        int page = Math.clamp(requested, 0, pages - 1);
+        var screen = icons.screen(pages == 1 ? "Replays: Choose a Player" : "Replays (" + (page + 1) + "/" + pages + ")");
+        if (profiles.isEmpty()) screen.add(new Icon(Material.PAPER, "No recordings yet", "Players appear here after their first recorded session.", null).withClick(null));
+        for (var profile : profiles.subList(page * IconMenu.PAGE_SIZE, Math.min(profiles.size(), (page + 1) * IconMenu.PAGE_SIZE))) {
+            screen.add(new Icon(Material.PLAYER_HEAD, profile.name(), "Play recorded time. Offline gaps are skipped.",
+                    () -> { if (canReviewBuilds(player)) replayViewer.open(player, profile.id()); }).withClick("Click to watch!"));
+        }
+        screen.pages(page > 0 ? () -> recordings(player, page - 1) : null, page + 1 < pages ? () -> recordings(player, page + 1) : null);
+        back(screen, player);
+        screen.show(player);
+    }
 
     public void open(Player p) {
         if (!competition.isAuthenticated(p)) {
@@ -84,6 +118,7 @@ public final class PlayerActions implements Listener, AutoCloseable {
             screen.add(new Icon(Material.NETHER_STAR, "Competition Projects", "Your entries, camera and gallery.", () -> projects(p)));
         }
         screen.add(new Icon(Material.BOOK, "Help", "Rules, how to play and the campus map download.", () -> help(p)));
+        if (canReviewBuilds(p)) screen.add(replays(p));
         if (access.mayReviewReplays(p) || p.hasPermission("hill175.campus.rollback")) {
             screen.add(new Icon(Material.SPYGLASS, "Staff", "Review builds and other staff tools.", () -> staff(p)));
         }
@@ -211,6 +246,7 @@ public final class PlayerActions implements Listener, AutoCloseable {
 
     private void staff(Player p) {
         List<Icon> page = new ArrayList<>();
+        if (canReviewBuilds(p)) page.add(replays(p));
         var target = field("Player name or account ID", "", 100);
         var reason = field("Reason", "", 300);
         if (blueprint != null && blueprint.allowedActions(p).contains("review")) {

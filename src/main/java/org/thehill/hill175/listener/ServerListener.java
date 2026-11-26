@@ -712,7 +712,8 @@ public final class ServerListener implements Listener {
         if (worlds.isSurvivalWorld(event.getLocation().getWorld())) {
             return;
         }
-        if (event.getEntity() instanceof ArmorStand) {
+        if (event.getEntity() instanceof ArmorStand || event.getEntity() instanceof org.bukkit.entity.Mannequin
+                && event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM && event.getLocation().getWorld().getName().startsWith("hill_replay_")) {
             return;
         }
         boolean systemNpc = event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.CUSTOM

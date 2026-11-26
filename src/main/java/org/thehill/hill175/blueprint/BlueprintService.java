@@ -268,7 +268,7 @@ public final class BlueprintService implements AutoCloseable {
         if (world == null) return false;
         String name = world.getName();
         if (isBlueprint(world)) return editors.isEmpty() || committingDraft || failed || closing || !initialized || merging || saving;
-        if (name.equals("hill_blueprint") || name.startsWith("hill_bp_") || failedWorlds.contains(name)) return true;
+        if (name.equals("hill_blueprint") || name.startsWith("hill_bp_") || name.startsWith("hill_replay_") || failedWorlds.contains(name)) return true;
         UUID entryId = branchByWorld.get(name);
         if (entryId == null) return false;
         Branch branch = branches.get(entryId);

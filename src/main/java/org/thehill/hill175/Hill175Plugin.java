@@ -33,6 +33,8 @@ import org.thehill.hill175.ui.CampusWorkshop;
 import org.thehill.hill175.undo.CampusUndoService;
 import org.thehill.hill175.world.OfficialCampusMapRenderer;
 import org.thehill.hill175.download.StudentMapDownloadService;
+import org.thehill.hill175.replay.BuildRecorder;
+import org.thehill.hill175.replay.BuildReplayViewer;
 import org.thehill.hill175.replay.IncidentReplayService;
 import org.thehill.hill175.replay.PacketReplayService;
 import org.thehill.hill175.blueprint.BlueprintService;
@@ -60,6 +62,8 @@ public final class Hill175Plugin extends JavaPlugin {
     private CampusUndoService campusUndo;
     private AccessControl access;
     private StudentMapDownloadService studentDownloads;
+    private BuildRecorder buildRecorder;
+    private BuildReplayViewer buildReplayViewer;
     private IncidentReplayService incidentReplay;
     private PacketReplayService packetReplay;
     private BlueprintService blueprint;
@@ -178,8 +182,20 @@ public final class Hill175Plugin extends JavaPlugin {
         CommandModule commands = new CommandModule(competition, menus);
 
         PluginManager pluginManager = getServer().getPluginManager();
+        if (getConfig().getBoolean("build-replay.enabled", true)) {
+            String authWorld = worlds.authenticationSpawn().getWorld().getName();
+            buildRecorder = new BuildRecorder(this, competition, world -> !world.getName().equals(authWorld)
+                    && !world.getName().startsWith("hill_replay_") && !world.getName().startsWith("hill_recovery_")
+                    && !world.getName().startsWith("hill_bp_"));
+            buildRecorder.start();
+        }
+        buildReplayViewer = new BuildReplayViewer(this, competition,
+                player -> buildRecorder != null && access.mayReviewReplays(player) && player.hasPermission("hill175.replay"), buildRecorder);
+        buildReplayViewer.start();
+        competition.buildReplay(buildReplayViewer::contains);
+        if (buildRecorder != null) actions.buildReplays(buildRecorder, buildReplayViewer);
         if (blueprint != null && pluginManager.isPluginEnabled("WorldEdit")) {
-            campusWorldEdit = new CampusWorldEdit(this, competition, blueprint);
+            campusWorldEdit = new CampusWorldEdit(this, competition, blueprint, buildRecorder);
             serverListener.worldEditCommands(campusWorldEdit::handleCommand);
             pluginManager.registerEvents(campusWorldEdit, this);
         }
@@ -249,6 +265,7 @@ public final class Hill175Plugin extends JavaPlugin {
         campusUndo = new CampusUndoService(this,
                 (player, location) -> (campusBackups == null || !campusBackups.isRestoring()) && competition.mayBuild(player, location),
                 world -> worlds.isSharedCampus(world) || blueprint != null && blueprint.isCampus(world));
+        if (buildRecorder != null) campusUndo.appliedChanges(buildRecorder::changed);
         competition.campusUndo(player -> {
             if (campusBackups != null && campusBackups.isRestoring()) {
                 player.sendMessage("Undo is paused while a campus area is being restored.");
@@ -370,6 +387,8 @@ public final class Hill175Plugin extends JavaPlugin {
     @Override
     public void onDisable() {
         if (campusWorldEdit != null) campusWorldEdit.close();
+        if (buildReplayViewer != null) buildReplayViewer.close();
+        if (buildRecorder != null) buildRecorder.close();
         if (actions != null) actions.close();
         if (parties != null) parties.close();
         if (blueprint != null) blueprint.close();
